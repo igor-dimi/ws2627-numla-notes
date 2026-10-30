@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Session 1 — Vector Spaces and Linear Maps – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../references.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-251915186e5ac48a2a36efd978de2bb8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review</a></li><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#subspaces-and-span" id="toc-subspaces-and-span" class="nav-link active" data-scroll-target="#subspaces-and-span"><span class="header-section-number">2.1</span> Subspaces and span</a>
+  <ul class="collapse">
+  <li><a href="#subspaces" id="toc-subspaces" class="nav-link" data-scroll-target="#subspaces">Subspaces</a></li>
+  <li><a href="#span" id="toc-span" class="nav-link" data-scroll-target="#span">Span</a></li>
+  <li><a href="#worked-example-generators-and-constraints" id="toc-worked-example-generators-and-constraints" class="nav-link" data-scroll-target="#worked-example-generators-and-constraints">Worked example: generators and constraints</a></li>
+  </ul></li>
+  <li><a href="#independence-bases-and-dimension" id="toc-independence-bases-and-dimension" class="nav-link" data-scroll-target="#independence-bases-and-dimension"><span class="header-section-number">2.2</span> Independence, bases, and dimension</a>
+  <ul class="collapse">
+  <li><a href="#linear-independence" id="toc-linear-independence" class="nav-link" data-scroll-target="#linear-independence">Linear independence</a></li>
+  <li><a href="#bases-and-coordinates" id="toc-bases-and-coordinates" class="nav-link" data-scroll-target="#bases-and-coordinates">Bases and coordinates</a></li>
+  <li><a href="#dimension" id="toc-dimension" class="nav-link" data-scroll-target="#dimension">Dimension</a></li>
+  <li><a href="#a-basis-stored-as-a-matrix" id="toc-a-basis-stored-as-a-matrix" class="nav-link" data-scroll-target="#a-basis-stored-as-a-matrix">A basis stored as a matrix</a></li>
+  </ul></li>
+  <li><a href="#linear-maps-and-their-matrix-representations" id="toc-linear-maps-and-their-matrix-representations" class="nav-link" data-scroll-target="#linear-maps-and-their-matrix-representations"><span class="header-section-number">2.3</span> Linear maps and their matrix representations</a>
+  <ul class="collapse">
+  <li><a href="#constructing-the-representing-matrix" id="toc-constructing-the-representing-matrix" class="nav-link" data-scroll-target="#constructing-the-representing-matrix">Constructing the representing matrix</a></li>
+  <li><a href="#worked-example-differentiation" id="toc-worked-example-differentiation" class="nav-link" data-scroll-target="#worked-example-differentiation">Worked example: differentiation</a></li>
+  </ul></li>
+  <li><a href="#kernel-image-and-solvability" id="toc-kernel-image-and-solvability" class="nav-link" data-scroll-target="#kernel-image-and-solvability"><span class="header-section-number">2.4</span> Kernel, image, and solvability</a>
+  <ul class="collapse">
+  <li><a href="#solvability-and-all-solutions" id="toc-solvability-and-all-solutions" class="nav-link" data-scroll-target="#solvability-and-all-solutions">Solvability and all solutions</a></li>
+  <li><a href="#injectivity-and-surjectivity" id="toc-injectivity-and-surjectivity" class="nav-link" data-scroll-target="#injectivity-and-surjectivity">Injectivity and surjectivity</a></li>
+  <li><a href="#worked-example-a-complete-rectangular-system" id="toc-worked-example-a-complete-rectangular-system" class="nav-link" data-scroll-target="#worked-example-a-complete-rectangular-system">Worked example: a complete rectangular system</a></li>
+  <li><a href="#why-use-the-original-pivot-columns" id="toc-why-use-the-original-pivot-columns" class="nav-link" data-scroll-target="#why-use-the-original-pivot-columns">Why use the original pivot columns?</a></li>
+  </ul></li>
+  <li><a href="#the-ranknullity-theorem" id="toc-the-ranknullity-theorem" class="nav-link" data-scroll-target="#the-ranknullity-theorem"><span class="header-section-number">2.5</span> The rank–nullity theorem</a>
+  <ul class="collapse">
+  <li><a href="#proof-by-extending-a-kernel-basis" id="toc-proof-by-extending-a-kernel-basis" class="nav-link" data-scroll-target="#proof-by-extending-a-kernel-basis">Proof by extending a kernel basis</a></li>
+  <li><a href="#interpretation-and-consequences" id="toc-interpretation-and-consequences" class="nav-link" data-scroll-target="#interpretation-and-consequences">Interpretation and consequences</a></li>
+  </ul></li>
+  <li><a href="#change-of-basis" id="toc-change-of-basis" class="nav-link" data-scroll-target="#change-of-basis"><span class="header-section-number">2.6</span> Change of basis</a>
+  <ul class="collapse">
+  <li><a href="#changing-a-maps-matrix" id="toc-changing-a-maps-matrix" class="nav-link" data-scroll-target="#changing-a-maps-matrix">Changing a map’s matrix</a></li>
+  <li><a href="#worked-example-coordinates-reveal-a-simpler-action" id="toc-worked-example-coordinates-reveal-a-simpler-action" class="nav-link" data-scroll-target="#worked-example-coordinates-reveal-a-simpler-action">Worked example: coordinates reveal a simpler action</a></li>
+  </ul></li>
+  <li><a href="#connections-to-numerical-linear-algebra" id="toc-connections-to-numerical-linear-algebra" class="nav-link" data-scroll-target="#connections-to-numerical-linear-algebra"><span class="header-section-number">2.7</span> Connections to numerical linear algebra</a></li>
+  <li><a href="#independent-exercises" id="toc-independent-exercises" class="nav-link" data-scroll-target="#independent-exercises"><span class="header-section-number">2.8</span> Independent exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1-subspaces-and-coordinates" id="toc-exercise-1-subspaces-and-coordinates" class="nav-link" data-scroll-target="#exercise-1-subspaces-and-coordinates">Exercise 1 — Subspaces and coordinates</a></li>
+  <li><a href="#exercise-2-a-rectangular-system" id="toc-exercise-2-a-rectangular-system" class="nav-link" data-scroll-target="#exercise-2-a-rectangular-system">Exercise 2 — A rectangular system</a></li>
+  <li><a href="#exercise-3-changing-coordinates" id="toc-exercise-3-changing-coordinates" class="nav-link" data-scroll-target="#exercise-3-changing-coordinates">Exercise 3 — Changing coordinates</a></li>
+  <li><a href="#exercise-4-losing-information-in-two-stages" id="toc-exercise-4-losing-information-in-two-stages" class="nav-link" data-scroll-target="#exercise-4-losing-information-in-two-stages">Exercise 4 — Losing information in two stages</a></li>
+  <li><a href="#exercise-5-a-map-on-polynomials" id="toc-exercise-5-a-map-on-polynomials" class="nav-link" data-scroll-target="#exercise-5-a-map-on-polynomials">Exercise 5 — A map on polynomials</a></li>
+  </ul></li>
+  <li><a href="#solutions-consult-after-attempting-the-exercises" id="toc-solutions-consult-after-attempting-the-exercises" class="nav-link" data-scroll-target="#solutions-consult-after-attempting-the-exercises"><span class="header-section-number">2.9</span> Solutions — consult after attempting the exercises</a>
+  <ul class="collapse">
+  <li><a href="#solution-1" id="toc-solution-1" class="nav-link" data-scroll-target="#solution-1">Solution 1</a></li>
+  <li><a href="#solution-2" id="toc-solution-2" class="nav-link" data-scroll-target="#solution-2">Solution 2</a></li>
+  <li><a href="#solution-3" id="toc-solution-3" class="nav-link" data-scroll-target="#solution-3">Solution 3</a></li>
+  <li><a href="#solution-4" id="toc-solution-4" class="nav-link" data-scroll-target="#solution-4">Solution 4</a></li>
+  <li><a href="#solution-5" id="toc-solution-5" class="nav-link" data-scroll-target="#solution-5">Solution 5</a></li>
+  </ul></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">2.10</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review</a></li><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The central idea of this session is that <strong>a linear map acts on vectors, while a matrix describes that action in chosen coordinates</strong>. Bases connect these two viewpoints. Kernel, image, rank, and nullity describe what the map loses and what it can produce.</p>
+<p>Allow approximately <strong>35–40 minutes for the notes and worked examples</strong>, followed by <strong>20–25 minutes for the exercises</strong>. The aim is to reconstruct the reasoning, not simply read the formulas.</p>
+<p>Throughout, vector spaces are finite-dimensional over <span class="math inline">\(\mathbb F=\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>, and coordinate vectors are columns.</p>
+<section id="subspaces-and-span" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="subspaces-and-span"><span class="header-section-number">2.1</span> Subspaces and span</h2>
+<p>A <strong>vector space</strong> is a set whose elements can be added and multiplied by scalars, obeying the usual distributive and associative laws, with a zero vector and additive inverses. Examples include <span class="math inline">\(\mathbb R^n\)</span>, <span class="math inline">\(\mathbb C^n\)</span>, and the space <span class="math display">\[
+\mathcal P_2=\{a+bt+ct^2:a,b,c\in\mathbb F\}
+\]</span> of polynomials of degree at most two.</p>
+<p>The important point is that a “vector” need not be an arrow: it can be a polynomial, a function, or a matrix.</p>
+<section id="subspaces" class="level3">
+<h3 class="anchored" data-anchor-id="subspaces">Subspaces</h3>
+<p>A subset <span class="math inline">\(U\subseteq V\)</span> is a <strong>subspace</strong> if it is itself a vector space under the operations inherited from <span class="math inline">\(V\)</span>.</p>
+<p>To check this, it suffices to verify <span class="math display">\[
+0\in U,
+\qquad
+\alpha u+\beta v\in U
+\quad\text{for all }u,v\in U,\ \alpha,\beta\in\mathbb F.
+\]</span></p>
+<p>Thus a subspace is closed under linear combinations. Over <span class="math inline">\(\mathbb R\)</span>, lines and planes through the origin are familiar examples.</p>
+</section>
+<section id="span" class="level3">
+<h3 class="anchored" data-anchor-id="span">Span</h3>
+<p>The <strong>span</strong> of vectors <span class="math inline">\(v_1,\ldots,v_k\)</span> is <span class="math display">\[
+\operatorname{span}\{v_1,\ldots,v_k\}
+=
+\left\{\sum_{j=1}^k c_jv_j:c_j\in\mathbb F\right\}.
+\]</span></p>
+<p>It consists of all vectors obtainable by combining the given vectors. It is the smallest subspace containing them: any subspace containing the generators must also contain all their linear combinations.</p>
+</section>
+<section id="worked-example-generators-and-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-generators-and-constraints">Worked example: generators and constraints</h3>
+<p>Let <span class="math display">\[
+u=\begin{pmatrix}1\\0\\1\end{pmatrix},
+\qquad
+v=\begin{pmatrix}0\\1\\1\end{pmatrix},
+\qquad
+w=\begin{pmatrix}1\\1\\2\end{pmatrix}.
+\]</span> Because <span class="math inline">\(w=u+v\)</span>, <span class="math display">\[
+\operatorname{span}\{u,v,w\}=\operatorname{span}\{u,v\}.
+\]</span></p>
+<p>Moreover, <span class="math display">\[
+\alpha u+\beta v
+=
+\begin{pmatrix}\alpha\\\beta\\\alpha+\beta\end{pmatrix},
+\]</span> so this span is exactly <span class="math display">\[
+U=\left\{x\in\mathbb R^3:x_3=x_1+x_2\right\}.
+\]</span></p>
+<p>We have described the same plane in two ways:</p>
+<ul>
+<li><strong>By generators:</strong> <span class="math inline">\(U=\operatorname{span}\{u,v\}\)</span>.</li>
+<li><strong>By a homogeneous constraint:</strong> <span class="math inline">\(x_3-x_1-x_2=0\)</span>.</li>
+</ul>
+<p>Replacing the constraint by <span class="math inline">\(x_3-x_1-x_2=1\)</span> gives a translated plane. It is not a subspace because it does not contain zero.</p>
+</section>
+</section>
+<section id="independence-bases-and-dimension" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="independence-bases-and-dimension"><span class="header-section-number">2.2</span> Independence, bases, and dimension</h2>
+<p>Span answers: <strong>Which vectors can we represent?</strong></p>
+<p>Linear independence answers: <strong>Is the representation unique?</strong></p>
+<section id="linear-independence" class="level3">
+<h3 class="anchored" data-anchor-id="linear-independence">Linear independence</h3>
+<p>A family <span class="math inline">\(v_1,\ldots,v_k\)</span> is <strong>linearly independent</strong> if <span class="math display">\[
+\sum_{j=1}^k c_jv_j=0
+\quad\Longrightarrow\quad
+c_1=\cdots=c_k=0.
+\]</span></p>
+<p>Otherwise it is <strong>linearly dependent</strong>.</p>
+<p>A nontrivial dependence relation allows at least one vector to be expressed using the others. Indeed, if <span class="math inline">\(c_\ell\ne0\)</span>, then <span class="math display">\[
+v_\ell=-\sum_{j\ne\ell}\frac{c_j}{c_\ell}v_j.
+\]</span></p>
+<p>Thus dependence means redundancy. It does not require two of the vectors to be parallel.</p>
+</section>
+<section id="bases-and-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="bases-and-coordinates">Bases and coordinates</h3>
+<p>An ordered family <span class="math display">\[
+\mathcal B=(b_1,\ldots,b_n)
+\]</span> is a <strong>basis</strong> of <span class="math inline">\(V\)</span> if it is independent and spans <span class="math inline">\(V\)</span>.</p>
+<p>Every <span class="math inline">\(x\in V\)</span> then has a unique representation <span class="math display">\[
+x=\xi_1b_1+\cdots+\xi_nb_n.
+\]</span> Its coordinate vector relative to <span class="math inline">\(\mathcal B\)</span> is <span class="math display">\[
+[x]_{\mathcal B}
+=
+\begin{pmatrix}\xi_1\\\vdots\\\xi_n\end{pmatrix}.
+\]</span></p>
+<p>Why unique? If two coefficient lists represent <span class="math inline">\(x\)</span>, subtracting the representations gives a zero linear combination of the basis vectors. Independence forces the corresponding coefficients to agree.</p>
+<p>Consequently:</p>
+<blockquote class="blockquote">
+<p><strong>Spanning guarantees existence of coordinates; independence guarantees uniqueness.</strong></p>
+</blockquote>
+<p>In the preceding example, <span class="math inline">\(u,v\)</span> are independent because <span class="math display">\[
+\alpha u+\beta v=0
+\]</span> forces <span class="math inline">\(\alpha=\beta=0\)</span> from the first two components. Hence <span class="math inline">\((u,v)\)</span> is a basis of <span class="math inline">\(U\)</span>, and <span class="math display">\[
+\left[
+\begin{pmatrix}a\\b\\a+b\end{pmatrix}
+\right]_{(u,v)}
+=
+\begin{pmatrix}a\\b\end{pmatrix}.
+\]</span></p>
+<p>The vector has three ambient components but only two coordinates within the plane.</p>
+</section>
+<section id="dimension" class="level3">
+<h3 class="anchored" data-anchor-id="dimension">Dimension</h3>
+<p><strong>Theorem.</strong> Every basis of a finite-dimensional vector space has the same number of elements. This number is its <strong>dimension</strong>.</p>
+<p>Two related facts are particularly useful:</p>
+<ol type="1">
+<li>Every independent family can be extended to a basis.</li>
+<li>Every finite spanning family contains a basis.</li>
+</ol>
+<p>For the first, repeatedly append a vector outside the current span. For the second, repeatedly remove a redundant vector. The underlying counting principle is that an independent family cannot contain more vectors than a spanning family; applying this to two bases in both directions proves that their lengths agree.</p>
+<p>Therefore, in a space of dimension <span class="math inline">\(n\)</span>:</p>
+<ul>
+<li>Any <span class="math inline">\(n\)</span> independent vectors form a basis.</li>
+<li>Any <span class="math inline">\(n\)</span> spanning vectors form a basis.</li>
+<li>More than <span class="math inline">\(n\)</span> vectors are dependent.</li>
+<li>Fewer than <span class="math inline">\(n\)</span> vectors cannot span.</li>
+</ul>
+<p>The zero space <span class="math inline">\(\{0\}\)</span> has dimension zero and the empty basis. The family consisting of the zero vector is not independent.</p>
+</section>
+<section id="a-basis-stored-as-a-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="a-basis-stored-as-a-matrix">A basis stored as a matrix</h3>
+<p>For vectors <span class="math inline">\(b_j\in\mathbb F^m\)</span>, write <span class="math display">\[
+B=\begin{pmatrix}b_1&amp;\cdots&amp;b_k\end{pmatrix}
+\in\mathbb F^{m\times k}.
+\]</span> Then <span class="math display">\[
+Bc=\sum_{j=1}^k c_jb_j.
+\]</span></p>
+<p>Thus matrix–vector multiplication constructs a vector from its coefficients.</p>
+<p>If the columns are independent, they form a basis of their column span, and <span class="math display">\[
+x=B[x]_{\mathcal B}
+\qquad(x\in\operatorname{span}\{b_1,\ldots,b_k\}).
+\]</span></p>
+<p>A basis matrix for a subspace can be rectangular. It need not possess a two-sided inverse.</p>
+</section>
+</section>
+<section id="linear-maps-and-their-matrix-representations" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="linear-maps-and-their-matrix-representations"><span class="header-section-number">2.3</span> Linear maps and their matrix representations</h2>
+<p>A map <span class="math inline">\(T:V\to W\)</span> is <strong>linear</strong> if <span class="math display">\[
+T(\alpha x+\beta y)=\alpha T(x)+\beta T(y).
+\]</span> In particular, <span class="math inline">\(T(0)=0\)</span>.</p>
+<p>Linearity implies that a map is completely determined by its values on a basis: <span class="math display">\[
+T\left(\sum_j\xi_jb_j\right)
+=
+\sum_j\xi_jT(b_j).
+\]</span></p>
+<section id="constructing-the-representing-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="constructing-the-representing-matrix">Constructing the representing matrix</h3>
+<p>Choose bases <span class="math display">\[
+\mathcal B=(b_1,\ldots,b_n)\quad\text{of }V,
+\qquad
+\mathcal C=(c_1,\ldots,c_m)\quad\text{of }W.
+\]</span></p>
+<p>The matrix <span class="math display">\[
+A=[T]_{\mathcal C\leftarrow\mathcal B}
+\]</span> is defined by taking the coordinates of <span class="math inline">\(T(b_j)\)</span> as its <span class="math inline">\(j\)</span>-th column: <span class="math display">\[
+A=
+\begin{pmatrix}
+[T(b_1)]_{\mathcal C}&amp;\cdots&amp;[T(b_n)]_{\mathcal C}
+\end{pmatrix}.
+\]</span></p>
+<p>Then <span class="math display">\[
+\boxed{[T(x)]_{\mathcal C}=A[x]_{\mathcal B}.}
+\]</span></p>
+<p>This is the fundamental relationship:</p>
+<blockquote class="blockquote">
+<p><strong>The map takes vectors to vectors; its matrix takes input coordinates to output coordinates.</strong></p>
+</blockquote>
+<p>In standard bases, <span class="math inline">\(Ae_j\)</span> is simply the <span class="math inline">\(j\)</span>-th column of <span class="math inline">\(A\)</span>.</p>
+</section>
+<section id="worked-example-differentiation" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-differentiation">Worked example: differentiation</h3>
+<p>Consider <span class="math display">\[
+D:\mathcal P_2\longrightarrow\mathcal P_1,
+\qquad D(p)=p'.
+\]</span> Choose <span class="math display">\[
+\mathcal B=(1,t,t^2),
+\qquad
+\mathcal C=(1,t).
+\]</span> Since <span class="math display">\[
+D(1)=0,\qquad D(t)=1,\qquad D(t^2)=2t,
+\]</span> we obtain <span class="math display">\[
+[D]_{\mathcal C\leftarrow\mathcal B}
+=
+\begin{pmatrix}
+0&amp;1&amp;0\\
+0&amp;0&amp;2
+\end{pmatrix}.
+\]</span></p>
+<p>Indeed, <span class="math display">\[
+\begin{pmatrix}
+0&amp;1&amp;0\\
+0&amp;0&amp;2
+\end{pmatrix}
+\begin{pmatrix}a\\b\\c\end{pmatrix}
+=
+\begin{pmatrix}b\\2c\end{pmatrix},
+\]</span> which represents the derivative of <span class="math inline">\(a+bt+ct^2\)</span>.</p>
+<p>The matrix has three columns because the domain has dimension three, and two rows because the codomain has dimension two.</p>
+</section>
+</section>
+<section id="kernel-image-and-solvability" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="kernel-image-and-solvability"><span class="header-section-number">2.4</span> Kernel, image, and solvability</h2>
+<p>For a linear map <span class="math inline">\(T:V\to W\)</span>, define <span class="math display">\[
+\ker T=\{x\in V:T(x)=0\},
+\]</span> and <span class="math display">\[
+\operatorname{im}T
+=
+\operatorname{ran}T
+=
+\{T(x):x\in V\}.
+\]</span></p>
+<p>The <strong>kernel</strong> consists of input directions erased by the map. The <strong>image</strong>, also called the <strong>range</strong>, consists of attainable outputs.</p>
+<p>Both are subspaces. For example, if <span class="math inline">\(u,v\in\ker T\)</span>, then <span class="math display">\[
+T(\alpha u+\beta v)=\alpha T(u)+\beta T(v)=0.
+\]</span> For the image, <span class="math display">\[
+\alpha T(u)+\beta T(v)=T(\alpha u+\beta v)
+\]</span> is again an attainable output.</p>
+<p>Define <span class="math display">\[
+\operatorname{nullity}T=\dim\ker T,
+\qquad
+\operatorname{rank}T=\dim\operatorname{im}T.
+\]</span></p>
+<p>For <span class="math inline">\(A\in\mathbb F^{m\times n}\)</span>, regarded as the map <span class="math inline">\(x\mapsto Ax\)</span>, <span class="math display">\[
+\ker A\subseteq\mathbb F^n,
+\qquad
+\operatorname{im}A\subseteq\mathbb F^m.
+\]</span> Since <span class="math inline">\(Ax=\sum_jx_ja_j\)</span>, <span class="math display">\[
+\operatorname{im}A=\operatorname{span}\{a_1,\ldots,a_n\}.
+\]</span></p>
+<section id="solvability-and-all-solutions" class="level3">
+<h3 class="anchored" data-anchor-id="solvability-and-all-solutions">Solvability and all solutions</h3>
+<p>The equation <span class="math inline">\(T(x)=b\)</span> is solvable exactly when <span class="math display">\[
+b\in\operatorname{im}T.
+\]</span></p>
+<p>If <span class="math inline">\(x_p\)</span> is one solution, then <span class="math display">\[
+\boxed{\{x:T(x)=b\}=x_p+\ker T.}
+\]</span></p>
+<p><strong>Proof.</strong> <span class="math display">\[
+T(x)=b=T(x_p)
+\iff T(x-x_p)=0
+\iff x-x_p\in\ker T.
+\]</span></p>
+<p>The kernel therefore describes the ambiguity in reconstructing an input from an output. A nonempty solution set is a translate of the kernel; for <span class="math inline">\(b\ne0\)</span>, it is not a subspace.</p>
+</section>
+<section id="injectivity-and-surjectivity" class="level3">
+<h3 class="anchored" data-anchor-id="injectivity-and-surjectivity">Injectivity and surjectivity</h3>
+<p>A map is <strong>injective</strong> if equal outputs imply equal inputs. Because <span class="math display">\[
+T(x)=T(y)\iff x-y\in\ker T,
+\]</span> we have <span class="math display">\[
+\boxed{T\text{ injective}\iff\ker T=\{0\}.}
+\]</span></p>
+<p>A map is <strong>surjective</strong> if every vector in its codomain is attained: <span class="math display">\[
+\boxed{T\text{ surjective}\iff\operatorname{im}T=W.}
+\]</span></p>
+<p>For differentiation, <span class="math display">\[
+\ker D=\operatorname{span}\{1\},
+\qquad
+\operatorname{im}D=\mathcal P_1.
+\]</span> Thus <span class="math inline">\(D:\mathcal P_2\to\mathcal P_1\)</span> is surjective but not injective: differentiation loses the constant term.</p>
+<p>For instance, <span class="math display">\[
+p'=2+6t
+\quad\Longleftrightarrow\quad
+p(t)=2t+3t^2+c.
+\]</span></p>
+</section>
+<section id="worked-example-a-complete-rectangular-system" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-a-complete-rectangular-system">Worked example: a complete rectangular system</h3>
+<p>Consider <span class="math display">\[
+A=
+\begin{pmatrix}
+1&amp;2&amp;0&amp;1\\
+0&amp;0&amp;1&amp;1\\
+1&amp;2&amp;1&amp;2
+\end{pmatrix},
+\qquad A:\mathbb R^4\to\mathbb R^3.
+\]</span></p>
+<p>Subtracting rows 1 and 2 from row 3 gives <span class="math display">\[
+R=
+\begin{pmatrix}
+1&amp;2&amp;0&amp;1\\
+0&amp;0&amp;1&amp;1\\
+0&amp;0&amp;0&amp;0
+\end{pmatrix}.
+\]</span></p>
+<p>The pivots lie in columns 1 and 3. Variables <span class="math inline">\(x_2,x_4\)</span> are free.</p>
+<p><strong>Kernel.</strong> Set <span class="math inline">\(x_2=s\)</span>, <span class="math inline">\(x_4=t\)</span>. The homogeneous equations give <span class="math display">\[
+x_1=-2s-t,\qquad x_3=-t.
+\]</span> Hence <span class="math display">\[
+x=
+s\begin{pmatrix}-2\\1\\0\\0\end{pmatrix}
++
+t\begin{pmatrix}-1\\0\\-1\\1\end{pmatrix}.
+\]</span> These vectors span the kernel and are independent: their second and fourth components recover <span class="math inline">\(s,t\)</span>. Therefore <span class="math display">\[
+\ker A=
+\operatorname{span}\left\{
+\begin{pmatrix}-2\\1\\0\\0\end{pmatrix},
+\begin{pmatrix}-1\\0\\-1\\1\end{pmatrix}
+\right\},
+\qquad \operatorname{nullity}A=2.
+\]</span></p>
+<p><strong>Image.</strong> Take the pivot columns of the <strong>original matrix</strong>: <span class="math display">\[
+a_1=\begin{pmatrix}1\\0\\1\end{pmatrix},
+\qquad
+a_3=\begin{pmatrix}0\\1\\1\end{pmatrix}.
+\]</span> They are independent, and <span class="math display">\[
+a_2=2a_1,\qquad a_4=a_1+a_3.
+\]</span> Thus <span class="math display">\[
+\operatorname{im}A=\operatorname{span}\{a_1,a_3\}
+=
+\left\{b\in\mathbb R^3:b_3=b_1+b_2\right\},
+\qquad \operatorname{rank}A=2.
+\]</span></p>
+<p><strong>Solvability.</strong> Applying the row operation to the augmented matrix gives <span class="math display">\[
+\left(
+\begin{array}{cccc|c}
+1&amp;2&amp;0&amp;1&amp;b_1\\
+0&amp;0&amp;1&amp;1&amp;b_2\\
+0&amp;0&amp;0&amp;0&amp;b_3-b_1-b_2
+\end{array}
+\right).
+\]</span> Therefore, <span class="math display">\[
+Ax=b\text{ is solvable}\iff b_3=b_1+b_2.
+\]</span></p>
+<p>For <span class="math inline">\(b=(3,2,5)^T\)</span>, one solution is <span class="math inline">\(x_p=(3,0,2,0)^T\)</span>, and every solution is <span class="math display">\[
+x=
+\begin{pmatrix}3\\0\\2\\0\end{pmatrix}
++s\begin{pmatrix}-2\\1\\0\\0\end{pmatrix}
++t\begin{pmatrix}-1\\0\\-1\\1\end{pmatrix}.
+\]</span> For <span class="math inline">\(b=(3,2,6)^T\)</span>, no solution exists.</p>
+</section>
+<section id="why-use-the-original-pivot-columns" class="level3">
+<h3 class="anchored" data-anchor-id="why-use-the-original-pivot-columns">Why use the original pivot columns?</h3>
+<p>Row operations produce <span class="math inline">\(R=EA\)</span>, where <span class="math inline">\(E\)</span> is invertible. Consequently, <span class="math display">\[
+Rx=0\iff Ax=0,
+\]</span> so the kernel is unchanged.</p>
+<p>They also preserve relations among columns: <span class="math display">\[
+\sum_jc_jEa_j=0
+\iff
+\sum_jc_ja_j=0.
+\]</span> Thus pivot-column indices identify independent spanning columns in the original matrix.</p>
+<p>However, <span class="math display">\[
+\operatorname{im}R=E(\operatorname{im}A),
+\]</span> which is generally a different subspace. Here <span class="math inline">\(\operatorname{im}R\)</span> is the plane <span class="math inline">\(b_3=0\)</span>, while <span class="math inline">\(\operatorname{im}A\)</span> is the plane <span class="math inline">\(b_3=b_1+b_2\)</span>.</p>
+</section>
+</section>
+<section id="the-ranknullity-theorem" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="the-ranknullity-theorem"><span class="header-section-number">2.5</span> The rank–nullity theorem</h2>
+<p><strong>Theorem.</strong> For a linear map <span class="math inline">\(T:V\to W\)</span>, <span class="math display">\[
+\boxed{\dim\ker T+\dim\operatorname{im}T=\dim V.}
+\]</span></p>
+<section id="proof-by-extending-a-kernel-basis" class="level3">
+<h3 class="anchored" data-anchor-id="proof-by-extending-a-kernel-basis">Proof by extending a kernel basis</h3>
+<p>Let <span class="math inline">\(k_1,\ldots,k_q\)</span> be a basis of <span class="math inline">\(\ker T\)</span>. Extend it to a basis of <span class="math inline">\(V\)</span>: <span class="math display">\[
+(k_1,\ldots,k_q,v_1,\ldots,v_{n-q}),
+\qquad n=\dim V.
+\]</span></p>
+<p>We show that <span class="math display">\[
+T(v_1),\ldots,T(v_{n-q})
+\]</span> form a basis of the image.</p>
+<p><strong>They span the image.</strong> Every input can be expanded in the extended basis. Applying <span class="math inline">\(T\)</span> annihilates all kernel terms, leaving a combination of the <span class="math inline">\(T(v_j)\)</span>.</p>
+<p><strong>They are independent.</strong> Suppose <span class="math display">\[
+\sum_j\alpha_jT(v_j)=0.
+\]</span> Then <span class="math display">\[
+\sum_j\alpha_jv_j\in\ker T,
+\]</span> so it equals some <span class="math inline">\(\sum_i\beta_i k_i\)</span>. Therefore <span class="math display">\[
+\sum_j\alpha_jv_j-\sum_i\beta_i k_i=0.
+\]</span> Independence of the extended basis forces every coefficient to vanish.</p>
+<p>Hence <span class="math display">\[
+\dim\operatorname{im}T=n-q,
+\]</span> which proves the theorem.</p>
+</section>
+<section id="interpretation-and-consequences" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation-and-consequences">Interpretation and consequences</h3>
+<p>There are <span class="math inline">\(q\)</span> independent input directions that the map erases. The remaining <span class="math inline">\(n-q\)</span> basis directions produce independent outputs.</p>
+<p>This is a dimension statement. It does not say that kernel and image belong to the same ambient space or are orthogonal.</p>
+<p>For the preceding <span class="math inline">\(3\times4\)</span> example, <span class="math display">\[
+\operatorname{rank}A+\operatorname{nullity}A=2+2=4,
+\]</span> the number of <strong>columns</strong>, which is the domain dimension.</p>
+<p>For <span class="math inline">\(A\in\mathbb F^{m\times n}\)</span>, with rank <span class="math inline">\(r\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>Equivalent condition</th>
+<th>Meaning for <span class="math inline">\(Ax=b\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Injective</td>
+<td><span class="math inline">\(r=n\)</span>, full column rank</td>
+<td>At most one solution for each <span class="math inline">\(b\)</span></td>
+</tr>
+<tr class="even">
+<td>Surjective onto <span class="math inline">\(\mathbb F^m\)</span></td>
+<td><span class="math inline">\(r=m\)</span>, full row rank</td>
+<td>At least one solution for every <span class="math inline">\(b\)</span></td>
+</tr>
+<tr class="odd">
+<td>Bijective</td>
+<td><span class="math inline">\(m=n=r\)</span></td>
+<td>Exactly one solution for every <span class="math inline">\(b\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Since <span class="math inline">\(r\le\min(m,n)\)</span>, a wide matrix cannot be injective, and a tall matrix cannot be surjective onto its full codomain.</p>
+<p>For a square matrix, <span class="math display">\[
+\text{injective}\iff\text{surjective}\iff\text{invertible}.
+\]</span></p>
+<p>A consistent system has <span class="math inline">\(n-r\)</span> free parameters.</p>
+</section>
+</section>
+<section id="change-of-basis" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="change-of-basis"><span class="header-section-number">2.6</span> Change of basis</h2>
+<p>The vector stays the same when we change its basis; its coordinate vector changes.</p>
+<p>Let <span class="math inline">\(\mathcal B\)</span> and <span class="math inline">\(\widetilde{\mathcal B}\)</span> be bases of the same space. Define <span class="math display">\[
+S=
+\begin{pmatrix}
+[\widetilde b_1]_{\mathcal B}&amp;\cdots&amp;
+[\widetilde b_n]_{\mathcal B}
+\end{pmatrix}.
+\]</span> Expanding a vector in the new basis and then expressing those basis vectors in the old basis gives <span class="math display">\[
+\boxed{[x]_{\mathcal B}=S[x]_{\widetilde{\mathcal B}}.}
+\]</span></p>
+<p>Thus:</p>
+<ul>
+<li><span class="math inline">\(S\)</span> converts <strong>new coordinates to old coordinates</strong>.</li>
+<li><span class="math inline">\(S^{-1}\)</span> converts <strong>old coordinates to new coordinates</strong>.</li>
+</ul>
+<p>Its columns are new basis vectors expressed in old coordinates.</p>
+<section id="changing-a-maps-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="changing-a-maps-matrix">Changing a map’s matrix</h3>
+<p>Suppose <span class="math display">\[
+A=[T]_{\mathcal C\leftarrow\mathcal B},
+\]</span> and the new input and output bases satisfy <span class="math display">\[
+[x]_{\mathcal B}=S[x]_{\widetilde{\mathcal B}},
+\qquad
+[y]_{\mathcal C}=P[y]_{\widetilde{\mathcal C}}.
+\]</span> Then <span class="math display">\[
+[T(x)]_{\widetilde{\mathcal C}}
+=
+P^{-1}[T(x)]_{\mathcal C}
+=
+P^{-1}AS[x]_{\widetilde{\mathcal B}}.
+\]</span> Therefore, <span class="math display">\[
+\boxed{\widetilde A=P^{-1}AS.}
+\]</span></p>
+<p>Read the product from right to left:</p>
+<ol type="1">
+<li>Convert input coordinates to the old basis.</li>
+<li>Apply the old representing matrix.</li>
+<li>Convert output coordinates to the new basis.</li>
+</ol>
+<p>For an endomorphism <span class="math inline">\(T:V\to V\)</span>, if we use the same basis change for input and output, <span class="math inline">\(P=S\)</span>, giving <span class="math display">\[
+\boxed{\widetilde A=S^{-1}AS.}
+\]</span> This is a <strong>similarity transformation</strong>.</p>
+</section>
+<section id="worked-example-coordinates-reveal-a-simpler-action" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-coordinates-reveal-a-simpler-action">Worked example: coordinates reveal a simpler action</h3>
+<p>In standard coordinates, let <span class="math display">\[
+T(x)=Ax,
+\qquad
+A=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix}.
+\]</span> Choose <span class="math display">\[
+b_1=\begin{pmatrix}1\\0\end{pmatrix},
+\qquad
+b_2=\begin{pmatrix}-1\\1\end{pmatrix}.
+\]</span> The basis matrix and its inverse are <span class="math display">\[
+S=\begin{pmatrix}1&amp;-1\\0&amp;1\end{pmatrix},
+\qquad
+S^{-1}=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix}.
+\]</span> Hence <span class="math display">\[
+S^{-1}AS=\begin{pmatrix}2&amp;0\\0&amp;1\end{pmatrix}.
+\]</span></p>
+<p>We can see this directly: <span class="math display">\[
+T(b_1)=2b_1,\qquad T(b_2)=b_2.
+\]</span> These images have new coordinates <span class="math inline">\((2,0)^T\)</span> and <span class="math inline">\((0,1)^T\)</span>, respectively.</p>
+<p>For <span class="math inline">\(x=(3,1)^T\)</span>, <span class="math display">\[
+[x]_{\mathcal B}=S^{-1}x=\begin{pmatrix}4\\1\end{pmatrix}.
+\]</span> Applying the new matrix gives <span class="math display">\[
+[T(x)]_{\mathcal B}
+=
+\begin{pmatrix}2&amp;0\\0&amp;1\end{pmatrix}
+\begin{pmatrix}4\\1\end{pmatrix}
+=
+\begin{pmatrix}8\\1\end{pmatrix}.
+\]</span> Converting back, <span class="math display">\[
+T(x)=S\begin{pmatrix}8\\1\end{pmatrix}
+=\begin{pmatrix}7\\1\end{pmatrix}
+=Ax.
+\]</span></p>
+<p>The map has not changed; its action is simpler to describe in the new basis.</p>
+<p>Invertible coordinate changes preserve rank and nullity. The coordinate descriptions of kernel and image transform according to <span class="math display">\[
+\ker(P^{-1}AS)=S^{-1}(\ker A),
+\qquad
+\operatorname{im}(P^{-1}AS)=P^{-1}(\operatorname{im}A).
+\]</span></p>
+</section>
+</section>
+<section id="connections-to-numerical-linear-algebra" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="connections-to-numerical-linear-algebra"><span class="header-section-number">2.7</span> Connections to numerical linear algebra</h2>
+<p>Let <span class="math inline">\(V\in\mathbb F^{n\times k}\)</span> have independent columns spanning a subspace <span class="math inline">\(U\)</span>. If <span class="math inline">\(M\in\mathbb F^{k\times k}\)</span> is invertible, then <span class="math display">\[
+\operatorname{im}(VM)=\operatorname{im}V,
+\]</span> because <span class="math inline">\(Mc\)</span> ranges over all of <span class="math inline">\(\mathbb F^k\)</span>.</p>
+<p>This distinction between a <strong>subspace</strong> and a <strong>basis representing it</strong> is fundamental.</p>
+<p><strong>Orthogonalization and QR.</strong> A thin QR factorization <span class="math display">\[
+V=QR
+\]</span> replaces independent columns of <span class="math inline">\(V\)</span> by orthonormal columns of <span class="math inline">\(Q\)</span>. Since <span class="math inline">\(R\)</span> is invertible, the span is preserved. Moreover, <span class="math display">\[
+x=Vc=Q(Rc),
+\]</span> so <span class="math inline">\(R\)</span> converts <span class="math inline">\(V\)</span>-basis coordinates into <span class="math inline">\(Q\)</span>-basis coordinates. Sessions 2 and 4 develop the geometry and algorithms.</p>
+<p><strong>Krylov subspaces.</strong> <span class="math display">\[
+\mathcal K_k(A,v)=\operatorname{span}\{v,Av,\ldots,A^{k-1}v\}.
+\]</span> There are <span class="math inline">\(k\)</span> generators, but their span may have smaller dimension if they are dependent. Counting generated vectors is not the same as counting independent directions.</p>
+<p><strong>Subspace iteration and filtering.</strong> Applying <span class="math inline">\(A\)</span>, or a polynomial <span class="math display">\[
+p(A)=\sum_{j=0}^d\alpha_jA^j,
+\]</span> to a basis matrix produces the image of its subspace under that map. This may change the subspace and lower its dimension. Subsequent orthogonalization preserves the resulting span; it cannot recover directions erased by the map.</p>
+<p><strong>Invariant subspaces and projection methods.</strong> A subspace <span class="math inline">\(U\)</span> is invariant under <span class="math inline">\(A\)</span> if <span class="math display">\[
+AU\subseteq U.
+\]</span> If <span class="math inline">\(V\)</span> is a basis matrix of <span class="math inline">\(U\)</span>, this is equivalent to <span class="math display">\[
+AV=VH
+\]</span> for a unique <span class="math inline">\(k\times k\)</span> matrix <span class="math inline">\(H\)</span>. Its columns contain the coordinates of the vectors <span class="math inline">\(Av_j\)</span> within <span class="math inline">\(U\)</span>. Thus <span class="math inline">\(H\)</span> represents the restriction of <span class="math inline">\(A\)</span> to <span class="math inline">\(U\)</span>. If <span class="math inline">\(U\)</span> is not invariant, projection methods instead represent a projected action, studied later.</p>
+<p>Finally, our calculations used <strong>exact rank</strong>. In floating-point arithmetic, nearly dependent columns can be difficult to distinguish from dependent ones. For example, <span class="math display">\[
+\begin{pmatrix}1&amp;0\\0&amp;\varepsilon\end{pmatrix}
+\]</span> has exact rank two whenever <span class="math inline">\(\varepsilon\ne0\)</span>, however small. Numerical rank requires a tolerance and attention to scale.</p>
+</section>
+<section id="independent-exercises" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="independent-exercises"><span class="header-section-number">2.8</span> Independent exercises</h2>
+<p>Attempt these before opening the solutions below.</p>
+<section id="exercise-1-subspaces-and-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-1-subspaces-and-coordinates">Exercise 1 — Subspaces and coordinates</h3>
+<p>Let <span class="math display">\[
+U=\{(a,b,a+b)^T:a,b\in\mathbb R\},
+\qquad
+F=\{(a,b,a+b+1)^T:a,b\in\mathbb R\}.
+\]</span></p>
+<p>Justify that <span class="math inline">\(U\)</span> is a subspace and <span class="math inline">\(F\)</span> is not. Show that <span class="math display">\[
+\mathcal B=((1,1,2)^T,(1,-1,0)^T)
+\]</span> is a basis of <span class="math inline">\(U\)</span>, and find <span class="math inline">\([(3,1,4)^T]_{\mathcal B}\)</span>.</p>
+</section>
+<section id="exercise-2-a-rectangular-system" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-2-a-rectangular-system">Exercise 2 — A rectangular system</h3>
+<p>For <span class="math display">\[
+B=\begin{pmatrix}
+1&amp;1&amp;0&amp;2\\
+0&amp;1&amp;1&amp;1\\
+1&amp;2&amp;1&amp;3
+\end{pmatrix},
+\]</span> find bases of its kernel and image, compute rank and nullity, and verify rank–nullity.</p>
+<p>Characterize all <span class="math inline">\(b\in\mathbb R^3\)</span> for which <span class="math inline">\(Bx=b\)</span> is solvable, and find every solution for <span class="math inline">\(b=(2,1,3)^T\)</span>.</p>
+<p>Is this map injective or surjective? Explain why columns of its row-reduced form cannot automatically serve as an image basis of <span class="math inline">\(B\)</span>.</p>
+</section>
+<section id="exercise-3-changing-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-3-changing-coordinates">Exercise 3 — Changing coordinates</h3>
+<p>Let <span class="math display">\[
+T(x_1,x_2)^T=(x_1+2x_2,3x_2)^T.
+\]</span> Use the basis <span class="math display">\[
+\mathcal B=((1,0)^T,(1,1)^T)
+\]</span> for both domain and codomain.</p>
+<p>Compute the representing matrix both directly from basis images and by similarity. Verify your answer on <span class="math inline">\(x=(0,1)^T\)</span>.</p>
+</section>
+<section id="exercise-4-losing-information-in-two-stages" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-4-losing-information-in-two-stages">Exercise 4 — Losing information in two stages</h3>
+<p>Let <span class="math inline">\(T:V\to W\)</span> and <span class="math inline">\(L:W\to Z\)</span> be linear. Prove <span class="math display">\[
+\ker T\subseteq\ker(LT),
+\qquad
+\operatorname{rank}(LT)
+\le\min(\operatorname{rank}T,\operatorname{rank}L).
+\]</span></p>
+<p>Explain how composition can lose directions, and give an example where <span class="math inline">\(T,L\ne0\)</span> but <span class="math inline">\(LT=0\)</span>.</p>
+</section>
+<section id="exercise-5-a-map-on-polynomials" class="level3">
+<h3 class="anchored" data-anchor-id="exercise-5-a-map-on-polynomials">Exercise 5 — A map on polynomials</h3>
+<p>Define <span class="math display">\[
+E:\mathcal P_2\to\mathbb R^2,
+\qquad E(p)=(p(0),p(1))^T.
+\]</span></p>
+<p>Find its matrix in the input basis <span class="math inline">\((1,t,t^2)\)</span> and the standard output basis. Determine its kernel, image, rank, and nullity, and describe every polynomial satisfying <span class="math inline">\(p(0)=a\)</span>, <span class="math inline">\(p(1)=b\)</span>.</p>
+<p>Finally, use the input basis <span class="math display">\[
+(1-t,\ t,\ t(t-1)).
+\]</span> Find the new matrix directly and explain why this basis is adapted to the interpolation problem.</p>
+<hr>
+</section>
+</section>
+<section id="solutions-consult-after-attempting-the-exercises" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="solutions-consult-after-attempting-the-exercises"><span class="header-section-number">2.9</span> Solutions — consult after attempting the exercises</h2>
+<section id="solution-1" class="level3">
+<h3 class="anchored" data-anchor-id="solution-1">Solution 1</h3>
+<p>The zero vector belongs to <span class="math inline">\(U\)</span>, and linear combinations preserve the condition <span class="math inline">\(x_3=x_1+x_2\)</span>. Thus <span class="math inline">\(U\)</span> is a subspace. The zero vector does not belong to <span class="math inline">\(F\)</span>, so <span class="math inline">\(F\)</span> is not.</p>
+<p>For <span class="math inline">\(b_1=(1,1,2)^T\)</span>, <span class="math inline">\(b_2=(1,-1,0)^T\)</span>, <span class="math display">\[
+c_1b_1+c_2b_2=(c_1+c_2,c_1-c_2,2c_1)^T.
+\]</span> Every <span class="math inline">\((a,b,a+b)^T\in U\)</span> has the unique coefficients <span class="math display">\[
+c_1=\frac{a+b}{2},\qquad c_2=\frac{a-b}{2}.
+\]</span> Therefore <span class="math inline">\((b_1,b_2)\)</span> is a basis, and <span class="math display">\[
+[(3,1,4)^T]_{\mathcal B}=(2,1)^T.
+\]</span></p>
+</section>
+<section id="solution-2" class="level3">
+<h3 class="anchored" data-anchor-id="solution-2">Solution 2</h3>
+<p>Row reduction gives <span class="math display">\[
+B\longrightarrow
+R=\begin{pmatrix}
+1&amp;0&amp;-1&amp;1\\
+0&amp;1&amp;1&amp;1\\
+0&amp;0&amp;0&amp;0
+\end{pmatrix}.
+\]</span> The homogeneous equations are <span class="math display">\[
+x_1=x_3-x_4,\qquad x_2=-x_3-x_4.
+\]</span> Thus a kernel basis is <span class="math display">\[
+\left\{
+\begin{pmatrix}1\\-1\\1\\0\end{pmatrix},
+\begin{pmatrix}-1\\-1\\0\\1\end{pmatrix}
+\right\}.
+\]</span> The third and fourth components establish independence.</p>
+<p>The original pivot columns <span class="math display">\[
+c_1=\begin{pmatrix}1\\0\\1\end{pmatrix},
+\qquad
+c_2=\begin{pmatrix}1\\1\\2\end{pmatrix}
+\]</span> form an image basis: they are independent, and the other columns satisfy <span class="math display">\[
+c_3=c_2-c_1,\qquad c_4=c_1+c_2.
+\]</span> Hence rank and nullity are both two, and their sum is four.</p>
+<p>The image is <span class="math display">\[
+\{b:b_3=b_1+b_2\}.
+\]</span> Indeed, <span class="math display">\[
+(b_1,b_2,b_1+b_2)^T=(b_1-b_2)c_1+b_2c_2.
+\]</span></p>
+<p>For <span class="math inline">\(b=(2,1,3)^T\)</span>, all solutions are <span class="math display">\[
+x=
+\begin{pmatrix}1\\1\\0\\0\end{pmatrix}
++s\begin{pmatrix}1\\-1\\1\\0\end{pmatrix}
++t\begin{pmatrix}-1\\-1\\0\\1\end{pmatrix}.
+\]</span></p>
+<p>The map is neither injective nor surjective onto <span class="math inline">\(\mathbb R^3\)</span>. Its kernel is nontrivial, and its image has dimension two.</p>
+<p>The reduced matrix has image <span class="math inline">\(\{y:y_3=0\}\)</span>, different from the original image. Row operations preserve column dependence relations, but generally move the column space.</p>
+</section>
+<section id="solution-3" class="level3">
+<h3 class="anchored" data-anchor-id="solution-3">Solution 3</h3>
+<p>Directly, <span class="math display">\[
+T(1,0)^T=(1,0)^T=b_1,
+\qquad
+T(1,1)^T=(3,3)^T=3b_2.
+\]</span> Therefore <span class="math display">\[
+[T]_{\mathcal B\leftarrow\mathcal B}
+=\begin{pmatrix}1&amp;0\\0&amp;3\end{pmatrix}.
+\]</span></p>
+<p>Alternatively, <span class="math display">\[
+A=\begin{pmatrix}1&amp;2\\0&amp;3\end{pmatrix},
+\quad
+S=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix},
+\quad
+S^{-1}=\begin{pmatrix}1&amp;-1\\0&amp;1\end{pmatrix},
+\]</span> and multiplication gives <span class="math display">\[
+S^{-1}AS=\begin{pmatrix}1&amp;0\\0&amp;3\end{pmatrix}.
+\]</span></p>
+<p>For <span class="math inline">\(x=(0,1)^T\)</span>, <span class="math display">\[
+[x]_{\mathcal B}=(-1,1)^T,
+\qquad
+[T(x)]_{\mathcal B}=(-1,3)^T.
+\]</span> Converting back yields <span class="math display">\[
+S(-1,3)^T=(2,3)^T=Ax.
+\]</span></p>
+</section>
+<section id="solution-4" class="level3">
+<h3 class="anchored" data-anchor-id="solution-4">Solution 4</h3>
+<p>If <span class="math inline">\(x\in\ker T\)</span>, then <span class="math inline">\(L(Tx)=L(0)=0\)</span>. Thus <span class="math display">\[
+\ker T\subseteq\ker(LT).
+\]</span></p>
+<p>Also, <span class="math display">\[
+\operatorname{im}(LT)=L(\operatorname{im}T)
+\subseteq\operatorname{im}L,
+\]</span> so <span class="math inline">\(\operatorname{rank}(LT)\le\operatorname{rank}L\)</span>.</p>
+<p>If <span class="math inline">\(w_1,\ldots,w_r\)</span> is an image basis of <span class="math inline">\(T\)</span>, then <span class="math display">\[
+L(w_1),\ldots,L(w_r)
+\]</span> span the image of <span class="math inline">\(LT\)</span>. Its dimension is therefore at most <span class="math inline">\(r=\operatorname{rank}T\)</span>.</p>
+<p>For example, <span class="math display">\[
+T=\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix},
+\qquad
+L=\begin{pmatrix}0&amp;0\\0&amp;1\end{pmatrix}
+\]</span> are both nonzero, but <span class="math inline">\(LT=0\)</span>. The first map’s entire image lies in the second map’s kernel.</p>
+</section>
+<section id="solution-5" class="level3">
+<h3 class="anchored" data-anchor-id="solution-5">Solution 5</h3>
+<p>The basis images are <span class="math display">\[
+E(1)=(1,1)^T,\qquad
+E(t)=(0,1)^T,\qquad
+E(t^2)=(0,1)^T,
+\]</span> so <span class="math display">\[
+[E]=\begin{pmatrix}1&amp;0&amp;0\\1&amp;1&amp;1\end{pmatrix}.
+\]</span></p>
+<p>For <span class="math inline">\(p=c_0+c_1t+c_2t^2\)</span>, the kernel conditions give <span class="math display">\[
+c_0=0,\qquad c_1+c_2=0.
+\]</span> Hence <span class="math display">\[
+\ker E=\operatorname{span}\{t^2-t\}.
+\]</span> The first two matrix columns are independent, so <span class="math display">\[
+\operatorname{im}E=\mathbb R^2,\qquad
+\operatorname{rank}E=2,\qquad
+\operatorname{nullity}E=1.
+\]</span></p>
+<p>One polynomial with the prescribed values is <span class="math inline">\(a(1-t)+bt\)</span>. Every solution is therefore <span class="math display">\[
+\boxed{p(t)=a(1-t)+bt+c\,t(t-1),\qquad c\in\mathbb R.}
+\]</span></p>
+<p>The new input basis has images <span class="math display">\[
+E(1-t)=(1,0)^T,\quad E(t)=(0,1)^T,\quad E(t(t-1))=0,
+\]</span> giving <span class="math display">\[
+[E]_{\mathrm{standard}\leftarrow\widetilde{\mathcal B}}
+=
+\begin{pmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\end{pmatrix}.
+\]</span></p>
+<p>To check that it is a basis, evaluate a vanishing linear combination at <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, forcing its first two coefficients to vanish; the third then vanishes because <span class="math inline">\(t(t-1)\)</span> is a nonzero polynomial.</p>
+<p>This basis separates the two prescribed values from the one undetermined direction. Only the input basis changed, so this is not a similarity transformation.</p>
+</section>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">2.10</span> End-of-session mastery checklist</h2>
+<p>Without consulting the notes, you should be able to:</p>
+<ul>
+<li>State the subspace test and distinguish a subspace from a translated solution set.</li>
+<li>Explain how spanning and independence provide existence and uniqueness of coordinates.</li>
+<li>Distinguish a vector, its coordinate vector, and a basis matrix.</li>
+<li>Construct a map’s matrix from the images of basis vectors.</li>
+<li>Find a kernel basis using free variables and an image basis using original pivot columns.</li>
+<li>Characterize solvability by <span class="math inline">\(b\in\operatorname{im}A\)</span> and all solutions by <span class="math inline">\(x_p+\ker A\)</span>.</li>
+<li>Prove rank–nullity by extending a kernel basis.</li>
+<li>Connect rank and nullity to injectivity, surjectivity, and invertibility.</li>
+<li>Derive <span class="math inline">\(\widetilde A=P^{-1}AS\)</span> and explain when it becomes similarity.</li>
+<li>Explain why changing a basis preserves a subspace, while applying a linear map may change its dimension.</li>
+</ul>
+<p><strong>Ready for Session 2:</strong> you can complete Exercises 2 and 3 independently, reconstruct the rank–nullity proof, and explain why a basis need not be orthogonal. Session 2 will add lengths, angles, and orthogonality to this algebraic foundation.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../references.html" class="pagination-link" aria-label="References">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">References</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

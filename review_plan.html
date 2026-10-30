@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; Overview – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-251915186e5ac48a2a36efd978de2bb8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./review_plan.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="./Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./review_plan.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#numerical-linear-algebra-overview" id="toc-numerical-linear-algebra-overview" class="nav-link active" data-scroll-target="#numerical-linear-algebra-overview"><span class="header-section-number">1.1</span> Numerical Linear Algebra Overview</a>
+  <ul class="collapse">
+  <li><a href="#main-computational-problems" id="toc-main-computational-problems" class="nav-link" data-scroll-target="#main-computational-problems">Main computational problems</a></li>
+  <li><a href="#the-special-importance-of-large-and-sparse-matrices" id="toc-the-special-importance-of-large-and-sparse-matrices" class="nav-link" data-scroll-target="#the-special-importance-of-large-and-sparse-matrices">The special importance of large and sparse matrices</a></li>
+  </ul></li>
+  <li><a href="#course-overview" id="toc-course-overview" class="nav-link" data-scroll-target="#course-overview"><span class="header-section-number">1.2</span> Course Overview</a>
+  <ul class="collapse">
+  <li><a href="#the-five-main-chapters" id="toc-the-five-main-chapters" class="nav-link" data-scroll-target="#the-five-main-chapters">The five main chapters</a></li>
+  <li><a href="#relationship-between-chapters" id="toc-relationship-between-chapters" class="nav-link" data-scroll-target="#relationship-between-chapters">Relationship Between Chapters</a></li>
+  </ul></li>
+  <li><a href="#linear-algebra-and-numerics-prerequisites-and-review" id="toc-linear-algebra-and-numerics-prerequisites-and-review" class="nav-link" data-scroll-target="#linear-algebra-and-numerics-prerequisites-and-review"><span class="header-section-number">1.3</span> Linear Algebra and Numerics Prerequisites and Review</a>
+  <ul class="collapse">
+  <li><a href="#essential-linear-algebra-topics" id="toc-essential-linear-algebra-topics" class="nav-link" data-scroll-target="#essential-linear-algebra-topics">Essential linear algebra topics</a></li>
+  <li><a href="#prerequisites-from-numerics-0" id="toc-prerequisites-from-numerics-0" class="nav-link" data-scroll-target="#prerequisites-from-numerics-0">Prerequisites from Numerics 0</a></li>
+  <li><a href="#the-connection-to-the-chebyshev-filtered-subspace-iteration-seminar" id="toc-the-connection-to-the-chebyshev-filtered-subspace-iteration-seminar" class="nav-link" data-scroll-target="#the-connection-to-the-chebyshev-filtered-subspace-iteration-seminar">The connection to the Chebyshev-filtered subspace iteration seminar</a></li>
+  </ul></li>
+  <li><a href="#revision-strategy" id="toc-revision-strategy" class="nav-link" data-scroll-target="#revision-strategy"><span class="header-section-number">1.4</span> Revision Strategy</a>
+  <ul class="collapse">
+  <li><a href="#phase-1---linear-algebra-foundation" id="toc-phase-1---linear-algebra-foundation" class="nav-link" data-scroll-target="#phase-1---linear-algebra-foundation">Phase 1 - linear algebra foundation</a></li>
+  <li><a href="#phase-2---numerical-analysis-foundation" id="toc-phase-2---numerical-analysis-foundation" class="nav-link" data-scroll-target="#phase-2---numerical-analysis-foundation">Phase 2 - numerical-analysis foundation</a></li>
+  <li><a href="#phase-3---eigenvalues" id="toc-phase-3---eigenvalues" class="nav-link" data-scroll-target="#phase-3---eigenvalues">Phase 3 - Eigenvalues</a></li>
+  <li><a href="#targeted-revision-plan" id="toc-targeted-revision-plan" class="nav-link" data-scroll-target="#targeted-revision-plan">Targeted Revision Plan</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="numerical-linear-algebra-overview" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="numerical-linear-algebra-overview"><span class="header-section-number">1.1</span> Numerical Linear Algebra Overview</h2>
+<section id="main-computational-problems" class="level3">
+<h3 class="anchored" data-anchor-id="main-computational-problems">Main computational problems</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 34%">
+<col style="width: 45%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Mathematical formulation</th>
+<th>Typical numerical methods</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear systems</td>
+<td><span class="math inline">\(Ax = b\)</span></td>
+<td>LU, Cholesky, CG, GMRES</td>
+</tr>
+<tr class="even">
+<td>Eigenvalue problems</td>
+<td><span class="math inline">\(Av = \lambda v\)</span></td>
+<td>Power iteration, QR iteration, Lanczos, Arnoldi</td>
+</tr>
+<tr class="odd">
+<td>Least-squares problems</td>
+<td><span class="math inline">\(\min_x \|Ax - b\|_2\)</span></td>
+<td>QR, SVD</td>
+</tr>
+<tr class="even">
+<td>Matrix factorizations</td>
+<td><span class="math inline">\(A = QR,\; A = LU,\; A = U\Sigma V^*\)</span></td>
+<td>Householder, Gaussian elimination, SVD algorithms</td>
+</tr>
+<tr class="odd">
+<td>Low-rank approximation</td>
+<td><span class="math inline">\(A \approx UV^*\)</span></td>
+<td>Truncated SVD, randomized algorithms</td>
+</tr>
+<tr class="even">
+<td>Matrix functions</td>
+<td><span class="math inline">\(f(A)v\)</span>, e.g.&nbsp;<span class="math inline">\(e^A v\)</span></td>
+<td>Polynomial and Krylov approximations</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-special-importance-of-large-and-sparse-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="the-special-importance-of-large-and-sparse-matrices">The special importance of large and sparse matrices</h3>
+<p>large and sparse matrices arise naturally in many settings, e.g.&nbsp;determining the stationary temperature distribution in a two-dimenstional plate.</p>
+<div id="cell-fig-tridiagonal" class="cell" width="75%" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-tridiagonal" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-tridiagonal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="review_plan_files/figure-html/fig-tridiagonal-output-1.png" class="quarto-figure quarto-figure-center figure-img" width="470" height="470">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tridiagonal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: Sparsity pattern of a tridiagonal matrix.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Iterative methods and subspaces exploit sparsity. This is more effective than simply extending Gaussian elimination to bigger matrices.</p>
+</section>
+</section>
+<section id="course-overview" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="course-overview"><span class="header-section-number">1.2</span> Course Overview</h2>
+<p>The central focus is computing solutions of linear systems and eigenvalue problems for dense and large sparse matrices.</p>
+<section id="the-five-main-chapters" class="level3">
+<h3 class="anchored" data-anchor-id="the-five-main-chapters">The five main chapters</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Chapter</th>
+<th>Subject</th>
+<th>Central ideas</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1. Introduction</strong></td>
+<td>Applications and motivation</td>
+<td>Discretized differential equations, least squares, sparse matrices, PageRank</td>
+</tr>
+<tr class="even">
+<td><strong>2. Orthogonalization and QR Factorization</strong></td>
+<td>Constructing orthonormal bases</td>
+<td>Gram–Schmidt, Householder transformations, Givens rotations</td>
+</tr>
+<tr class="odd">
+<td><strong>3. Dense Algebraic Eigenvalue Problems</strong></td>
+<td>Computing eigenvalues of dense matrices</td>
+<td>Schur decomposition, eigenvalue conditioning, vector and subspace iterations, QR iteration</td>
+</tr>
+<tr class="even">
+<td><strong>4. Large Sparse Linear Systems</strong></td>
+<td>Solving very large <span class="math inline">\(Ax=b\)</span> problems</td>
+<td>Jacobi, Gauss–Seidel, projection methods, Krylov subspaces, CG, GMRES, preconditioning</td>
+</tr>
+<tr class="odd">
+<td><strong>5. Large Sparse Eigenvalue Problems</strong></td>
+<td>Finding selected eigenvalues of huge matrices</td>
+<td>Rayleigh–Ritz, Lanczos, Arnoldi, implicitly restarted Arnoldi, interior eigenvalues</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="relationship-between-chapters" class="level3">
+<h3 class="anchored" data-anchor-id="relationship-between-chapters">Relationship Between Chapters</h3>
+<div class="cell" data-fig-width="4.5" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-chapter-dependencies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-chapter-dependencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-chapter-dependencies">flowchart TB
+    A["`**Linear algebra foundations**
+    Vector spaces · eigenvalues · norms · orthogonality · projections`"]
+
+    B["`**Chapter 2 · Orthogonalization and QR**
+    Constructing stable orthonormal bases`"]
+
+    C["`**Chapter 3**
+    Dense eigenvalue problems
+    Power, subspace and QR iteration`"]
+
+    D["`**Chapter 4**
+    Large sparse linear systems
+    Projection methods, CG, GMRES`"]
+
+    E["`**Chapter 5 · Large sparse eigenvalue problems**
+    Rayleigh–Ritz · Lanczos · Arnoldi · restarted methods`"]
+
+    F["`**Connection to your seminar**
+    Polynomial filtering + subspace iteration + Rayleigh–Ritz eigenvalue extraction`"]
+
+    A --&gt; B
+    B --&gt; C
+    B --&gt; D
+    C --&gt; E
+    D --&gt; E
+    E --&gt; F
+
+    classDef foundation fill:#ffffff,stroke:#dddddd,color:#222222
+    classDef highlighted fill:#e8eff4,stroke:#e8eff4,color:#222222
+    classDef chapter fill:#ffffff,stroke:#ffffff,color:#222222
+
+    class A,F foundation
+    class B,E highlighted
+    class C,D chapter
+</pre>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-chapter-dependencies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: Conceptual relationships between the main chapters.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>orthogonalization and projection are the unifying ideas behind much of the course</strong>.</p>
+<p><strong>Orthogonalization</strong> provides suitable bases for subspaces. Projection reduces large computational problems to smaller ones.</p>
+<p>A Krylov subspace has the form:</p>
+<p><span class="math display">\[
+\mathcal K_m(A,v)
+=\operatorname{span}\{v,Av,A^2v,\ldots,A^{m-1}v\}.
+\]</span></p>
+<p>This same construction appears in both large sparse linear-system solvers an dlarge sparse eigensovles. The same Arnoldi or Lanczos machinery can support both kinds of computation.</p>
+</section>
+</section>
+<section id="linear-algebra-and-numerics-prerequisites-and-review" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="linear-algebra-and-numerics-prerequisites-and-review"><span class="header-section-number">1.3</span> Linear Algebra and Numerics Prerequisites and Review</h2>
+<section id="essential-linear-algebra-topics" class="level3">
+<h3 class="anchored" data-anchor-id="essential-linear-algebra-topics">Essential linear algebra topics</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Topic</th>
+<th>What you should be able to do</th>
+<th>Why it matters for NLA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Vector spaces, bases and dimension</strong></td>
+<td>Work with span, linear independence, rank, kernel, image and basis changes</td>
+<td>Almost every iterative algorithm constructs or manipulates subspaces</td>
+</tr>
+<tr class="even">
+<td><strong>Inner products and orthogonality</strong></td>
+<td>Calculate inner products, orthogonal complements, orthonormal bases</td>
+<td>Gram–Schmidt, QR, Arnoldi, Lanczos</td>
+</tr>
+<tr class="odd">
+<td><strong>Orthogonal projections</strong></td>
+<td>Understand projections onto subspaces and their matrix representation</td>
+<td>Least squares, Galerkin and Rayleigh–Ritz methods</td>
+</tr>
+<tr class="even">
+<td><strong>Eigenvalues and eigenvectors</strong></td>
+<td>Compute simple eigenpairs, understand diagonalization and eigenspaces</td>
+<td>Chapters 3 and 5, and your seminar</td>
+</tr>
+<tr class="odd">
+<td><strong>Symmetric and Hermitian matrices</strong></td>
+<td>Understand the spectral theorem and orthogonal diagonalization</td>
+<td>CG, Lanczos, eigenvalue conditioning</td>
+</tr>
+<tr class="even">
+<td><strong>Positive-definite matrices</strong></td>
+<td>Recognize SPD matrices and understand quadratic forms</td>
+<td>Cholesky, CG, energy minimization</td>
+</tr>
+<tr class="odd">
+<td><strong>Similarity transformations</strong></td>
+<td>Interpret <span class="math inline">\(V^{-1}AV\)</span> as a basis change</td>
+<td>Schur decomposition, QR eigenvalue iteration</td>
+</tr>
+<tr class="even">
+<td><strong>Matrix norms and spectral radius</strong></td>
+<td>Understand operator norms, eigenvalue magnitudes and basic inequalities</td>
+<td>Error estimates, convergence, conditioning</td>
+</tr>
+</tbody>
+</table>
+<p>Especially three concepts deserve extra attention:</p>
+<section id="orthogonality-projection-and-subspaces" class="level4">
+<h4 class="anchored" data-anchor-id="orthogonality-projection-and-subspaces">Orthogonality, projection and subspaces</h4>
+<p>Suppose <span class="math inline">\(Q \in \mathbb{R}^{n\times m}\)</span> has orthonormal columns:</p>
+<p><span class="math display">\[
+Q^TQ=I_m.
+\]</span></p>
+<p>Then the matrix</p>
+<p><span class="math display">\[
+P=QQ^T
+\]</span></p>
+<p>is the orthogonal projector onto the subspace spanned by the columns of <span class="math inline">\(Q\)</span>.</p>
+</section>
+<section id="eigenvalues-diagonalization-and-the-spectral-theorem" class="level4">
+<h4 class="anchored" data-anchor-id="eigenvalues-diagonalization-and-the-spectral-theorem">Eigenvalues, diagonalization and the spectral theorem</h4>
+<p>For a general diagonalizable matrix,</p>
+<p><span class="math display">\[
+A=V\Lambda V^{-1}.
+\]</span></p>
+<p>For a real symmetric matrix, the much stronger result</p>
+<p><span class="math display">\[
+A=Q\Lambda Q^T,\qquad Q^TQ=I.
+\]</span></p>
+<p>Is the spectral theorem. It t ells us that a symmetric matrix has real eigenvalues and admits an orthonormal basis or eigenvectors.</p>
+<p>Consider an inital vector</p>
+<p><span class="math display">\[
+v=\sum_{i=1}^n\alpha_iq_i,
+\]</span></p>
+<p>where <span class="math inline">\(q_i\)</span> are the orthonormal eigenvectors of <span class="math inline">\(A\)</span>. Then</p>
+<p><span class="math display">\[
+A^kv=\sum_{i=1}^n\alpha_i\lambda_i^kq_i.
+\]</span></p>
+<p>Applying the matrix repeatedly changes the relative importance of the eigenvector accordidng to the magnitued of their eigenvalues. This explains the fundamental mechanism of <strong>power iteration</strong> and, after generalization, subspace iteration and polynomial filtering.</p>
+</section>
+<section id="symmetric-positive-definiteness-and-quadratic-forms" class="level4">
+<h4 class="anchored" data-anchor-id="symmetric-positive-definiteness-and-quadratic-forms">Symmetric positive definiteness and quadratic forms</h4>
+<p>A real symmetric matrix <span class="math inline">\(A\)</span> is positive definite when</p>
+<p><span class="math display">\[
+x^TAx&gt;0\qquad\text{for every }x\ne0.
+\]</span></p>
+<p>Equivalent characterizations include the positivity of all eigenvalues and the existence of a Cholesky factorization.</p>
+<p>The relationship between SPD matrices and minimization problems is especially useful. For example, solving <span class="math inline">\(Ax = b\)</span> for an SPD matrix is equivalnet to minimizing</p>
+<p><span class="math display">\[
+f(x)=\frac12x^TAx-b^Tx.
+\]</span></p>
+<p>This provides a natural connection between linear systems, quadratic optimization and the conjugate gradient method.</p>
+</section>
+</section>
+<section id="prerequisites-from-numerics-0" class="level3">
+<h3 class="anchored" data-anchor-id="prerequisites-from-numerics-0">Prerequisites from Numerics 0</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 24%">
+<col style="width: 27%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subject</th>
+<th>Bastian’s <code>num0.pdf</code></th>
+<th>Scheichl–Zech’s <code>Num0_notes_ss25.pdf</code></th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Floating-point arithmetic and rounding errors</td>
+<td>§§2–3</td>
+<td>§§2.3–2.4</td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>Conditioning, matrix norms and stability</td>
+<td>§§3, 5–6</td>
+<td>§§2.1–2.2, 3.1–3.3</td>
+<td>Very high</td>
+</tr>
+<tr class="odd">
+<td>Direct methods: Gaussian elimination, LU, Cholesky</td>
+<td>§§7–10</td>
+<td>§§3.4–3.7</td>
+<td>Medium–high</td>
+</tr>
+<tr class="even">
+<td>Least squares, QR and Householder</td>
+<td>§§11–12</td>
+<td>§§3.8–3.9</td>
+<td>Very high</td>
+</tr>
+<tr class="odd">
+<td>Basic iterative linear solvers</td>
+<td>§§13–14</td>
+<td>§6.3</td>
+<td>Very high</td>
+</tr>
+<tr class="even">
+<td>Polynomial approximation, especially Chebyshev</td>
+<td>§§17–19, 23 for broader background</td>
+<td>§§4.9–4.10</td>
+<td>High for seminar</td>
+</tr>
+</tbody>
+</table>
+<section id="conditioning-versus-stability" class="level4">
+<h4 class="anchored" data-anchor-id="conditioning-versus-stability">Conditioning versus stability</h4>
+<p>Conditioning is a property of a mathematical problem. Stability is a property of an algorithm used to solve that problem.</p>
+<p>For instance, suppose <span class="math inline">\(Ax = b\)</span> and we perturb the right-hand side by <span class="math inline">\(\Delta b\)</span>. The solution changes according to</p>
+<p><span class="math display">\[
+\Delta x = A^{-1} \Delta b
+\]</span></p>
+<p>The condition number</p>
+<p><span class="math display">\[
+\kappa(A)=\|A\|\|A^{-1}\|
+\]</span></p>
+<p>measures the potential amplification of relative errors. But even if a problem is well-conditioned, a poor algorithm can introduce unnecessarily large computational errors.</p>
+<p>It is alos essential to distinguish the residual</p>
+<p><span class="math display">\[
+r=b-A\widetilde x
+\]</span></p>
+<p>from the actual solution error</p>
+<p><span class="math display">\[
+e=x-\widetilde x.
+\]</span></p>
+<p>They are related by</p>
+<p><span class="math display">\[
+Ae=r,\qquad e=A^{-1}r.
+\]</span></p>
+<p>Thus a small residual does not automatically guarantee a small forward error when the matrix is ill-conditioned.</p>
+<p>These ideas reappear throghout NLA, including in the conditioning of eigenvalues and eigenvectors.</p>
+</section>
+<section id="matrix-factorizations-and-orthogonal-transformations" class="level4">
+<h4 class="anchored" data-anchor-id="matrix-factorizations-and-orthogonal-transformations">Matrix factorizations and orthogonal transformations</h4>
+<p>Distinction between QR and LU:</p>
+<ul>
+<li>LU decomposes a matrix into triangular factors and supports the direct solution of linear systems.</li>
+<li>QR constructs orthonormal bases and triangular factors, which are especially useful least squares and eigenvalue algorithms.</li>
+<li>Cholesky exploits symmetric positive definiteness.</li>
+</ul>
+<p>For NLA <strong>QR is more urgent than detailed LU pivoting analysis</strong>, because Ch 2 of NLA directly develops Gram-Schmidt, Householder and Givens transformations.</p>
+</section>
+<section id="basic-iterative-methods-and-convergence" class="level4">
+<h4 class="anchored" data-anchor-id="basic-iterative-methods-and-convergence">Basic iterative methods and convergence</h4>
+<p>Consider an iteration</p>
+<p><span class="math display">\[
+x^{(k+1)}=Bx^{(k)}+c.
+\]</span></p>
+<p>If <span class="math inline">\(x^{*}\)</span> is its fixed point, then the error satisfies</p>
+<p><span class="math display">\[
+e^{(k+1)}=Be^{(k)}.
+\]</span></p>
+<p>Consequently,</p>
+<p><span class="math display">\[
+e^{(k)}=B^ke^{(0)}.
+\]</span></p>
+<p>The fundamental convergence criterion is</p>
+<p><span class="math display">\[
+\boxed{\rho(B)&lt;1}
+\]</span></p>
+<p>where <span class="math inline">\(\rho(B)\)</span> is the spectral radius.</p>
+<p>This connects eigenvalues directly to the convergence of numerical algorithms. Jacobi and Gauss-Seidel should be revised, but with a focus on understanding how their iteration matrices arise and how their convergence can be analyzed.</p>
+</section>
+<section id="chevyshev-polynomials" class="level4">
+<h4 class="anchored" data-anchor-id="chevyshev-polynomials">Chevyshev Polynomials</h4>
+<p>The NLA script has Appendix B.2: Chebyshev polynomials, beginning on printed page 153.</p>
+<p>It introduces the recurrence <span class="math display">\[
+T_0(x)=1,\qquad T_1(x)=x,
+\]</span></p>
+<p><span class="math display">\[
+T_{k+1}(x)=2xT_k(x)-T_{k-1}(x),
+\]</span></p>
+<p>and properties of Chebyshev polynomials on and outside <span class="math inline">\([-1,1]\)</span></p>
+</section>
+</section>
+<section id="the-connection-to-the-chebyshev-filtered-subspace-iteration-seminar" class="level3">
+<h3 class="anchored" data-anchor-id="the-connection-to-the-chebyshev-filtered-subspace-iteration-seminar">The connection to the Chebyshev-filtered subspace iteration seminar</h3>
+<section id="ordinary-subspace-iteration" class="level4">
+<h4 class="anchored" data-anchor-id="ordinary-subspace-iteration">Ordinary subspace iteration</h4>
+<p>Suppose <span class="math inline">\(A\)</span> is symmetric and we wish to compute several of its dominant eigenpairs.</p>
+<p>We begin with a matrix <span class="math inline">\(Q_0\)</span> whose columns are orthonormal and repeatedly compute <span class="math display">\[
+Y_{k+1}=AQ_k,
+\]</span></p>
+<p>followed by orthonormalization, <span class="math display">\[
+Q_{k+1}=\operatorname{orth}(Y_{k+1}).
+\]</span></p>
+<p>The successive subspaces approach an invariant subspace corresponding to dominant eigenvalues, subject to appropriate initial-subspace and spectral-gap assumptions.</p>
+</section>
+<section id="polynomial-filtered-iteration" class="level4">
+<h4 class="anchored" data-anchor-id="polynomial-filtered-iteration">Polynomial-filtered iteration</h4>
+<p>Instead of multiplying by <span class="math inline">\(A\)</span>, we apply a polynomial in <span class="math inline">\(A\)</span>: <span class="math display">\[
+Y_{k+1}=p_m(A)Q_k.
+\]</span></p>
+<p>Why does this help?</p>
+<p>Because for an eigenvector <span class="math inline">\(q_i\)</span>, <span class="math display">\[
+Aq_i=\lambda_iq_i
+\quad\Longrightarrow\quad
+p_m(A)q_i=p_m(\lambda_i)q_i.
+\]</span></p>
+<p>We can therefore choose a polynomial that makes the desired eigenvalue components comparatively large and suppresses the unwanted components.</p>
+<p>A Chebyshev polynomial, after suitable shifting and scaling, is an effective choice because of its controlled magnitude on a specified interval and rapid growth outside it.</p>
+<p>The important point is that we can apply such a polynomial using a recurrence involving matrix–vector products, without constructing the generally dense matrix <span class="math inline">\(p_m(A)\)</span>.</p>
+</section>
+<section id="what-is-needed-to-understand-the-complete-algorithm" class="level4">
+<h4 class="anchored" data-anchor-id="what-is-needed-to-understand-the-complete-algorithm">What is needed to understand the complete algorithm</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Mathematical prerequisite</th>
+<th>NLA connection</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Spectral transformation <span class="math inline">\(p(A)\)</span></td>
+<td>Diagonalization, matrix polynomials</td>
+<td>Appendix A.1.2, §3.3</td>
+</tr>
+<tr class="even">
+<td>Desired invariant subspace</td>
+<td>Subspaces, eigenspaces, spectral gaps</td>
+<td>§§3.2–3.3</td>
+</tr>
+<tr class="odd">
+<td>Chebyshev filter</td>
+<td>Polynomial recurrence and approximation</td>
+<td>Appendix B.2</td>
+</tr>
+<tr class="even">
+<td>Orthonormalization</td>
+<td>Inner products, Gram–Schmidt, QR</td>
+<td>Chapter 2</td>
+</tr>
+<tr class="odd">
+<td>Subspace update</td>
+<td>Orthogonal subspace iteration</td>
+<td>§3.3.2</td>
+</tr>
+<tr class="even">
+<td>Approximate eigenpairs</td>
+<td>Rayleigh quotient, orthogonal projection</td>
+<td>§5.1</td>
+</tr>
+<tr class="odd">
+<td>Competing eigensolvers</td>
+<td>Krylov spaces, Lanczos, Arnoldi</td>
+<td>Chapters 4–5</td>
+</tr>
+</tbody>
+</table>
+<p>The script even develops polynomial filtering in §3.3. There is an example using <span class="math display">\[
+A=\operatorname{diag}(1,2,3)
+\]</span></p>
+<p>and the polynomial <span class="math display">\[
+p(t)=(t-1)(t-3).
+\]</span></p>
+<p>Here the unwanted eigenvalues <span class="math inline">\(1\)</span> and <span class="math inline">\(3\)</span> are mapped to zero, while the component associated with eigenvalue <span class="math inline">\(2\)</span> is retained.</p>
+<p>Chapter 5 then combines projection, Rayleigh–Ritz approximation and Krylov-based eigenvalue methods. This is a natural starting point for comparing your seminar algorithm with Lanczos and Arnoldi methods.</p>
+<p>One subtle but important distinction is that the seminar’s polynomial-filtered subspace method need not itself be a Krylov-subspace algorithm in the same sense as Arnoldi. Both make essential use of matrix polynomials and subspaces, but organize their iterations differently.</p>
+</section>
+</section>
+</section>
+<section id="revision-strategy" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="revision-strategy"><span class="header-section-number">1.4</span> Revision Strategy</h2>
+<section id="phase-1---linear-algebra-foundation" class="level3">
+<h3 class="anchored" data-anchor-id="phase-1---linear-algebra-foundation">Phase 1 - linear algebra foundation</h3>
+<p>Vector spaces and bases, innder products, projections, eigenvalues, diagonalization, and SPD matrices.</p>
+<p>Useful readiness test:</p>
+<blockquote class="blockquote">
+<p>can you explain, and then prove why <span class="math inline">\(QQ^T\)</span> is an orthogonal projector when <span class="math inline">\(Q\)</span> has orthonormal columns</p>
+</blockquote>
+</section>
+<section id="phase-2---numerical-analysis-foundation" class="level3">
+<h3 class="anchored" data-anchor-id="phase-2---numerical-analysis-foundation">Phase 2 - numerical-analysis foundation</h3>
+<p>Conditioning, residuals and error estimates, floating-point arithmetic, QR factorization and convergence of iterative methods.</p>
+<p>readiness test:</p>
+<blockquote class="blockquote">
+<ol type="1">
+<li>why does conditioning matter?</li>
+<li>why can a small residual be misleading?</li>
+<li>why does the spectral radius control stationary iterations?</li>
+</ol>
+</blockquote>
+</section>
+<section id="phase-3---eigenvalues" class="level3">
+<h3 class="anchored" data-anchor-id="phase-3---eigenvalues">Phase 3 - Eigenvalues</h3>
+<p>Power method, Rayleigh quitient, subspace iteration and polynonial filtering. Chebyshev polynomials and Rayleigh-Ritz.</p>
+</section>
+<section id="targeted-revision-plan" class="level3">
+<h3 class="anchored" data-anchor-id="targeted-revision-plan">Targeted Revision Plan</h3>
+<p><strong>11 focused sessions</strong>.</p>
+<section id="week-1---rebuild-the-linear-algebra-foundations" class="level4">
+<h4 class="anchored" data-anchor-id="week-1---rebuild-the-linear-algebra-foundations">Week 1 - Rebuild the linear algebra foundations</h4>
+<p><strong>Goal:</strong> Recover fluency with vectors, subspaces, projections, and orthogonalization so that Chapter 2 becomes manageable.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session</th>
+<th>Material to revise</th>
+<th>Mastery check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1. Vector spaces and linear maps</strong> · 60 min</td>
+<td>Span, linear independence, bases, dimension, rank, kernel, image, change of basis</td>
+<td>Given a matrix, determine bases for its kernel and image; explain rank–nullity</td>
+</tr>
+<tr class="even">
+<td><strong>2. Inner products and orthogonality</strong> · 75 min</td>
+<td>Inner products, orthogonal complements, orthonormal bases, Gram–Schmidt</td>
+<td>Construct an orthonormal basis from linearly independent vectors</td>
+</tr>
+<tr class="odd">
+<td><strong>3. Orthogonal projections</strong> · 75 min</td>
+<td>Projection onto a line/subspace, <span class="math inline">\(P = QQ^T\)</span>, least-squares geometry</td>
+<td>Derive the projection matrix and prove <span class="math inline">\(P^2 = P\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>4. QR factorization</strong> · 90 min</td>
+<td>Gram–Schmidt, Householder reflections, QR, least-squares solution</td>
+<td>Perform QR on a small matrix and explain why orthogonality is useful numerically</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading sources</strong>: NLA Appendix A.1–A.3, NLA Chapter 2, Bastian’s §5 and §§11–12, and Scheichl–Zech’s §§3.8–3.9.</p>
+</section>
+<section id="week-2---recover-spectral-theory-and-numerical-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="week-2---recover-spectral-theory-and-numerical-analysis">Week 2 - Recover spectral theory and numerical analysis</h4>
+<p><strong>Goal:</strong> Understand how matrix structure, conditioning and numerical algorithms interact.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session</th>
+<th>Material to revise</th>
+<th>Mastery check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>5. Eigenvalues and the spectral theorem</strong> · 90 min</td>
+<td>Eigenvectors, eigenspaces, diagonalization, symmetric/Hermitian matrices, SPD</td>
+<td>Diagonalize a symmetric matrix and use the decomposition to compute <span class="math inline">\(A^k v\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>6. Matrix norms and conditioning</strong> · 75 min</td>
+<td>Induced norms, spectral radius, condition numbers, residual versus error, stability</td>
+<td>Derive an error estimate using <span class="math inline">\(e = A^{-1}r\)</span> and explain why small residuals can mislead</td>
+</tr>
+<tr class="odd">
+<td><strong>7. Direct numerical methods</strong> · 60 min</td>
+<td>Gaussian elimination, LU, pivoting, triangular systems, Cholesky</td>
+<td>Solve a system via LU and explain when Cholesky applies</td>
+</tr>
+<tr class="even">
+<td><strong>8. Basic iterative methods</strong> · 75 min</td>
+<td>Fixed-point iteration, Jacobi, Gauss–Seidel, iteration matrices, convergence</td>
+<td>Derive <span class="math inline">\(e^{(k+1)} = Be^{(k)}\)</span> and explain the role of <span class="math inline">\(\rho(B)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading sources</strong>: NLA §§3.1–3.2, Appendix B.1 and §4.2; Bastian’s §§3, 5–10 and 13–14; Scheichl–Zech’s §§2–3 and 6.3.</p>
+</section>
+<section id="week-3---connect-the-foundations-to-eigensolvers-and-your-seminar" class="level4">
+<h4 class="anchored" data-anchor-id="week-3---connect-the-foundations-to-eigensolvers-and-your-seminar">Week 3 - Connect the foundations to eigensolvers and your seminar</h4>
+<p><strong>Goal:</strong> Build a conceptual understanding of polynomial-filtered subspace iteration.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session</th>
+<th>Material to revise</th>
+<th>Mastery check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>9. Power and subspace iteration</strong> · 90 min</td>
+<td>Power method, spectral gaps, invariant subspaces, orthogonal subspace iteration</td>
+<td>Derive why the power method favors a dominant eigenvector and explain why subspace iteration requires orthonormalization</td>
+</tr>
+<tr class="even">
+<td><strong>10. Matrix polynomials and Chebyshev filtering</strong> · 90 min</td>
+<td><span class="math inline">\(p(A)\)</span>, spectral mapping for polynomials, Chebyshev recurrence, interval scaling</td>
+<td>Explain why applying a polynomial to <span class="math inline">\(A\)</span> can suppress unwanted eigenvector components</td>
+</tr>
+<tr class="odd">
+<td><strong>11. Rayleigh–Ritz and integration</strong> · 75 min</td>
+<td><span class="math inline">\(Q^T A Q\)</span>, Ritz values/vectors, residual orthogonality, connection to filtered subspace iteration</td>
+<td>Derive the Rayleigh–Ritz projection and describe a complete filtered eigensolver at a high level</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading sources:</strong> NLA §§3.3, 5.1 and Appendix B.2; Scheichl–Zech’s §4.10 for deeper Chebyshev approximation background.</p>
+<p>The NLA script explicitly introduces polynomial filtering within vector iteration and later Rayleigh–Ritz approximation for large sparse eigenvalue problems.</p>
+</section>
+<section id="specific-exercises-to-verify-your-pogress" class="level4">
+<h4 class="anchored" data-anchor-id="specific-exercises-to-verify-your-pogress">Specific exercises to verify your pogress</h4>
+<p>Rather than completing a large number of routine exercises, a small nunmber that requires to combing computation with explanation</p>
+<p>For examle five representative checkpoint problems</p>
+<ul>
+<li><strong>Checkpoint A - Linear algebra</strong></li>
+</ul>
+<p>Given <span class="math display">\[
+A=\begin{pmatrix}1&amp;2\\2&amp;4\end{pmatrix},
+\]</span></p>
+<p>determine <span class="math inline">\(\ker(A)\)</span>, <span class="math inline">\(\operatorname{im}(A)\)</span>, rank and nullity. Relate your results to invertibility.</p>
+<ul>
+<li><strong>Checkpoint B - Orthogonal projections</strong></li>
+</ul>
+<p>Let <span class="math display">\[
+q=\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix}.
+\]</span></p>
+<p>Compute <span class="math inline">\(P=qq^T\)</span>, prove that <span class="math inline">\(P\)</span> is an orthogonal projector, and use it to project <span class="math inline">\((1,0)^T\)</span>.</p>
+<ul>
+<li><strong>Checkpoint C - Spectral theorem</strong></li>
+</ul>
+<p>Let <span class="math display">\[
+A=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix}.
+\]</span></p>
+<p>Determine its eigenvalues and an orthonormal eigenbasis. Express <span class="math inline">\(A^k\)</span> in terms of its eigendecomposition.</p>
+<ul>
+<li><strong>Checkpoint D - Numerical Conditioning</strong></li>
+</ul>
+<p>Consider <span class="math display">\[
+A=\begin{pmatrix}1&amp;0\\0&amp;10^{-4}\end{pmatrix}.
+\]</span></p>
+<p>Calculate <span class="math inline">\(\kappa_2(A)\)</span>. Explain how small perturbations in the second component of <span class="math inline">\(b\)</span> can affect the solution of <span class="math inline">\(Ax=b\)</span>.</p>
+<ul>
+<li><strong>Checkpoint D - Numerical Conditioning</strong></li>
+</ul>
+<p>Consider <span class="math display">\[
+A=\begin{pmatrix}1&amp;0\\0&amp;10^{-4}\end{pmatrix}.
+\]</span></p>
+<p>Calculate <span class="math inline">\(\kappa_2(A)\)</span>. Explain how small perturbations in the second component of <span class="math inline">\(b\)</span> can affect the solution of <span class="math inline">\(Ax=b\)</span>.</p>
+<ul>
+<li><strong>Checkpoint E - Polynomial Filtering</strong></li>
+</ul>
+<p>Let</p>
+<p><span class="math display">\[
+A=\operatorname{diag}(1,2,3),\qquad
+p(t)=(t-1)(t-3).
+\]</span></p>
+<p>Determine <span class="math inline">\(p(A)\)</span>. Explain how repeated application of <span class="math inline">\(p(A)\)</span> affects each eigenspace.</p>
+<p>The first four checkpoints test prerequisites. The last one connects directly to the polynomial-filtering example in NLA §3.3.</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
