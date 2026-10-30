@@ -1,0 +1,555 @@
+# Overview
+
+## Numerical Linear Algebra Overview
+
+### Main computational problems
+
+| Problem                | Mathematical formulation              | Typical numerical methods                         |
+| ---------------------- | ------------------------------------- | ------------------------------------------------- |
+| Linear systems         | $Ax = b$                              | LU, Cholesky, CG, GMRES                           |
+| Eigenvalue problems    | $Av = \lambda v$                      | Power iteration, QR iteration, Lanczos, Arnoldi   |
+| Least-squares problems | $\min_x \|Ax - b\|_2$                 | QR, SVD                                           |
+| Matrix factorizations  | $A = QR,\; A = LU,\; A = U\Sigma V^*$ | Householder, Gaussian elimination, SVD algorithms |
+| Low-rank approximation | $A \approx UV^*$                      | Truncated SVD, randomized algorithms              |
+| Matrix functions       | $f(A)v$, e.g. $e^A v$                 | Polynomial and Krylov approximations              |
+
+### The special importance of large and sparse matrices
+
+
+large and sparse matrices arise naturally in many settings, e.g. determining
+the stationary temperature distribution in a two-dimenstional plate.
+
+
+````{python}
+#| label: fig-tridiagonal
+#| fig-cap: "Sparsity pattern of a tridiagonal matrix."
+#| fig-align: center
+#| echo: false
+#| width: "75%"
+
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+
+n = 12
+fig, ax = plt.subplots(figsize=(5, 5))
+
+for i in range(n):
+    for j in range(n):
+        nonzero = abs(i - j) <= 1
+        color = "#2583A0" if nonzero else "#E9EDEF"
+
+        cell = FancyBboxPatch(
+            (j + 0.08, i + 0.08),
+            0.84, 0.84,
+            boxstyle="round,pad=0,rounding_size=0.09",
+            facecolor=color,
+            linewidth=0
+        )
+        ax.add_patch(cell)
+
+ax.set_xlim(0, n)
+ax.set_ylim(n, 0)
+ax.set_aspect("equal")
+ax.axis("off")
+
+plt.tight_layout()
+plt.show()
+````
+
+Iterative methods and subspaces exploit sparsity. This is more effective than simply extending
+Gaussian elimination to bigger matrices.
+
+## Course Overview
+
+The central focus is computing solutions of linear systems and eigenvalue problems 
+for dense and large sparse matrices.
+
+### The five main chapters
+
+| Chapter                                       | Subject                                       | Central ideas                                                                              |
+| --------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **1. Introduction**                           | Applications and motivation                   | Discretized differential equations, least squares, sparse matrices, PageRank               |
+| **2. Orthogonalization and QR Factorization** | Constructing orthonormal bases                | Gram–Schmidt, Householder transformations, Givens rotations                                |
+| **3. Dense Algebraic Eigenvalue Problems**    | Computing eigenvalues of dense matrices       | Schur decomposition, eigenvalue conditioning, vector and subspace iterations, QR iteration |
+| **4. Large Sparse Linear Systems**            | Solving very large $Ax=b$ problems            | Jacobi, Gauss–Seidel, projection methods, Krylov subspaces, CG, GMRES, preconditioning     |
+| **5. Large Sparse Eigenvalue Problems**       | Finding selected eigenvalues of huge matrices | Rayleigh–Ritz, Lanczos, Arnoldi, implicitly restarted Arnoldi, interior eigenvalues        |
+
+### Relationship Between Chapters
+
+```{mermaid}
+%%| label: fig-chapter-dependencies
+%%| fig-cap: "Conceptual relationships between the main chapters."
+%%| fig-align: center
+%%| fig-width: 4.5
+
+flowchart TB
+    A["`**Linear algebra foundations**
+    Vector spaces · eigenvalues · norms · orthogonality · projections`"]
+
+    B["`**Chapter 2 · Orthogonalization and QR**
+    Constructing stable orthonormal bases`"]
+
+    C["`**Chapter 3**
+    Dense eigenvalue problems
+    Power, subspace and QR iteration`"]
+
+    D["`**Chapter 4**
+    Large sparse linear systems
+    Projection methods, CG, GMRES`"]
+
+    E["`**Chapter 5 · Large sparse eigenvalue problems**
+    Rayleigh–Ritz · Lanczos · Arnoldi · restarted methods`"]
+
+    F["`**Connection to your seminar**
+    Polynomial filtering + subspace iteration + Rayleigh–Ritz eigenvalue extraction`"]
+
+    A --> B
+    B --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+
+    classDef foundation fill:#ffffff,stroke:#dddddd,color:#222222
+    classDef highlighted fill:#e8eff4,stroke:#e8eff4,color:#222222
+    classDef chapter fill:#ffffff,stroke:#ffffff,color:#222222
+
+    class A,F foundation
+    class B,E highlighted
+    class C,D chapter
+```
+
+**orthogonalization and projection are the unifying ideas behind much of the course**.
+
+**Orthogonalization** provides suitable bases for subspaces. Projection reduces large computational
+problems to smaller ones.
+
+A Krylov subspace has the form:
+
+$$
+\mathcal K_m(A,v)
+=\operatorname{span}\{v,Av,A^2v,\ldots,A^{m-1}v\}.
+$$
+
+This same construction appears in both large sparse linear-system solvers an dlarge sparse eigensovles.
+The same Arnoldi or Lanczos machinery can support both kinds of computation.
+
+## Linear Algebra and Numerics Prerequisites and Review
+
+### Essential linear algebra topics
+
+| Topic | What you should be able to do | Why it matters for NLA |
+|---|---|---|
+| **Vector spaces, bases and dimension** | Work with span, linear independence, rank, kernel, image and basis changes | Almost every iterative algorithm constructs or manipulates subspaces |
+| **Inner products and orthogonality** | Calculate inner products, orthogonal complements, orthonormal bases | Gram–Schmidt, QR, Arnoldi, Lanczos |
+| **Orthogonal projections** | Understand projections onto subspaces and their matrix representation | Least squares, Galerkin and Rayleigh–Ritz methods |
+| **Eigenvalues and eigenvectors** | Compute simple eigenpairs, understand diagonalization and eigenspaces | Chapters 3 and 5, and your seminar |
+| **Symmetric and Hermitian matrices** | Understand the spectral theorem and orthogonal diagonalization | CG, Lanczos, eigenvalue conditioning |
+| **Positive-definite matrices** | Recognize SPD matrices and understand quadratic forms | Cholesky, CG, energy minimization |
+| **Similarity transformations** | Interpret $V^{-1}AV$ as a basis change | Schur decomposition, QR eigenvalue iteration |
+| **Matrix norms and spectral radius** | Understand operator norms, eigenvalue magnitudes and basic inequalities | Error estimates, convergence, conditioning |
+
+Especially three concepts deserve extra attention:
+
+#### Orthogonality, projection and subspaces
+
+Suppose $Q \in \mathbb{R}^{n\times m}$ has orthonormal columns:
+
+$$
+Q^TQ=I_m.
+$$
+
+Then the matrix 
+
+$$
+P=QQ^T
+$$
+
+is the orthogonal projector onto the subspace spanned by the columns of $Q$.
+
+
+#### Eigenvalues, diagonalization and the spectral theorem
+
+For a general diagonalizable matrix,
+
+$$
+A=V\Lambda V^{-1}.
+$$
+
+For a real symmetric matrix, the much stronger result
+
+$$
+A=Q\Lambda Q^T,\qquad Q^TQ=I.
+$$
+
+Is the spectral theorem. It t ells us that a symmetric matrix has real eigenvalues
+and admits an orthonormal basis or eigenvectors.
+
+Consider an inital vector
+
+$$
+v=\sum_{i=1}^n\alpha_iq_i,
+$$
+
+where $q_i$ are the orthonormal eigenvectors of $A$. Then
+
+$$
+A^kv=\sum_{i=1}^n\alpha_i\lambda_i^kq_i.
+$$
+
+Applying the matrix repeatedly changes the relative importance of the eigenvector
+accordidng to the magnitued of their eigenvalues. This explains the fundamental mechanism of
+**power iteration** and, after generalization, subspace iteration and polynomial filtering.
+
+
+#### Symmetric positive definiteness and quadratic forms
+
+A real symmetric matrix $A$ is positive definite when
+
+$$
+x^TAx>0\qquad\text{for every }x\ne0.
+$$
+
+Equivalent characterizations include the positivity of all eigenvalues and the existence of a 
+Cholesky factorization.
+
+The relationship between SPD matrices and minimization problems is especially useful. 
+For example, solving $Ax = b$ for an SPD matrix is equivalnet to minimizing
+
+$$
+f(x)=\frac12x^TAx-b^Tx.
+$$
+
+This provides a natural connection between linear systems, quadratic optimization
+and the conjugate gradient method.
+
+### Prerequisites from Numerics 0
+
+| Subject                                            | Bastian's `num0.pdf`               | Scheichl–Zech's `Num0_notes_ss25.pdf` | Priority         |
+| -------------------------------------------------- | ---------------------------------- | ------------------------------------- | ---------------- |
+| Floating-point arithmetic and rounding errors      | §§2–3                              | §§2.3–2.4                             | High             |
+| Conditioning, matrix norms and stability           | §§3, 5–6                           | §§2.1–2.2, 3.1–3.3                    | Very high        |
+| Direct methods: Gaussian elimination, LU, Cholesky | §§7–10                             | §§3.4–3.7                             | Medium–high      |
+| Least squares, QR and Householder                  | §§11–12                            | §§3.8–3.9                             | Very high        |
+| Basic iterative linear solvers                     | §§13–14                            | §6.3                                  | Very high        |
+| Polynomial approximation, especially Chebyshev     | §§17–19, 23 for broader background | §§4.9–4.10                            | High for seminar |
+
+
+#### Conditioning versus stability
+
+Conditioning is a property of a mathematical problem. Stability is a property of an algorithm used to solve that
+problem.
+
+For instance, suppose $Ax = b$ and we perturb the right-hand side by $\Delta b$. The solution
+changes according to
+
+$$
+\Delta x = A^{-1} \Delta b
+$$
+
+The condition number 
+
+$$
+\kappa(A)=\|A\|\|A^{-1}\|
+$$
+
+measures the potential amplification of relative errors. But even if a problem is well-conditioned,
+a poor algorithm can introduce unnecessarily large computational errors.
+
+It is alos essential to distinguish the residual
+
+$$
+r=b-A\widetilde x
+$$
+
+from the actual solution error
+
+$$
+e=x-\widetilde x.
+$$
+
+They are related by 
+
+$$
+Ae=r,\qquad e=A^{-1}r.
+$$
+
+Thus a small residual does not automatically guarantee a small forward error when the 
+matrix is ill-conditioned.
+
+These ideas reappear throghout NLA, including in the conditioning of eigenvalues
+and eigenvectors. 
+
+#### Matrix factorizations and orthogonal transformations
+
+Distinction between QR and LU:
+
+* LU decomposes a matrix into triangular factors and supports the direct solution
+  of linear systems.
+* QR constructs orthonormal bases and triangular factors, which are especially useful
+  least squares and eigenvalue algorithms.
+* Cholesky exploits symmetric positive definiteness. 
+
+For NLA **QR is more urgent than detailed LU pivoting analysis**, because Ch 2 of NLA
+directly develops Gram-Schmidt, Householder and Givens transformations.
+
+#### Basic iterative methods and convergence
+
+Consider an iteration
+
+$$
+x^{(k+1)}=Bx^{(k)}+c.
+$$
+
+If $x^{*}$ is its fixed point, then the error satisfies
+
+$$
+e^{(k+1)}=Be^{(k)}.
+$$
+
+Consequently,
+
+$$
+e^{(k)}=B^ke^{(0)}.
+$$
+
+The fundamental convergence criterion is
+
+$$
+\boxed{\rho(B)<1}
+$$
+
+where $\rho(B)$ is the spectral radius.
+
+This connects eigenvalues directly to the convergence of numerical algorithms.
+Jacobi and Gauss-Seidel should be revised, but with a focus on understanding how
+their iteration matrices arise and how their convergence can be analyzed.
+
+#### Chevyshev Polynomials
+
+The NLA script has Appendix B.2: Chebyshev polynomials, beginning on printed page 153.
+
+It introduces the recurrence
+$$
+T_0(x)=1,\qquad T_1(x)=x,
+$$
+
+$$
+T_{k+1}(x)=2xT_k(x)-T_{k-1}(x),
+$$
+
+and properties of Chebyshev polynomials on and outside $[-1,1]$
+
+### The connection to the Chebyshev-filtered subspace iteration seminar
+
+#### Ordinary subspace iteration
+
+Suppose $A$ is symmetric and we wish to compute several of its dominant eigenpairs.
+
+We begin with a matrix $Q_0$ whose columns are orthonormal and repeatedly compute
+$$
+Y_{k+1}=AQ_k,
+$$
+
+followed by orthonormalization,
+$$
+Q_{k+1}=\operatorname{orth}(Y_{k+1}).
+$$
+
+The successive subspaces approach an invariant subspace corresponding to dominant eigenvalues, subject to appropriate initial-subspace and spectral-gap assumptions.
+
+#### Polynomial-filtered iteration
+
+Instead of multiplying by $A$, we apply a polynomial in $A$:
+$$
+Y_{k+1}=p_m(A)Q_k.
+$$
+
+Why does this help?
+
+Because for an eigenvector $q_i$,
+$$
+Aq_i=\lambda_iq_i
+\quad\Longrightarrow\quad
+p_m(A)q_i=p_m(\lambda_i)q_i.
+$$
+
+We can therefore choose a polynomial that makes the desired eigenvalue components comparatively large and suppresses the unwanted components.
+
+A Chebyshev polynomial, after suitable shifting and scaling, is an effective choice because of its controlled magnitude on a specified interval and rapid growth outside it.
+
+The important point is that we can apply such a polynomial using a recurrence involving matrix–vector products, without constructing the generally dense matrix $p_m(A)$.
+
+#### What is needed to understand the complete algorithm
+
+| Component | Mathematical prerequisite | NLA connection |
+|---|---|---|
+| Spectral transformation $p(A)$ | Diagonalization, matrix polynomials | Appendix A.1.2, §3.3 |
+| Desired invariant subspace | Subspaces, eigenspaces, spectral gaps | §§3.2–3.3 |
+| Chebyshev filter | Polynomial recurrence and approximation | Appendix B.2 |
+| Orthonormalization | Inner products, Gram–Schmidt, QR | Chapter 2 |
+| Subspace update | Orthogonal subspace iteration | §3.3.2 |
+| Approximate eigenpairs | Rayleigh quotient, orthogonal projection | §5.1 |
+| Competing eigensolvers | Krylov spaces, Lanczos, Arnoldi | Chapters 4–5 |
+
+The script even develops polynomial filtering in §3.3. There is an example using
+$$
+A=\operatorname{diag}(1,2,3)
+$$
+
+and the polynomial
+$$
+p(t)=(t-1)(t-3).
+$$
+
+Here the unwanted eigenvalues $1$ and $3$ are mapped to zero, while the component associated with eigenvalue $2$ is retained.
+
+Chapter 5 then combines projection, Rayleigh–Ritz approximation and Krylov-based eigenvalue methods. This is a natural starting point for comparing your seminar algorithm with Lanczos and Arnoldi methods.
+
+One subtle but important distinction is that the seminar's polynomial-filtered subspace method need not itself be a Krylov-subspace algorithm in the same sense as Arnoldi. Both make essential use of matrix polynomials and subspaces, but organize their iterations differently.
+
+## Revision Strategy
+
+### Phase 1 - linear algebra foundation
+
+Vector spaces and bases, innder products, projections, eigenvalues, diagonalization,
+and SPD matrices.
+
+Useful readiness test: 
+
+> can you explain, and then prove why $QQ^T$ is an orthogonal projector when
+> $Q$ has orthonormal columns
+
+### Phase 2 - numerical-analysis foundation
+
+Conditioning, residuals and error estimates, floating-point arithmetic, QR factorization
+and convergence of iterative methods.
+
+readiness test:
+
+> 1. why does conditioning matter?
+> 2. why can a small residual be misleading?
+> 3. why does the spectral radius control stationary iterations?
+
+### Phase 3 - Eigenvalues
+
+Power method, Rayleigh quitient, subspace iteration and polynonial filtering.
+Chebyshev polynomials and Rayleigh-Ritz.
+
+
+### Targeted Revision Plan
+
+**11 focused sessions**. 
+
+
+#### Week 1 - Rebuild the linear algebra foundations
+
+**Goal:** Recover fluency with vectors, subspaces, projections, and orthogonalization so that Chapter 2 becomes manageable.
+
+| Session | Material to revise | Mastery check |
+|---|---|---|
+| **1. Vector spaces and linear maps** · 60 min | Span, linear independence, bases, dimension, rank, kernel, image, change of basis | Given a matrix, determine bases for its kernel and image; explain rank–nullity |
+| **2. Inner products and orthogonality** · 75 min | Inner products, orthogonal complements, orthonormal bases, Gram–Schmidt | Construct an orthonormal basis from linearly independent vectors |
+| **3. Orthogonal projections** · 75 min | Projection onto a line/subspace, $P = QQ^T$, least-squares geometry | Derive the projection matrix and prove $P^2 = P$ |
+| **4. QR factorization** · 90 min | Gram–Schmidt, Householder reflections, QR, least-squares solution | Perform QR on a small matrix and explain why orthogonality is useful numerically |
+
+**Reading sources**: NLA Appendix A.1–A.3, NLA Chapter 2, Bastian's §5 and §§11–12, and Scheichl–Zech's §§3.8–3.9.
+
+
+#### Week 2 - Recover spectral theory and numerical analysis
+
+**Goal:** Understand how matrix structure, conditioning and numerical algorithms interact.
+
+| Session | Material to revise | Mastery check |
+|---|---|---|
+| **5. Eigenvalues and the spectral theorem** · 90 min | Eigenvectors, eigenspaces, diagonalization, symmetric/Hermitian matrices, SPD | Diagonalize a symmetric matrix and use the decomposition to compute $A^k v$ |
+| **6. Matrix norms and conditioning** · 75 min | Induced norms, spectral radius, condition numbers, residual versus error, stability | Derive an error estimate using $e = A^{-1}r$ and explain why small residuals can mislead |
+| **7. Direct numerical methods** · 60 min | Gaussian elimination, LU, pivoting, triangular systems, Cholesky | Solve a system via LU and explain when Cholesky applies |
+| **8. Basic iterative methods** · 75 min | Fixed-point iteration, Jacobi, Gauss–Seidel, iteration matrices, convergence | Derive $e^{(k+1)} = Be^{(k)}$ and explain the role of $\rho(B)$ |
+
+**Reading sources**: NLA §§3.1–3.2, Appendix B.1 and §4.2; Bastian's §§3, 5–10 and 13–14; Scheichl–Zech's §§2–3 and 6.3. 
+
+
+#### Week 3 - Connect the foundations to eigensolvers and your seminar
+
+**Goal:** Build a conceptual understanding of polynomial-filtered subspace iteration.
+
+| Session | Material to revise | Mastery check |
+|---|---|---|
+| **9. Power and subspace iteration** · 90 min | Power method, spectral gaps, invariant subspaces, orthogonal subspace iteration | Derive why the power method favors a dominant eigenvector and explain why subspace iteration requires orthonormalization |
+| **10. Matrix polynomials and Chebyshev filtering** · 90 min | $p(A)$, spectral mapping for polynomials, Chebyshev recurrence, interval scaling | Explain why applying a polynomial to $A$ can suppress unwanted eigenvector components |
+| **11. Rayleigh–Ritz and integration** · 75 min | $Q^T A Q$, Ritz values/vectors, residual orthogonality, connection to filtered subspace iteration | Derive the Rayleigh–Ritz projection and describe a complete filtered eigensolver at a high level |
+
+**Reading sources:** NLA §§3.3, 5.1 and Appendix B.2; Scheichl–Zech's §4.10 for deeper Chebyshev approximation background.
+
+The NLA script explicitly introduces polynomial filtering within vector iteration and later Rayleigh–Ritz approximation for large sparse eigenvalue problems.
+
+#### Specific exercises to verify your pogress
+
+Rather than completing a large number of routine exercises, a small nunmber that requires to combing
+computation with explanation
+
+For examle five representative checkpoint problems
+
+
+* **Checkpoint A - Linear algebra**
+
+Given
+$$
+A=\begin{pmatrix}1&2\\2&4\end{pmatrix},
+$$
+
+determine $\ker(A)$, $\operatorname{im}(A)$, rank and nullity. Relate your results to invertibility.
+
+* **Checkpoint B - Orthogonal projections**
+
+Let
+$$
+q=\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix}.
+$$
+
+Compute $P=qq^T$, prove that $P$ is an orthogonal projector, and use it to project $(1,0)^T$.
+
+* **Checkpoint C - Spectral theorem**
+
+Let
+$$
+A=\begin{pmatrix}2&1\\1&2\end{pmatrix}.
+$$
+
+Determine its eigenvalues and an orthonormal eigenbasis. Express $A^k$ in terms of its eigendecomposition.
+
+
+* **Checkpoint D - Numerical Conditioning**
+
+Consider
+$$
+A=\begin{pmatrix}1&0\\0&10^{-4}\end{pmatrix}.
+$$
+
+Calculate $\kappa_2(A)$. Explain how small perturbations in the second component of $b$ can affect the solution of $Ax=b$.
+
+* **Checkpoint D - Numerical Conditioning**
+
+Consider
+$$
+A=\begin{pmatrix}1&0\\0&10^{-4}\end{pmatrix}.
+$$
+
+Calculate $\kappa_2(A)$. Explain how small perturbations in the second component of $b$ can affect the solution of $Ax=b$.
+
+
+* **Checkpoint E - Polynomial Filtering**
+
+Let
+
+$$
+A=\operatorname{diag}(1,2,3),\qquad
+p(t)=(t-1)(t-3).
+$$
+
+Determine $p(A)$. Explain how repeated application of $p(A)$ affects each eigenspace.
+
+
+The first four checkpoints test prerequisites. The last one connects directly to the polynomial-filtering example in NLA §3.3.
+

@@ -1,17 +1,30 @@
 project:
   type: book
 
+number-depth: 2
+
+execute: 
+  freeze: auto
+
 book:
-  title: "Numerical Linear Algebra"
-  author: "Norah Jones"
+  title: "Numerical Linear Algebra WS 26/27 Notes"
+  author: "Igor Dimitrov" 
   date: "10/21/2026"
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
+    - review_plan.qmd
+    # - intro.qmd
+    # - summary.qmd
     - references.qmd
+    - part: "Review"
+      chapters: 
+      - review/01_vector_spaces.qmd
+
+  downloads: pdf
 
 bibliography: references.bib
+
+
 
 format:
   html:
