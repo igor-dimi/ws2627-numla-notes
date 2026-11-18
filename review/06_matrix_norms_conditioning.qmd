@@ -1,0 +1,269 @@
+# Session 6 — Matrix Norms and Conditioning
+
+A solver reports a relative residual of $10^{-8}$. Can you promise even one accurate digit in the solution? To decide, we need to know what happens to an error vector when the matrix acts on it. If the matrix nearly erases one direction, checking the equations can hide precisely the error we care about.
+
+**Revision route (75 minutes).** Spend 12 minutes on amplification and spectral radius, 12 on perturbations, 14 on residuals and the experiment, and 10 on backward error, stability, and synthesis. Reserve 27 minutes for the exercises. The mastery task is to reconstruct the relative error bound and exhibit a system where equality holds even though the residual tends to zero.
+
+## Measuring amplification
+
+A residual is a vector with one entry per equation. To compare it with the data, we need a common scale. A **vector norm** assigns a nonnegative real size to each vector, with $\|x\|=0$ exactly when $x=0$, $\|\alpha x\|=|\alpha|\,\|x\|$, and $\|x+y\|\leq\|x\|+\|y\|$. For real or complex coordinates, the usual choices are
+
+$$
+\|x\|_1=\sum_i|x_i|,\qquad
+\|x\|_2=\left(\sum_i|x_i|^2\right)^{1/2},\qquad
+\|x\|_\infty=\max_i|x_i|.
+$$
+
+They measure total absolute size, Euclidean length, and the largest coordinate magnitude. Their unit balls in the real plane are a diamond, a disk, and an axis-aligned square. Choose a norm according to the error you want to control, and keep that choice throughout an estimate.
+
+### From vector size to operator size
+
+For a matrix $A$ mapping one coordinate space into another, its **induced norm** is the greatest amplification of input size,
+
+$$
+\|A\|=\sup_{v\ne0}\frac{\|Av\|}{\|v\|}
+     =\max_{\|v\|=1}\|Av\|.
+$$
+
+Homogeneity allows normalization. In finite dimensions the unit sphere is compact, so the continuous function $v\mapsto\|Av\|$ attains its maximum. Every individual ratio lies below that maximum. Thus $\|Av\|\leq\|A\|\,\|v\|$, also for $v=0$. This step converts an exact vector identity into a scalar error bound. Applying it twice gives $\|ABv\|\leq\|A\|\,\|B\|\,\|v\|$. Maximizing over unit vectors proves **submultiplicativity**, $\|AB\|\leq\|A\|\,\|B\|$, for compatible dimensions and norms.
+
+The subscript $p$ denotes the same $p$-norm on the input and output. Writing $a_{ij}$ for the matrix entries gives
+
+$$
+\|A\|_1=\max_j\sum_i|a_{ij}|,\qquad
+\|A\|_\infty=\max_i\sum_j|a_{ij}|.
+$$
+
+**Why columns and rows?** In the $1$-norm, $Av$ combines columns with weights $v_j$. The triangle inequality bounds its size by the largest column sum times $\sum_j|v_j|$. A coordinate vector selecting a largest column attains the bound. In the infinity norm, each output coordinate is a row acting on $v$. Its magnitude is at most the absolute row sum times $\|v\|_\infty$. For a maximizing row, choose unit-modulus input entries whose phases make all its nonzero terms positive real. This attains the row bound.
+
+For the Euclidean norm, let $A^*$ denote the conjugate transpose (ordinary transpose over the reals). Since $A^*A$ is Hermitian positive semidefinite, Session 5 gives an orthonormal eigenbasis. In that basis, $v^*A^*Av$ for a unit vector is a weighted average of eigenvalues with weights equal to squared coordinate magnitudes. The largest average is the largest eigenvalue, attained on its eigenvector. Hence
+
+$$
+\|A\|_2^2=\max_{\|v\|_2=1}\|Av\|_2^2
+=\max_{\|v\|_2=1}v^*A^*Av=\lambda_{\max}(A^*A).
+$$
+
+The square roots of these eigenvalues are the **singular values** (for square matrices). In particular $\|A\|_2=\sigma_{\max}(A)$, the longest semiaxis of the image of the unit sphere. Unitary changes of coordinates preserve Euclidean length and hence preserve these stretching factors.
+
+**Worked example.** Take $B=\begin{pmatrix}0&3\\0&4\end{pmatrix}$. Its largest column sum is $7$, its largest row sum is $4$, and $B^*B=\operatorname{diag}(0,25)$ gives $\|B\|_2=5$. Indeed $B(s,t)^T=(3t,4t)^T$ has length $5|t|$, maximized on the unit circle at $(0,\pm1)^T$.
+
+The **Frobenius norm** $\|A\|_F=(\sum_{ij}|a_{ij}|^2)^{1/2}$ measures the Euclidean size of the whole array. It is submultiplicative (apply Cauchy–Schwarz to each entry of a product and sum). For the $n$-dimensional identity $I$, every norm induced by the same vector norm on both sides satisfies $\|I\|=1$, whereas $\|I\|_F=\sqrt n$. This rules out such an induced-norm interpretation for $n>1$.
+
+## One application versus repeated applications
+
+The **spectral radius** of a square matrix is $\rho(A)=\max_{\lambda\in\sigma(A)}|\lambda|$, where $\sigma(A)$ is the set of complex eigenvalues. For an eigenpair $Av=\lambda v$ with $v\ne0$, we have $|\lambda|\,\|v\|=\|Av\|\leq\|A\|\,\|v\|$. Taking the maximum gives $\rho(A)\leq\|A\|$ for any induced norm on the complex space. For real matrices the usual $1,2,\infty$ formulas give the same operator norms over either field.
+
+For Hermitian $A$, an orthonormal eigenbasis diagonalizes $A$ and $A^*A$ with respective entries $\lambda_i$ and $|\lambda_i|^2$. Thus $\|A\|_2=\rho(A)$. The same proof applies to every **normal** matrix ($A^*A=AA^*$), by unitary diagonalization.
+
+**Revisit $B$.** Its triangular form gives eigenvalues $0,4$, so $\rho(B)=4<5=\|B\|_2$. Its most stretched input $(0,1)^T$ changes direction. Indeed $B^2=4B$, so $\|B^k\|_2=5\cdot4^{k-1}$ for $k\geq1$. The one-step maximum is $5$, yet the long-run per-step growth factor is $4$. More generally, for a stationary iteration with error recurrence $e_{k+1}=Te_k$, the error tends to zero for every initial error exactly when $\rho(T)<1$. A norm bound $\|T\|<1$ guarantees contraction at every step. Session 8 studies this distinction.
+
+## Conditioning a linear solve
+
+Assume from here that $A$ is square and invertible, $Ax=b$, and all matrix norms are induced by the chosen vector norm unless marked otherwise. Relative measures below assume $b\ne0$, which also gives $x\ne0$.
+
+### What changes when the data change?
+
+Hold $A$ fixed and replace $b$ by $b+\delta b$. Subtracting the original equations from $A(x+\delta x)=b+\delta b$ gives $A\delta x=\delta b$. The absolute sensitivity is governed by $\delta x=A^{-1}\delta b$. To compare *relative* changes, insert the scale of the original data,
+
+$$
+\frac{\|\delta x\|}{\|x\|}
+\leq \|A^{-1}\|\frac{\|b\|}{\|x\|}
+      \frac{\|\delta b\|}{\|b\|}
+\leq \underbrace{\|A^{-1}\|\,\|A\|}_{\kappa(A)}
+      \frac{\|\delta b\|}{\|b\|}.
+$$
+
+The last step uses $\|b\|=\|Ax\|\leq\|A\|\,\|x\|$. The **condition number** $\kappa(A)$ is dimensionless because the units of forward and inverse amplification cancel. Scaling $A$ by any nonzero scalar leaves it unchanged. Also $1=\|I\|\leq\|A\|\,\|A^{-1}\|$.
+
+For this particular $b$, the sharp worst-direction factor is $\|A^{-1}\|\,\|b\|/\|x\|$. Maximizing over $x$ as well yields $\kappa(A)$. A large value describes possible amplification. The actual outcome depends on both the original solution direction and the direction of the perturbation. No solver entered the derivation.
+
+### Stretching factors and inversion
+
+As a unit vector ranges over all directions, its squared image length ranges from $\lambda_{\min}(A^*A)$ to $\lambda_{\max}(A^*A)$. Write $\sigma_{\min}$ and $\sigma_{\max}$ for the corresponding positive square roots. Substituting $w=Av$ in the definition of the inverse norm gives
+
+$$
+\|A^{-1}\|_2=\max_{v\ne0}\frac{\|v\|_2}{\|Av\|_2}
+=\frac{1}{\sigma_{\min}},\qquad
+\kappa_2(A)=\frac{\sigma_{\max}}{\sigma_{\min}}.
+$$
+
+Thus conditioning measures the aspect ratio of the image ellipsoid. For Hermitian positive-definite $A$, all eigenvalues are positive and $A^*A=A^2$, so $\kappa_2(A)=\lambda_{\max}(A)/\lambda_{\min}(A)$. Inversion multiplies each eigenvector by the reciprocal eigenvalue. For a general invertible matrix the singular-value formula applies, even when eigenvectors fail to span the space.
+
+**Worked example.** Set $A_\varepsilon=\operatorname{diag}(1,\varepsilon)$ with $0<\varepsilon\leq1$. The unit circle maps to an ellipse with horizontal semiaxis $1$ and vertical semiaxis $\varepsilon$. Inversion stretches a vertical data perturbation by $1/\varepsilon$ and preserves a horizontal one. For $\varepsilon=10^{-4}$ the corresponding amplification factors are $10^4$ and $1$, and $\kappa_2=10^4$. By comparison, $10^{-4}I$ amplifies *every* direction by $10^4$ under inversion but has condition number $1$. Absolute amplification and relative sensitivity answer different questions.
+
+### If the matrix changes too
+
+Suppose $(A+\delta A)(x+\delta x)=b+\delta b$. Expansion gives the exact identity $A\delta x=\delta b-\delta A\,x-\delta A\,\delta x$. The extra terms express a change in the operator itself. Put $d_A=\|\delta A\|/\|A\|$ and $d_b=\|\delta b\|/\|b\|$. Apply $A^{-1}$, take norms, and move the term containing $\|\delta x\|$ to the left. When $\kappa(A)d_A<1$, the result is
+
+$$
+\frac{\|\delta x\|}{\|x\|}
+\leq \frac{\kappa(A)(d_A+d_b)}{1-\kappa(A)d_A}.
+$$
+
+The condition ensures invertibility of $A+\delta A$ because $\|A^{-1}\delta A\|<1$ and $I+A^{-1}\delta A$ has a convergent geometric-series inverse. To first order in small perturbations the numerator gives the bound. For fixed $A$ the denominator is exactly one.
+
+## The error equation
+
+Given a candidate $\widehat{x}$, form the **residual** $r=b-A\widehat{x}$ from known quantities. The **forward error** $e=x-\widehat{x}$ involves the unknown exact solution. Linearity connects them:
+
+$$
+Ae=Ax-A\widehat{x}=b-A\widehat{x}=r,
+\qquad \boxed{e=A^{-1}r}.
+$$
+
+This identity says that recovering the missing correction is itself a solve with the original matrix. It does not require forming an inverse. Taking norms gives $\|e\|\leq\|A^{-1}\|\,\|r\|$. For $b\ne0$, insert $\|b\|/\|b\|$ and use $\|b\|/\|x\|\leq\|A\|$:
+
+$$
+\boxed{\frac{\|x-\widehat{x}\|}{\|x\|}
+\leq\kappa(A)\frac{\|b-A\widehat{x}\|}{\|b\|}.}
+$$
+
+The second factor measures the defect on the scale of the equations. The first translates that defect into a worst-case relative uncertainty in solution space. For example, a verified $\kappa(A)\leq20$ and a relative residual at most $10^{-8}$ certify relative error at most $2\cdot10^{-7}$. An estimated condition number gives a diagnostic estimate unless it is known to bound the true value from above.
+
+### One residual, two directions
+
+Take $A_\varepsilon$ as above, $x=(1,0)^T$, $b=(1,0)^T$, and $\widehat{x}=(1,1)^T$. Then
+
+$$
+A_\varepsilon\widehat{x}=(1,\varepsilon)^T,\qquad
+r=(0,-\varepsilon)^T,\qquad e=(0,-1)^T.
+$$
+
+Both reference norms are $1$. The relative residual is $\varepsilon$, the relative error is $1$, and the upper bound is $(1/\varepsilon)\varepsilon=1$. **Equality holds at every scale.** An entire spurious vertical component survives in the computed solution while contributing only $\varepsilon$ to the equations. Taking $\varepsilon\downarrow0$ makes the residual arbitrarily small while keeping every matrix invertible.
+
+Keep the matrix and $b$ fixed but choose $\widehat{x}=(1-\varepsilon,0)^T$. The equally small horizontal residual $(\varepsilon,0)^T$ now corresponds to relative error $\varepsilon$. Conversely, for the well-conditioned system $A=I$, $b=(1,0)^T$, every residual *equals* its error vector. The first approximation $(1,1)^T$ then has relative residual $1$, immediately exposing the error.
+
+### Experiment in two dimensions
+
+Predict the slope of each curve as $\varepsilon$ decreases. The experiment prescribes a candidate so that it isolates what a residual can certify independently of how the candidate was obtained.
+
+```{python}
+#| label: fig-session6-residual-conditioning
+#| fig-cap: "As the vertical stretching factor decreases, the relative residual shrinks while the relative error remains one. Open circles mark the upper bound, which is attained at every point."
+#| fig-width: 6.2
+#| fig-height: 3.4
+import numpy as np
+import matplotlib.pyplot as plt
+
+eps_values = 10.0 ** (-np.arange(0, 13, dtype=float))
+x = np.array([1.0, 0.0])
+x_hat = np.array([1.0, 1.0])
+measurements = []
+
+for eps in eps_values:
+    A = np.diag([1.0, eps])
+    b = A @ x
+    relative_residual = np.linalg.norm(b - A @ x_hat) / np.linalg.norm(b)
+    relative_error = np.linalg.norm(x - x_hat) / np.linalg.norm(x)
+    condition = np.linalg.cond(A, 2)
+    measurements.append((condition, relative_residual, relative_error,
+                         condition * relative_residual))
+
+condition, residual, error, bound = np.array(measurements).T
+for observed, predicted in zip((condition, residual, error, bound),
+                               (1 / eps_values, eps_values, 1.0, 1.0)):
+    np.testing.assert_allclose(observed, predicted, rtol=1e-13, atol=0)
+
+fig, ax = plt.subplots(figsize=(6.2, 3.4), constrained_layout=True)
+ax.loglog(eps_values, condition, "^-", label="Condition number")
+ax.loglog(eps_values, residual, "v--", label="Relative residual")
+ax.loglog(eps_values, error, "-", color="black", label="Relative error")
+ax.loglog(eps_values, bound, "o", mfc="none", color="black", label="Bound")
+ax.invert_xaxis()
+ax.set(xlabel=r"Vertical stretching factor $\varepsilon$", ylabel="Magnitude")
+ax.grid(True, which="major", alpha=0.25)
+ax.legend(fontsize=8, ncol=2)
+plt.show()
+```
+
+In exact arithmetic the four quantities are $1/\varepsilon,\varepsilon,1,1$. At $10^{-8}$ this gives $10^8,10^{-8},1,1$. The code computes all four from the arrays and checks agreement to relative tolerance $10^{-13}$. The range down to $10^{-12}$ stays far above underflow. The vertical residual subtracts a nonzero entry from zero, so it avoids the cancellation that can complicate real residual evaluations.
+
+## Backward error and stability
+
+Ask how the *data* would have to change to make the computed answer exact. With $A$ fixed, $A\widehat{x}=b-r$, so the unique admissible change is $\delta b=-r$. The relative **right-hand-side backward error** is therefore $\eta_b=\|r\|/\|b\|$. For the vertical error above, $\widehat{x}$ is an exact answer for data only $\varepsilon$ away in relative terms.
+
+A different model allows simultaneous, unstructured changes to both inputs. In the Euclidean and induced spectral norms let $\eta_{A,b}$ be the smallest $t$ for which $(A+\delta A)\widehat{x}=b+\delta b$, with $\|\delta A\|_2\leq t\|A\|_2$ and $\|\delta b\|_2\leq t\|b\|_2$. Then
+
+$$
+\eta_{A,b}=\frac{\|r\|_2}{\|A\|_2\|\widehat{x}\|_2+\|b\|_2}.
+$$
+
+Indeed $r=\delta A\widehat{x}-\delta b$ gives the lower bound by the triangle inequality. For nonzero $r,\widehat{x}$, set $q=r/\|r\|_2$, $v=\widehat{x}/\|\widehat{x}\|_2$ and take $\delta A=t\|A\|_2qv^*$, $\delta b=-t\|b\|_2q$. The two contributions point along $q$ and attain the bound at the stated $t$. Zero residual gives zero backward error, and $\widehat{x}=0$ requires $\delta b=-b$. Restrictions such as symmetry, sparsity, or componentwise tolerances define other models. To bound forward error from $\eta_{A,b}$, use the simultaneous perturbation estimate with $d_A,d_b\leq\eta_{A,b}$ and check its denominator.
+
+**Backward stability** means that an algorithm, over its stated class of inputs, returns exact solutions for admissibly perturbed data with backward error bounded on the scale of $C u$, where $u$ is unit roundoff and $C$ is a suitably modest factor under the stated assumptions. A single observed backward error assesses one result. An algorithmic stability claim requires a bound across inputs. On an ill-conditioned system, even an error on the scale of roundoff can be amplified by the inverse.
+
+**Worked example — same problem, different algorithms.** Solve the scalar system $1x=1$ in binary64 arithmetic with rounding to nearest, ties to even. Direct division gives $1$. Another procedure computes $((b+M)-M)/A$ with $M=2^{53}$. This is the same formula in exact arithmetic. In binary64, the consecutive representable numbers at and just above $M$ are $M$ and $M+2$. The midpoint $M+1$ rounds to $M$, so the procedure returns $0$. Here $\kappa=1$, and both the relative residual and relative forward error of the second answer are $1$. The damaging operation was introduced by the algorithm. Session 4 used the same diagnostic discipline for QR by checking *both* the reconstruction residual $\|A-\widehat Q\widehat R\|$ and the orthogonality defect $\|I-\widehat Q^*\widehat Q\|$.
+
+## Central Synthesis — Conditioning, Backward Error, and Forward Error
+
+Start with the candidate produced by the algorithm. Substitution into the equations gives a defect. Specify which inputs may change, then translate the defect into a backward error. A sensitivity estimate for **that same data model** converts the backward error into a statement about forward accuracy. In the fixed-$A$ model the entire argument fits in one line:
+
+$$
+ A\widehat{x}=b-r
+ \quad\Longrightarrow\quad
+ x-\widehat{x}=A^{-1}r
+ \quad\Longrightarrow\quad
+ \frac{\|x-\widehat{x}\|}{\|x\|}\leq\kappa(A)\eta_b.
+$$
+
+**Reading a solver report.** The following quantities assume consistent norms and nonzero reference data where needed.
+
+| Diagnostic | Quantity | Available without $x$? |
+|---|---|---|
+| Absolute residual | $\|b-A\widehat{x}\|$ | Yes, in the units of $b$ |
+| Relative residual | $\|r\|/\|b\|$ | Yes, relative to data scale |
+| Absolute forward error | $\|x-\widehat{x}\|$ | Usually requires a reference solution |
+| Relative forward error | $\|x-\widehat{x}\|/\|x\|$ | Usually requires a reference solution |
+| Condition number | $\|A\|\,\|A^{-1}\|$ | Yes, often estimated using solves |
+| Backward error | $\eta_b$ or $\eta_{A,b}$ | Yes, after specifying the model |
+
+A small upper bound certifies accuracy. A large upper bound leaves accuracy undecided, as the two residual directions for $A_\varepsilon$ illustrate. Good conditioning helps only when the algorithm delivers small backward error. In practice the computed residual also contains rounding from the matrix-vector product and subtraction. If $A\widehat{x}$ is very close to $b$, that rounding can dominate the defect. Recomputing the residual in higher precision, as in mixed-precision iterative refinement, makes the diagnostic more informative.
+
+### Connections to the lecture and seminar
+
+- **Direct methods (Session 7).** For a backward-stable QR solve, or an LU solve with suitably controlled growth, a small backward error and large condition number can coexist. Pivoting and the choice of factorization concern the algorithm. Sensitivity of the original solve is common to all of them.
+- **Stationary iterations (Session 8).** The iteration matrix governs how errors propagate between steps. The system matrix governs how the current residual translates into solution error. A residual stopping tolerance needs the latter relationship.
+- **Eigensolvers (Sessions 9 and 11).** For a unit candidate $\widehat v$ and approximate eigenvalue $\widehat\lambda$, the eigenpair residual $s=A\widehat v-\widehat\lambda\widehat v$ is computable. For Hermitian $A$, expanding in an orthonormal eigenbasis gives $\|s\|_2^2=\sum_i |\lambda_i-\widehat\lambda|^2|c_i|^2$, where $c_i$ are the coefficients of $\widehat v$. If several eigenvalues cluster near $\widehat\lambda$, many mixtures give small residuals. Accuracy of an individual eigenvector requires spectral separation.
+- **Chebyshev filtering (Sessions 9–11).** In exact arithmetic a polynomial $p(A)$ weights each eigenvector component by $p(\lambda_i)$. Separation between wanted and unwanted filter values drives subspace improvement. In finite precision, polynomial evaluation introduces errors, and unequal amplification can make block columns nearly dependent. QR restores a usable basis to the extent that its directions are still resolved. Check basis orthogonality and Ritz residuals alongside the predicted filter response.
+
+**Course reading.** The Review I route follows §§1.3, 1.3.3, and 1.4.4 of the book. Kanschat and Scheichl, *Numerical Linear Algebra*, Appendix B.1 gives the operator-norm and spectral-radius framework, with Chapters 3–4 supplying eigenvalue and iteration contexts. Scheichl and Zech, *Numerik 0*, §§2.1–2.2 and 3.1–3.3 develop conditioning, stability, matrix norms, and perturbation bounds. Bastian, *Numerik 0*, §§3, 5, and 6 connects finite arithmetic to linear-system sensitivity.
+
+## Independent exercises
+
+1. **Three views of one matrix (3 min).** For $C=\begin{pmatrix}1&-2\\0&0\end{pmatrix}$, compute the induced $1,\infty,2$ norms and $\rho(C)$. Exhibit a Euclidean unit input attaining the spectral norm.
+2. **A first step that grows (3 min).** For $T=\begin{pmatrix}0&6\\0&0\end{pmatrix}$, find $\rho(T)$ and $\|T\|_2$. Starting from $(0,1)^T$, calculate the first two errors in $e_{k+1}=Te_k$. Explain their behavior.
+3. **Two data errors (4 min).** Take $A=\operatorname{diag}(4,1/2)$, $x=(1,0)^T$, and $b=Ax$. Compute $\kappa_2(A)$. Perturb $b$ first by $(0.04,0)^T$, then by $(0,0.04)^T$. Find the relative data and solution changes. Which direction attains the global bound?
+4. **Reconstruct the certificate (5 min).** Given $Ax=b$ and a candidate $y$, derive the absolute and relative forward-error bounds from the definition of the induced norm. State every nonzero or invertibility assumption. Recover the relative right-hand-side perturbation estimate by choosing $y$ appropriately.
+5. **Audit an accuracy claim (6 min).** A report gives a relative residual of $10^{-9}$ and an estimated $\kappa_2$ of $10^9$. It claims nine accurate digits. Assess the claim, then construct two invertible diagonal-system examples with those exact diagnostics, one with relative error $1$ and one with relative error $10^{-9}$. You may use the same matrix for both.
+6. **Two solvers and two data models (6 min).** A matrix has verified $\kappa_2(A)=3$. On the same data, solvers P and Q produce relative residuals $10^{-14}$ and $0.2$, respectively. Give upper *and lower* bounds on their relative forward errors. Which stability claims about the algorithms follow? For Q, suppose additionally that $\|A\|_2\|\widehat x\|_2=2\|b\|_2$. Calculate the simultaneous backward error and explain why it differs from $0.2$.
+
+## Worked solutions
+
+**1. Three views.** The absolute column sums are $1,2$ and row sums are $3,0$, giving $\|C\|_1=2$ and $\|C\|_\infty=3$. A unit input $(s,t)^T$ produces length $|s-2t|\leq\sqrt5$ by Cauchy–Schwarz. Equality holds at $(1,-2)^T/\sqrt5$, so $\|C\|_2=\sqrt5$. Triangularity gives eigenvalues $1,0$ and spectral radius $1$.
+
+**2. A first step that grows.** Both eigenvalues are zero. Acting on $(s,t)^T$ gives $(6t,0)^T$, so $\|T\|_2=6$. Starting on the vertical axis gives $e_1=(6,0)^T$ and $e_2=0$. The maximally stretched direction maps into the kernel. Indeed $T^2=0$ for all initial vectors, consistent with $\rho(T)=0$.
+
+**3. Two data errors.** The singular values are $4,1/2$, so $\kappa_2=8$. Since $b=(4,0)^T$, both relative perturbations are $0.04/4=0.01$. Multiplication by $A^{-1}=\operatorname{diag}(1/4,2)$ gives corrections $(0.01,0)^T$ and $(0,0.08)^T$. The original solution has unit norm, so the relative changes are $0.01$ and $0.08$. The vertical perturbation attains $8\cdot0.01$.
+
+**4. Reconstruct the certificate.** Let $A$ be square and invertible and take a vector norm with its induced matrix norm. Set $e=x-y$ and $r=b-Ay$. Then $Ae=r$, hence $e=A^{-1}r$. The defining supremum bounds $\|e\|$ by $\|A^{-1}\|\,\|r\|$ (including $r=0$). For $b\ne0$ we have $x\ne0$ and $\|b\|/\|x\|\leq\|A\|$. Dividing the absolute bound by $\|x\|$ and inserting this ratio gives $\|e\|/\|x\|\leq\kappa(A)\|r\|/\|b\|$. If $Ay=b+\delta b$, then $r=-\delta b$ and $e=-(y-x)$. Taking norms gives the desired relative perturbation estimate.
+
+**5. Audit an accuracy claim.** Even if the condition estimate is exact, the upper bound is $1$. An estimated condition number introduces additional uncertainty. Choose $A=\operatorname{diag}(1,10^{-9})$ and $x=b=(1,0)^T$. With $y=(1,1)^T$, $r=(0,-10^{-9})^T$ and $e=(0,-1)^T$. With $y=(1-10^{-9},0)^T$, $r=e=(10^{-9},0)^T$. Both candidates have the reported diagnostics in exact arithmetic. Their relative errors are $1$ and $10^{-9}$ respectively. The report omits the direction information that distinguishes them.
+
+**6. Two solvers.** Write $h=\|r\|/\|b\|$ and $f=\|e\|/\|x\|$. From $r=Ae$ and $x=A^{-1}b$ we get $h\leq\|A\|\,\|A^{-1}\|f$. Combine this with $f\leq\kappa(A)h$ to obtain $h/3\leq f\leq3h$. P has $10^{-14}/3\leq f\leq3\cdot10^{-14}$. Q has $1/15\leq f\leq0.6$. The lower bound establishes an actual loss of accuracy for Q. Conditioning is identical in both runs. P delivered small backward error on this instance, which alone cannot establish backward stability over a class of inputs. Q's result contradicts any claimed fixed-$A$ stability guarantee requiring a relative backward error smaller than $0.2$ on these data. For the simultaneous model the denominator is $3\|b\|_2$, giving $\eta_{A,b}=0.2/3=1/15$. Allowing perturbations in the operator as well as the data makes a smaller common budget sufficient.
+
+## End-of-session mastery checklist
+
+Before Session 7, close the chapter and check that you can independently:
+
+- Define an induced norm, prove $\|Av\|\leq\|A\|\,\|v\|$, and use the same argument for a product.
+- Calculate induced $1,\infty,2$ norms for a small matrix and identify a maximally stretched input.
+- Define $\rho(A)$, prove the induced-norm bound, and explain the Euclidean equality for normal matrices.
+- Interpret $\kappa(A)$ through inversion, singular values, and directional sensitivity.
+- Derive the relative right-hand-side perturbation estimate and identify what changes when $A$ varies.
+- Derive $e=A^{-1}r$ and the relative forward-error bound, stating its assumptions.
+- Construct a family with vanishing relative residual and order-one relative forward error.
+- Distinguish forward error, right-hand-side backward error, and simultaneous backward error.
+- Explain backward stability and why ill-conditioning can limit the forward accuracy of a stable solve.
+- Explain why Ritz residuals, spectral separation, and basis orthogonality matter in a filtered eigensolver.
+
+**Ready for direct methods.** Given a computed LU or QR solution, you can now say which defect you can measure, which perturbation it represents, and what further information would justify a claim about solution accuracy.

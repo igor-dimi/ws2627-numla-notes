@@ -1,5 +1,9 @@
 project:
   type: book
+  preview:
+    port: 4200
+    browser: false
+
 
 number-depth: 2
 
@@ -21,6 +25,11 @@ book:
       - review/01_vector_spaces.qmd
       - review/02_inner_products_orthogonality.qmd
       - review/03_orthogonal_projections.qmd
+      - review/04_qr_factorization.qmd
+      - review/05_eigenvalues_spectral_theorem.qmd
+      - review/06_matrix_norms_conditioning.qmd
+      - review/07_direct_numerical_methods.qmd
+      - review/08_basic_iterative_methods.qmd
     - part: "Review II"
       chapters:
         # - review_2/a.qmd

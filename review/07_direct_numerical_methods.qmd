@@ -1,0 +1,285 @@
+# Session 7 — Direct Numerical Methods
+
+Given $Ax=b$, how can we turn the equations into a form we can solve one unknown at a time? Session 1 supplies the algebraic idea of composing linear maps. Session 6 supplies a separate question about the answer we compute: how much uncertainty does a small residual leave in the solution? A direct solver brings these questions together. Its transformations determine the work, the intermediate numbers and, ultimately, how much accuracy survives.
+
+**One-hour route.** Spend 12 minutes on elimination, substitution and LU, 9 on pivoting and the experiment results, 8 on Cholesky, and 8 on comparing and assessing solvers. Reserve 23 minutes for the exercises. The experiment runs during rendering. Studying its implementation is optional.
+
+Throughout, $A\in\mathbb F^{n\times n}$ with $\mathbb F=\mathbb R$ or $\mathbb C$, and $A^*$ denotes the conjugate transpose. Derivations use exact arithmetic unless rounding is mentioned.
+
+## Elimination changes the equations
+
+In $Ax=b$, applying an invertible map $E$ to the equation space gives $EAx=Eb$. Every solution satisfies the transformed equations, and multiplication by $E^{-1}$ recovers the originals. In particular, the unknown $x$ keeps its original coordinates. Each elementary row operation has an explicit inverse: swap the same rows again, scale by the reciprocal of a nonzero scale factor, or undo a row addition by subtracting the same multiple. Carry the right-hand side through every operation.
+
+Starting with $A^{(1)}=A$, suppose the first $k-1$ columns already have zeros below their diagonals. The **pivot** $a^{(k)}_{kk}$ is the coefficient used to eliminate the remaining entries below it in column $k$. For a nonzero pivot and each $i>k$, set
+$$
+m_{ik}=\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}},
+\qquad R_i\gets R_i-m_{ik}R_k .
+$$
+The new column entry is zero by construction. The pivot row has zeros in the preceding columns, so those columns stay triangular. **Gaussian elimination** stops at upper-triangular form and uses substitution. **Gauss–Jordan elimination** continues by normalizing pivots and clearing entries above them to obtain reduced row echelon form.
+
+**Running example.** Start with the augmented matrix below. Subtract twice row 1 from row 2 and add row 1 to row 3:
+$$
+\left[\begin{array}{rrr|r}2&1&1&3\\4&5&0&14\\-2&2&5&-3\end{array}\right]
+\longrightarrow
+\left[\begin{array}{rrr|r}2&1&1&3\\0&3&-2&8\\0&3&6&0\end{array}\right].
+$$
+The first two multipliers were $2$ and $-1$. Now subtract row 2 from row 3. The multiplier is $1$, using the *current* entries $3/3$. The final system is
+$$
+Ux=y,\qquad U=\begin{pmatrix}2&1&1\\0&3&-2\\0&0&8\end{pmatrix},
+\qquad y=\begin{pmatrix}3\\8\\-8\end{pmatrix}.
+$$
+The three diagonal entries $2,3,8$ are the pivots, including the last coefficient used in the solve.
+
+## Triangular systems have a natural order
+
+The last equation of $Ux=y$ determines $x_n$. At row $i$, all terms to the right of $u_{ii}x_i$ are already known. Isolating that term gives **backward substitution**. A lower-triangular system $Ly=b$ has the reverse dependency and gives **forward substitution**:
+$$
+\begin{aligned}
+x_i &= \frac{y_i-\sum_{j=i+1}^n u_{ij}x_j}{u_{ii}},
+   &&i=n,n-1,\ldots,1,\\
+y_i &= \frac{b_i-\sum_{j=1}^{i-1}\ell_{ij}y_j}{\ell_{ii}},
+   &&i=1,2,\ldots,n.
+\end{aligned}
+$$
+An empty sum is zero. For a **unit lower-triangular** matrix every $\ell_{ii}=1$, so the divisions disappear. A square triangular matrix has a unique solution for every right-hand side exactly when every diagonal entry is nonzero: its determinant is their product. With a zero on the diagonal, consistency determines whether there are infinitely many solutions or none.
+
+In the example the last equation gives $x_3=-1$, the second gives $x_2=(8+2x_3)/3=2$, and the first gives $x_1=(3-x_2-x_3)/2=1$. Across all rows there are $n(n-1)/2$ off-diagonal products to subtract, hence $O(n^2)$ work. Substitution computes the action of an inverse on the one vector we need. Forming the whole inverse would solve for all its columns and introduce extra work and rounding.
+
+## LU remembers the elimination
+
+Let $e_k$ be the $k$th coordinate vector and $m_k$ the column containing $m_{ik}$ for $i>k$ and zeros elsewhere. Since $e_k^T A^{(k)}$ extracts row $k$, one stage is
+$$
+A^{(k+1)}=E_k A^{(k)},\qquad
+E_k=I-m_k e_k^T,\qquad E_k^{-1}=I+m_k e_k^T.
+$$
+The inverse follows from $e_k^T m_k=0$. After the last stage,
+$$
+U=E_{n-1}\cdots E_1 A,\qquad
+A=LU,\qquad L=E_1^{-1}\cdots E_{n-1}^{-1}.
+$$
+The inverse factors occur in reverse order from the elimination factors. In this product every cross term with indices $j<k$ contains $e_j^T m_k=0$. Thus $L=I+\sum_k m_k e_k^T$: write each multiplier, with its original sign, below the diagonal in the column where it was used.
+
+**Verification and reuse.** In the running example,
+$$
+\underbrace{\begin{pmatrix}1&0&0\\2&1&0\\-1&1&1\end{pmatrix}}_{L}
+\underbrace{\begin{pmatrix}2&1&1\\0&3&-2\\0&0&8\end{pmatrix}}_{U}
+=\begin{pmatrix}2&1&1\\4&5&0\\-2&2&5\end{pmatrix}=A.
+$$
+For instance, row 3 of the product is minus row 1 of $U$ plus rows 2 and 3. Solve $Ly=b$ from the top: $y_1=3$, $y_2=14-2(3)=8$, and $y_3=-3+3-8=-8$. This recovers exactly the transformed right-hand side. Backward substitution then gives the previously obtained $x=(1,2,-1)^T$. For a new load vector $b$, only these two substitutions change. The same factors solve a whole block $AX=B$ by solving $LY=B$ and $UX=Y$ column by column or in a block.
+
+**When does this work without exchanges?** For nonsingular $A$, unpivoted elimination succeeds exactly when every leading principal minor $d_k=\det A_{1:k,1:k}$ is nonzero. To see why, set $d_0=1$. Once the first $k-1$ stages succeed, row additions restricted to the leading $k$ rows triangularize the leading $k$-by-$k$ block. Thus $d_k=d_{k-1}u_{kk}$. Induction gives the criterion and the pivot formula $u_{kk}=d_k/d_{k-1}$. Nonsingularity alone guarantees only $d_n\ne0$.
+
+For a real dense matrix, updating a trailing $j$-by-$j$ block takes about $2j^2$ flops when a multiplication and a subtraction count separately. Summing over $j=1,\ldots,n-1$ gives $2n^3/3+O(n^2)$; multiplier divisions affect lower-order terms. Each further right-hand side costs about $2n^2$ flops for both substitutions together.
+
+## Pivot choice and element growth
+
+**A zero pivot on a perfectly conditioned system.** Take
+$$
+A=\begin{pmatrix}0&1\\1&0\end{pmatrix},\qquad b=(2,3)^T.
+$$
+Unpivoted elimination asks for division by zero. Yet $A^*A=I$, so both singular values are one and $\kappa_2(A)=1$. With the row swap $P=A$, we obtain $PA=I=LU$ with $L=U=I$. The transformed right-hand side $Pb=(3,2)^T$ is already the solution. It was the ordering of the equations that failed.
+
+**Partial pivoting.** At stage $k$, select a row $p\ge k$ maximizing $|a^{(k)}_{pk}|$ and exchange it with row $k$. If the maximum is zero, the active column is zero and the remaining square system is singular in exact arithmetic. Otherwise the multipliers have magnitude at most one. Each exchange is multiplication on the left by a permutation matrix. Their chronological action on the original equations gives a net permutation $P$. Think of replaying elimination with those rows placed in their final order from the start: the record of multipliers for each equation must move with that equation. In particular, a late exchange swaps the two rows of the **already filled columns** of $L$. The result is
+$$
+PA=LU,\qquad Ly=Pb,\qquad Ux=y.
+$$
+We use this convention throughout. A source writing $A=\widetilde P LU$ uses $\widetilde P=P^{-1}=P^T$. One swap is its own inverse, but a sequence of swaps need not be. **Complete pivoting** searches the whole active submatrix and may swap columns as well. A column permutation reorders unknowns and must be undone when reporting the solution.
+
+**A small nonzero pivot.** Consider
+$$
+A_\varepsilon=\begin{pmatrix}\varepsilon&1\\1&1\end{pmatrix},
+\qquad 0<\varepsilon\ll1 .
+$$
+Without a swap, $m_{21}=1/\varepsilon$ and $u_{22}=1-1/\varepsilon$. The updated right-hand side $b_2-b_1/\varepsilon$ may also be large. Back substitution reconstructs $x_1=(b_1-\widehat x_2)/\varepsilon$: even a tiny absolute error in $\widehat x_2$ is divided by $\varepsilon$. When $b_1$ and $\widehat x_2$ are nearly equal, cancellation exposes the error already in these operands. With a swap, $m_{21}=\varepsilon$, $u_{22}=1-\varepsilon$, and the final division for $x_1$ uses the pivot $1$.
+
+The **growth factor** compares the largest absolute entry seen in the coefficient matrices during elimination with the largest in the original matrix. Exclude stored multipliers and the augmented right-hand side. For this family unpivoted growth is of order $1/\varepsilon$, while partial pivoting gives growth factor one. Large entries increase the scale of local rounding errors, which may survive even when the entries later cancel. Partial pivoting controls each multiplier, but repeated updates can still cause large growth on exceptional matrices. Its generally good practical accuracy depends in part on the growth actually encountered.
+
+### Experiment: hold conditioning nearly fixed and change the pivot
+
+Take $x=(1,7/4)^T$ and $\varepsilon=3\cdot 2^{-k}$. For the exponents below, $b=(\varepsilon+7/4,11/4)^T$ is exactly representable in binary64, as are $A_\varepsilon$ and $x$. Thus we know the exact solution of the *stored* data. As $\varepsilon\to0$, the limiting symmetric matrix has eigenvalues $(1\pm\sqrt5)/2$. Its singular values are their absolute values, so $\kappa_2$ tends to $(3+\sqrt5)/2\approx2.618$. Predict which solver's error can increase while this condition number stays nearly fixed.
+
+```{python}
+#| label: direct-methods-pivot-experiment
+import numpy as np
+
+def solve_two_by_two(A, b, pivot):
+    """One elimination step and back substitution in binary64."""
+    U = np.array(A, dtype=np.float64, copy=True)
+    y = np.array(b, dtype=np.float64, copy=True)
+    if U.shape != (2, 2) or y.shape != (2,):
+        raise ValueError("Expected a 2-by-2 matrix and a length-2 vector")
+    if pivot and abs(U[1, 0]) > abs(U[0, 0]):
+        U = U[[1, 0], :]
+        y = y[[1, 0]]
+    if U[0, 0] == 0:
+        raise ValueError("Zero first pivot")
+    multiplier = U[1, 0] / U[0, 0]
+    U[1, 1] -= multiplier * U[0, 1]
+    y[1] -= multiplier * y[0]
+    if U[1, 1] == 0:
+        raise ValueError("Zero second pivot")
+    x2 = y[1] / U[1, 1]
+    x1 = (y[0] - U[0, 1] * x2) / U[0, 0]
+    return np.array([x1, x2])
+
+exact = np.array([1.0, 1.75])
+print(" k  cond2  method       rel.res.  rel.error")
+for k in (10, 25, 40, 50):
+    eps = 3.0 * 2.0**(-k)
+    A = np.array([[eps, 1.0], [1.0, 1.0]])
+    b = A @ exact
+    answers = [
+        ("no swap", solve_two_by_two(A, b, False)),
+        ("partial", solve_two_by_two(A, b, True)),
+        ("library", np.linalg.solve(A, b)),
+    ]
+    for method, computed in answers:
+        residual = np.linalg.norm(b - A @ computed) / np.linalg.norm(b)
+        error = np.linalg.norm(computed - exact) / np.linalg.norm(exact)
+        print(f"{k:2}  {np.linalg.cond(A):5.3f}  {method:8}"
+              f"  {residual:9.2e}  {error:9.2e}")
+```
+
+Read across methods at fixed $k$ first. They receive identical data; the library solve provides a practical reference, while the known $x$ provides the forward-error measurement. At $k=50$ the unpivoted first component loses about $0.083$ in absolute value. The condition number is still about $2.62$. A displayed zero residual is a zero in the arithmetic used for the check. Re-evaluating a residual at higher precision can distinguish small errors hidden by that rounding.
+
+## Cholesky uses positive definiteness
+
+Session 5 characterized a **Hermitian positive-definite** (HPD) matrix by $A=A^*$ and $z^*Az>0$ for all $z\ne0$, equivalently by Hermitian symmetry and strictly positive eigenvalues. The real case is symmetric positive definite (SPD).
+
+**Cholesky theorem.** Every HPD matrix admits a unique factorization $A=LL^*$ with $L$ lower triangular and strictly positive real diagonal. For real SPD matrices, $A=LL^T$. Conversely, any such product is Hermitian and $z^*LL^*z=\|L^*z\|_2^2>0$ for $z\ne0$, since $L^*$ is invertible.
+
+**Why no pivot search is necessary.** Partition the first column from the rest:
+$$
+A=\begin{pmatrix}a&w^*\\w&B\end{pmatrix},
+\qquad S=B-ww^*/a .
+$$
+Testing on $e_1$ gives $a>0$. For any $z\ne0$, test the quadratic form on $v=\binom{-w^*z/a}{z}$, interpreted as a stacked scalar and column. Direct multiplication gives $v^*Av=z^*Sz>0$. Thus the trailing matrix $S$ after eliminating column one is again HPD. Cholesky takes $\sqrt a$ as its first diagonal entry, $w/\sqrt a$ below it, and factors $S$ recursively. This is symmetric Gaussian elimination: the trailing update preserves Hermitian symmetry, so only one triangle needs to be updated. General LU would maintain two factors without using this relationship.
+
+**How to compute the entries.** Expand $a_{ij}=\sum_{s\le j}\ell_{is}\overline{\ell_{js}}$ for $i\ge j$, and process columns in increasing order:
+$$
+\begin{aligned}
+\ell_{jj}&=\sqrt{a_{jj}-\sum_{s<j}|\ell_{js}|^2},\\
+\ell_{ij}&=\frac{a_{ij}-\sum_{s<j}\ell_{is}\overline{\ell_{js}}}
+                  {\ell_{jj}},\qquad i>j.
+\end{aligned}
+$$
+Each radicand is the leading entry of an HPD trailing matrix, hence real and positive. Taking its positive square root fixes the only sign or phase ambiguity. The column formulas then determine every subsequent entry uniquely.
+
+**Worked example.** Solve with
+$$
+A=\begin{pmatrix}4&2&0\\2&5&-2\\0&-2&2\end{pmatrix},
+\qquad b=(4,4,-2)^T.
+$$
+The first column of $L$ is $(2,1,0)^T$. In column two, $\ell_{22}=\sqrt{5-1}=2$ and $\ell_{32}=(-2-0)/2=-1$. Finally $\ell_{33}=\sqrt{2-0^2-(-1)^2}=1$. Multiplication verifies both the factorization and positive definiteness:
+$$
+\begin{pmatrix}2&0&0\\1&2&0\\0&-1&1\end{pmatrix}
+\begin{pmatrix}2&1&0\\0&2&-1\\0&0&1\end{pmatrix}
+=\begin{pmatrix}4&2&0\\2&5&-2\\0&-2&2\end{pmatrix}.
+$$
+Forward substitution in $Ly=b$ gives $y_1=2$, $y_2=(4-2)/2=1$, $y_3=-2+1=-1$. In $L^*x=y$, the last row gives $x_3=-1$, then $2x_2-x_3=1$ gives $x_2=0$, and $2x_1+x_2=2$ gives $x_1=1$.
+
+**Where the hypotheses matter.** A positive semidefinite Hermitian matrix has $z^*Az\ge0$; if singular, it cannot have a Cholesky factor with strictly positive diagonal (try $\operatorname{diag}(1,0)$). An indefinite Hermitian matrix has directions of both signs. For $\left(\begin{smallmatrix}1&2\\2&1\end{smallmatrix}\right)$ both diagonal entries are positive, yet the second radicand is $1-2^2=-3$. A non-Hermitian matrix cannot equal $LL^*$ because every such product is Hermitian. In floating point a very small positive radicand can be lost in subtraction. An implementation checks for breakdown; a failure near the boundary of positive definiteness needs interpretation in light of input accuracy and rounding.
+
+## Choosing and assessing a solver
+
+Classical leading work below assumes a dense, real, nonsingular square matrix. QR uses Householder reflectors stored implicitly. Each method takes $O(n^2)$ additional work per right-hand side.
+
+| Method | When to use it | Factorization work | Reliability |
+|:---|:---|:---|:---|
+| LU, no swaps | Leading minors nonzero and pivot behavior understood | $2n^3/3$ | Small relative pivots can give large growth. |
+| LU, partial pivoting | General square solve | $2n^3/3$ | Bounded multipliers; accuracy still depends on growth. |
+| Cholesky | Hermitian positive definite | $n^3/3$ | Positive exact pivots; backward stable on successful completion under standard rounding assumptions. |
+| Householder QR | General square solve; also useful for least squares | $4n^3/3$ | Unitary transformations preserve the 2-norm; normwise backward stable. |
+
+Cholesky roughly halves the leading LU factorization cost by updating one triangle. Session 4's QR solve applies the reflectors to form $Q^*b$, then solves $Rx=Q^*b$. In all four methods the factors act directly on any new right-hand side. Explicitly constructing $A^{-1}$ adds work even if many right-hand sides are expected.
+
+**Residual, backward error and forward error.** Given a computed $\widehat x$, set $r=b-A\widehat x$. The residual answers how far the computed vector misses the equations. Since $A\widehat x=b-r$, it is also an explicit backward perturbation to the right-hand side. With perturbations allowed in both $A$ and $b$, a common normwise backward-error measure is
+$$
+\eta=\frac{\|r\|_2}{\|A\|_2\|\widehat x\|_2+\|b\|_2}.
+$$
+It is the smallest common relative bound on $\|\Delta A\|_2/\|A\|_2$ and $\|\Delta b\|_2/\|b\|_2$ needed for $(A+\Delta A)\widehat x=b+\Delta b$, assuming $b\ne0$. A backward-stable solve delivers a solution to data perturbed on the scale of rounding, up to dimension-dependent factors. A measured small backward error describes this particular result; a stability analysis concerns the algorithm over its class of inputs.
+
+For nonsingular $A$ and $b\ne0$, Session 6 gives
+$$
+x-\widehat x=A^{-1}r,\qquad
+\frac{\|x-\widehat x\|_2}{\|x\|_2}
+\le \kappa_2(A)\frac{\|r\|_2}{\|b\|_2}.
+$$
+A small relative residual and moderate condition number certify small forward error. A large condition number weakens that certificate: an error pointing along a small-singular-value direction can have a very small image under $A$. Even a backward-stable solver can then lose forward accuracy.
+
+## Where the factors reappear
+
+**Sparse systems and Session 8.** Discretizing a differential operator often couples each unknown only to a few neighbors. During elimination two neighbors of the eliminated unknown can become coupled to one another. A newly nonzero factor entry in a previously zero position is *fill-in*. Its extent depends on ordering and can dominate storage and work. Dense costs can therefore be prohibitive, and the cost of a sparse factorization depends on more than the initial number of nonzeros. A direct method follows a finite elimination and substitution schedule in exact arithmetic. An iterative method produces successive approximations and stops using an accuracy criterion. A factorization of a simpler approximation to $A$ can also supply an inexpensive solve inside an iterative method as a preconditioner.
+
+**Eigenvalue methods and the seminar.** At a fixed shift $\sigma$ outside the spectrum, inverse iteration repeatedly solves $(A-\sigma I)y=x$ with changing $x$. One pivoted LU of the shifted matrix can serve every step. An eigencomponent with eigenvalue $\lambda$ is scaled by $1/(\lambda-\sigma)$. In Chebyshev-filtered subspace iteration the corresponding weight is $p(\lambda)$: a polynomial recurrence applies $A$ repeatedly to vectors or blocks, avoiding a shifted factorization and its possible fill-in. QR orthonormalization still has a role after filtering. Sessions 9–11 return to these choices.
+
+## Central Synthesis — From Elimination to Reliable Numerical Solvers
+
+| Question | What the factorization tells us | What to check |
+|:---|:---|:---|
+| Mathematical equivalence | Each invertible row operation acts on both sides. Elimination ends with triangular equations having the same solution. | Track the right-hand side and the row order. |
+| Computational efficiency | $LU$ records all elimination steps; substitutions reuse them. HPD structure makes the second Cholesky factor the adjoint of the first. | Match the structure and number of right-hand sides to the factorization. |
+| Numerical stability | Pivot choices determine multipliers and affect element growth. An algebraically valid elimination can produce poor factors after rounding. | Inspect a scaled residual or backward error, then use conditioning to assess forward accuracy. |
+
+The two pivot examples separate two diagnoses. The exchange matrix forces a row swap even in exact arithmetic. The small-pivot family permits both algorithms in exact arithmetic, yet choosing the smaller pivot can lose accuracy. In either case $\kappa_2(A)$ is a property of the input shared by both algorithms. Conversely, selecting a stable solver leaves the sensitivity of an ill-conditioned problem in place.
+
+**Course reading.** The revision plan and seminar connection are in §§1.3–1.4 of the course notes book. For elimination, pivoting and Cholesky, see Scheichl and Zech, *Num0 notes*, §§3.4–3.7, and Bastian, *num0*, §§7–10. For the orthogonal alternative, see Kanschat and Scheichl, *Numerical Linear Algebra*, Chapter 2.
+
+## Exercises
+
+1. **Recover a triangular system (3 min).** Eliminate below the first pivot of $A=\left(\begin{smallmatrix}2&-1\\6&1\end{smallmatrix}\right)$ with $b=(1,11)^T$. Record the multiplier, $L$ and $U$. Solve via $Ly=b$ and $Ux=y$.
+2. **Undo two stages (3 min).** Suppose $E_1=I-2e_2e_1^T+e_3e_1^T$, $E_2=I-3e_3e_2^T$, and $E_2E_1A=U$. Derive $L$ in $A=LU$. Show by multiplication what goes wrong if you reverse the two inverse factors.
+3. **Choose a Cholesky solve (4 min).** For $C=\left(\begin{smallmatrix}9&3\\3&5\end{smallmatrix}\right)$ construct a Cholesky factor, certify positive definiteness and solve $Cx=(6,-2)^T$. Classify $\left(\begin{smallmatrix}1&1\\1&1\end{smallmatrix}\right)$, $\operatorname{diag}(2,-1)$ and $\left(\begin{smallmatrix}2&1\\0&2\end{smallmatrix}\right)$ with respect to the same algorithm.
+4. **Diagnose a pivot (3 min).** Let $J=\left(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\right)$. Determine its first unpivoted pivot, determinant and $\kappa_2$. Repeat for $tJ$, $t>0$. For the experiment's $A_\varepsilon$, identify which intermediate quantity grows and why swapping helps. Which of these observations concerns the problem's sensitivity?
+5. **A late row exchange (6 min).** Take
+   $$
+   A=\begin{pmatrix}4&4&0\\2&2&1\\1&3&2\end{pmatrix},
+   \qquad b=(4,4,3)^T .
+   $$
+   Decide whether unpivoted elimination succeeds. Construct $P,L,U$ using partial pivoting, verify $PA=LU$ by multiplication, and solve the two triangular systems. Check the residual. Distinguish an exact zero residual from a small residual evaluated in floating point.
+6. **A good residual for a poor answer (4 min).** Take $D=\operatorname{diag}(1,10^{-8})$, $b=(1,0)^T$ and $\widehat x=(1,1)^T$. Compute the relative residual, relative forward error and $\kappa_2(D)$. Give a right-hand-side perturbation making $\widehat x$ exact. Can these data alone establish that a particular solver is unstable?
+
+## Worked solutions
+
+**1.** The multiplier is $6/2=3$. Subtracting three times the first equation from the second gives $4x_2=8$. Thus
+$$
+L=\begin{pmatrix}1&0\\3&1\end{pmatrix},\qquad
+U=\begin{pmatrix}2&-1\\0&4\end{pmatrix}.
+$$
+Forward substitution gives $y=(1,11-3)^T=(1,8)^T$. Back substitution gives $x_2=2$ and $x_1=(1+2)/2=3/2$.
+
+**2.** Multiplying $E_2E_1A=U$ first by $E_2^{-1}$ and then by $E_1^{-1}$ gives
+$$
+L=\begin{pmatrix}1&0&0\\2&1&0\\-1&0&1\end{pmatrix}
+  \begin{pmatrix}1&0&0\\0&1&0\\0&3&1\end{pmatrix}
+ =\begin{pmatrix}1&0&0\\2&1&0\\-1&3&1\end{pmatrix}.
+$$
+In reversed order row 3 of the product becomes $3(2,1,0)+(-1,0,1)=(5,3,1)$. The spurious $6$ in column one records an operation on a row already modified at the wrong stage.
+
+**3.** The first column is $(3,1)^T$ and the remaining diagonal is $\sqrt{5-1}=2$. With $L=\left(\begin{smallmatrix}3&0\\1&2\end{smallmatrix}\right)$, multiplication gives $LL^T=C$. Invertibility of $L$ implies $z^TCz=\|L^Tz\|_2^2>0$ for every nonzero real $z$. Forward substitution gives $y=(2,-2)^T$ and backward substitution gives $x=(1,-1)^T$. The all-ones matrix has quadratic form $(z_1+z_2)^2$ on real vectors and is singular positive semidefinite. The diagonal matrix is indefinite. The final matrix is nonsymmetric. None admits a real Cholesky factor with strictly positive diagonal.
+
+**4.** The first pivot is zero in both cases. The determinants are $-1$ and $-t^2$, respectively. Since $(tJ)^T(tJ)=t^2 I$, both singular values are $t$, giving $\kappa_2=1$ for every $t>0$, including $t=1$. In $A_\varepsilon$ the multiplier $1/\varepsilon$ and updated entry $1-1/\varepsilon$ grow in magnitude. Exchanging the rows gives a multiplier $\varepsilon$ and updated entry $1-\varepsilon$. The singular-value ratio measures relative worst-case sensitivity. The intermediate quantities describe a particular elimination order.
+
+**5.** The first pivot is $4$, with multipliers $1/2,1/4$. The remaining rows become $(0,0,1)$ and $(0,2,2)$, so the second unpivoted pivot vanishes. Swap rows two and three, including their stored first-column multipliers. The final multiplier is zero. Then
+$$
+P=\begin{pmatrix}1&0&0\\0&0&1\\0&1&0\end{pmatrix},\quad
+L=\begin{pmatrix}1&0&0\\1/4&1&0\\1/2&0&1\end{pmatrix},\quad
+U=\begin{pmatrix}4&4&0\\0&2&2\\0&0&1\end{pmatrix}.
+$$
+The rows of $LU$ are $(4,4,0)$, $(1,1,0)+(0,2,2)=(1,3,2)$ and $(2,2,0)+(0,0,1)=(2,2,1)$, exactly those of $PA$. Here $Pb=(4,3,4)^T$. Forward substitution gives $y=(4,3-1,4-2)^T=(4,2,2)^T$. From the bottom, $x_3=2$, $x_2=(2-4)/2=-1$, $x_1=(4+4)/4=2$. Direct multiplication gives $Ax=(4,4,3)^T$ and $r=0$. With nonsingular $A$, an exact zero proves $\widehat x=x$. For a numerical residual one must allow for rounding in its evaluation and use conditioning to turn a relative residual into a forward-error bound.
+
+**6.** The exact solution is $(1,0)^T$ and $r=(0,-10^{-8})^T$. The relative residual is $10^{-8}$, the relative forward error is $1$, and $\kappa_2(D)=10^8$. The residual bound is attained. Perturbing $b$ by $-r=(0,10^{-8})^T$ makes $\widehat x$ exact. This example shows how the poorly scaled direction weakens the residual certificate. Judging the stability of an algorithm would also require its precision, the backward-error scale expected at that precision, and information about the procedure that produced the result.
+
+### End-of-session mastery checklist
+
+Before Session 8, **Basic Iterative Methods**, check that you can independently:
+
+- Prove that simultaneous elementary operations on $A$ and $b$ preserve the solution set.
+- Eliminate by hand, identify pivots and multipliers, and derive $A=LU$ by undoing the stages.
+- Explain what each factor stores, perform both substitutions and reuse factors for new loads.
+- Construct $PA=LU$, including a late exchange, and apply the same permutation to $b$.
+- Distinguish pivot breakdown, singularity, poor conditioning and numerical instability with examples.
+- State and justify the HPD hypothesis, compute a Cholesky factor and explain the saving in work.
+- Choose among pivoted LU, Cholesky and Householder QR using structure, cost and accuracy.
+- Interpret a computed residual using backward error and conditioning.
+- Explain how triangular solves enter iterative and shifted eigenvalue methods, and identify the main operation in a polynomial filter.
