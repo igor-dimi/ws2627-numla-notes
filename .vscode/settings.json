@@ -1,0 +1,7 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.defaultInterpreterPath": "/home/igor/miniconda3/envs/quarto-env/bin/python",
+    "python-envs.terminal.autoActivationType": "off",
+    "python.terminal.activateEnvironment": false
+}

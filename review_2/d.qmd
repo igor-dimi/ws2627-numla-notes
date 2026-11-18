@@ -1,0 +1,5542 @@
+---
+title: "Module D — Spectral Theory"
+---
+
+Eigenvalues, invariant subspaces, spectral decompositions, Rayleigh quotients, Rayleigh–Ritz approximation, singular values, and spectral projections
+
+*Advanced undergraduate · 8 study sessions · Approximately 18–24 hours*
+
+|                       |                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Prerequisites**     | Modules A–C: linear maps, kernels, direct sums, duality, inner products, adjoints, orthogonal projections, and positive definiteness  |
+| **Primary objective** | Understand how a linear operator organizes a space into invariant components and how those components can be approximated numerically |
+| **Applications**      | Numerical eigensolvers, low-rank approximation, PDE eigenvalue problems, spectral filtering, and scientific computing                 |
+| **Next module**       | Module E: Numerical Eigenvalue Methods, Conditioning, and Stability                                                                   |
+
+## Introduction — Understanding an operator through its spectrum {#sec-module-d-introduction-understanding-an-operator-through-its-spectrum}
+
+In Module A, we studied a linear transformation through its kernel, image, and the ways its domain can be decomposed.
+
+In Module B, we developed algebraic duality, linear measurements, transpose maps, and annihilators.
+
+In Module C, an inner product allowed us to study geometry: orthogonality, adjoints, projections, self-adjointness, and positive definiteness.
+
+**Module D brings these ideas together by asking how a linear operator acts on distinguished directions and subspaces.**
+
+For a square matrix $A$, an eigenvector $v\ne0$ satisfies
+
+$$
+Av=\lambda v.
+$$
+
+Along such a direction, an otherwise complicated linear transformation reduces to multiplication by a scalar.
+
+But individual eigenvectors are only the beginning. In numerical linear algebra, we often want to approximate an entire invariant subspace, not merely a single eigenvector.
+
+The central questions are:
+
+- When can a linear operator be decomposed into simpler invariant components?
+- What makes the spectral theory of Hermitian matrices especially favorable?
+- How do eigenvalues and eigenspaces relate to optimization and approximation?
+- Why are residuals and spectral gaps important when computing eigenvectors numerically?
+- How does the singular value decomposition extend spectral geometry to rectangular matrices?
+- Why do polynomial filters, especially Chebyshev filters, reveal desired eigenspaces?
+
+The mathematical centerpiece will be the spectral decomposition of a Hermitian matrix:
+
+$$
+\boxed{A=Q\Lambda Q^*.}
+$$
+
+Here $Q$ is unitary, its columns are orthonormal eigenvectors, and $\Lambda$ contains the eigenvalues.
+
+This representation gives meaning to matrix functions:
+
+$$
+\boxed{p(A)=Qp(\Lambda)Q^*.}
+$$
+
+It is also the algebraic foundation of Chebyshev-filtered subspace iteration.
+
+## Our six perspectives {#sec-module-d-our-six-perspectives}
+
+| Perspective                 | Questions we will answer                                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Rigorous**                | Under what assumptions do spectral decompositions exist, and what can be proved about them?                           |
+| **Intuitive and geometric** | How does a transformation stretch, rotate, mix, or preserve different subspaces?                                      |
+| **Computational**           | How do we approximate eigenvalues, eigenvectors, invariant subspaces, and singular values?                            |
+| **Structural**              | How do kernels, direct sums, projections, adjoints, and quotient operators appear in spectral theory?                 |
+| **Universal**               | How do invariant decompositions and spectral projectors relate to algebraic functional calculus and module structure? |
+| **Applied**                 | How does spectral theory underpin numerical eigensolvers, finite elements, PDEs, and hardware-aware computation?      |
+
+## Study roadmap {#sec-module-d-study-roadmap}
+
+| Session | Topic                                              | Main result                                                       |
+| ------- | -------------------------------------------------- | ----------------------------------------------------------------- |
+| 1 | [Eigenvalues, eigenspaces, and invariant subspaces](#sec-module-d-session-1) | Diagonalizability and invariant decompositions |
+| 2 | [Spectral theorem and matrix functions](#sec-module-d-session-2) | $A=Q\Lambda Q^*$, $f(A)$, spectral projections |
+| 3 | [Geometry of spectral subspaces](#sec-module-d-session-3) | Principal angles, spectral gaps, and invariant-subspace residuals |
+| 4 | [Rayleigh quotients and Rayleigh–Ritz](#sec-module-d-session-4) | Min–max principle, Ritz values, residual bounds |
+| 5 | [Singular value decomposition](#sec-module-d-session-5) | SVD, pseudoinverse, and optimal low-rank approximation |
+| 6 | [The bridge to eigenvalue algorithms](#sec-module-d-session-6) | Power iteration, subspace iteration, and Ritz extraction |
+| 7 | [Polynomial and Chebyshev filtering](#sec-module-d-session-7) | Spectral amplification and subspace convergence |
+| 8 | [Functional analysis and structural generalizations](#sec-module-d-session-8) | Compact operators, PDE spectra, and functional calculus |
+
+We will concentrate on finite-dimensional real and complex inner-product spaces. The infinite-dimensional theory will be introduced carefully in Session 8.
+
+Notation: $A^*$ means conjugate transpose, reducing to $A^T$ for real matrices. All norms $\|\cdot\|_2$ are Euclidean vector norms or induced matrix 2-norms unless stated otherwise.
+
+## Session 1 — Eigenvalues, eigenspaces, and invariant subspaces {#sec-module-d-session-1}
+
+### From arbitrary transformations to operators {#sec-module-d-session-1-from-arbitrary-transformations-to-operators}
+
+An arbitrary linear map may have different domain and codomain:
+
+$$
+T:V\to W.
+$$
+
+To discuss ordinary eigenvalues, we normally require a linear **operator**:
+
+$$
+\boxed{T:V\to V.}
+$$
+
+Why?
+
+An eigenvector equation compares $Tv$ with $\lambda v$:
+
+$$
+Tv=\lambda v.
+$$
+
+Both vectors must belong to the same space.
+
+For a rectangular map $V\to W$, this equation is not intrinsically defined without an additional identification between the spaces.
+
+Rectangular matrices instead admit singular value decompositions, which we will study in Session 5.
+
+### Eigenvalues as failures of invertibility {#sec-module-d-session-1-eigenvalues-as-failures-of-invertibility}
+
+Let $T:V\to V$ be linear.
+
+A scalar $\lambda$ is an **eigenvalue** if there exists $v\ne0$ such that
+
+$$
+Tv=\lambda v.
+$$
+
+Equivalently,
+
+$$
+(T-\lambda I)v=0
+$$
+
+for some nonzero $v$.
+
+Thus
+
+$$
+\boxed{ \lambda\text{ is an eigenvalue} \iff \ker(T-\lambda I)\ne\{0\}. }
+$$
+
+The corresponding **eigenspace** is
+
+$$
+\boxed{ E_\lambda=\ker(T-\lambda I). }
+$$
+
+This connects spectral theory directly to the kernels studied in Module A.
+
+For finite-dimensional $V$,
+
+$$
+\lambda\text{ is an eigenvalue} \iff T-\lambda I\text{ is not invertible}.
+$$
+
+If $A$ is a matrix representing $T$, then
+
+$$
+\boxed{\det(A-\lambda I)=0.}
+$$
+
+The determinant expression is a computational method for small matrices. The deeper definition is that $T-\lambda I$ has a nontrivial kernel.
+
+#### Zero eigenvalues and singular matrices {#module-d-session-1-eigenvalues-as-failures-of-invertibility-zero-eigenvalues-and-singular-matrices}
+
+A matrix can certainly have eigenvalues without being invertible.
+
+In fact,
+
+$$
+\boxed{ 0\text{ is an eigenvalue of }A \iff A\text{ is singular}. }
+$$
+
+Its zero eigenspace is exactly the null space:
+
+$$
+E_0=\ker A.
+$$
+
+This means that the spectral description of a singular matrix includes its lost directions.
+
+### Real versus complex eigenvalues {#sec-module-d-session-1-real-versus-complex-eigenvalues}
+
+Consider the real rotation matrix
+
+$$
+R_\theta= \begin{pmatrix}
+  \cos\theta&-\sin\theta\\
+  \sin\theta&\cos\theta
+\end{pmatrix}.
+$$
+
+For a rotation angle other than a multiple of $\pi$, there is no nonzero real vector whose image remains on its original line.
+
+Thus there are no real eigenvectors.
+
+However, over $\mathbb C$, the eigenvalues are
+
+$$
+\boxed{\lambda_\pm=e^{\pm i\theta}.}
+$$
+
+For example,
+
+$$
+R_{\pi/2}= \begin{pmatrix}
+  0&-1\\
+  1&0
+\end{pmatrix}
+$$
+
+has eigenvalues $i$ and $-i$.
+
+One corresponding eigenvector for $i$ is
+
+$$
+v_+=\begin{pmatrix}
+  1\\
+  -i
+\end{pmatrix}.
+$$
+
+Indeed,
+
+$$
+R_{\pi/2}v_+ = \begin{pmatrix}
+  i\\
+  1
+\end{pmatrix} = i\begin{pmatrix}
+  1\\
+  -i
+\end{pmatrix}.
+$$
+
+So an operator's eigenstructure can depend on the underlying scalar field.
+
+For an $n\times n$ complex matrix, the characteristic polynomial has $n$ roots counting algebraic multiplicity.
+
+But having $n$ eigenvalues counting multiplicity does **not** imply that the matrix has $n$ independent eigenvectors.
+
+That requires diagonalizability.
+
+### Algebraic and geometric multiplicity {#sec-module-d-session-1-algebraic-and-geometric-multiplicity}
+
+For an eigenvalue $\lambda$, define:
+
+The **algebraic multiplicity** $a_\lambda$ is its multiplicity as a root of the characteristic polynomial.
+
+The **geometric multiplicity** is
+
+$$
+\boxed{g_\lambda=\dim E_\lambda.}
+$$
+
+We always have
+
+$$
+\boxed{1\le g_\lambda\le a_\lambda}
+$$
+
+for an eigenvalue of a finite-dimensional matrix.
+
+The inequality can be strict.
+
+#### Example: a defective matrix {#module-d-session-1-algebraic-and-geometric-multiplicity-example-a-defective-matrix}
+
+Consider
+
+$$
+J= \begin{pmatrix}
+  2&1\\
+  0&2
+\end{pmatrix}.
+$$
+
+Its characteristic polynomial is
+
+$$
+\det(J-\lambda I)=(2-\lambda)^2.
+$$
+
+Thus $\lambda=2$ has algebraic multiplicity $2$.
+
+But
+
+$$
+J-2I= \begin{pmatrix}
+  0&1\\
+  0&0
+\end{pmatrix}.
+$$
+
+Its kernel is
+
+$$
+\boxed{E_2=\operatorname{span}\{(1,0)^T\}.}
+$$
+
+Therefore,
+
+$$
+g_2=1<2=a_2.
+$$
+
+The matrix has only one linearly independent eigenvector.
+
+It cannot be diagonalized.
+
+#### A geometric interpretation {#module-d-session-1-algebraic-and-geometric-multiplicity-a-geometric-interpretation}
+
+The matrix acts as
+
+$$
+J(x,y)=(2x+y,2y).
+$$
+
+The first coordinate contains an additional contribution from the second coordinate.
+
+Thus the transformation is not merely independent scaling along two eigenvector directions.
+
+The off-diagonal entry represents coupling that cannot be removed by choosing an eigenbasis.
+
+This is the beginning of Jordan theory.
+
+We do not need the full Jordan canonical form for your numerical linear algebra objectives, but this example is useful for understanding why self-adjointness is such a strong assumption.
+
+### Invariant subspaces {#sec-module-d-session-1-invariant-subspaces}
+
+A subspace $U\subseteq V$ is **invariant under** $T$ if
+
+$$
+\boxed{T(U)\subseteq U.}
+$$
+
+This means that once a vector belongs to $U$, applying $T$ keeps it inside $U$.
+
+Every eigenspace is invariant.
+
+Indeed, if $v\in E_\lambda$, then
+
+$$
+Tv=\lambda v\in E_\lambda.
+$$
+
+But an invariant subspace need not be spanned by eigenvectors.
+
+Our rotation example illustrates this over $\mathbb R$: the entire real plane is invariant, but a nontrivial rotation through an angle other than $0$ or $\pi$ has no real eigenvectors.
+
+#### Why invariant subspaces matter {#module-d-session-1-invariant-subspaces-why-invariant-subspaces-matter}
+
+Suppose $U\subseteq V$ is invariant.
+
+Then $T$ restricts to an operator
+
+$$
+T|_U:U\to U.
+$$
+
+We can study its action on $U$ independently of what happens elsewhere in the space.
+
+This creates the possibility of reducing a large problem to a smaller problem.
+
+Numerical eigenvalue algorithms exploit exactly this idea.
+
+Instead of finding every eigenvector, they may approximate a low-dimensional subspace containing the eigenvectors of interest.
+
+### Adapted bases and block matrices {#sec-module-d-session-1-adapted-bases-and-block-matrices}
+
+Suppose $\dim U=k$, and choose a basis
+
+$$
+(u_1,\ldots,u_k)
+$$
+
+of $U$.
+
+Extend it to a basis
+
+$$
+(u_1,\ldots,u_k,w_1,\ldots,w_{n-k})
+$$
+
+of $V$.
+
+Because $U$ is invariant, each $Tu_j$ is a linear combination of the $u_i$.
+
+Therefore, the matrix of $T$ in this basis has the block form
+
+$$
+\boxed{ [T]= \begin{pmatrix}
+  B&C\\
+  0&D
+\end{pmatrix}. }
+$$
+
+The lower-left block is zero because vectors in $U$ cannot be mapped outside $U$.
+
+If the complement $W=\operatorname{span}\{w_1,\ldots,w_{n-k}\}$ is also invariant, then $C=0$, yielding
+
+$$
+\boxed{ [T]= \begin{pmatrix}
+  B&0\\
+  0&D
+\end{pmatrix}. }
+$$
+
+This is a block-diagonal decomposition.
+
+The distinction matters: invariance of only one summand guarantees block triangularity, not block diagonality.
+
+#### The quotient operator {#module-d-session-1-adapted-bases-and-block-matrices-the-quotient-operator}
+
+As we saw in Module B, an invariant subspace also lets us define
+
+$$
+\overline T:V/U\to V/U, \qquad \overline T(v+U)=Tv+U.
+$$
+
+The block $B$ represents the restriction $T|_U$.
+
+The block $D$ represents the induced operator on the quotient, in a compatible quotient basis.
+
+Thus block triangularization connects invariant subspaces, quotient spaces, and spectral theory.
+
+### Diagonalizability as an invariant direct sum {#sec-module-d-session-1-diagonalizability-as-an-invariant-direct-sum}
+
+An operator $T$ is diagonalizable when $V$ has a basis of eigenvectors.
+
+Equivalently, its eigenspaces provide a direct-sum decomposition:
+
+$$
+\boxed{ V=\bigoplus_{\lambda\in\sigma(T)}E_\lambda, }
+$$
+
+where $\sigma(T)$ is the set of distinct eigenvalues of $T$, over the chosen field.
+
+If $A$ is diagonalizable, there is an invertible matrix $X$ such that
+
+$$
+\boxed{ A=X\Lambda X^{-1}. }
+$$
+
+The columns of $X$ are eigenvectors.
+
+The inverse $X^{-1}$ converts vectors into their eigenbasis coordinates.
+
+Recall Module B: the rows of $X^{-1}$ are the corresponding dual-basis functionals.
+
+Thus diagonalization naturally combines eigenvectors and duality.
+
+#### Why this matters numerically {#module-d-session-1-diagonalizability-as-an-invariant-direct-sum-why-this-matters-numerically}
+
+The eigenvector matrix $X$ need not be well-conditioned.
+
+Even when a matrix is diagonalizable, its eigenvectors may be nearly linearly dependent.
+
+Consequently, a spectral decomposition
+
+$$
+A=X\Lambda X^{-1}
+$$
+
+can be highly sensitive to perturbations.
+
+For a Hermitian matrix, we can choose $X=Q$ unitary, giving
+
+$$
+Q^{-1}=Q^*.
+$$
+
+This eliminates the conditioning problem associated with a nonorthogonal eigenvector basis.
+
+It is one reason Hermitian eigenvalue problems are generally more favorable numerically.
+
+### Checkpoint 1 {#module-d-checkpoint-1 .unnumbered .unlisted}
+
+Prove that eigenspaces associated with distinct eigenvalues are linearly independent as a family of subspaces.
+
+Then explain why diagonalizability is equivalent to the direct sum of all eigenspaces spanning $V$.
+
+Finally, distinguish carefully between:
+
+$$
+\text{invertible},\qquad \text{diagonalizable},\qquad \text{normal},\qquad \text{self-adjoint}.
+$$
+
+These are different properties.
+
+## Session 2 — The spectral theorem and spectral projections {#sec-module-d-session-2}
+
+We now specialize to operators with particularly favorable geometry.
+
+### Self-adjoint and normal operators {#sec-module-d-session-2-self-adjoint-and-normal-operators}
+
+Recall from Module C:
+
+An operator $A$ on an inner-product space is **self-adjoint** when
+
+$$
+\boxed{A=A^*.}
+$$
+
+A broader condition is **normality**:
+
+$$
+\boxed{AA^*=A^*A.}
+$$
+
+Every self-adjoint operator is normal.
+
+Unitary operators are also normal, because
+
+$$
+U^*U=UU^*=I.
+$$
+
+But a normal operator need not be self-adjoint.
+
+For example, a nontrivial planar rotation is orthogonal and therefore normal, but is generally not symmetric.
+
+#### The complex spectral theorem {#module-d-session-2-self-adjoint-and-normal-operators-the-complex-spectral-theorem}
+
+A complex matrix $A$ is normal if and only if it is unitarily diagonalizable:
+
+$$
+\boxed{ A\text{ normal} \iff A=Q\Lambda Q^* }
+$$
+
+for a unitary $Q$ and diagonal $\Lambda$.
+
+Its eigenvalues may be complex.
+
+For a self-adjoint matrix, all eigenvalues are real.
+
+For a unitary matrix, all eigenvalues have modulus one.
+
+These spectral restrictions reflect the geometry that each operator preserves.
+
+### The finite-dimensional self-adjoint spectral theorem {#sec-module-d-session-2-the-finite-dimensional-self-adjoint-spectral-theorem}
+
+**Theorem.** If $A=A^*$ on a finite-dimensional real or complex inner-product space, there exists an orthonormal eigenbasis.
+
+In matrix form,
+
+$$
+\boxed{ A=Q\Lambda Q^*, }
+$$
+
+where $Q^*Q=I$ and $\Lambda$ is real diagonal.
+
+Let us prove the real case carefully.
+
+#### Step 1: Existence of an eigenvector {#module-d-session-2-the-finite-dimensional-self-adjoint-spectral-theorem-step-1-existence-of-an-eigenvector}
+
+Consider the Rayleigh quotient
+
+$$
+\rho_A(x)=\frac{x^TAx}{x^Tx}
+$$
+
+for $x\ne0$.
+
+On the unit sphere,
+
+$$
+\rho_A(x)=x^TAx.
+$$
+
+The unit sphere is compact in finite dimensions, and the quadratic form is continuous.
+
+Therefore, there is a unit vector $q$ maximizing $\rho_A$.
+
+Set
+
+$$
+\lambda=q^TAq.
+$$
+
+Because $q$ maximizes the Rayleigh quotient, its derivative must vanish in every direction $h$.
+
+For
+
+$$
+\phi(t)= \frac{(q+th)^TA(q+th)} {(q+th)^T(q+th)},
+$$
+
+differentiating at $t=0$ gives
+
+$$
+\phi'(0)=2h^T(Aq-\lambda q).
+$$
+
+Since $\phi'(0)=0$ for every $h$,
+
+$$
+Aq-\lambda q=0.
+$$
+
+Thus
+
+$$
+\boxed{Aq=\lambda q.}
+$$
+
+We have found an eigenvector.
+
+#### Step 2: The orthogonal complement is invariant {#module-d-session-2-the-finite-dimensional-self-adjoint-spectral-theorem-step-2-the-orthogonal-complement-is-invariant}
+
+Let
+
+$$
+U=\operatorname{span}\{q\}.
+$$
+
+The subspace $U$ is invariant.
+
+Since $A$ is self-adjoint, Module C showed that $U^\perp$ is also invariant.
+
+Indeed, for $x\in U^\perp$,
+
+$$
+\langle Ax,q\rangle = \langle x,Aq\rangle = \lambda\langle x,q\rangle=0.
+$$
+
+Therefore $Ax\in U^\perp$.
+
+#### Step 3: Induction on dimension {#module-d-session-2-the-finite-dimensional-self-adjoint-spectral-theorem-step-3-induction-on-dimension}
+
+The restriction
+
+$$
+A|_{U^\perp}:U^\perp\to U^\perp
+$$
+
+is still self-adjoint.
+
+The subspace $U^\perp$ has dimension $n-1$.
+
+Applying the same argument inductively gives an orthonormal eigenbasis of $U^\perp$.
+
+Adding $q$ produces an orthonormal eigenbasis of the entire space.
+
+This proves the spectral theorem.
+
+For complex Hermitian matrices, an analogous variational argument works, using complex variations and the reality of the Rayleigh quotient.
+
+### Spectral decomposition into eigenspaces {#sec-module-d-session-2-spectral-decomposition-into-eigenspaces}
+
+Suppose $A$ is Hermitian and its distinct eigenvalues are
+
+$$
+\mu_1,\ldots,\mu_s.
+$$
+
+Let $E_{\mu_j}$ be the eigenspace corresponding to $\mu_j$.
+
+The spectral theorem gives
+
+$$
+\boxed{ V=E_{\mu_1}\oplus^\perp\cdots \oplus^\perp E_{\mu_s}. }
+$$
+
+This is an **orthogonal invariant direct-sum decomposition**.
+
+Each vector has a unique expansion
+
+$$
+x=x_1+\cdots+x_s, \qquad x_j\in E_{\mu_j}.
+$$
+
+The operator acts independently on the components:
+
+$$
+Ax=\mu_1x_1+\cdots+\mu_sx_s.
+$$
+
+Thus an apparently complicated linear operator becomes scalar multiplication on each spectral subspace.
+
+This is the geometric heart of the spectral theorem.
+
+### Spectral projections {#sec-module-d-session-2-spectral-projections}
+
+Let $P_j$ denote the orthogonal projection onto $E_{\mu_j}$.
+
+Then
+
+$$
+\boxed{ P_j^2=P_j=P_j^*. }
+$$
+
+Because distinct eigenspaces are orthogonal,
+
+$$
+P_iP_j=0\qquad(i\ne j).
+$$
+
+Furthermore,
+
+$$
+\boxed{ I=\sum_{j=1}^sP_j. }
+$$
+
+Every vector is the sum of its spectral components.
+
+The operator itself can be reconstructed as
+
+$$
+\boxed{ A=\sum_{j=1}^s\mu_jP_j. }
+$$
+
+#### Proof {#module-d-session-2-spectral-projections-proof}
+
+For any $x\in V$, the orthogonal eigenspace decomposition gives
+
+$$
+x=\sum_jP_jx.
+$$
+
+Applying $A$,
+
+$$
+Ax=\sum_jA(P_jx).
+$$
+
+Since $P_jx\in E_{\mu_j}$,
+
+$$
+A(P_jx)=\mu_jP_jx.
+$$
+
+Thus
+
+$$
+Ax=\sum_j\mu_jP_jx.
+$$
+
+Since this holds for every $x$, the operator identity follows.
+
+#### Spectral projections commute with the operator {#module-d-session-2-spectral-projections-spectral-projections-commute-with-the-operator}
+
+We also have
+
+$$
+\boxed{AP_j=P_jA=\mu_jP_j.}
+$$
+
+This means that extracting a spectral component and then applying the operator gives the same result as applying the operator first and then extracting that component.
+
+Spectral projections are especially well matched to the operator's structure.
+
+### A running spectral example {#sec-module-d-session-2-a-running-spectral-example}
+
+Consider
+
+$$
+\boxed{ A= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix}. }
+$$
+
+Its eigenvalues are
+
+$$
+\boxed{1,\quad3,\quad9.}
+$$
+
+An orthonormal eigenbasis is
+
+$$
+q_1=\frac1{\sqrt2} \begin{pmatrix}
+  1\\
+  -1\\
+  0
+\end{pmatrix},
+$$
+
+$$
+q_2=\frac1{\sqrt2} \begin{pmatrix}
+  1\\
+  1\\
+  0
+\end{pmatrix},
+$$
+
+$$
+q_3= \begin{pmatrix}
+  0\\
+  0\\
+  1
+\end{pmatrix}.
+$$
+
+Define
+
+$$
+Q=(q_1\ q_2\ q_3).
+$$
+
+Then
+
+$$
+A=Q \begin{pmatrix}
+  1&0&0\\
+  0&3&0\\
+  0&0&9
+\end{pmatrix} Q^T.
+$$
+
+The rank-one spectral projectors are
+
+$$
+P_1=q_1q_1^T = \frac12 \begin{pmatrix}
+  1&-1&0\\
+  -1&1&0\\
+  0&0&0
+\end{pmatrix},
+$$
+
+$$
+P_2=q_2q_2^T = \frac12 \begin{pmatrix}
+  1&1&0\\
+  1&1&0\\
+  0&0&0
+\end{pmatrix},
+$$
+
+and
+
+$$
+P_3=q_3q_3^T = \begin{pmatrix}
+  0&0&0\\
+  0&0&0\\
+  0&0&1
+\end{pmatrix}.
+$$
+
+They satisfy
+
+$$
+P_1+P_2+P_3=I
+$$
+
+and
+
+$$
+\boxed{A=P_1+3P_2+9P_3.}
+$$
+
+#### Geometric meaning {#module-d-session-2-a-running-spectral-example-geometric-meaning}
+
+The vector space is decomposed into three orthogonal directions.
+
+The operator multiplies the first direction by $1$, the second by $3$, and the third by $9$.
+
+Every input vector is decomposed into those directions, independently scaled, and then recombined.
+
+This is the geometry of a symmetric positive definite transformation.
+
+### Matrix functions and polynomial functional calculus {#sec-module-d-session-2-matrix-functions-and-polynomial-functional-calculus}
+
+Suppose
+
+$$
+p(t)=a_0+a_1t+\cdots+a_dt^d.
+$$
+
+Define
+
+$$
+p(A)=a_0I+a_1A+\cdots+a_dA^d.
+$$
+
+If
+
+$$
+A=Q\Lambda Q^*,
+$$
+
+then
+
+$$
+A^k=Q\Lambda^kQ^*.
+$$
+
+Hence
+
+$$
+\boxed{ p(A)=Qp(\Lambda)Q^*. }
+$$
+
+Equivalently,
+
+$$
+\boxed{ p(A)=\sum_{j=1}^s p(\mu_j)P_j. }
+$$
+
+Thus applying a polynomial to an operator changes the scaling factor associated with each eigenspace from $\mu_j$ to $p(\mu_j)$.
+
+#### Example {#module-d-session-2-matrix-functions-and-polynomial-functional-calculus-example}
+
+Take
+
+$$
+p(t)=\frac{9-t}{8}.
+$$
+
+Then
+
+$$
+p(1)=1,\qquad p(3)=\frac34,\qquad p(9)=0.
+$$
+
+Therefore,
+
+$$
+\boxed{ p(A)=P_1+\frac34P_2. }
+$$
+
+The eigenspace corresponding to eigenvalue $9$ is completely eliminated.
+
+The eigenspace corresponding to eigenvalue $3$ is attenuated.
+
+The eigenspace corresponding to eigenvalue $1$ is preserved.
+
+This is a simple spectral filter.
+
+### Spectral projections as polynomials {#sec-module-d-session-2-spectral-projections-as-polynomials}
+
+There is a useful converse.
+
+Suppose the distinct eigenvalues of a diagonalizable operator are
+
+$$
+\mu_1,\ldots,\mu_s.
+$$
+
+For each $j$, define the Lagrange interpolation polynomial
+
+$$
+\ell_j(t)= \prod_{k\ne j} \frac{t-\mu_k}{\mu_j-\mu_k}.
+$$
+
+It satisfies
+
+$$
+\ell_j(\mu_i)=\delta_{ij}.
+$$
+
+Therefore,
+
+$$
+\ell_j(A) = \sum_i\ell_j(\mu_i)P_i = P_j.
+$$
+
+Thus
+
+$$
+\boxed{ P_j= \prod_{k\ne j} \frac{A-\mu_kI}{\mu_j-\mu_k}. }
+$$
+
+This is a striking connection:
+
+**The spectral projector onto an eigenspace can itself be expressed as a polynomial of the operator.**
+
+It follows that the projector is intrinsic to the operator, without depending on a particular orthonormal eigenbasis inside a repeated eigenspace.
+
+This construction also connects spectral theory with polynomial interpolation, an important topic in numerical analysis.
+
+However, explicitly evaluating these polynomials can be numerically unstable when eigenvalues are closely clustered. The formula is primarily a structural identity, not necessarily a recommended numerical algorithm.
+
+### Matrix functions beyond polynomials {#sec-module-d-session-2-matrix-functions-beyond-polynomials}
+
+For a Hermitian matrix, we can define a much larger class of functions by
+
+$$
+\boxed{ f(A)=Qf(\Lambda)Q^*, }
+$$
+
+where
+
+$$
+f(\Lambda) = \operatorname{diag}(f(\lambda_1),\ldots,f(\lambda_n)).
+$$
+
+Examples include:
+
+$$
+e^A=Qe^\Lambda Q^*,
+$$
+
+$$
+A^{1/2}=Q\Lambda^{1/2}Q^*
+$$
+
+for positive semidefinite $A$, and
+
+$$
+A^{-1}=Q\Lambda^{-1}Q^*
+$$
+
+when $A$ is invertible.
+
+For finite-dimensional Hermitian matrices, it is enough that $f$ be defined on the finite spectrum of $A$.
+
+This is an elementary form of **functional calculus**: we apply scalar functions to operators by applying them to the spectral values.
+
+In infinite-dimensional operator theory, functional calculus becomes a central construction.
+
+### Structural connection: projectors and algebra {#sec-module-d-session-2-structural-connection-projectors-and-algebra}
+
+The spectral decomposition expresses an operator through mutually orthogonal idempotents:
+
+$$
+A=\sum_j\mu_jP_j.
+$$
+
+The identities
+
+$$
+P_iP_j=\delta_{ij}P_i,\qquad \sum_jP_j=I
+$$
+
+are algebraic.
+
+Self-adjointness adds the geometric property
+
+$$
+P_j^*=P_j.
+$$
+
+This distinction illustrates a recurring theme of our curriculum.
+
+The existence of direct sums and algebraic projections belongs to structural linear algebra.
+
+Orthogonality and self-adjoint projections belong to inner-product geometry.
+
+The spectral theorem combines both.
+
+### Checkpoint 2 {#module-d-checkpoint-2 .unnumbered .unlisted}
+
+Prove directly that the spectral projectors of a Hermitian matrix are mutually orthogonal idempotents and that their sum is the identity.
+
+Then derive
+
+$$
+p(A)=\sum_jp(\mu_j)P_j.
+$$
+
+Finally, explain why polynomial filtering changes spectral components without changing their eigenspaces.
+
+## Session 3 — The geometry of spectral subspaces {#sec-module-d-session-3}
+
+Individual eigenvectors are useful, but many important numerical algorithms seek an entire invariant subspace.
+
+This is particularly natural when eigenvalues are clustered or repeated.
+
+If several eigenvalues lie close together, their individual eigenvectors may be difficult to distinguish accurately, while the subspace spanned by them can still be approximated reliably.
+
+We therefore need a way to measure the distance between subspaces.
+
+### A subspace is more fundamental than a chosen basis {#sec-module-d-session-3-a-subspace-is-more-fundamental-than-a-chosen-basis}
+
+Suppose $Q\in\mathbb R^{n\times k}$ has orthonormal columns spanning a subspace $U$.
+
+Then
+
+$$
+Q^TQ=I_k.
+$$
+
+But $Q$ is not unique.
+
+For any orthogonal $R\in\mathbb R^{k\times k}$,
+
+$$
+\widetilde Q=QR
+$$
+
+also has orthonormal columns, and
+
+$$
+\operatorname{im}\widetilde Q=\operatorname{im}Q.
+$$
+
+Therefore, an algorithm tracking an invariant subspace should not mistake a change of basis inside that subspace for a change in the subspace itself.
+
+This is important in subspace iteration and Rayleigh–Ritz methods.
+
+#### A basis-independent representation {#module-d-session-3-a-subspace-is-more-fundamental-than-a-chosen-basis-a-basis-independent-representation}
+
+The orthogonal projector onto $U$ is
+
+$$
+\boxed{P_U=QQ^T.}
+$$
+
+Replacing $Q$ by $QR$ gives
+
+$$
+\widetilde Q\widetilde Q^T = QRR^TQ^T = QQ^T.
+$$
+
+Thus the projector depends only on $U$, not on its chosen orthonormal basis.
+
+Spectral subspaces can therefore be studied through their projectors.
+
+### Measuring the angle between two lines {#sec-module-d-session-3-measuring-the-angle-between-two-lines}
+
+Consider two unit vectors $u,v\in\mathbb R^n$.
+
+The acute angle between their one-dimensional spans is
+
+$$
+\boxed{ \theta=\arccos|u^Tv|, \qquad 0\le\theta\le\frac\pi2. }
+$$
+
+The absolute value matters because $u$ and $-u$ span the same line.
+
+We want to measure the angle between subspaces, not between arbitrarily oriented basis vectors.
+
+The sine of this angle is
+
+$$
+\boxed{ \sin\theta = \|(I-uu^T)v\|_2. }
+$$
+
+Indeed,
+
+$$
+v=(u^Tv)u+(I-uu^T)v
+$$
+
+is an orthogonal decomposition.
+
+Since $\|v\|=1$,
+
+$$
+\|(I-uu^T)v\|^2 = 1-|u^Tv|^2 = \sin^2\theta.
+$$
+
+Thus the angle measures how much of one unit vector lies outside the other line.
+
+### Principal angles between subspaces {#sec-module-d-session-3-principal-angles-between-subspaces}
+
+For two $k$-dimensional subspaces $U,W\subseteq\mathbb R^n$, choose orthonormal basis matrices $Q_U,Q_W$.
+
+Compute the singular values of
+
+$$
+Q_U^TQ_W.
+$$
+
+Write them in descending order:
+
+$$
+\sigma_1\ge\cdots\ge\sigma_k.
+$$
+
+The **principal angles** are defined by
+
+$$
+\boxed{ \cos\theta_i=\sigma_i(Q_U^TQ_W), \qquad 0\le\theta_1\le\cdots\le\theta_k\le\frac\pi2. }
+$$
+
+This generalizes the angle between two lines.
+
+The smallest principal angle describes the closest alignment between directions in the two subspaces.
+
+The largest principal angle describes their greatest mismatch.
+
+These angles are independent of the orthonormal bases chosen.
+
+Why? Changing the bases multiplies $Q_U^TQ_W$ on the left and right by orthogonal matrices, which do not change its singular values.
+
+#### A useful error measure {#module-d-session-3-principal-angles-between-subspaces-a-useful-error-measure}
+
+For subspaces of equal dimension,
+
+$$
+\boxed{ \|\sin\Theta(U,W)\|_2 = \sin\theta_{\max}. }
+$$
+
+Here $\sin\Theta$ denotes the diagonal matrix of sines of the principal angles.
+
+One equivalent expression is
+
+$$
+\boxed{ \sin\theta_{\max} = \|(I-P_U)Q_W\|_2. }
+$$
+
+This is useful in numerical algorithms because $Q_W$ is typically an orthonormal basis produced by a computation.
+
+We can compare it with a desired invariant subspace $U$ without requiring the basis vectors to align individually.
+
+For equal-dimensional subspaces, another identity is
+
+$$
+\boxed{ \|P_U-P_W\|_2=\sin\theta_{\max}. }
+$$
+
+This provides a basis-independent metric for comparing subspaces.
+
+### An illustrative two-dimensional example {#sec-module-d-session-3-an-illustrative-two-dimensional-example}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&0\\
+  0&4
+\end{pmatrix}.
+$$
+
+Its eigenvectors are $e_1,e_2$.
+
+Suppose we want to approximate the eigenspace
+
+$$
+U=\operatorname{span}\{e_1\}.
+$$
+
+Take a unit vector
+
+$$
+x(\theta)= \begin{pmatrix}
+  \cos\theta\\
+  \sin\theta
+\end{pmatrix}, \qquad 0\le\theta\le\frac\pi2.
+$$
+
+The trial subspace is
+
+$$
+W_\theta=\operatorname{span}\{x(\theta)\}.
+$$
+
+The angle between $U$ and $W_\theta$ is exactly $\theta$.
+
+Its projector is
+
+$$
+P_\theta=x(\theta)x(\theta)^T.
+$$
+
+The subspace error is
+
+$$
+\boxed{ \|P_\theta-P_U\|_2=\sin\theta. }
+$$
+
+This illustrates why subspace error is not quite the same thing as ordinary vector error.
+
+The vectors $x(\theta)$ and $-x(\theta)$ represent the same subspace, even though their Euclidean distance can be large.
+
+#### Explore the example {#module-d-session-3-an-illustrative-two-dimensional-example-explore-the-example}
+
+```{=html}
+<div id="module-d-angle-demo" style="max-width:32rem;margin:1rem auto;padding:1rem;border:1px solid #94a3b8;border-radius:.4rem">
+<label for="module-d-angle">Trial angle θ</label>
+<input id="module-d-angle" type="range" min="0" max="90" step="1" value="42" style="width:60%;vertical-align:middle">
+<output for="module-d-angle" data-angle>42°</output>
+<svg viewBox="0 0 280 174" role="img" aria-label="Unit trial direction between the two eigenvector axes" style="display:block;width:100%;max-height:13rem">
+  <path d="M36 16 V146 H244" fill="none" stroke="currentColor"/>
+  <path d="M36 26 A120 120 0 0 1 156 146" fill="none" stroke="#82919d" stroke-dasharray="3 4"/>
+  <text x="245" y="150" fill="currentColor">e₁</text>
+  <text x="14" y="22" fill="currentColor">e₂</text>
+  <line data-vector x1="36" y1="146" x2="125.18" y2="65.70" stroke="#168a79" stroke-width="3"/>
+  <circle data-tip cx="125.18" cy="65.70" r="4" fill="#168a79"/>
+</svg>
+<div>Subspace error <output data-error>0.669</output></div>
+<div>Rayleigh quotient <output data-rho>2.343</output></div>
+<div>Residual norm <output data-residual>1.492</output></div>
+</div>
+<script>
+(() => {
+  const demo = document.getElementById("module-d-angle-demo");
+  const slider = demo.querySelector("input");
+  function update() {
+    const theta = Number(slider.value) * Math.PI / 180;
+    const s = Math.sin(theta), c = Math.cos(theta);
+    const x = 36 + 120 * c, y = 146 - 120 * s;
+    const vector = demo.querySelector("[data-vector]"), tip = demo.querySelector("[data-tip]");
+    vector.setAttribute("x2", x); vector.setAttribute("y2", y);
+    tip.setAttribute("cx", x); tip.setAttribute("cy", y);
+    demo.querySelector("[data-angle]").value = slider.value + "°";
+    demo.querySelector("[data-error]").value = s.toFixed(3);
+    demo.querySelector("[data-rho]").value = (1 + 3 * s * s).toFixed(3);
+    demo.querySelector("[data-residual]").value = (3 * s * c).toFixed(3);
+  }
+  slider.addEventListener("input", update);
+  update();
+})();
+</script>
+```
+
+::: {.content-visible unless-format="html"}
+
+| Trial angle | Subspace error | Rayleigh quotient | Residual norm |
+|---:|---:|---:|---:|
+| 0° | 0.000 | 1.000 | 0.000 |
+| 42° | 0.669 | 2.343 | 1.492 |
+| 45° | 0.707 | 2.500 | 1.500 |
+| 90° | 1.000 | 4.000 | 0.000 |
+
+:::
+
+Notice that the residual vanishes at both $0^\circ$ and $90^\circ$: both directions are exact eigenvectors, but only the first is the intended target. A small residual must therefore be interpreted together with the approximate eigenvalue and spectral separation.
+
+The formulas behind this visualization will be derived in Session 4.
+
+### What is an approximately invariant subspace? {#sec-module-d-session-3-what-is-an-approximately-invariant-subspace}
+
+Let $A=A^*\in\mathbb C^{n\times n}$.
+
+Suppose $Q\in\mathbb C^{n\times k}$ has orthonormal columns spanning a trial subspace $U$.
+
+The subspace is invariant precisely when
+
+$$
+A(U)\subseteq U.
+$$
+
+Equivalently, every vector $AQy$ must belong to $\operatorname{im}Q$.
+
+The orthogonal projector onto $U$ is
+
+$$
+P=QQ^*.
+$$
+
+A vector belongs to $U$ exactly when its component outside $U$ vanishes.
+
+Therefore,
+
+$$
+\boxed{ U\text{ is invariant} \iff (I-P)AQ=0. }
+$$
+
+This motivates defining the **invariance residual**
+
+$$
+\boxed{ R_U=(I-QQ^*)AQ. }
+$$
+
+It measures how much $A$ sends the trial subspace outside itself.
+
+#### Connection to Rayleigh–Ritz {#module-d-session-3-what-is-an-approximately-invariant-subspace-connection-to-rayleigh-ritz}
+
+Define the compressed matrix
+
+$$
+H=Q^*AQ.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  AQ-QH &=AQ-QQ^*AQ\\
+  &=(I-QQ^*)AQ.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{ R_U=AQ-QH. }
+$$
+
+When $R_U=0$, the trial subspace is exactly invariant.
+
+When $\|R_U\|$ is small, it is approximately invariant.
+
+This is a key quantity in subspace iteration and numerical eigenvalue methods.
+
+### Why spectral gaps matter {#sec-module-d-session-3-why-spectral-gaps-matter}
+
+Suppose a Hermitian matrix has eigenvalues
+
+$$
+\lambda_1\le\cdots\le\lambda_n.
+$$
+
+We are interested in a group of eigenvalues separated from the rest.
+
+For example, perhaps we want the eigenspace associated with $\lambda_1$, and
+
+$$
+\lambda_2-\lambda_1
+$$
+
+is appreciably positive.
+
+This difference is a **spectral gap**.
+
+More generally, for two disjoint spectral sets $\Lambda_1,\Lambda_2$, define their separation by
+
+$$
+\boxed{ \operatorname{gap}(\Lambda_1,\Lambda_2) = \min_{\lambda\in\Lambda_1,\ \mu\in\Lambda_2} |\lambda-\mu|. }
+$$
+
+Why is a gap useful?
+
+Because a vector with a small residual can have components in several nearby eigenspaces.
+
+If the unwanted eigenvalues are well separated from the approximate eigenvalue, those unwanted components can be bounded using the residual.
+
+We will derive a precise version of this statement in the next session.
+
+#### Structural connection to perturbation theory {#module-d-session-3-why-spectral-gaps-matter-structural-connection-to-perturbation-theory}
+
+For a Hermitian matrix, an isolated cluster of eigenvalues determines a spectral subspace.
+
+Small perturbations of the matrix often lead to small changes in that subspace, provided the perturbation is small relative to the separation from the rest of the spectrum.
+
+This is the setting of classical invariant-subspace perturbation results, including the Davis–Kahan sin $\Theta$ theorem.
+
+The important conceptual ingredients are already present:
+
+$$
+\boxed{ \text{spectral projector} \quad+\quad \text{subspace angle} \quad+\quad \text{spectral gap}. }
+$$
+
+We will use these ideas in numerical error analysis rather than proving the full perturbation theorem here.
+
+### Checkpoint 3 {#module-d-checkpoint-3 .unnumbered .unlisted}
+
+Explain why comparing two orthonormal basis matrices entry by entry is generally not a reliable way to measure the difference between their subspaces.
+
+Prove
+
+$$
+U\text{ invariant under }A \iff (I-QQ^*)AQ=0.
+$$
+
+Then explain the roles of the invariance residual and spectral separation when assessing a numerically computed invariant subspace.
+
+## Session 4 — Rayleigh quotients, variational principles, and Rayleigh–Ritz {#sec-module-d-session-4}
+
+We now connect spectral theory to optimization.
+
+One of the most important facts about Hermitian matrices is that their eigenvalues can be characterized through variational problems.
+
+This allows us to approximate eigenvalues using subspaces rather than characteristic polynomials.
+
+### The Rayleigh quotient {#sec-module-d-session-4-the-rayleigh-quotient}
+
+Let $A=A^*\in\mathbb C^{n\times n}$.
+
+For $x\ne0$, define
+
+$$
+\boxed{ \rho_A(x)=\frac{x^*Ax}{x^*x}. }
+$$
+
+Because $A$ is Hermitian, the numerator is real.
+
+Suppose
+
+$$
+Aq_i=\lambda_iq_i,
+$$
+
+where the $q_i$ form an orthonormal eigenbasis.
+
+Write
+
+$$
+x=\sum_{i=1}^n c_iq_i.
+$$
+
+Then
+
+$$
+x^*Ax=\sum_i\lambda_i|c_i|^2
+$$
+
+and
+
+$$
+x^*x=\sum_i|c_i|^2.
+$$
+
+Therefore,
+
+$$
+\boxed{ \rho_A(x)= \frac{\sum_i\lambda_i|c_i|^2} {\sum_i|c_i|^2}. }
+$$
+
+The Rayleigh quotient is a weighted average of the eigenvalues.
+
+Hence
+
+$$
+\boxed{ \lambda_{\min}\le\rho_A(x)\le\lambda_{\max}. }
+$$
+
+This provides a geometric interpretation of eigenvalues as extreme values of a quadratic form on the unit sphere.
+
+### The min–max principle {#sec-module-d-session-4-the-min-max-principle}
+
+Order the eigenvalues as
+
+$$
+\lambda_1\le\lambda_2\le\cdots\le\lambda_n,
+$$
+
+counting multiplicity.
+
+The **Courant–Fischer min–max theorem** states that
+
+$$
+\boxed{ \lambda_k = \min_{\substack{S\subseteq\mathbb C^n\\
+\dim S=k}} \ \max_{0\ne x\in S}\rho_A(x). }
+$$
+
+There is also the dual characterization
+
+$$
+\boxed{ \lambda_k = \max_{\substack{S\subseteq\mathbb C^n\\
+\dim S=n-k+1}} \ \min_{0\ne x\in S}\rho_A(x). }
+$$
+
+These formulas characterize every eigenvalue through subspaces and the Rayleigh quotient.
+
+#### Proof of the first characterization {#module-d-session-4-the-min-max-principle-proof-of-the-first-characterization}
+
+Let
+
+$$
+E_k=\operatorname{span}\{q_1,\ldots,q_k\}.
+$$
+
+Every nonzero $x\in E_k$ satisfies
+
+$$
+\rho_A(x)\le\lambda_k.
+$$
+
+Equality is attained at $x=q_k$.
+
+Thus
+
+$$
+\max_{0\ne x\in E_k}\rho_A(x)=\lambda_k,
+$$
+
+giving
+
+$$
+\min_{\dim S=k}\max_{x\in S\setminus\{0\}}\rho_A(x) \le\lambda_k.
+$$
+
+For the reverse inequality, let $S$ be any $k$-dimensional subspace.
+
+Consider
+
+$$
+F_k=\operatorname{span}\{q_k,\ldots,q_n\}.
+$$
+
+This has dimension $n-k+1$.
+
+Since
+
+$$
+\dim S+\dim F_k=n+1>n,
+$$
+
+we must have
+
+$$
+S\cap F_k\ne\{0\}.
+$$
+
+Choose a nonzero $x\in S\cap F_k$.
+
+Because $x\in F_k$, its spectral expansion contains only eigenvectors with eigenvalues at least $\lambda_k$.
+
+Therefore,
+
+$$
+\rho_A(x)\ge\lambda_k.
+$$
+
+Thus
+
+$$
+\max_{0\ne y\in S}\rho_A(y)\ge\lambda_k.
+$$
+
+Since this holds for every $k$-dimensional $S$,
+
+$$
+\min_{\dim S=k}\max_{y\in S\setminus\{0\}}\rho_A(y) \ge\lambda_k.
+$$
+
+Combining both inequalities proves the result.
+
+The second characterization follows by a symmetric argument.
+
+#### Why this theorem matters {#module-d-session-4-the-min-max-principle-why-this-theorem-matters}
+
+The min–max principle describes eigenvalues without referring to a particular eigenbasis.
+
+It is invariant under changes of coordinates and extends naturally to variational eigenvalue problems.
+
+It also explains why approximating an operator on a smaller subspace produces meaningful eigenvalue estimates.
+
+### Rayleigh–Ritz approximation {#sec-module-d-session-4-rayleigh-ritz-approximation}
+
+Let $U\subseteq\mathbb C^n$ be a $k$-dimensional trial subspace.
+
+Choose an orthonormal basis matrix
+
+$$
+Q\in\mathbb C^{n\times k}, \qquad Q^*Q=I.
+$$
+
+We seek approximate eigenpairs of $A$ inside $U$.
+
+A vector $u\in U$ can be written as
+
+$$
+u=Qy.
+$$
+
+Define the compressed matrix
+
+$$
+\boxed{ H=Q^*AQ. }
+$$
+
+Since $A$ is Hermitian,
+
+$$
+H^*=H.
+$$
+
+Thus $H$ is a smaller Hermitian matrix.
+
+Solve
+
+$$
+\boxed{Hy=\theta y.}
+$$
+
+Then
+
+$$
+u=Qy
+$$
+
+is a **Ritz vector**, and $\theta$ is a **Ritz value**.
+
+If $y$ is normalized, so is $u$.
+
+### Deriving the Ritz equations from residual orthogonality {#sec-module-d-session-4-deriving-the-ritz-equations-from-residual-orthogonality}
+
+Define the eigenpair residual
+
+$$
+\boxed{ r=Au-\theta u. }
+$$
+
+For an exact eigenpair, $r=0$.
+
+But an approximate eigenvector constrained to $U$ generally cannot satisfy the exact equation.
+
+Rayleigh–Ritz instead imposes
+
+$$
+\boxed{r\perp U.}
+$$
+
+This means
+
+$$
+Q^*r=0.
+$$
+
+Substitute $u=Qy$:
+
+$$
+Q^*(AQy-\theta Qy)=0.
+$$
+
+Therefore,
+
+$$
+Q^*AQy=\theta Q^*Qy.
+$$
+
+Since $Q^*Q=I$,
+
+$$
+\boxed{Hy=\theta y.}
+$$
+
+Thus the reduced eigenvalue problem is precisely the condition that the full-space residual annihilate the trial subspace.
+
+This is closely related to Galerkin orthogonality from Module C.
+
+#### A variational interpretation {#module-d-session-4-deriving-the-ritz-equations-from-residual-orthogonality-a-variational-interpretation}
+
+The Ritz values are the stationary values of the Rayleigh quotient restricted to the trial subspace.
+
+Indeed,
+
+$$
+\rho_A(Qy) = \frac{y^*Hy}{y^*y}.
+$$
+
+Thus approximating eigenvalues in $U$ is equivalent to studying the Rayleigh quotient of the smaller Hermitian matrix $H$.
+
+### Ritz value interlacing {#sec-module-d-session-4-ritz-value-interlacing}
+
+Let the eigenvalues of $A$ be
+
+$$
+\lambda_1\le\cdots\le\lambda_n
+$$
+
+and the Ritz values of a $k$-dimensional trial subspace be
+
+$$
+\theta_1\le\cdots\le\theta_k.
+$$
+
+Then
+
+$$
+\boxed{ \lambda_i\le\theta_i\le\lambda_{i+n-k}, \qquad i=1,\ldots,k. }
+$$
+
+This is a form of eigenvalue interlacing.
+
+It follows from the min–max principle, since the Ritz variational problem is restricted to subspaces contained in the trial space.
+
+In particular, for the smallest Ritz value,
+
+$$
+\boxed{\theta_1\ge\lambda_1.}
+$$
+
+For the largest Ritz value,
+
+$$
+\boxed{\theta_k\le\lambda_n.}
+$$
+
+The Ritz values remain within the spectral interval of the original Hermitian matrix.
+
+This is useful both theoretically and as a numerical consistency check.
+
+### Worked Rayleigh–Ritz example {#sec-module-d-session-4-worked-rayleigh-ritz-example}
+
+Consider the diagonal Hermitian matrix
+
+$$
+A= \begin{pmatrix}
+  1&0&0\\
+  0&3&0\\
+  0&0&9
+\end{pmatrix}.
+$$
+
+Let
+
+$$
+q_1=\frac1{\sqrt2}(e_1+e_2), \qquad q_2=e_3.
+$$
+
+These form an orthonormal basis of the two-dimensional trial subspace
+
+$$
+U=\operatorname{span}\{q_1,q_2\}.
+$$
+
+Set
+
+$$
+Q=(q_1\ q_2).
+$$
+
+The reduced matrix is
+
+$$
+H=Q^TAQ.
+$$
+
+Because $q_1$ combines the eigenvalues $1$ and $3$ equally,
+
+$$
+q_1^TAq_1=\frac{1+3}{2}=2.
+$$
+
+Also,
+
+$$
+q_2^TAq_2=9.
+$$
+
+The cross terms are zero.
+
+Therefore,
+
+$$
+\boxed{ H= \begin{pmatrix}
+  2&0\\
+  0&9
+\end{pmatrix}. }
+$$
+
+The Ritz values are $2$ and $9$.
+
+The first Ritz vector is $q_1$.
+
+Its residual is
+
+$$
+\begin{aligned}
+  r_1 &=Aq_1-2q_1\\
+  &=\frac1{\sqrt2} \begin{pmatrix}
+  1\\
+  3\\
+  0
+\end{pmatrix} - \frac2{\sqrt2} \begin{pmatrix}
+  1\\
+  1\\
+  0
+\end{pmatrix}\\
+&= \frac1{\sqrt2} \begin{pmatrix}
+  -1\\
+  1\\
+  0
+\end{pmatrix}.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{\|r_1\|_2=1.}
+$$
+
+The residual is orthogonal to the trial subspace.
+
+The second Ritz vector $e_3$ is an exact eigenvector, with zero residual.
+
+This example illustrates that a Ritz value need not be an exact eigenvalue of $A$.
+
+The Ritz value $2$ is an approximation obtained from a trial direction mixing the exact eigendirections for eigenvalues $1$ and $3$.
+
+### Residuals give eigenvalue inclusion bounds {#sec-module-d-session-4-residuals-give-eigenvalue-inclusion-bounds}
+
+Suppose $A=A^*$ and $u$ is a unit vector.
+
+For any scalar $\theta$, define
+
+$$
+r=Au-\theta u.
+$$
+
+Expand $u$ in an orthonormal eigenbasis:
+
+$$
+u=\sum_i c_iq_i.
+$$
+
+Then
+
+$$
+r=\sum_i c_i(\lambda_i-\theta)q_i.
+$$
+
+Therefore,
+
+$$
+\|r\|^2 = \sum_i|c_i|^2|\lambda_i-\theta|^2.
+$$
+
+Let
+
+$$
+d=\min_i|\lambda_i-\theta|.
+$$
+
+Since every term satisfies $|\lambda_i-\theta|\ge d$,
+
+$$
+\|r\|^2 \ge d^2\sum_i|c_i|^2 =d^2.
+$$
+
+Hence
+
+$$
+\boxed{ \operatorname{dist}(\theta,\sigma(A)) \le\|r\|_2. }
+$$
+
+This tells us that if the residual is small, then $\theta$ is close to at least one eigenvalue.
+
+The conclusion requires Hermitian or normal structure for this particularly clean estimate.
+
+For strongly nonnormal matrices, small residuals can occur far from the spectrum, which motivates the concept of pseudospectra.
+
+### Residuals and eigenvector accuracy {#sec-module-d-session-4-residuals-and-eigenvector-accuracy}
+
+A small residual alone does not identify which eigenvector is being approximated.
+
+We also need spectral separation.
+
+Suppose $A$ has eigenvectors $q_i$, and we are interested in a spectral subspace
+
+$$
+U_J=\operatorname{span}\{q_j:j\in J\}.
+$$
+
+Let $P_J$ be its orthogonal projector.
+
+For a unit approximate vector $u$ and scalar $\theta$, define
+
+$$
+r=Au-\theta u.
+$$
+
+Assume
+
+$$
+\delta= \min_{i\notin J}|\lambda_i-\theta|>0.
+$$
+
+Then
+
+$$
+\boxed{ \|(I-P_J)u\|_2 \le \frac{\|r\|_2}{\delta}. }
+$$
+
+#### Proof {#module-d-session-4-residuals-and-eigenvector-accuracy-proof}
+
+Write
+
+$$
+u=\sum_i c_iq_i.
+$$
+
+The component outside the target subspace is
+
+$$
+(I-P_J)u=\sum_{i\notin J}c_iq_i.
+$$
+
+Therefore,
+
+$$
+\|(I-P_J)u\|^2 = \sum_{i\notin J}|c_i|^2.
+$$
+
+Meanwhile,
+
+$$
+\|r\|^2 = \sum_i|\lambda_i-\theta|^2|c_i|^2.
+$$
+
+For $i\notin J$, the assumed separation gives
+
+$$
+|\lambda_i-\theta|\ge\delta.
+$$
+
+Hence
+
+$$
+\|r\|^2 \ge \delta^2\sum_{i\notin J}|c_i|^2 = \delta^2\|(I-P_J)u\|^2.
+$$
+
+Taking square roots proves the result.
+
+This is an elementary but powerful residual-to-subspace-error estimate.
+
+It expresses a central principle:
+
+**Residual accuracy becomes subspace accuracy when the desired spectral components are separated from the unwanted ones.**
+
+### Why eigenvalue errors can be smaller than eigenvector errors {#sec-module-d-session-4-why-eigenvalue-errors-can-be-smaller-than-eigenvector-errors}
+
+Return to the two-dimensional example
+
+$$
+A=\begin{pmatrix}
+  1&0\\
+  0&4
+\end{pmatrix}, \qquad x(\theta)= \begin{pmatrix}
+  \cos\theta\\
+  \sin\theta
+\end{pmatrix}.
+$$
+
+The Rayleigh quotient is
+
+$$
+\begin{aligned}
+  \rho_A(x) &=\cos^2\theta+4\sin^2\theta\\
+  &=1+3\sin^2\theta.
+\end{aligned}
+$$
+
+Thus its error relative to eigenvalue $1$ is
+
+$$
+\boxed{ \rho_A(x)-1=3\sin^2\theta. }
+$$
+
+The eigenvector subspace error is
+
+$$
+\sin\theta.
+$$
+
+So the Rayleigh quotient error is quadratic in the subspace error.
+
+Now calculate the residual:
+
+$$
+r=Ax-\rho_A(x)x.
+$$
+
+Using $\rho_A(x)=1+3\sin^2\theta$, one obtains
+
+$$
+r= 3\sin\theta\cos\theta \begin{pmatrix}
+  -\sin\theta\\
+  \cos\theta
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\boxed{ \|r\|_2=3|\sin\theta\cos\theta|. }
+$$
+
+For small $\theta$,
+
+$$
+\sin\theta\approx\theta,\qquad\cos\theta\approx1.
+$$
+
+Hence
+
+$$
+\|r\|\approx3\theta,
+$$
+
+while
+
+$$
+\rho_A(x)-1\approx3\theta^2.
+$$
+
+This explains why eigenvalue approximations can converge faster than the associated eigenvectors.
+
+It is also important when interpreting numerical convergence plots: eigenvalue errors, residual norms, and subspace angles are related but not interchangeable quantities.
+
+### Checkpoint 4 {#module-d-checkpoint-4 .unnumbered .unlisted}
+
+Prove the eigenvalue inclusion bound
+
+$$
+\operatorname{dist}(\theta,\sigma(A))\le\|Au-\theta u\|
+$$
+
+for a unit vector $u$ and Hermitian $A$.
+
+Then derive the Rayleigh–Ritz equations from residual orthogonality.
+
+Finally, explain why spectral separation is needed to convert a small residual into a bound on a particular eigenspace error.
+
+## Session 5 — Singular value decomposition: spectral geometry for rectangular matrices {#sec-module-d-session-5}
+
+Ordinary eigenvalues describe operators of the form
+
+$$
+A:V\to V.
+$$
+
+But many numerical problems involve rectangular matrices:
+
+$$
+A:\mathbb R^n\to\mathbb R^m.
+$$
+
+How can we analyze their geometry?
+
+The answer is the **singular value decomposition**, or SVD.
+
+It is among the most important constructions in numerical linear algebra because it connects kernels, images, orthogonality, conditioning, approximation, and least squares.
+
+### From $A$ to the self-adjoint matrix $A^*A$ {#sec-module-d-session-5-from-to-the-self-adjoint-matrix}
+
+For a rectangular matrix $A\in\mathbb C^{m\times n}$, the product
+
+$$
+A^*A\in\mathbb C^{n\times n}
+$$
+
+is square and Hermitian:
+
+$$
+(A^*A)^*=A^*A.
+$$
+
+It is also positive semidefinite:
+
+$$
+x^*A^*Ax=\|Ax\|_2^2\ge0.
+$$
+
+Therefore the spectral theorem applies.
+
+Let
+
+$$
+A^*Av_i=\sigma_i^2v_i,
+$$
+
+where the $v_i$ form an orthonormal basis and
+
+$$
+\sigma_i\ge0.
+$$
+
+The numbers $\sigma_i$ are the **singular values** of $A$.
+
+They are the nonnegative square roots of the eigenvalues of $A^*A$.
+
+The corresponding $v_i$ are right singular vectors.
+
+### Constructing the left singular vectors {#sec-module-d-session-5-constructing-the-left-singular-vectors}
+
+Suppose $\sigma_i>0$.
+
+Define
+
+$$
+\boxed{ u_i=\frac{Av_i}{\sigma_i}. }
+$$
+
+Then
+
+$$
+\begin{aligned}
+  u_i^*u_j &=\frac{v_i^*A^*Av_j}{\sigma_i\sigma_j}\\
+  &=\frac{\sigma_j^2v_i^*v_j}{\sigma_i\sigma_j}\\
+  &=\delta_{ij}.
+\end{aligned}
+$$
+
+Thus the left singular vectors corresponding to positive singular values are orthonormal.
+
+Moreover,
+
+$$
+\boxed{ Av_i=\sigma_i u_i. }
+$$
+
+Applying $A^*$,
+
+$$
+A^*u_i = \frac{A^*Av_i}{\sigma_i} = \sigma_i v_i.
+$$
+
+So
+
+$$
+\boxed{ A^*u_i=\sigma_i v_i. }
+$$
+
+These paired equations are fundamental.
+
+The transformation $A$ maps a right singular direction $v_i$ to the corresponding left singular direction $u_i$, scaled by $\sigma_i$.
+
+Its adjoint maps $u_i$ back to $v_i$, scaled by the same factor.
+
+### Statement of the SVD theorem {#sec-module-d-session-5-statement-of-the-svd-theorem}
+
+Every matrix
+
+$$
+A\in\mathbb C^{m\times n}
+$$
+
+admits a factorization
+
+$$
+\boxed{ A=U\Sigma V^*, }
+$$
+
+where:
+
+- $U\in\mathbb C^{m\times m}$ is unitary.
+- $V\in\mathbb C^{n\times n}$ is unitary.
+- $\Sigma\in\mathbb R^{m\times n}$ is rectangular diagonal, with nonnegative singular values.
+
+Conventionally,
+
+$$
+\sigma_1\ge\sigma_2\ge\cdots\ge\sigma_r>0,
+$$
+
+where
+
+$$
+r=\operatorname{rank}A.
+$$
+
+All remaining singular values are zero.
+
+#### Completing the construction {#module-d-session-5-statement-of-the-svd-theorem-completing-the-construction}
+
+We have already constructed orthonormal right singular vectors from the spectral theorem for $A^*A$.
+
+For every positive singular value, we constructed a corresponding left singular vector.
+
+These left singular vectors span $\operatorname{im}A$.
+
+Extend them to an orthonormal basis of $\mathbb C^m$.
+
+The resulting unitary matrices $U,V$ give
+
+$$
+A=U\Sigma V^*.
+$$
+
+This proves the existence of the SVD.
+
+### Geometric meaning: orthogonal directions and stretching factors {#sec-module-d-session-5-geometric-meaning-orthogonal-directions-and-stretching-factors}
+
+Consider the action of $A$ on a unit sphere in the input space.
+
+The SVD says we can understand this action in three steps:
+
+$$
+\boxed{ x \xrightarrow{V^*} \text{right singular coordinates} \xrightarrow{\Sigma} \text{scaled coordinates} \xrightarrow{U} Ax. }
+$$
+
+The unitary transformations preserve lengths and angles.
+
+The diagonal matrix $\Sigma$ performs independent scaling along orthogonal singular directions.
+
+Thus a unit sphere is mapped into an ellipsoid, possibly of lower dimension.
+
+The singular values describe the principal semiaxis lengths of that ellipsoid.
+
+**Input unit circle**
+
+**Output ellipse**
+
+Schematic of an SVD with $\sigma_1>\sigma_2>0$. The orthogonal singular directions describe how the transformation stretches the input sphere.
+
+This geometric interpretation is useful for understanding conditioning.
+
+If one singular value is extremely small, the transformation nearly collapses one direction.
+
+Recovering the input component in that direction from a noisy output can then be highly sensitive.
+
+### The four fundamental subspaces from the SVD {#sec-module-d-session-5-the-four-fundamental-subspaces-from-the-svd}
+
+Let $A\in\mathbb C^{m\times n}$ have rank $r$.
+
+Partition
+
+$$
+V=(V_r\ V_0), \qquad U=(U_r\ U_0),
+$$
+
+where $V_r,U_r$ contain the singular vectors associated with positive singular values.
+
+Then
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}A^*&=\operatorname{im}V_r,\\
+  \ker A&=\operatorname{im}V_0,\\
+  \operatorname{im}A&=\operatorname{im}U_r,\\
+  \ker A^*&=\operatorname{im}U_0.
+\end{aligned} }
+$$
+
+Thus the SVD provides **orthonormal bases for all four fundamental subspaces**.
+
+The orthogonal decompositions are
+
+$$
+\mathbb C^n = \operatorname{im}A^*\oplus^\perp\ker A
+$$
+
+and
+
+$$
+\mathbb C^m = \operatorname{im}A\oplus^\perp\ker A^*.
+$$
+
+These are precisely the fundamental subspace decompositions derived abstractly in Modules B and C.
+
+The SVD makes them computationally explicit.
+
+### The SVD and the pseudoinverse {#sec-module-d-session-5-the-svd-and-the-pseudoinverse}
+
+If
+
+$$
+A=U\Sigma V^*,
+$$
+
+define
+
+$$
+\boxed{ A^+=V\Sigma^+U^*, }
+$$
+
+where each positive singular value $\sigma_i$ is replaced by $1/\sigma_i$, and zero singular values remain zero.
+
+The minimum-norm least-squares solution is
+
+$$
+\boxed{x_{\min}=A^+b.}
+$$
+
+Using the singular vectors,
+
+$$
+\boxed{ A^+b = \sum_{i=1}^r \frac{u_i^*b}{\sigma_i}v_i. }
+$$
+
+The formula is especially revealing.
+
+The coefficient $u_i^*b$ measures the output data along the left singular direction $u_i$.
+
+Dividing by $\sigma_i$ reconstructs the corresponding input coefficient.
+
+If $\sigma_i$ is very small, even a small measurement error in $u_i^*b$ can be amplified.
+
+This is the mechanism behind ill-conditioning of inverse problems.
+
+### Singular values and the condition number {#sec-module-d-session-5-singular-values-and-the-condition-number}
+
+For a matrix $A$ with full column rank,
+
+$$
+\|A\|_2=\sigma_1.
+$$
+
+Moreover,
+
+$$
+\min_{\|x\|=1}\|Ax\|=\sigma_n>0.
+$$
+
+Thus the 2-norm condition number is
+
+$$
+\boxed{ \kappa_2(A)=\frac{\sigma_1}{\sigma_n}. }
+$$
+
+For an invertible square matrix, this agrees with
+
+$$
+\kappa_2(A)=\|A\|_2\|A^{-1}\|_2.
+$$
+
+A large condition number means that some directions are stretched much more strongly than others.
+
+When solving inverse problems, reconstructing components along weakly stretched directions may strongly amplify perturbations.
+
+For rank-deficient matrices, the ordinary inverse condition number is infinite. When working on the subspace on which $A$ is injective, the ratio of the largest to the smallest positive singular value describes the conditioning of that restricted map.
+
+### Optimal low-rank approximation {#sec-module-d-session-5-optimal-low-rank-approximation}
+
+The SVD also solves an important approximation problem.
+
+Suppose
+
+$$
+A=\sum_{i=1}^r\sigma_i u_iv_i^*.
+$$
+
+For $k<r$, define the truncated SVD
+
+$$
+\boxed{ A_k=\sum_{i=1}^k\sigma_i u_iv_i^*. }
+$$
+
+This matrix has rank at most $k$.
+
+The **Eckart–Young–Mirsky theorem** states that
+
+$$
+\boxed{ \min_{\operatorname{rank}B\le k}\|A-B\|_2 = \|A-A_k\|_2 = \sigma_{k+1}. }
+$$
+
+And in the Frobenius norm,
+
+$$
+\boxed{ \min_{\operatorname{rank}B\le k}\|A-B\|_F = \left(\sum_{i=k+1}^r\sigma_i^2\right)^{1/2}. }
+$$
+
+Thus the truncated SVD is an optimal rank-$k$ approximation in both norms.
+
+#### Proof in the spectral norm {#module-d-session-5-optimal-low-rank-approximation-proof-in-the-spectral-norm}
+
+The upper bound is immediate.
+
+Because
+
+$$
+A-A_k=\sum_{i=k+1}^r\sigma_i u_iv_i^*,
+$$
+
+its spectral norm is $\sigma_{k+1}$.
+
+For the lower bound, let $B$ have rank at most $k$.
+
+Consider the $(k+1)$-dimensional subspace
+
+$$
+S=\operatorname{span}\{v_1,\ldots,v_{k+1}\}.
+$$
+
+The restriction $B|_S$ cannot be injective because its image has dimension at most $k$.
+
+Therefore there is a unit vector $x\in S$ with
+
+$$
+Bx=0.
+$$
+
+Then
+
+$$
+\|(A-B)x\|=\|Ax\|.
+$$
+
+Because $x$ belongs to the span of the first $k+1$ right singular vectors,
+
+$$
+\|Ax\|\ge\sigma_{k+1}.
+$$
+
+Hence
+
+$$
+\|A-B\|_2\ge\sigma_{k+1}.
+$$
+
+Since $A_k$ attains this bound, it is optimal.
+
+The Frobenius-norm version follows from the corresponding variational characterization of the sum of squared singular values.
+
+#### Applied significance {#module-d-session-5-optimal-low-rank-approximation-applied-significance}
+
+Optimal low-rank approximation appears in:
+
+- Principal component analysis and dimensionality reduction.
+- Data compression.
+- Reduced-order modeling.
+- Approximation of large matrices and operators.
+- Scientific computing with low-rank structure.
+
+The deeper principle is that an operator may act strongly on only a few important directions.
+
+A low-rank approximation retains those dominant directions and discards less significant ones.
+
+That is conceptually related to invariant-subspace approximation, although singular subspaces and eigenspaces are not always the same.
+
+### A rectangular example {#sec-module-d-session-5-a-rectangular-example}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  3&0\\
+  0&1\\
+  0&0
+\end{pmatrix}.
+$$
+
+Its singular values are
+
+$$
+\sigma_1=3,\qquad\sigma_2=1.
+$$
+
+The best rank-one approximation is
+
+$$
+\boxed{ A_1= \begin{pmatrix}
+  3&0\\
+  0&0\\
+  0&0
+\end{pmatrix}. }
+$$
+
+The error is
+
+$$
+\boxed{\|A-A_1\|_2=1.}
+$$
+
+No rank-one matrix can approximate $A$ more accurately in spectral norm.
+
+### Checkpoint 5 {#module-d-checkpoint-5 .unnumbered .unlisted}
+
+Construct an SVD starting from the spectral decomposition of $A^*A$.
+
+Use it to prove that
+
+$$
+\ker(A^*A)=\ker A.
+$$
+
+Then explain why the smallest nonzero singular values are especially important for the conditioning of inverse problems.
+
+Finally, reconstruct the proof of the spectral-norm optimality of the truncated SVD.
+
+## Session 6 — From spectral theory to eigenvalue algorithms {#sec-module-d-session-6}
+
+We now move toward numerical methods.
+
+The goal of this session is not yet a complete analysis of numerical stability. That is the purpose of Module E.
+
+Instead, we will understand how eigenvalue algorithms exploit the spectral decompositions developed in the preceding sessions.
+
+### Why not simply solve the characteristic polynomial? {#sec-module-d-session-6-why-not-simply-solve-the-characteristic-polynomial}
+
+For a small matrix, eigenvalues can be found by solving
+
+$$
+\det(A-\lambda I)=0.
+$$
+
+But for a large matrix, this is usually not an effective numerical strategy.
+
+Computing characteristic polynomial coefficients can be poorly conditioned, and solving the resulting polynomial is not the standard stable approach to a large eigenvalue problem.
+
+Instead, numerical algorithms exploit matrix-vector products, invariant subspaces, factorizations, and orthogonal transformations.
+
+The spectral theorem helps us explain why these methods work.
+
+### Power iteration {#sec-module-d-session-6-power-iteration}
+
+Let $A\in\mathbb R^{n\times n}$ be symmetric, with orthonormal eigenvectors $q_i$.
+
+Order its eigenvalues by decreasing magnitude:
+
+$$
+|\lambda_1|>|\lambda_2|\ge\cdots\ge|\lambda_n|.
+$$
+
+Suppose the initial vector is
+
+$$
+x_0=\sum_{i=1}^n c_iq_i, \qquad c_1\ne0.
+$$
+
+Power iteration repeatedly applies $A$ and normalizes:
+
+$$
+\boxed{ x_{k+1}=\frac{Ax_k}{\|Ax_k\|_2}. }
+$$
+
+Ignoring normalization temporarily,
+
+$$
+A^kx_0=\sum_{i=1}^n c_i\lambda_i^kq_i.
+$$
+
+Factor out $c_1\lambda_1^k$:
+
+$$
+A^kx_0 = c_1\lambda_1^k \left( q_1+ \sum_{i=2}^n \frac{c_i}{c_1} \left(\frac{\lambda_i}{\lambda_1}\right)^kq_i \right).
+$$
+
+Because
+
+$$
+\left|\frac{\lambda_i}{\lambda_1}\right|<1
+$$
+
+for $i\ge2$, all unwanted components decay relative to the dominant eigendirection.
+
+Therefore,
+
+$$
+\boxed{ \operatorname{span}\{x_k\} \longrightarrow \operatorname{span}\{q_1\}. }
+$$
+
+We formulate convergence in terms of spans because the normalized vector may alternate sign if $\lambda_1<0$.
+
+#### Convergence factor {#module-d-session-6-power-iteration-convergence-factor}
+
+The asymptotic rate is governed by
+
+$$
+\boxed{ \left|\frac{\lambda_2}{\lambda_1}\right|. }
+$$
+
+If this ratio is close to one, convergence can be slow.
+
+If it is much smaller than one, convergence is rapid.
+
+#### Example {#module-d-session-6-power-iteration-example}
+
+Let
+
+$$
+A=\operatorname{diag}(9,3,1), \qquad x_0=(1,1,1)^T.
+$$
+
+Then
+
+$$
+A^kx_0=(9^k,3^k,1)^T.
+$$
+
+Dividing by $9^k$,
+
+$$
+\frac{A^kx_0}{9^k} = \left(1,\left(\frac13\right)^k,\left(\frac19\right)^k\right)^T.
+$$
+
+The unwanted components decay geometrically.
+
+#### Failure modes {#module-d-session-6-power-iteration-failure-modes}
+
+Power iteration can fail to isolate a unique eigenvector if:
+
+- The initial vector has no component in the dominant eigendirection.
+- Multiple eigenvalues have equal largest magnitude.
+- The dominant eigenvalue is not sufficiently separated, causing very slow convergence.
+
+For a general nonnormal matrix, convergence behavior can be more complicated because the eigenvectors need not be orthogonal and the matrix may not even be diagonalizable.
+
+### Shift-and-invert iteration {#sec-module-d-session-6-shift-and-invert-iteration}
+
+What if we want an eigenvalue near a specified target $\mu$, rather than the eigenvalue of largest magnitude?
+
+Consider
+
+$$
+B_\mu=(A-\mu I)^{-1},
+$$
+
+assuming $\mu$ is not an eigenvalue.
+
+If
+
+$$
+Aq_i=\lambda_iq_i,
+$$
+
+then
+
+$$
+(A-\mu I)q_i=(\lambda_i-\mu)q_i.
+$$
+
+Thus
+
+$$
+\boxed{ B_\mu q_i=\frac1{\lambda_i-\mu}q_i. }
+$$
+
+Eigenvalues of $A$ close to $\mu$ become eigenvalues of $B_\mu$ with large magnitude.
+
+Applying power iteration to $B_\mu$ therefore tends to select the eigendirection whose eigenvalue is nearest to the shift.
+
+In practice, we do not form $B_\mu$.
+
+Instead, each iteration solves a linear system
+
+$$
+\boxed{ (A-\mu I)y_k=x_k. }
+$$
+
+This connects eigenvalue approximation to linear system solvers and matrix factorizations.
+
+### Rayleigh quotient iteration {#sec-module-d-session-6-rayleigh-quotient-iteration}
+
+A more adaptive method updates the shift using the current Rayleigh quotient:
+
+$$
+\mu_k=\rho_A(x_k).
+$$
+
+The next step solves
+
+$$
+(A-\mu_kI)y_k=x_k
+$$
+
+and normalizes $y_k$.
+
+This is called **Rayleigh quotient iteration**.
+
+For a real symmetric or complex Hermitian matrix, under suitable local assumptions near a simple eigenpair, it has cubic local convergence.
+
+That is significantly faster than ordinary power iteration.
+
+However, each step requires solving a shifted linear system.
+
+This illustrates a recurring numerical tradeoff:
+
+Faster convergence per iteration may require more expensive operations.
+
+### Subspace iteration {#sec-module-d-session-6-subspace-iteration}
+
+Power iteration seeks one eigendirection.
+
+**Subspace iteration** seeks an invariant subspace of dimension $k$.
+
+Suppose $X_0\in\mathbb C^{n\times k}$ has linearly independent columns.
+
+A basic iteration is
+
+$$
+Y_{j+1}=AX_j,
+$$
+
+followed by orthonormalization:
+
+$$
+\boxed{ Y_{j+1}=X_{j+1}R_{j+1}, \qquad X_{j+1}^*X_{j+1}=I. }
+$$
+
+The columns of $X_j$ span the current trial subspace.
+
+The QR factorization prevents the basis vectors from collapsing toward the same dominant eigenvector.
+
+It does not change the span generated by $Y_{j+1}$, provided $Y_{j+1}$ has full column rank.
+
+#### Why subspace iteration converges {#module-d-session-6-subspace-iteration-why-subspace-iteration-converges}
+
+Assume $A$ is Hermitian and that
+
+$$
+|\lambda_1|\ge\cdots\ge|\lambda_k| > |\lambda_{k+1}|\ge\cdots\ge|\lambda_n|.
+$$
+
+Let
+
+$$
+U_*=\operatorname{span}\{q_1,\ldots,q_k\}
+$$
+
+be the desired invariant subspace.
+
+Suppose the starting trial subspace has sufficient overlap with $U_*$: specifically, its projection onto $U_*$ has full rank $k$.
+
+Repeated application of $A$ scales desired spectral components by the first $k$ eigenvalues and unwanted components by the remaining eigenvalues.
+
+Under the gap assumption, the unwanted components decay relative to the desired components.
+
+The characteristic convergence factor is
+
+$$
+\boxed{ \left|\frac{\lambda_{k+1}}{\lambda_k}\right|. }
+$$
+
+More precisely, this ratio controls a bound on the tangent of the largest principal angle to the desired subspace.
+
+The subspace may converge even though its basis vectors rotate or change sign from one iteration to the next.
+
+This is another reason principal angles and projectors are preferable to entrywise basis comparisons.
+
+### Rayleigh–Ritz extraction during subspace iteration {#sec-module-d-session-6-rayleigh-ritz-extraction-during-subspace-iteration}
+
+After constructing an orthonormal basis $X_k$, form
+
+$$
+H_k=X_k^*AX_k.
+$$
+
+Solve the reduced eigenvalue problem
+
+$$
+H_ky=\theta y.
+$$
+
+The approximate eigenvector is
+
+$$
+u=X_ky.
+$$
+
+The residual is
+
+$$
+r=Au-\theta u.
+$$
+
+Thus one iteration cycle naturally consists of two complementary operations:
+
+**Subspace improvement:** Apply $A$ or a spectral filter to move the trial subspace toward the desired invariant subspace.
+
+**Ritz extraction:** Solve a projected eigenvalue problem to identify approximate eigenpairs within the current trial subspace.
+
+This division of labor is fundamental in modern iterative eigenvalue methods.
+
+### Orthogonal iteration and the QR algorithm {#sec-module-d-session-6-orthogonal-iteration-and-the-qr-algorithm}
+
+There is also a deep relationship between subspace iteration and the QR algorithm.
+
+In orthogonal iteration, one updates a full orthonormal basis $Q_k$ by
+
+$$
+AQ_k=Q_{k+1}R_{k+1}.
+$$
+
+If $Q_k$ is square and unitary, the iteration is closely related to repeated QR factorizations and unitary similarity transformations.
+
+The QR algorithm starts with $A_0=A$, computes
+
+$$
+A_k=Q_kR_k,
+$$
+
+and then forms
+
+$$
+\boxed{ A_{k+1}=R_kQ_k. }
+$$
+
+Because $R_k=Q_k^*A_k$,
+
+$$
+A_{k+1}=Q_k^*A_kQ_k.
+$$
+
+Thus each step preserves the eigenvalues.
+
+For Hermitian matrices, appropriately shifted QR iterations converge toward diagonal form under standard assumptions.
+
+For general matrices, the corresponding target is an upper triangular Schur form over $\mathbb C$.
+
+We will examine the numerical details in Module E.
+
+### The role of orthogonality in numerical stability {#sec-module-d-session-6-the-role-of-orthogonality-in-numerical-stability}
+
+Orthonormalization is not merely aesthetic.
+
+Without it, repeated multiplication may make different trial vectors nearly parallel, causing severe loss of linear independence in floating-point arithmetic.
+
+QR factorization restores a numerically useful basis for the evolving subspace.
+
+This is closely tied to the geometry of the Stiefel and Grassmann manifolds:
+
+- The **Stiefel manifold** consists of matrices with orthonormal columns.
+- The **Grassmannian** consists of subspaces of a fixed dimension.
+
+Subspace iteration is most fundamentally an algorithm evolving a point on a Grassmannian, while orthonormal basis matrices provide convenient computational representations.
+
+This is a useful structural perspective for understanding eigenvalue algorithms and their software implementations.
+
+### Checkpoint 6 {#module-d-checkpoint-6 .unnumbered .unlisted}
+
+Derive the convergence mechanism of power iteration from the spectral decomposition.
+
+Explain why the largest-magnitude eigenvalue is selected, rather than necessarily the largest algebraic eigenvalue.
+
+Then describe why subspace iteration needs orthonormalization and why its convergence should be measured through subspace angles rather than differences between basis matrices.
+
+## Session 7 — Polynomial filtering and Chebyshev-filtered subspace iteration {#sec-module-d-session-7}
+
+This session brings together the main spectral ideas of Module D.
+
+We will first understand polynomial filtering as a consequence of the spectral theorem, then show why Chebyshev polynomials are particularly effective for separating desired and unwanted spectral components.
+
+Finally, we will derive a subspace convergence estimate explaining the mechanism behind filtered subspace iteration.
+
+### Polynomial filtering revisited {#sec-module-d-session-7-polynomial-filtering-revisited}
+
+Let $A=A^*$ have spectral decomposition
+
+$$
+A=Q\Lambda Q^*.
+$$
+
+For a polynomial $p$,
+
+$$
+p(A)=Qp(\Lambda)Q^*.
+$$
+
+If
+
+$$
+x=\sum_i c_iq_i,
+$$
+
+then
+
+$$
+\boxed{ p(A)x=\sum_i c_i p(\lambda_i)q_i. }
+$$
+
+Thus polynomial filtering acts independently on every eigendirection.
+
+Suppose we want to retain eigenvectors corresponding to a selected spectral region $\Lambda_{\mathrm{wanted}}$, while suppressing components associated with $\Lambda_{\mathrm{unwanted}}$.
+
+We want a polynomial with the property that
+
+$$
+|p(\lambda)|
+$$
+
+is relatively large on the desired eigenvalues and relatively small on the unwanted eigenvalues.
+
+The important quantity is not necessarily the absolute size of $p$, but the **ratio** between its values on the wanted and unwanted spectral regions.
+
+### Why use a polynomial at all? {#sec-module-d-session-7-why-use-a-polynomial-at-all}
+
+If we could construct the exact spectral projector onto the desired invariant subspace, we could apply that projector directly.
+
+For an isolated set of eigenvalues, the desired projector is
+
+$$
+P_{\mathrm{wanted}} = \sum_{\lambda_i\in\Lambda_{\mathrm{wanted}}}q_iq_i^*.
+$$
+
+But constructing $P_{\mathrm{wanted}}$ directly usually requires knowing the very eigenvectors we are trying to compute.
+
+A polynomial filter provides an approximation using only applications of $A$.
+
+Because
+
+$$
+p(A)=a_0I+a_1A+\cdots+a_dA^d,
+$$
+
+we can apply $p(A)$ to vectors through matrix-vector products.
+
+For sparse matrices, this can be much cheaper than constructing a full spectral decomposition.
+
+The basic idea is to approximate the action of a spectral projector without explicitly forming it.
+
+### Chebyshev polynomials {#sec-module-d-session-7-chebyshev-polynomials}
+
+The Chebyshev polynomials of the first kind satisfy
+
+$$
+\boxed{ T_k(\cos\theta)=\cos(k\theta). }
+$$
+
+The first few are
+
+$$
+T_0(t)=1,
+$$
+
+$$
+T_1(t)=t,
+$$
+
+$$
+T_2(t)=2t^2-1,
+$$
+
+$$
+T_3(t)=4t^3-3t.
+$$
+
+They satisfy the three-term recurrence
+
+$$
+\boxed{ T_{k+1}(t)=2tT_k(t)-T_{k-1}(t). }
+$$
+
+#### Behavior on $[-1,1]$ {#module-d-session-7-chebyshev-polynomials-behavior-on}
+
+If $t\in[-1,1]$, we can write $t=\cos\theta$.
+
+Then
+
+$$
+T_k(t)=\cos(k\theta).
+$$
+
+Therefore,
+
+$$
+\boxed{ |T_k(t)|\le1 \qquad\text{for }t\in[-1,1]. }
+$$
+
+This is an exceptionally useful property.
+
+No matter how large the degree becomes, the polynomial remains bounded by one on this interval.
+
+#### Behavior outside $[-1,1]$ {#module-d-session-7-chebyshev-polynomials-behavior-outside}
+
+For $t>1$, write
+
+$$
+t=\cosh\alpha
+$$
+
+with $\alpha>0$.
+
+Then
+
+$$
+\boxed{ T_k(t)=\cosh(k\alpha). }
+$$
+
+Equivalently,
+
+$$
+T_k(t) = \frac12 \left[ \left(t+\sqrt{t^2-1}\right)^k + \left(t-\sqrt{t^2-1}\right)^k \right].
+$$
+
+The magnitude grows rapidly with $k$.
+
+For $t<-1$,
+
+$$
+T_k(t)=(-1)^kT_k(-t).
+$$
+
+Thus
+
+\boxed{\
+|T_k(t)|>1
+
+outside $[-1,1]$, with growth becoming stronger as the degree increases.
+
+This combination of bounded behavior inside an interval and rapid growth outside it is exactly what we need for spectral filtering.
+
+### The minimax property {#sec-module-d-session-7-the-minimax-property}
+
+Chebyshev polynomials are not merely convenient because of their recurrence.
+
+They also have an extremal approximation property.
+
+Among monic polynomials of degree $d\ge1$, the polynomial
+
+$$
+2^{1-d}T_d(t)
+$$
+
+minimizes the maximum absolute value on $[-1,1]$.
+
+In other words,
+
+$$
+\boxed{ \min_{\substack{p\text{ monic}\\
+\deg p=d}} \max_{t\in[-1,1]}|p(t)| = 2^{1-d}. }
+$$
+
+This is a version of the Chebyshev minimax theorem.
+
+The reason is the alternating behavior of $T_d$, which reaches extrema of equal magnitude at $d+1$ points.
+
+A polynomial of lower degree cannot cancel that alternating pattern everywhere.
+
+This extremal behavior explains why Chebyshev polynomials repeatedly appear in approximation theory and numerical algorithms.
+
+We will use the boundedness and growth properties directly, without requiring the full minimax theorem in every calculation.
+
+### Mapping an unwanted spectral interval to $[-1,1]$ {#sec-module-d-session-7-mapping-an-unwanted-spectral-interval-to}
+
+Suppose the unwanted eigenvalues of a Hermitian matrix lie in
+
+$$
+[a,b], \qquad a<b.
+$$
+
+Define the affine transformation
+
+$$
+\boxed{ s(t)=\frac{2t-(a+b)}{b-a}. }
+$$
+
+It satisfies
+
+$$
+s(a)=-1,\qquad s(b)=1.
+$$
+
+Therefore,
+
+$$
+s([a,b])=[-1,1].
+$$
+
+Now define
+
+$$
+\boxed{ p_d(t)=T_d(s(t)). }
+$$
+
+For every unwanted eigenvalue $\lambda\in[a,b]$,
+
+$$
+|p_d(\lambda)|\le1.
+$$
+
+If a desired eigenvalue lies outside $[a,b]$, then $|s(\lambda)|>1$, so $|p_d(\lambda)|$ can be much larger than one.
+
+Thus the filter creates relative amplification of desired spectral components.
+
+#### Normalization {#module-d-session-7-mapping-an-unwanted-spectral-interval-to-normalization}
+
+Suppose $\lambda_\star$ is a desired reference eigenvalue outside $[a,b]$.
+
+We can define
+
+$$
+\boxed{ \widehat p_d(t) = \frac{T_d(s(t))}{T_d(s(\lambda_\star))}. }
+$$
+
+Then
+
+$$
+\widehat p_d(\lambda_\star)=1.
+$$
+
+On the unwanted interval,
+
+$$
+\boxed{ |\widehat p_d(t)| \le \frac1{|T_d(s(\lambda_\star))|}. }
+$$
+
+As the degree increases, the denominator grows rapidly, giving stronger suppression of unwanted components.
+
+For multiple desired eigenvalues, we must ensure that the polynomial is not too small at any desired eigenvalue. A filter designed around only one reference value may otherwise attenuate some desired components.
+
+### Explicit example: filtering the spectrum $\{1,3,9\}$ {#sec-module-d-session-7-explicit-example-filtering-the-spectrum}
+
+Return to our running matrix
+
+$$
+A= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix},
+$$
+
+with eigenvalues $1,3,9$.
+
+Suppose we want the eigenspace associated with $\lambda=1$.
+
+We regard the interval
+
+$$
+[3,9]
+$$
+
+as unwanted.
+
+The affine transformation mapping this interval onto $[-1,1]$ is
+
+$$
+\boxed{ s(t)=\frac{t-6}{3}. }
+$$
+
+Then
+
+$$
+s(1)=-\frac53, \qquad s(3)=-1, \qquad s(9)=1.
+$$
+
+Consider the degree-three Chebyshev polynomial
+
+$$
+T_3(t)=4t^3-3t.
+$$
+
+At the desired eigenvalue,
+
+$$
+\begin{aligned}
+  T_3\left(-\frac53\right) &=4\left(-\frac53\right)^3 -3\left(-\frac53\right)\\
+  &=-\frac{500}{27}+5\\
+  &=-\frac{365}{27}.
+\end{aligned}
+$$
+
+At the unwanted eigenvalues,
+
+$$
+T_3(-1)=-1,\qquad T_3(1)=1.
+$$
+
+Normalize:
+
+$$
+\boxed{ \widehat p_3(t) = \frac{T_3((t-6)/3)} {T_3(-5/3)}. }
+$$
+
+Then
+
+$$
+\widehat p_3(1)=1,
+$$
+
+$$
+\widehat p_3(3)=\frac{27}{365},
+$$
+
+$$
+\widehat p_3(9)=-\frac{27}{365}.
+$$
+
+Thus
+
+$$
+\boxed{ \max_{\lambda\in\{3,9\}} |\widehat p_3(\lambda)| = \frac{27}{365} \approx0.074. }
+$$
+
+The degree-three filter suppresses each unwanted spectral component to approximately $7.4\%$ of its original magnitude relative to the desired component.
+
+#### Compare filter degrees {#module-d-session-7-explicit-example-filtering-the-spectrum-compare-filter-degrees}
+
+```{dot}
+//| label: fig-module-d-filter-degrees
+//| fig-cap: "Maximum unwanted response on [3, 9] when the filter is normalized to one at the target eigenvalue 1."
+//| fig-alt: "The bound decreases from 1 at degree zero to about 0.00823 at degree five."
+digraph filter {
+  graph [layout=neato, splines=line, outputorder=edgesfirst, bgcolor="#ffffff", pad=0.16, id="module-d-filter"]
+  node [shape=point, width=0, height=0, label=""]
+  edge [dir=none, color="#11796e", penwidth=8]
+  a0 [pos="0,-0.00!"]; b0 [pos="2.70000,-0.00!"]
+  a0 -> b0
+  degree0 [shape=plaintext, pos="-.49,-0.00!", label="d = 0", fontname="sans-serif", fontsize=12]
+  value0 [shape=plaintext, pos="3.12000,-0.00!", label="1.00000", fontname="sans-serif", fontsize=12]
+  a1 [pos="0,-0.40!"]; b1 [pos="1.62000,-0.40!"]
+  a1 -> b1
+  degree1 [shape=plaintext, pos="-.49,-0.40!", label="d = 1", fontname="sans-serif", fontsize=12]
+  value1 [shape=plaintext, pos="2.04000,-0.40!", label="0.60000", fontname="sans-serif", fontsize=12]
+  a2 [pos="0,-0.80!"]; b2 [pos="0.59268,-0.80!"]
+  a2 -> b2
+  degree2 [shape=plaintext, pos="-.49,-0.80!", label="d = 2", fontname="sans-serif", fontsize=12]
+  value2 [shape=plaintext, pos="1.01268,-0.80!", label="0.21951", fontname="sans-serif", fontsize=12]
+  a3 [pos="0,-1.20!"]; b3 [pos="0.19973,-1.20!"]
+  a3 -> b3
+  degree3 [shape=plaintext, pos="-.49,-1.20!", label="d = 3", fontname="sans-serif", fontsize=12]
+  value3 [shape=plaintext, pos="0.61973,-1.20!", label="0.07397", fontname="sans-serif", fontsize=12]
+  a4 [pos="0,-1.60!"]; b4 [pos="0.06666,-1.60!"]
+  a4 -> b4
+  degree4 [shape=plaintext, pos="-.49,-1.60!", label="d = 4", fontname="sans-serif", fontsize=12]
+  value4 [shape=plaintext, pos="0.48666,-1.60!", label="0.02469", fontname="sans-serif", fontsize=12]
+  a5 [pos="0,-2.00!"]; b5 [pos="0.02222,-2.00!"]
+  a5 -> b5
+  degree5 [shape=plaintext, pos="-.49,-2.00!", label="d = 5", fontname="sans-serif", fontsize=12]
+  value5 [shape=plaintext, pos="0.44222,-2.00!", label="0.00823", fontname="sans-serif", fontsize=12]
+}
+```
+
+@fig-module-d-filter-degrees shows the rapid reduction of the unwanted-to-desired response ratio as the polynomial degree increases.
+
+The values arise from
+
+$$
+\frac1{|T_d(-5/3)|}.
+$$
+
+#### Acting on a vector {#module-d-session-7-explicit-example-filtering-the-spectrum-acting-on-a-vector}
+
+Let
+
+$$
+x=q_1+q_2+q_3.
+$$
+
+Then
+
+$$
+\widehat p_3(A)x = q_1+\frac{27}{365}q_2-\frac{27}{365}q_3.
+$$
+
+The desired component is preserved.
+
+The unwanted components are strongly attenuated.
+
+After normalization, the resulting vector is much closer to the eigendirection $q_1$.
+
+This is the basic mechanism of Chebyshev-filtered iteration.
+
+### Applying the Chebyshev recurrence to a matrix {#sec-module-d-session-7-applying-the-chebyshev-recurrence-to-a-matrix}
+
+Define the rescaled matrix
+
+$$
+\boxed{ B=s(A)=\frac{2A-(a+b)I}{b-a}. }
+$$
+
+We want to compute
+
+$$
+T_d(B)X
+$$
+
+for a vector or block $X$, without forming $T_d(B)$ explicitly.
+
+Set
+
+$$
+Y_0=X,
+$$
+
+$$
+Y_1=BX.
+$$
+
+Then use the recurrence
+
+$$
+\boxed{ Y_{j+1}=2BY_j-Y_{j-1}. }
+$$
+
+After $d$ steps,
+
+$$
+Y_d=T_d(B)X.
+$$
+
+If a normalized filter is required, divide by the appropriate normalization factor.
+
+This requires repeated applications of $A$ to vectors or blocks, along with vector additions and scalar multiplications.
+
+For sparse matrices, each recurrence step can often be implemented using a sparse matrix-vector or matrix-block product.
+
+The three-term recurrence avoids explicitly forming powers of $A$, which would generally be computationally expensive and could destroy sparsity.
+
+### A rigorous subspace convergence estimate {#sec-module-d-session-7-a-rigorous-subspace-convergence-estimate}
+
+We can now explain the convergence mechanism for filtered subspace iteration.
+
+Suppose $A$ is Hermitian and has the spectral decomposition
+
+$$
+A= \begin{pmatrix}
+  Q_1&Q_2
+\end{pmatrix} \begin{pmatrix}
+  \Lambda_1&0\\
+  0&\Lambda_2
+\end{pmatrix} \begin{pmatrix}
+  Q_1&Q_2
+\end{pmatrix}^*.
+$$
+
+Here:
+
+- The columns of $Q_1\in\mathbb C^{n\times k}$ span the desired invariant subspace.
+- The columns of $Q_2$ span its orthogonal complement.
+- $\Lambda_1$ contains the desired eigenvalues.
+- $\Lambda_2$ contains the unwanted eigenvalues.
+
+Let the starting block $X\in\mathbb C^{n\times k}$ have full column rank.
+
+Write its spectral coordinates as
+
+$$
+\boxed{ X=Q_1C+Q_2D, }
+$$
+
+where $C\in\mathbb C^{k\times k}$ and $D\in\mathbb C^{(n-k)\times k}$.
+
+Assume $C$ is invertible.
+
+This is the algebraic condition that the trial subspace has full-dimensional overlap with the desired subspace.
+
+#### Representing the trial subspace as a graph {#module-d-session-7-a-rigorous-subspace-convergence-estimate-representing-the-trial-subspace-as-a-graph}
+
+Because $C$ is invertible,
+
+$$
+X=(Q_1+Q_2DC^{-1})C.
+$$
+
+Multiplication on the right by an invertible matrix does not change the column space.
+
+Therefore,
+
+$$
+\operatorname{im}X = \operatorname{im}(Q_1+Q_2M),
+$$
+
+where
+
+$$
+\boxed{M=DC^{-1}.}
+$$
+
+The matrix $M$ describes how much the trial subspace tilts away from the desired invariant subspace.
+
+In fact,
+
+$$
+\boxed{ \|M\|_2=\tan\theta_{\max}, }
+$$
+
+where $\theta_{\max}$ is the largest principal angle between the two $k$-dimensional subspaces.
+
+#### Apply a polynomial filter {#module-d-session-7-a-rigorous-subspace-convergence-estimate-apply-a-polynomial-filter}
+
+Now compute
+
+$$
+Y=p(A)X.
+$$
+
+Using the spectral decomposition,
+
+$$
+\begin{aligned}
+  Y &=Q_1p(\Lambda_1)C +Q_2p(\Lambda_2)D.
+\end{aligned}
+$$
+
+Assume that $p(\Lambda_1)$ is invertible, so that the filter does not annihilate a desired eigendirection.
+
+The new graph matrix is
+
+$$
+\boxed{ M_{\mathrm{new}} = p(\Lambda_2)M\,p(\Lambda_1)^{-1}. }
+$$
+
+Therefore,
+
+$$
+\|M_{\mathrm{new}}\|_2 \le \|p(\Lambda_2)\|_2 \|M\|_2 \|p(\Lambda_1)^{-1}\|_2.
+$$
+
+Since these are diagonal spectral matrices,
+
+$$
+\|p(\Lambda_2)\|_2 = \max_{\lambda\in\Lambda_{\mathrm{unwanted}}}|p(\lambda)|,
+$$
+
+while
+
+$$
+\|p(\Lambda_1)^{-1}\|_2 = \frac1{ \min_{\lambda\in\Lambda_{\mathrm{wanted}}}|p(\lambda)| }.
+$$
+
+Hence
+
+$$
+\boxed{ \tan\theta_{\max}^{\mathrm{new}} \le \gamma_p\, \tan\theta_{\max}^{\mathrm{old}}, }
+$$
+
+where
+
+$$
+\boxed{ \gamma_p= \frac{ \max_{\lambda\in\Lambda_{\mathrm{unwanted}}}|p(\lambda)| }{ \min_{\lambda\in\Lambda_{\mathrm{wanted}}}|p(\lambda)| }. }
+$$
+
+This is the central exact-arithmetic estimate behind polynomial-filtered subspace iteration.
+
+If
+
+$$
+\gamma_p<1,
+$$
+
+the trial subspace moves closer to the desired invariant subspace, as measured by its largest principal angle.
+
+#### What makes Chebyshev filtering effective? {#module-d-session-7-a-rigorous-subspace-convergence-estimate-what-makes-chebyshev-filtering-effective}
+
+The purpose of Chebyshev filtering is to construct a polynomial with a small $\gamma_p$, while keeping its evaluation computationally practical.
+
+The mathematical problem is therefore a polynomial approximation and spectral separation problem.
+
+The computational problem is to evaluate the filter accurately and efficiently.
+
+This is precisely where spectral theory, numerical analysis, and hardware-aware implementation intersect.
+
+### Finite-precision and hardware-aware considerations {#sec-module-d-session-7-finite-precision-and-hardware-aware-considerations}
+
+The estimate above assumes exact arithmetic.
+
+Real computations introduce additional effects.
+
+A computed matrix-vector product can be modeled schematically as
+
+$$
+\operatorname{fl}(Ax)=Ax+\delta,
+$$
+
+where $\delta$ represents the error of the operation.
+
+Similarly, a computed Chebyshev recurrence does not satisfy the exact polynomial recurrence.
+
+If
+
+$$
+\widehat Y_{j+1} = 2B\widehat Y_j-\widehat Y_{j-1}+E_j,
+$$
+
+then the matrices $E_j$ represent perturbations due to arithmetic, communication, compression, or approximate matrix products.
+
+A convergence analysis must account for how these perturbations propagate through the recurrence.
+
+The simple exact-arithmetic inequality
+
+$$
+\tan\theta_{\mathrm{new}} \le\gamma_p\tan\theta_{\mathrm{old}}
+$$
+
+then requires additional error terms.
+
+Several numerical issues arise:
+
+**Spectral bounds.** The unwanted interval $[a,b]$ must adequately contain the unwanted spectrum. An eigenvalue lying unexpectedly outside the interval may be amplified instead of suppressed.
+
+**Polynomial degree.** Increasing the degree improves spectral separation in exact arithmetic, but also increases the number of matrix operations and opportunities for rounding error.
+
+**Scaling.** Chebyshev polynomials can grow rapidly outside $[-1,1]$. Careful scaling may be needed to avoid overflow or loss of numerical range.
+
+**Orthogonalization.** A filtered block still needs a numerically reliable basis. QR factorization or other orthogonalization procedures control loss of linear independence.
+
+**Low precision.** Lower-precision arithmetic can reduce cost on some hardware, but the resulting perturbations may limit attainable subspace accuracy.
+
+**Residuals.** A small recurrence change does not automatically imply a small eigenpair residual. Residual evaluation provides a separate measure of the quality of the computed Ritz pairs.
+
+For your HASC seminar, these are the mathematical questions that connect the exact spectral theory to implementations using inexact products, reduced precision, and hardware-dependent performance characteristics.
+
+The detailed error recurrences, stability conditions, and performance tradeoffs belong to Module E.
+
+### Checkpoint 7 {#module-d-checkpoint-7 .unnumbered .unlisted}
+
+Derive the mapping
+
+$$
+s(t)=\frac{2t-(a+b)}{b-a}
+$$
+
+and explain why it is appropriate for Chebyshev filtering.
+
+Then reconstruct the filtered-subspace inequality
+
+$$
+\tan\theta_{\mathrm{new}} \le\gamma_p\tan\theta_{\mathrm{old}}.
+$$
+
+Finally, explain why the convergence factor must involve both the maximum unwanted filter response and the minimum desired filter response.
+
+## Session 8 — Spectral theory beyond matrices {#sec-module-d-session-8}
+
+We end the module by connecting finite-dimensional spectral theory to functional analysis, PDEs, and structural algebra.
+
+These connections are important because they reveal which ideas are truly general and which depend on special assumptions such as finite dimensionality or self-adjointness.
+
+### Spectrum in infinite-dimensional spaces {#sec-module-d-session-8-spectrum-in-infinite-dimensional-spaces}
+
+For a finite-dimensional complex matrix, $\lambda$ belongs to the spectrum precisely when
+
+$$
+A-\lambda I
+$$
+
+is not invertible.
+
+In infinite-dimensional spaces, the same broad definition remains useful, but invertibility must be understood in the appropriate operator-theoretic sense.
+
+For a bounded operator $T:X\to X$ on a complex Banach space, the spectrum is
+
+$$
+\boxed{ \sigma(T)= \{\lambda\in\mathbb C: T-\lambda I \text{ has no bounded inverse defined on all of }X\}. }
+$$
+
+The spectrum may contain values that are not eigenvalues.
+
+This is a major difference from finite-dimensional linear algebra.
+
+### A self-adjoint operator with no eigenvalues {#sec-module-d-session-8-a-self-adjoint-operator-with-no-eigenvalues}
+
+Consider the Hilbert space
+
+$$
+H=L^2(0,1).
+$$
+
+Define the multiplication operator
+
+$$
+\boxed{ (Mf)(x)=xf(x). }
+$$
+
+This operator is bounded and self-adjoint.
+
+Indeed,
+
+$$
+\langle Mf,g\rangle = \int_0^1 xf(x)\overline{g(x)}\,dx = \langle f,Mg\rangle.
+$$
+
+Its spectrum is
+
+$$
+\boxed{\sigma(M)=[0,1].}
+$$
+
+But it has no eigenvalues.
+
+To see why, suppose
+
+$$
+Mf=\lambda f.
+$$
+
+Then
+
+$$
+(x-\lambda)f(x)=0
+$$
+
+for almost every $x\in(0,1)$.
+
+Thus $f$ can be nonzero only on the set $\{x=\lambda\}$, which has measure zero.
+
+Therefore $f=0$ as an element of $L^2(0,1)$.
+
+So no nonzero eigenfunction exists.
+
+This example shows that the finite-dimensional picture of spectral theory cannot always be extended by simply replacing matrices with infinite-dimensional operators.
+
+### Compact self-adjoint operators {#sec-module-d-session-8-compact-self-adjoint-operators}
+
+An operator $T:H\to H$ on a Hilbert space is **compact** if it maps bounded sets into relatively compact sets—that is, sets whose closures are compact.
+
+Compact self-adjoint operators have spectral properties resembling those of finite-dimensional Hermitian matrices.
+
+For such an operator:
+
+- Every nonzero spectral value is an eigenvalue.
+- Nonzero eigenvalues have finite multiplicity.
+- The nonzero spectrum can accumulate only at zero.
+- The Hilbert space admits an orthonormal basis consisting of eigenvectors, including a basis for the kernel when necessary.
+
+A typical example is
+
+$$
+T:\ell^2\to\ell^2, \qquad T(x_1,x_2,\ldots) = \left(x_1,\frac{x_2}{2},\frac{x_3}{3},\ldots\right).
+$$
+
+Its eigenvectors are the standard coordinate sequences, with eigenvalues
+
+$$
+1,\frac12,\frac13,\ldots.
+$$
+
+The eigenvalues approach zero.
+
+Zero belongs to the spectrum but is not an eigenvalue, because the operator is injective.
+
+This example is particularly useful for connecting spectral theory with numerical conditioning and compact inverse problems.
+
+### Differential operators and PDE eigenvalue problems {#sec-module-d-session-8-differential-operators-and-pde-eigenvalue-problems}
+
+Consider the eigenvalue problem
+
+$$
+\boxed{ -u''(x)=\lambda u(x), \qquad 0<x<1, }
+$$
+
+with boundary conditions
+
+$$
+u(0)=u(1)=0.
+$$
+
+We seek nonzero solutions $u$.
+
+For positive $\lambda$, write
+
+$$
+\lambda=\omega^2.
+$$
+
+The general solution is
+
+$$
+u(x)=A\sin(\omega x)+B\cos(\omega x).
+$$
+
+The condition $u(0)=0$ gives $B=0$.
+
+The condition $u(1)=0$ then requires
+
+$$
+\sin\omega=0.
+$$
+
+For a nonzero solution,
+
+$$
+\omega=n\pi,\qquad n=1,2,\ldots.
+$$
+
+Therefore,
+
+$$
+\boxed{ \lambda_n=n^2\pi^2. }
+$$
+
+The corresponding normalized eigenfunctions are
+
+$$
+\boxed{ q_n(x)=\sqrt2\sin(n\pi x). }
+$$
+
+They form an orthonormal basis of $L^2(0,1)$.
+
+Thus the differential operator
+
+$$
+L=-\frac{d^2}{dx^2}
+$$
+
+with Dirichlet boundary conditions has a spectral decomposition involving infinitely many eigenfunctions.
+
+A careful operator-theoretic formulation regards $L$ as an unbounded self-adjoint operator on $L^2(0,1)$, with a suitable dense domain such as
+
+$$
+D(L)=H^2(0,1)\cap H_0^1(0,1).
+$$
+
+The eigenvalues grow without bound.
+
+Its inverse, defined on $L^2(0,1)$, is compact.
+
+This is an important bridge between finite-dimensional spectral theory, compact operators, and PDEs.
+
+### Variational formulation of the PDE eigenproblem {#sec-module-d-session-8-variational-formulation-of-the-pde-eigenproblem}
+
+Multiply
+
+$$
+-u''=\lambda u
+$$
+
+by a test function $v\in H_0^1(0,1)$, and integrate by parts:
+
+$$
+\int_0^1u'(x)v'(x)\,dx = \lambda\int_0^1u(x)v(x)\,dx.
+$$
+
+Define
+
+$$
+a(u,v)=\int_0^1u'v'
+$$
+
+and
+
+$$
+m(u,v)=\int_0^1uv.
+$$
+
+Then the weak eigenvalue problem is
+
+$$
+\boxed{ a(u,v)=\lambda m(u,v) \qquad\forall v\in H_0^1(0,1). }
+$$
+
+Its finite-element discretization gives
+
+$$
+\boxed{Kc=\lambda Mc,}
+$$
+
+where $K$ and $M$ are stiffness and mass matrices.
+
+This is exactly the generalized eigenvalue structure introduced in Module C.
+
+The finite-dimensional spectral theory therefore arises as an approximation of the spectral theory of a differential operator.
+
+### The min–max principle in PDE approximation {#sec-module-d-session-8-the-min-max-principle-in-pde-approximation}
+
+For the Dirichlet Laplacian, the Rayleigh quotient is
+
+$$
+\boxed{ \rho(u)= \frac{\int_0^1|u'(x)|^2\,dx} {\int_0^1|u(x)|^2\,dx}. }
+$$
+
+The smallest eigenvalue can be characterized by
+
+$$
+\boxed{ \lambda_1= \min_{u\in H_0^1(0,1)\setminus\{0\}}\rho(u). }
+$$
+
+More generally, a min–max principle characterizes the higher eigenvalues using finite-dimensional trial subspaces of $H_0^1(0,1)$.
+
+Now restrict the variational problem to a conforming finite-element space
+
+$$
+V_h\subseteq H_0^1(0,1).
+$$
+
+Because the minimization is performed over a smaller set,
+
+$$
+\boxed{\lambda_{1,h}\ge\lambda_1.}
+$$
+
+The corresponding upper-bound property extends to higher eigenvalues under the standard min–max ordering, provided the trial space has sufficient dimension.
+
+As the finite-element spaces approximate the full function space, the computed eigenvalues can converge to the true PDE eigenvalues.
+
+This provides a conceptual reason for eigenvalue convergence in variational numerical methods.
+
+It also explains why Rayleigh–Ritz is so important in both finite-dimensional numerical linear algebra and infinite-dimensional spectral approximation.
+
+### Spectral theory as algebra: a module viewpoint {#sec-module-d-session-8-spectral-theory-as-algebra-a-module-viewpoint}
+
+We can now revisit an abstract question from the beginning of the curriculum.
+
+Why are invariant subspaces so fundamental?
+
+There is an elegant answer from abstract algebra.
+
+Let $V$ be a vector space over $\mathbb F$, and let
+
+$$
+T:V\to V
+$$
+
+be a linear operator.
+
+We can make $V$ into a module over the polynomial ring $\mathbb F[t]$.
+
+Define the action of a polynomial
+
+$$
+p(t)=a_0+a_1t+\cdots+a_dt^d
+$$
+
+on $v\in V$ by
+
+$$
+\boxed{ p(t)\cdot v=p(T)v. }
+$$
+
+In particular,
+
+$$
+t\cdot v=Tv.
+$$
+
+Now ask: what are the submodules of this $\mathbb F[t]$-module?
+
+A subspace $U\subseteq V$ is a submodule precisely when it is preserved by multiplication by $t$, meaning
+
+$$
+T(U)\subseteq U.
+$$
+
+Therefore,
+
+$$
+\boxed{ \text{Invariant subspaces of }T = \mathbb F[t]\text{-submodules of }V. }
+$$
+
+This is a genuinely useful universal perspective.
+
+It connects linear operator theory with module theory.
+
+#### Eigenspaces as algebraic kernels {#module-d-session-8-spectral-theory-as-algebra-a-module-viewpoint-eigenspaces-as-algebraic-kernels}
+
+The eigenspace
+
+$$
+E_\lambda=\ker(T-\lambda I)
+$$
+
+consists of vectors annihilated by the polynomial $t-\lambda$:
+
+$$
+(t-\lambda)\cdot v=0.
+$$
+
+Generalized eigenspaces consist of vectors annihilated by higher powers:
+
+$$
+\ker(T-\lambda I)^k.
+$$
+
+Thus Jordan theory can be understood in terms of the polynomial-ring module structure.
+
+#### Diagonalizability and decomposition {#module-d-session-8-spectral-theory-as-algebra-a-module-viewpoint-diagonalizability-and-decomposition}
+
+A diagonalizable operator is one for which the module decomposes into a direct sum of eigenspaces:
+
+$$
+V=\bigoplus_\lambda E_\lambda.
+$$
+
+Over a field where the minimal polynomial splits, diagonalizability is equivalent to the minimal polynomial having no repeated roots.
+
+For a Jordan block
+
+$$
+J= \begin{pmatrix}
+  2&1\\
+  0&2
+\end{pmatrix},
+$$
+
+the minimal polynomial is
+
+$$
+(t-2)^2.
+$$
+
+The repeated factor reflects the coupling that prevents diagonalization.
+
+For a self-adjoint operator, the spectral theorem provides an especially strong decomposition: an orthogonal direct sum of eigenspaces.
+
+#### Exact sequences return {#module-d-session-8-spectral-theory-as-algebra-a-module-viewpoint-exact-sequences-return}
+
+If $U\subseteq V$ is invariant, the sequence
+
+$$
+0\longrightarrow U \longrightarrow V \longrightarrow V/U \longrightarrow0
+$$
+
+is not only an exact sequence of vector spaces.
+
+It is also an exact sequence of $\mathbb F[t]$-modules, because the operator induces a well-defined action on the quotient.
+
+A vector-space complement of $U$ need not be invariant.
+
+Therefore, the sequence may split as vector spaces without splitting as $\mathbb F[t]$-modules.
+
+This is a structural explanation of why invariant complements are more restrictive than ordinary complements.
+
+It also explains why Jordan blocks represent genuinely nontrivial extensions of eigenspace behavior.
+
+#### Why this viewpoint is valuable {#module-d-session-8-spectral-theory-as-algebra-a-module-viewpoint-why-this-viewpoint-is-valuable}
+
+This perspective unifies several ideas:
+
+- Linear operators become actions of polynomial rings.
+- Invariant subspaces become submodules.
+- Eigenspaces become kernels of polynomial actions.
+- Spectral decompositions become module decompositions.
+- Polynomial functional calculus becomes the ring action itself.
+
+You do not need to study the full structure theorem for finitely generated modules over principal ideal domains before learning numerical eigenvalue methods.
+
+But it is useful to recognize that the same mathematics has an abstract algebraic interpretation.
+
+The Hilbert-space setting adds geometric requirements—orthogonality, completeness, and self-adjointness—that cannot be recovered from the module structure alone.
+
+### Checkpoint 8 {#module-d-checkpoint-8 .unnumbered .unlisted}
+
+Explain why the spectral theorem for finite-dimensional Hermitian matrices does not extend verbatim to all bounded self-adjoint operators on infinite-dimensional Hilbert spaces.
+
+Then derive the generalized finite-element eigenproblem
+
+$$
+Kc=\lambda Mc
+$$
+
+from the weak PDE eigenvalue formulation.
+
+Finally, prove that a subspace is invariant under $T$ if and only if it is a submodule of $V$ under the action $p(t)\cdot v=p(T)v$.
+
+## Exercises — Module D {#sec-module-d-exercises-module-d}
+
+The exercises are organized to develop the same six perspectives used throughout the curriculum: rigorous theory, geometry, computation, structural connections, universal generalization, and applications.
+
+For the proof-based exercises, try writing a complete argument before consulting the solutions.
+
+### Exercise 1 — Diagonalizability and field dependence {#module-d-exercise-1}
+
+Consider
+
+$$
+R= \begin{pmatrix}
+  0&-1\\
+  1&0
+\end{pmatrix}
+$$
+
+and
+
+$$
+J= \begin{pmatrix}
+  2&1\\
+  0&2
+\end{pmatrix}.
+$$
+
+Determine the eigenvalues and eigenspaces of both matrices over $\mathbb R$ and $\mathbb C$.
+
+Which matrices are diagonalizable over each field?
+
+Explain why the reasons for failure of real diagonalizability are different in these two examples.
+
+### Exercise 2 — An invariant subspace without an invariant complement {#module-d-exercise-2}
+
+Let
+
+$$
+J= \begin{pmatrix}
+  2&1\\
+  0&2
+\end{pmatrix}, \qquad U=\operatorname{span}\{e_1\}.
+$$
+
+Prove that $U$ is invariant under $J$.
+
+Show that $U$ has many complementary vector subspaces.
+
+However, prove that **none of its one-dimensional complements is invariant under $J$**.
+
+Interpret the result using the distinction between ordinary vector-space direct sums and decompositions into invariant subspaces.
+
+### Exercise 3 — Spectral projectors {#module-d-exercise-3}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix}.
+$$
+
+Construct the spectral projector onto the eigenspace associated with eigenvalue $1$ in two ways:
+
+1. Using the corresponding normalized eigenvector.
+2. Using the Lagrange interpolation polynomial
+
+$$
+\ell_1(t)=\frac{(t-3)(t-9)}{(1-3)(1-9)}.
+$$
+
+Verify that the two formulas agree.
+
+Then calculate $p(A)$ for
+
+$$
+p(t)=\frac{9-t}{8}.
+$$
+
+### Exercise 4 — Principal angles {#module-d-exercise-4}
+
+Let
+
+$$
+U=\operatorname{span}\{e_1,e_2\} \subseteq\mathbb R^3
+$$
+
+and
+
+$$
+W=\operatorname{span} \left\{ \cos\phi\,e_1+\sin\phi\,e_3,\ e_2 \right\},
+$$
+
+where $0\le\phi\le\pi/2$.
+
+Calculate the two principal angles between $U$ and $W$.
+
+Determine
+
+$$
+\|P_U-P_W\|_2.
+$$
+
+Explain why the answer is independent of the particular orthonormal bases chosen.
+
+### Exercise 5 — Rayleigh–Ritz and residuals {#module-d-exercise-5}
+
+Let
+
+$$
+A=\operatorname{diag}(1,3,9)
+$$
+
+and
+
+$$
+Q= \begin{pmatrix}
+  1/\sqrt2&0\\
+  1/\sqrt2&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Construct the reduced matrix
+
+$$
+H=Q^TAQ.
+$$
+
+Find its Ritz values and Ritz vectors.
+
+Calculate the residual norm of each Ritz pair.
+
+Verify the eigenvalue inclusion bound
+
+$$
+\operatorname{dist}(\theta,\sigma(A)) \le\|r\|_2.
+$$
+
+### Exercise 6 — Eigenvalue versus eigenvector accuracy {#module-d-exercise-6}
+
+Consider
+
+$$
+A=\operatorname{diag}(1,4)
+$$
+
+and
+
+$$
+x(\theta)= \begin{pmatrix}
+  \cos\theta\\
+  \sin\theta
+\end{pmatrix}.
+$$
+
+Derive
+
+$$
+\rho_A(x)=1+3\sin^2\theta.
+$$
+
+Calculate the residual
+
+$$
+r=Ax-\rho_A(x)x
+$$
+
+and its norm.
+
+Show that the Rayleigh quotient error relative to eigenvalue $1$ is quadratic in $\sin\theta$, while the residual norm is asymptotically linear in $\sin\theta$ near $\theta=0$.
+
+### Exercise 7 — SVD and minimum-norm least squares {#module-d-exercise-7}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  3&0\\
+  0&1\\
+  0&0
+\end{pmatrix}.
+$$
+
+Find an SVD of $A$.
+
+Determine its pseudoinverse $A^+$.
+
+For
+
+$$
+b=(6,2,5)^T,
+$$
+
+calculate the least-squares minimizer and the residual.
+
+Find the best rank-one approximation of $A$ in spectral norm, and give its error.
+
+### Exercise 8 — Power iteration {#module-d-exercise-8}
+
+Let
+
+$$
+A=\operatorname{diag}(9,3,1), \qquad x_0=(1,1,1)^T.
+$$
+
+Find $A^kx_0$.
+
+Determine the ratios of the second and third spectral coefficients to the first after $k$ iterations.
+
+Explain the convergence rate.
+
+What happens if the initial vector instead belongs to
+
+$$
+\operatorname{span}\{e_2,e_3\}?
+$$
+
+### Exercise 9 — A Chebyshev filter {#module-d-exercise-9}
+
+Let
+
+$$
+A=\operatorname{diag}(1,3,9).
+$$
+
+We want to retain the eigenspace associated with eigenvalue $1$.
+
+Take the unwanted spectral interval $[3,9]$.
+
+Construct the affine map taking this interval onto $[-1,1]$.
+
+Then construct the normalized degree-three Chebyshev filter satisfying $p_3(1)=1$.
+
+Calculate
+
+$$
+p_3(3),\qquad p_3(9).
+$$
+
+Apply the filter to
+
+$$
+x=(1,1,1)^T.
+$$
+
+Explain the result in spectral terms.
+
+### Exercise 10 — A residual-based subspace estimate {#module-d-exercise-10}
+
+Let
+
+$$
+A=\operatorname{diag}(1,4)
+$$
+
+and
+
+$$
+x(\theta)= \begin{pmatrix}
+  \cos\theta\\
+  \sin\theta
+\end{pmatrix}.
+$$
+
+Let
+
+$$
+U=\operatorname{span}\{e_1\}.
+$$
+
+Using the Rayleigh quotient $\rho_A(x)$, show that
+
+$$
+\boxed{ \|(I-P_U)x\| \le \frac{\|Ax-\rho_A(x)x\|} {|4-\rho_A(x)|} }
+$$
+
+whenever $\rho_A(x)\ne4$.
+
+Determine the value of the left-hand side and discuss when the bound is informative.
+
+### Exercise 11 — Spectral theory of a differential operator {#module-d-exercise-11}
+
+Consider
+
+$$
+-u''=\lambda u
+$$
+
+on $(0,1)$, with
+
+$$
+u(0)=u(1)=0.
+$$
+
+Derive the eigenvalues and eigenfunctions.
+
+Normalize the eigenfunctions in $L^2(0,1)$.
+
+Write down the Rayleigh quotient associated with the problem.
+
+Explain why restricting the variational eigenproblem to a finite-dimensional conforming subspace produces approximations of the eigenvalues from above.
+
+### Exercise 12 — Universal structure {#module-d-exercise-12}
+
+Let $T:V\to V$ be linear and define an action of $\mathbb F[t]$ on $V$ by
+
+$$
+p(t)\cdot v=p(T)v.
+$$
+
+Prove that a vector subspace $U\subseteq V$ is a submodule if and only if $U$ is invariant under $T$.
+
+Explain why an invariant subspace permits a quotient operator on $V/U$.
+
+Finally, use the Jordan block from Exercise 2 to explain why a short exact sequence of operator modules need not split, even when the corresponding sequence of vector spaces does.
+
+## Worked solutions {#sec-module-d-worked-solutions}
+
+### Solution 1 — Diagonalizability {#module-d-solution-1}
+
+For
+
+$$
+R= \begin{pmatrix}
+  0&-1\\
+  1&0
+\end{pmatrix},
+$$
+
+the characteristic polynomial is
+
+$$
+\lambda^2+1.
+$$
+
+Thus it has no real eigenvalues.
+
+Over $\mathbb C$, the eigenvalues are
+
+$$
+\lambda_1=i,\qquad\lambda_2=-i.
+$$
+
+Corresponding eigenvectors can be chosen as
+
+$$
+v_1=(1,-i)^T, \qquad v_2=(1,i)^T.
+$$
+
+They are linearly independent over $\mathbb C$, so $R$ is diagonalizable over $\mathbb C$, but not over $\mathbb R$.
+
+For
+
+$$
+J= \begin{pmatrix}
+  2&1\\
+  0&2
+\end{pmatrix},
+$$
+
+the only eigenvalue is $2$, with algebraic multiplicity two.
+
+The eigenspace is
+
+$$
+E_2=\ker(J-2I)=\operatorname{span}\{e_1\}.
+$$
+
+Thus $J$ has only one independent eigenvector, even over $\mathbb C$.
+
+It is not diagonalizable over either field.
+
+The rotation matrix lacks real eigenvalues because its characteristic polynomial does not split over $\mathbb R$.
+
+The Jordan block is defective because its eigenspace has insufficient dimension, even over a field containing all its eigenvalues.
+
+### Solution 2 — No invariant complement {#module-d-solution-2}
+
+We have
+
+$$
+Je_1=2e_1,
+$$
+
+so $U=\operatorname{span}\{e_1\}$ is invariant.
+
+Every line
+
+$$
+W=\operatorname{span}\{(a,b)^T\}
+$$
+
+with $b\ne0$ is a complement of $U$.
+
+Suppose such a complement were invariant.
+
+Because it is one-dimensional, its nonzero generator would have to be an eigenvector of $J$:
+
+$$
+J(a,b)^T=\lambda(a,b)^T.
+$$
+
+But the only eigenvectors of $J$ belong to $\operatorname{span}\{e_1\}$, which requires $b=0$.
+
+This contradicts the requirement $b\ne0$.
+
+Therefore $U$ has vector-space complements but no invariant complement.
+
+The short exact sequence involving $U$, $V$, and $V/U$ splits as vector spaces, but not as modules under the action of $J$.
+
+### Solution 3 — Spectral projectors {#module-d-solution-3}
+
+The normalized eigenvector for eigenvalue $1$ is
+
+$$
+q_1=\frac1{\sqrt2}(1,-1,0)^T.
+$$
+
+Therefore,
+
+$$
+\boxed{ P_1=q_1q_1^T = \frac12 \begin{pmatrix}
+  1&-1&0\\
+  -1&1&0\\
+  0&0&0
+\end{pmatrix}. }
+$$
+
+The Lagrange polynomial is
+
+$$
+\ell_1(t)=\frac{(t-3)(t-9)}{16}.
+$$
+
+It satisfies
+
+$$
+\ell_1(1)=1,\qquad \ell_1(3)=0,\qquad \ell_1(9)=0.
+$$
+
+Therefore, by spectral functional calculus,
+
+$$
+\ell_1(A)=P_1.
+$$
+
+For
+
+$$
+p(t)=\frac{9-t}{8},
+$$
+
+the spectral values are
+
+$$
+p(1)=1,\qquad p(3)=\frac34,\qquad p(9)=0.
+$$
+
+Hence
+
+$$
+p(A)=P_1+\frac34P_2.
+$$
+
+Using the explicit projectors,
+
+$$
+\boxed{ p(A)= \begin{pmatrix}
+  7/8&-1/8&0\\
+  -1/8&7/8&0\\
+  0&0&0
+\end{pmatrix}. }
+$$
+
+### Solution 4 — Principal angles {#module-d-solution-4}
+
+Choose
+
+$$
+Q_U=(e_1\ e_2)
+$$
+
+and
+
+$$
+Q_W= (\cos\phi\,e_1+\sin\phi\,e_3\ \ e_2).
+$$
+
+Then
+
+$$
+Q_U^TQ_W= \begin{pmatrix}
+  \cos\phi&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Its singular values are
+
+$$
+1,\qquad\cos\phi.
+$$
+
+Thus the principal angles are
+
+$$
+\boxed{0,\quad\phi.}
+$$
+
+The largest principal angle is $\phi$.
+
+Therefore,
+
+$$
+\boxed{\|P_U-P_W\|_2=\sin\phi.}
+$$
+
+Changing either orthonormal basis multiplies $Q_U^TQ_W$ by orthogonal matrices on the left or right, leaving its singular values unchanged.
+
+Thus the principal angles depend only on the subspaces.
+
+### Solution 5 — Rayleigh–Ritz {#module-d-solution-5}
+
+The reduced matrix is
+
+$$
+H= \begin{pmatrix}
+  2&0\\
+  0&9
+\end{pmatrix}.
+$$
+
+The Ritz values are
+
+$$
+\boxed{\theta_1=2,\qquad\theta_2=9.}
+$$
+
+Corresponding Ritz vectors are
+
+$$
+u_1=\frac1{\sqrt2}(1,1,0)^T, \qquad u_2=e_3.
+$$
+
+For the first pair,
+
+$$
+r_1=Au_1-2u_1 = \frac1{\sqrt2}(-1,1,0)^T.
+$$
+
+Thus
+
+$$
+\boxed{\|r_1\|_2=1.}
+$$
+
+For the second pair,
+
+$$
+r_2=Au_2-9u_2=0.
+$$
+
+The spectrum of $A$ is $\{1,3,9\}$.
+
+Therefore,
+
+$$
+\operatorname{dist}(2,\sigma(A))=1=\|r_1\|.
+$$
+
+And
+
+$$
+\operatorname{dist}(9,\sigma(A))=0=\|r_2\|.
+$$
+
+Both satisfy the residual inclusion bound.
+
+### Solution 6 — Quadratic eigenvalue error {#module-d-solution-6}
+
+For
+
+$$
+x=(\cos\theta,\sin\theta)^T,
+$$
+
+the Rayleigh quotient is
+
+$$
+\rho_A(x) = \cos^2\theta+4\sin^2\theta.
+$$
+
+Since $\cos^2\theta+\sin^2\theta=1$,
+
+$$
+\boxed{ \rho_A(x)=1+3\sin^2\theta. }
+$$
+
+Therefore,
+
+$$
+\boxed{\rho_A(x)-1=3\sin^2\theta.}
+$$
+
+The residual is
+
+$$
+r= 3\sin\theta\cos\theta \begin{pmatrix}
+  -\sin\theta\\
+  \cos\theta
+\end{pmatrix}.
+$$
+
+Hence
+
+$$
+\boxed{ \|r\|_2=3|\sin\theta\cos\theta|. }
+$$
+
+Near $\theta=0$,
+
+$$
+\sin\theta\sim\theta,\qquad \cos\theta\sim1.
+$$
+
+Thus
+
+$$
+\rho_A(x)-1\sim3\theta^2,
+$$
+
+while
+
+$$
+\|r\|\sim3|\theta|.
+$$
+
+The eigenvalue error is second-order in the angular error, while the residual is first-order.
+
+### Solution 7 — SVD and pseudoinverse {#module-d-solution-7}
+
+The matrix
+
+$$
+A= \begin{pmatrix}
+  3&0\\
+  0&1\\
+  0&0
+\end{pmatrix}
+$$
+
+is already in rectangular diagonal form.
+
+We may take
+
+$$
+U=I_3,\qquad V=I_2,
+$$
+
+and
+
+$$
+\Sigma=A.
+$$
+
+The singular values are
+
+$$
+\sigma_1=3,\qquad\sigma_2=1.
+$$
+
+Its pseudoinverse is
+
+$$
+\boxed{ A^+= \begin{pmatrix}
+  1/3&0&0\\
+  0&1&0
+\end{pmatrix}. }
+$$
+
+For $b=(6,2,5)^T$,
+
+$$
+x_{\mathrm{LS}}=A^+b = \boxed{ \begin{pmatrix}
+  2\\
+  2
+\end{pmatrix}. }
+$$
+
+Then
+
+$$
+Ax_{\mathrm{LS}}= \begin{pmatrix}
+  6\\
+  2\\
+  0
+\end{pmatrix},
+$$
+
+so
+
+$$
+\boxed{ r=b-Ax_{\mathrm{LS}} = \begin{pmatrix}
+  0\\
+  0\\
+  5
+\end{pmatrix}. }
+$$
+
+The best rank-one approximation is
+
+$$
+\boxed{ A_1= \begin{pmatrix}
+  3&0\\
+  0&0\\
+  0&0
+\end{pmatrix}. }
+$$
+
+Its spectral-norm error is
+
+$$
+\boxed{\|A-A_1\|_2=\sigma_2=1.}
+$$
+
+### Solution 8 — Power iteration {#module-d-solution-8}
+
+Since $A$ is diagonal,
+
+$$
+\boxed{ A^kx_0=(9^k,3^k,1)^T. }
+$$
+
+The ratio of the second spectral coefficient to the first is
+
+$$
+\frac{3^k}{9^k} = \boxed{\left(\frac13\right)^k}.
+$$
+
+The ratio of the third to the first is
+
+$$
+\frac1{9^k} = \boxed{\left(\frac19\right)^k}.
+$$
+
+Thus the subspace approaches $\operatorname{span}\{e_1\}$, with asymptotic convergence factor $1/3$.
+
+If the initial vector has no $e_1$ component, applying $A$ cannot create one, because the eigenspaces are invariant.
+
+Therefore power iteration cannot converge to $\operatorname{span}\{e_1\}$ from an initial vector entirely in $\operatorname{span}\{e_2,e_3\}$.
+
+If the $e_2$ component is nonzero, it instead tends toward $\operatorname{span}\{e_2\}$.
+
+### Solution 9 — Chebyshev filter {#module-d-solution-9}
+
+The unwanted interval is $[3,9]$.
+
+The affine spectral map is
+
+$$
+\boxed{s(t)=\frac{t-6}{3}.}
+$$
+
+The degree-three Chebyshev polynomial is
+
+$$
+T_3(z)=4z^3-3z.
+$$
+
+At the desired eigenvalue $1$,
+
+$$
+T_3(s(1)) = T_3(-5/3) = -\frac{365}{27}.
+$$
+
+Thus the normalized filter is
+
+$$
+\boxed{ p_3(t) = -\frac{27}{365} T_3\left(\frac{t-6}{3}\right). }
+$$
+
+We obtain
+
+$$
+\boxed{ p_3(1)=1,\qquad p_3(3)=\frac{27}{365},\qquad p_3(9)=-\frac{27}{365}. }
+$$
+
+Since $A$ is diagonal,
+
+$$
+\boxed{ p_3(A)(1,1,1)^T = \begin{pmatrix}
+  1\\
+  27/365\\
+  -27/365
+\end{pmatrix}. }
+$$
+
+The desired spectral component is preserved, while each unwanted component is reduced to about $7.4\%$ of its original magnitude.
+
+### Solution 10 — Residual and angular error {#module-d-solution-10}
+
+The target projector is
+
+$$
+P_U= \begin{pmatrix}
+  1&0\\
+  0&0
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+(I-P_U)x= \begin{pmatrix}
+  0\\
+  \sin\theta
+\end{pmatrix},
+$$
+
+so
+
+$$
+\boxed{ \|(I-P_U)x\|=|\sin\theta|. }
+$$
+
+The unwanted eigenvalue is $4$, and the separation from the Rayleigh quotient is
+
+$$
+\delta=|4-\rho_A(x)|.
+$$
+
+The residual bound gives
+
+$$
+|\sin\theta| \le \frac{3|\sin\theta\cos\theta|} {|4-(1+3\sin^2\theta)|}.
+$$
+
+For $0\le\theta<\pi/2$, the denominator is
+
+$$
+3\cos^2\theta.
+$$
+
+Therefore the right-hand side becomes
+
+$$
+\frac{\sin\theta}{\cos\theta} = \tan\theta.
+$$
+
+Hence
+
+$$
+\boxed{\sin\theta\le\tan\theta.}
+$$
+
+The bound is sharp to first order near $\theta=0$, where $\sin\theta\approx\tan\theta$.
+
+It becomes less informative as $\theta\to\pi/2$, because the approximate eigenvalue approaches the unwanted eigenvalue $4$ and the separation $\delta$ tends to zero.
+
+### Solution 11 — Dirichlet Laplacian {#module-d-solution-11}
+
+The eigenvalue equation is
+
+$$
+-u''=\lambda u.
+$$
+
+A nonzero solution satisfying the Dirichlet boundary conditions exists precisely for
+
+$$
+\boxed{\lambda_n=n^2\pi^2,\qquad n=1,2,\ldots.}
+$$
+
+Corresponding eigenfunctions are
+
+$$
+u_n(x)=\sin(n\pi x).
+$$
+
+Since
+
+$$
+\int_0^1\sin^2(n\pi x)\,dx=\frac12,
+$$
+
+the normalized eigenfunctions are
+
+$$
+\boxed{ q_n(x)=\sqrt2\sin(n\pi x). }
+$$
+
+The Rayleigh quotient is
+
+$$
+\boxed{ \rho(u)= \frac{\int_0^1|u'(x)|^2\,dx} {\int_0^1|u(x)|^2\,dx}. }
+$$
+
+The min–max principle characterizes the eigenvalues through trial subspaces.
+
+When we restrict the admissible subspaces to a conforming finite-dimensional space $V_h\subseteq H_0^1(0,1)$, we minimize over fewer possibilities.
+
+Therefore the computed Ritz eigenvalues cannot be smaller than the corresponding exact eigenvalues:
+
+$$
+\boxed{\lambda_{k,h}\ge\lambda_k}
+$$
+
+for the indices represented by the discrete problem.
+
+### Solution 12 — Operator modules {#module-d-solution-12}
+
+The action of $\mathbb F[t]$ is defined by
+
+$$
+p(t)\cdot v=p(T)v.
+$$
+
+A vector subspace $U$ is a submodule if it is closed under the action of all polynomials.
+
+If $U$ is a submodule, it is in particular closed under multiplication by $t$:
+
+$$
+t\cdot u=Tu\in U.
+$$
+
+Thus $U$ is $T$-invariant.
+
+Conversely, if $T(U)\subseteq U$, then induction gives
+
+$$
+T^k(U)\subseteq U
+$$
+
+for all $k$.
+
+Consequently,
+
+$$
+p(T)(U)\subseteq U
+$$
+
+for every polynomial $p$.
+
+Thus $U$ is a submodule.
+
+For the quotient, define
+
+$$
+\overline T(v+U)=Tv+U.
+$$
+
+This is well-defined because $U$ is invariant.
+
+For the Jordan block $J$ from Exercise 2, $U=\operatorname{span}\{e_1\}$ is invariant but has no invariant complement.
+
+Therefore,
+
+$$
+0\to U\to V\to V/U\to0
+$$
+
+splits as vector spaces but not as $\mathbb F[t]$-modules.
+
+An operator-compatible direct-sum decomposition is more restrictive than an arbitrary vector-space decomposition.
+
+## Computational laboratory — MATLAB {#sec-module-d-computational-laboratory-matlab}
+
+The laboratory is designed to connect the theoretical material to numerical computation.
+
+Each experiment demonstrates a different aspect of spectral theory.
+
+The examples are deliberately small or moderately sized so that you can compare numerical output with analytical predictions.
+
+One numerical correction to the illustrative Chebyshev attenuation chart in Session 7: the exact degree-four and degree-five bounds are respectively $81/3281\approx0.024688$ and $243/29525\approx0.008230$.
+
+```matlab
+%% Module D — Spectral Theory
+clear; clc; close all;
+
+%% 1. Spectral theorem and orthogonal eigenbasis
+A = [2 1 0;
+     1 2 0;
+     0 0 9];
+
+[Q,Lambda] = eig(A);
+
+% Sort eigenvalues and reorder eigenvectors
+[lambda,idx] = sort(diag(Lambda));
+Q = Q(:,idx);
+Lambda = diag(lambda);
+
+disp('Eigenvalues:');
+disp(lambda);
+
+fprintf('Orthogonality error: %.3e\n', ...
+    norm(Q.'*Q-eye(3)));
+
+fprintf('Spectral reconstruction error: %.3e\n', ...
+    norm(A-Q*Lambda*Q.'));
+
+
+%% 2. Spectral projectors
+P1 = Q(:,1)*Q(:,1).';
+P2 = Q(:,2)*Q(:,2).';
+P3 = Q(:,3)*Q(:,3).';
+
+fprintf('Projector sum error: %.3e\n', ...
+    norm(P1+P2+P3-eye(3)));
+
+fprintf('Spectral decomposition error: %.3e\n', ...
+    norm(A-(lambda(1)*P1 ...
+           +lambda(2)*P2+lambda(3)*P3)));
+
+% Lagrange polynomial projector onto eigenvalue 1
+I = eye(3);
+P1poly = ((A-3*I)*(A-9*I))/16;
+
+fprintf('Polynomial projector error: %.3e\n', ...
+    norm(P1poly-P1));
+
+
+%% 3. Principal angles between two planes
+phi = 20*pi/180;
+
+e1 = [1;0;0];
+e2 = [0;1;0];
+e3 = [0;0;1];
+
+Qu = [e1, e2];
+Qw = [cos(phi)*e1+sin(phi)*e3, e2];
+
+s = svd(Qu.'*Qw);
+s = min(1,max(0,s));  % Numerical safety
+
+principal_angles = acos(s);
+
+disp('Principal angles in degrees:');
+disp(sort(principal_angles)*180/pi);
+
+Pu = Qu*Qu.';
+Pw = Qw*Qw.';
+
+fprintf('||Pu-Pw||: %.8f\n', norm(Pu-Pw));
+fprintf('sin(phi):  %.8f\n', sin(phi));
+
+
+%% 4. Rayleigh-Ritz and eigenpair residuals
+B = diag([1,3,9]);
+
+Qtrial = [(e1+e2)/sqrt(2), e3];
+
+H = Qtrial.'*B*Qtrial;
+[Y,D] = eig(H);
+
+theta = diag(D);
+RitzVectors = Qtrial*Y;
+
+disp('Ritz values:');
+disp(theta);
+
+for j = 1:length(theta)
+    r = B*RitzVectors(:,j) ...
+        -theta(j)*RitzVectors(:,j);
+
+    fprintf('Ritz residual %d: %.8f\n', ...
+        j,norm(r));
+end
+
+
+%% 5. Singular value decomposition
+Arect = [3 0;
+         0 1;
+         0 0];
+
+[U,S,V] = svd(Arect);
+
+fprintf('SVD reconstruction error: %.3e\n', ...
+    norm(Arect-U*S*V.'));
+
+disp('Singular values:');
+disp(svd(Arect));
+
+% Minimum-norm least squares
+b = [6;2;5];
+x_min = pinv(Arect)*b;
+
+disp('Least-squares solution:');
+disp(x_min);
+
+disp('Residual:');
+disp(b-Arect*x_min);
+
+% Best rank-one approximation
+A1 = U(:,1)*S(1,1)*V(:,1).';
+
+fprintf('Best rank-one error: %.8f\n', ...
+    norm(Arect-A1));
+
+
+%% 6. Power iteration
+Apow = diag([9,3,1]);
+
+x = ones(3,1);
+x = x/norm(x);
+
+for j = 1:12
+    x = Apow*x;
+    x = x/norm(x);
+end
+
+disp('Power iteration direction:');
+disp(x);
+
+rho = x.'*Apow*x;
+
+fprintf('Rayleigh quotient: %.10f\n', rho);
+
+
+%% 7. Subspace iteration: principal-angle convergence
+rng(7);
+
+n = 40;
+k = 3;
+
+[Vbig,~] = qr(randn(n),0);
+
+spectrum = [9;8;7;linspace(2,0.05,n-3).'];
+
+Abig = Vbig*diag(spectrum)*Vbig.';
+
+Qtarget = Vbig(:,1:k);
+
+[X,~] = qr(randn(n,k),0);
+
+iterations = 15;
+subspace_error = zeros(iterations+1,1);
+
+for j = 1:iterations+1
+    singular_cosines = svd(Qtarget.'*X);
+    sigma_min = min(singular_cosines);
+
+    subspace_error(j) = ...
+        sqrt(max(0,1-sigma_min^2));
+
+    if j <= iterations
+        Y = Abig*X;
+        [X,~] = qr(Y,0);
+    end
+end
+
+figure;
+semilogy(0:iterations, ...
+    max(subspace_error,eps),'-o');
+xlabel('Subspace iteration');
+ylabel('sin(largest principal angle)');
+title('Subspace iteration convergence');
+grid on;
+
+
+%% 8. Chebyshev filtering
+Acheb = diag([1,3,9]);
+x = ones(3,1);
+
+% Map unwanted spectrum [3,9] to [-1,1]
+Bcheb = (Acheb-6*eye(3))/3;
+
+degree = 3;
+
+Yprev = x;
+Ycurr = Bcheb*x;
+
+for j = 2:degree
+    Ynext = 2*Bcheb*Ycurr-Yprev;
+    Yprev = Ycurr;
+    Ycurr = Ynext;
+end
+
+% T_3(-5/3) = -365/27
+normalization = -365/27;
+
+y_filtered = Ycurr/normalization;
+
+disp('Chebyshev filtered vector:');
+disp(y_filtered);
+
+disp('Expected: [1;27/365;-27/365]');
+
+
+%% 9. Generalized eigenproblem from FEM
+Kfe = [6 -3;
+      -3 6];
+
+Mfe = (1/18)*[4 1;
+              1 4];
+
+[Vfe,Dfe] = eig(Kfe,Mfe);
+
+lambda_fem = sort(diag(Dfe));
+
+disp('FEM generalized eigenvalues:');
+disp(lambda_fem);
+
+disp('Exact first two eigenvalues:');
+disp(([1;2]*pi).^2);
+```
+
+### What to investigate {#sec-module-d-computational-laboratory-matlab-what-to-investigate}
+
+#### Experiment A — Spectral projectors {#module-d-computational-laboratory-matlab-what-to-investigate-experiment-a-spectral-projectors}
+
+Verify
+
+$$
+P_i^2=P_i,\qquad P_iP_j=0\ (i\ne j),
+$$
+
+and
+
+$$
+\sum_iP_i=I.
+$$
+
+Then replace the symmetric matrix by a diagonalizable nonsymmetric matrix.
+
+Construct projectors using its right eigenvectors and dual left eigenvectors.
+
+Investigate which algebraic identities still hold and which geometric identities no longer hold.
+
+#### Experiment B — Subspace convergence {#module-d-computational-laboratory-matlab-what-to-investigate-experiment-b-subspace-convergence}
+
+In the subspace iteration experiment, the desired eigenvalues are $9,8,7$, while the largest unwanted eigenvalue is $2$.
+
+Thus the expected exact-arithmetic convergence factor is related to
+
+$$
+\frac27.
+$$
+
+Change the unwanted spectral values so that the largest becomes $6.8$.
+
+What happens to the convergence rate?
+
+Then replace ordinary multiplication by a polynomial filter designed to separate the desired spectral region from the unwanted region.
+
+Compare the principal-angle convergence histories.
+
+#### Experiment C — Chebyshev filtering {#module-d-computational-laboratory-matlab-what-to-investigate-experiment-c-chebyshev-filtering}
+
+Increase the filter degree from $3$ to $5$, $8$, and $12$.
+
+Track the ratio of the unwanted components to the desired component after filtering.
+
+Compare the measured reduction with the theoretical bound
+
+$$
+\gamma_d= \frac1{|T_d(-5/3)|}.
+$$
+
+At high degrees, investigate whether normalization is necessary to keep intermediate values in a convenient numerical range.
+
+#### Experiment D — Generalized eigenvalues {#module-d-computational-laboratory-matlab-what-to-investigate-experiment-d-generalized-eigenvalues}
+
+The finite-element generalized eigenproblem approximates the continuous Dirichlet Laplacian.
+
+Compare the first two discrete eigenvalues with
+
+$$
+\lambda_1=\pi^2,\qquad \lambda_2=4\pi^2.
+$$
+
+Then refine the mesh by increasing the number of interior nodes.
+
+Observe how the generalized eigenvalues approach the continuous ones.
+
+This experiment connects abstract spectral theory to numerical PDE approximation.
+
+## Synthesis — How the concepts fit together {#sec-module-d-synthesis-how-the-concepts-fit-together}
+
+Module D brings together the algebraic, geometric, and numerical structures from the first three modules.
+
+The central chain of ideas can be summarized as follows.
+
+**Linear operator**
+
+$$
+T:V\to V
+$$
+
+Kernels, invariant subspaces, quotient operators
+
+**Spectral structure**
+
+$$
+V=\bigoplus_\lambda E_\lambda
+$$
+
+Independent invariant components when diagonalizable
+
+Add self-adjointness and inner-product geometry
+
+**Orthogonal spectral decomposition**
+
+$$
+A=\sum_\lambda\lambda P_\lambda
+$$
+
+Orthogonal projectors and an orthonormal eigenbasis
+
+**Variational approximation**
+
+$$
+\rho_A(x),\qquad Q^*AQ
+$$
+
+Rayleigh quotients, Rayleigh–Ritz, residuals, and spectral gaps
+
+**Numerical invariant-subspace methods**
+
+$$
+X_{k+1}\approx p(A)X_k
+$$
+
+Subspace iteration, Chebyshev filtering, and residual-based accuracy assessment
+
+### Relationships worth retaining {#sec-module-d-synthesis-how-the-concepts-fit-together-relationships-worth-retaining}
+
+| Concept                         | Central theorem or formula                                                 | Why it matters                                            |
+| ------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Eigenspace                      | $E_\lambda=\ker(A-\lambda I)$                                         | Connects spectral theory to kernels                       |
+| Invariant subspace              | $A(U)\subseteq U$                                                      | Allows restriction and quotient operators                 |
+| Diagonalizability               | $A=X\Lambda X^{-1}$                                                    | Decomposes an operator into scalar actions                |
+| Spectral theorem                | $A=Q\Lambda Q^*$                                                      | Orthogonal decomposition for normal matrices              |
+| Spectral projector              | $P_j^2=P_j$, $AP_j=\lambda_jP_j$                                   | Extracts invariant spectral components                    |
+| Functional calculus             | $p(A)=Qp(\Lambda)Q^*$                                                 | Explains polynomial filters                               |
+| Principal angles                | $\cos\theta_i=\sigma_i(Q_U^*Q_W)$                                     | Measures distance between subspaces                       |
+| Invariance residual             | $(I-QQ^*)AQ$                                                          | Measures failure of a trial subspace to be invariant      |
+| Rayleigh quotient               | $x^*Ax/(x^*x)$                                                       | Gives variational eigenvalue estimates                    |
+| Min–max principle               | $\lambda_k=\min_{\dim S=k}\max_{x\in S}\rho_A(x)$                    | Characterizes ordered eigenvalues                         |
+| Rayleigh–Ritz                   | $Q^*AQy=\theta y$                                                     | Computes eigenpair approximations within a trial subspace |
+| SVD                             | $A=U\Sigma V^*$                                                       | Spectral geometry for rectangular matrices                |
+| Best rank-$k$ approximation | $\Vert A-A_k\Vert _2=\sigma_{k+1}$                                       | Optimal dimensional reduction                             |
+| Power iteration                 | $x_{j+1}\propto Ax_j$                                                 | Amplifies dominant spectral components                    |
+| Subspace iteration              | $\operatorname{im}X_{j+1}=\operatorname{im}(AX_j)$                    | Approximates dominant invariant subspaces                 |
+| Chebyshev filtering             | $\lvert T_d(t)\rvert\le1$ on $[-1,1]$                                       | Suppresses unwanted spectral components                   |
+| Filtered convergence factor     | $\gamma_p=\max_{\mathrm{unwanted}}\lvert p\rvert/\min_{\mathrm{wanted}}\lvert p\rvert$ | Predicts improvement in subspace angle                    |
+
+## Supplementary proof — Why normal matrices are unitarily diagonalizable {#sec-module-d-supplementary-proof-why-normal-matrices-are-unitarily-diagonalizable}
+
+We proved the spectral theorem for self-adjoint matrices. The more general normal-matrix theorem is worth understanding because it clarifies exactly which hypothesis guarantees an orthonormal eigenbasis.
+
+### Step 1: Schur triangularization {#sec-module-d-supplementary-proof-why-normal-matrices-are-unitarily-diagonalizable-step-1-schur-triangularization}
+
+Every complex square matrix $A$ has a **Schur decomposition**
+
+$$
+\boxed{A=QRQ^*,}
+$$
+
+where $Q$ is unitary and $R$ is upper triangular.
+
+One way to prove this is by induction.
+
+Because the characteristic polynomial has a complex root, $A$ has an eigenvector $q_1$.
+
+Normalize it and extend it to an orthonormal basis.
+
+In that basis, the first column of $A$ has the form
+
+$$
+\begin{pmatrix}
+  \lambda\\
+  0\\
+  \vdots\\
+  0
+\end{pmatrix}.
+$$
+
+Thus the matrix has block upper-triangular form
+
+$$
+\begin{pmatrix}
+  \lambda&*\\
+  0&B
+\end{pmatrix}.
+$$
+
+Apply the same argument inductively to $B$, using a unitary basis change within the orthogonal complement of $q_1$.
+
+This produces an upper-triangular matrix $R$.
+
+### Step 2: A normal upper-triangular matrix is diagonal {#sec-module-d-supplementary-proof-why-normal-matrices-are-unitarily-diagonalizable-step-2-a-normal-upper-triangular-matrix-is-diagonal}
+
+Suppose $R$ is upper triangular and normal:
+
+$$
+R^*R=RR^*.
+$$
+
+Normality implies
+
+$$
+\|Rx\|=\|R^*x\|
+$$
+
+for every $x$.
+
+Apply this to $e_1$.
+
+Because $R$ is upper triangular, its first column has only one potentially nonzero entry:
+
+$$
+Re_1= \begin{pmatrix}
+  r_{11}\\
+  0\\
+  \vdots\\
+  0
+\end{pmatrix}.
+$$
+
+Hence
+
+$$
+\|Re_1\|^2=|r_{11}|^2.
+$$
+
+But $R^*e_1$ contains the conjugates of the first-row entries:
+
+$$
+R^*e_1= \begin{pmatrix}
+  \overline{r_{11}}\\
+  \overline{r_{12}}\\
+  \vdots\\
+  \overline{r_{1n}}
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+\|R^*e_1\|^2 = |r_{11}|^2+ \sum_{j=2}^n|r_{1j}|^2.
+$$
+
+Equality of the norms implies
+
+$$
+\sum_{j=2}^n|r_{1j}|^2=0.
+$$
+
+Therefore,
+
+$$
+r_{12}=\cdots=r_{1n}=0.
+$$
+
+The first row has no off-diagonal entries.
+
+The remaining lower-right block is again upper triangular and normal.
+
+Repeating the argument inductively shows that $R$ is diagonal.
+
+Therefore,
+
+$$
+\boxed{A=Q\Lambda Q^*.}
+$$
+
+Conversely, if $A=Q\Lambda Q^*$ for unitary $Q$ and diagonal $\Lambda$, then
+
+$$
+AA^*=Q\Lambda\Lambda^*Q^*
+$$
+
+and
+
+$$
+A^*A=Q\Lambda^*\Lambda Q^*.
+$$
+
+Because diagonal matrices commute,
+
+$$
+AA^*=A^*A.
+$$
+
+Thus the equivalence is proved:
+
+$$
+\boxed{ A\text{ is normal} \iff A\text{ is unitarily diagonalizable}. }
+$$
+
+This theorem shows precisely why nonnormal diagonalizable matrices behave differently from Hermitian matrices: an arbitrary eigenvector basis need not be orthogonal, while a normal matrix always admits an orthonormal one.
+
+## Module D — Final mastery assessment {#sec-module-d-module-d-final-mastery-assessment}
+
+Before proceeding to Module E, the goal is not to memorize every formula. It is to be able to derive the central results, recognize their assumptions, and apply them to unfamiliar examples.
+
+- [ ] Explain eigenvalues through kernels and distinguish invertibility, diagonalizability, normality, and self-adjointness.
+- [ ] Prove the finite-dimensional self-adjoint spectral theorem and understand the normal spectral theorem.
+- [ ] Construct spectral projectors and derive polynomial functional calculus.
+- [ ] Calculate principal angles and explain the meaning of an invariant-subspace residual.
+- [ ] Prove the min–max principle and derive the Rayleigh–Ritz equations.
+- [ ] Prove eigenvalue residual inclusion and explain residual-to-subspace-error estimates.
+- [ ] Construct the SVD, pseudoinverse, and optimal truncated SVD.
+- [ ] Explain the convergence mechanisms of power iteration and subspace iteration.
+- [ ] Construct and evaluate a Chebyshev filter, and derive its subspace convergence factor.
+- [ ] Connect spectral theory to PDE eigenproblems, compact operators, and the abstract algebra of invariant subspaces.
+
+### Recommended consolidation exercise {#sec-module-d-module-d-final-mastery-assessment-recommended-consolidation-exercise}
+
+For the final synthesis, take one Hermitian matrix such as
+
+$$
+A= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix}
+$$
+
+and reconstruct the following chain without consulting the notes:
+
+$$
+\boxed{ \begin{gathered}
+  \text{Find eigenvalues and eigenspaces}\\
+  \downarrow\\
+  \text{Construct the orthogonal spectral projectors}\\
+  \downarrow\\
+  \text{Express }A\text{ through its projectors}\\
+  \downarrow\\
+  \text{Construct a polynomial filter }p(A)\\
+  \downarrow\\
+  \text{Apply the filter to a trial vector or subspace}\\
+  \downarrow\\
+  \text{Compute Ritz values and Ritz vectors}\\
+  \downarrow\\
+  \text{Evaluate residuals and subspace angles}\\
+  \downarrow\\
+  \text{Explain convergence using spectral separation}.
+\end{gathered} }
+$$
+
+If you can perform and explain this complete sequence, including why each step is mathematically justified, you have achieved the central objective of Module D.
+
+## Transition to Module E — Numerical methods and stability {#sec-module-d-transition-to-module-e-numerical-methods-and-stability}
+
+Module D has established the exact mathematical structures underlying eigenvalue algorithms.
+
+Module E will investigate what happens when we try to realize those structures computationally.
+
+The focus will shift from the question
+
+> Why does the spectral algorithm work in exact arithmetic?
+
+to the more numerical question:
+
+> Under what assumptions, and with what accuracy and cost, can we expect it to work in floating-point arithmetic?
+
+The principal subjects will include power and inverse iteration, block subspace iteration, Krylov methods, Rayleigh–Ritz and numerical residuals, Chebyshev recurrence evaluation, conditioning, backward stability, perturbation theory, and precision-dependent convergence.
+
+In the context of hardware-aware scientific computing, a central issue will be the distinction between **mathematical convergence mechanisms** and **implementation-dependent numerical behavior**.
+
+For example, an exact-arithmetic Chebyshev filter may reduce unwanted spectral components by a theoretically predictable factor. But an implementation using inexact matrix products and reduced precision also introduces errors that may accumulate, be amplified, or eventually create an accuracy floor.
+
+The study of those interactions is where spectral theory becomes numerical analysis.
+
+**The central achievement of Module D is a unified understanding of spectral decomposition, invariant-subspace geometry, variational eigenvalue approximation, and polynomial spectral filtering.** Together, these concepts provide the mathematical foundation for studying and analyzing modern numerical eigenvalue algorithms—and, more specifically, Chebyshev-filtered subspace iteration.

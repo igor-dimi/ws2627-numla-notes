@@ -1,0 +1,766 @@
+---
+jupyter: python3
+---
+
+# Module D — Spectral Theory {#sec-module-d}
+
+A vibration experiment records a mixture of modes. A single measurement gives a vector $x$, and applying the stiffness operator gives another vector $Ax$. What would let us extract a whole family of modes from such products? We need three ingredients. A decomposition tells us what a mode is. Geometry tells us how to measure the error in a proposed family. A polynomial changes the mixture in a predictable way using only applications of $A$. We will derive all three and use them to design a filtered subspace iteration.
+
+We will return to the matrix shared with Module E,
+$$
+A_0=\begin{pmatrix}2&1&0\\1&2&0\\0&0&9\end{pmatrix}.
+$$
+The first two coordinates interact. Equal and opposite displacements in these coordinates behave independently. Finding the right coordinates turns this observation into a calculation. Later we will deliberately mix those coordinates again to test what an approximate eigensolver can certify.
+
+**Conventions.** Until Session 10 all spaces are finite dimensional over $\mathbb F=\mathbb R$ or $\mathbb C$. In orthonormal coordinates use $\langle x,y\rangle=y^*x$, linear in $x$, as in the notes. A star on a matrix denotes conjugate transpose. The adjoint satisfies $\langle Ax,y\rangle=\langle x,A^\dagger y\rangle$. In coordinates with domain and range Gram matrices $G,H$, this gives $A^\dagger=G^{-1}A^*H$. In orthonormal coordinates we write $A^*$ for the adjoint itself. $\|\cdot\|$ denotes the Euclidean or induced operator 2-norm. $\|\cdot\|_F$ is the square root of the sum of squared entry magnitudes. An orthonormal basis matrix for a subspace has columns of unit length and $Q^*Q=I$.
+
+| Study sessions | Question to answer on paper |
+|---|---|
+| 1–2 | What do a restriction, a quotient and a dual coordinate each remember? |
+| 3–4 | When do the coordinates become orthogonal, and how does a polynomial act on them? |
+| 5–7 | How far is a trial space from a target, and what can one infer without knowing the target? |
+| 8 | Which directions of a rectangular map are amplified or lost? |
+| 9 | What exactly contracts during a filtered block iteration? |
+| 10 | Which parts survive a passage to functions or a change of scalar ring? |
+
+## Session 1 — Finding structure that survives an application of the operator
+
+A line $L=\mathbb Fv$ is preserved by an endomorphism $T:V\to V$ precisely when $Tv=\lambda v$ for some scalar $\lambda$ and $v\ne0$. Preservation means $T(L)\subseteq L$ and includes collapse to zero. For a real line, a negative eigenvalue reverses direction. A rectangular matrix maps between two coordinate spaces. Identifying an input vector with a scalar multiple of the output requires extra structure.
+
+The eigenspace $E_\lambda=\ker(T-\lambda I)$ contains zero as well as all eigenvectors for $\lambda$. In coordinates $\lambda$ is an eigenvalue exactly when $\chi_A(\lambda)=0$, where $\chi_A(t)=\det(tI-A)$. This follows because a square map has nontrivial kernel precisely when its determinant vanishes. Similarity preserves $\chi_A$, since $tI-S^{-1}AS=S^{-1}(tI-A)S$.
+
+**A field experiment.** For a real plane rotation through $\phi$, $\chi(t)=t^2-2\cos(\phi)t+1$. If $\sin\phi\ne0$, no real line is invariant. Over $\mathbb C$, the real rotation matrix with first column $(\cos\phi,\sin\phi)^T$ sends $(1,-i)^T$ to $e^{i\phi}(1,-i)^T$. Real and imaginary parts span the rotating real plane. Conjugation supplies the other eigenpair. Thus a useful real invariant piece can have dimension two and contain no real eigenline.
+
+### What the off-diagonal block measures
+
+**Proposition.** A subspace $U$ is invariant if and only if in a basis starting with a basis of $U$ the matrix has the form
+$$
+\begin{pmatrix}B&C\\0&D\end{pmatrix}.
+$$
+
+**Proof.** The first columns are images of the basis of $U$. Their lower coordinates vanish precisely when every such image lies in $U$. The upper-left block represents $T|_U$. On the quotient, define $\bar T(v+U)=Tv+U$. Replacing $v$ by $v+u$ changes $Tv$ by $Tu\in U$, so the formula is well-defined. Modulo $U$, the remaining basis vectors give a basis and their images have coordinates $D$. The block $C$ records components along $U$ acquired by the chosen representatives. Its vanishing means their span is also invariant. Conversely two complementary invariant spaces give a block diagonal matrix. $\square$
+
+In Module A language the quotient map $\pi$ satisfies $\pi T=\bar T\pi$. In Module B language the annihilator $U^\circ=\{\ell:\ell|_U=0\}$ is invariant under the dual map $\ell\mapsto\ell T$ because $\ell(Tu)=0$. Functionals in $U^\circ$ measure exactly those quantities that descend to $V/U$.
+
+Write $g_\lambda=\dim E_\lambda$ and $a_\lambda$ for the multiplicity of $\lambda$ as a root of $\chi_A$. Taking $U=E_\lambda$ gives $B=\lambda I_{g_\lambda}$, so factoring the block triangular determinant gives $g_\lambda\le a_\lambda$. The inequality can be strict. For $J=\left(\begin{smallmatrix}2&1\\0&2\end{smallmatrix}\right)$ both restriction to $\mathbb Fe_1$ and quotient by that line act as $2$. Yet $Je_2=2e_2+e_1$. An invariant complementary line would supply a second eigenvector, whereas $\ker(J-2I)=\mathbb Fe_1$. This *defective* matrix demonstrates exactly what is lost by recording only the two diagonal blocks. To obtain a proper invariant plane without an eigenbasis, embed $J$ as a diagonal block in $\operatorname{diag}(J,5)$.
+
+## Session 2 — Reading spectral components with the dual basis
+
+When does every vector have unique spectral coordinates? Suppose $\lambda_1,\ldots,\lambda_s$ are distinct and $\sum_j u_j=0$, $u_j\in E_{\lambda_j}$. Apply $\prod_{i\ne j}(T-\lambda_i I)$. All but one term vanish, leaving $\prod_{i\ne j}(\lambda_j-\lambda_i)u_j=0$. Hence the sum of distinct eigenspaces is direct.
+
+**Diagonalization criterion.** The following are equivalent over the chosen field: $A=X\Lambda X^{-1}$ with $\Lambda$ diagonal; there is a basis of eigenvectors; $V=\bigoplus_j E_{\lambda_j}$. Indeed $AX=X\Lambda$ says column by column that the columns of an invertible $X$ are an eigenbasis. Grouping these columns by eigenvalue yields the decomposition. Conversely concatenate bases of the summands. When $\chi_A$ splits, the multiplicities sum to $n$, so equality $g_\lambda=a_\lambda$ for every root is equivalent to diagonalizability.
+
+Write $X=[v_1,\dots,v_n]$ and let $\ell_i$ be row $i$ of $X^{-1}$. The identities $\ell_iv_j=\delta_{ij}$ and $\ell_i A=\lambda_i\ell_i$ say that the dual basis measures modal amplitudes and consists of left eigenfunctionals. Its representing columns satisfy $A^*\ell_i^*=\overline{\lambda_i}\ell_i^*$. Define $D_i=v_i\ell_i$. Then
+$$
+D_iD_j=\delta_{ij}D_i,\qquad \sum_iD_i=XX^{-1}=I,\qquad A=\sum_i\lambda_iD_i .
+$$
+Each multiplication here just extracts a coordinate and puts it back on its own basis vector. For a repeated eigenvalue, $P_\lambda=\sum_{\lambda_i=\lambda}D_i$ is the projection onto $E_\lambda$ along the sum of the other eigenspaces. This prescription uniquely specifies $P_\lambda$ even if the basis inside $E_\lambda$ changes.
+
+**An oblique measurement.** For $B=\left(\begin{smallmatrix}1&2\\0&3\end{smallmatrix}\right)$ choose $v_1=e_1$, $v_2=(1,1)^T$. The inverse basis matrix has rows $(1,-1)$ and $(0,1)$. Thus $P_1(x,y)=(x-y,0)$ projects parallel to the diagonal line, and $P_3(x,y)=(y,y)$. Applying the first projection to $e_2$ gives $-e_1$. Orthogonal projection onto the horizontal axis would give zero. As eigenlines approach each other the coordinate measurements can grow large. The bound $\|XDX^{-1}\|\le\kappa_2(X)\|D\|$ with $\kappa_2(X)=\|X\|\|X^{-1}\|$ quantifies the role of the eigenbasis, including its scaling.
+
+In @fig-d-oblique the two projections share their image. The dashed segments show the kernels through the input point. Changing the kernel changes which part of the vector counts as its horizontal component.
+
+```{python}
+#| label: fig-d-oblique
+#| fig-cap: "Projecting the same input onto the horizontal eigenline along two different complementary lines."
+#| echo: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.4), sharey=True)
+for ax, foot, name in zip(axes, [(-1, 0), (0, 0)],
+                          ["Spectral projection", "Orthogonal projection"]):
+    ax.axhline(0, color="0.35", linewidth=1)
+    ax.plot([0, foot[0]], [1, foot[1]], "--", color="tab:orange")
+    ax.scatter(*foot, color="tab:orange", zorder=3)
+    ax.scatter(0, 1, color="tab:blue")
+    ax.annotate("input (0, 1)", (0, 1), xytext=(4, 5),
+                textcoords="offset points")
+    ax.annotate(str(foot), foot, xytext=(0, -16), textcoords="offset points")
+    ax.set(xlim=(-1.4, 1.0), ylim=(-0.45, 1.45), aspect="equal",
+           title=name, xlabel="First coordinate")
+axes[0].set_ylabel("Second coordinate")
+fig.tight_layout()
+plt.show()
+```
+
+## Session 3 — When can the modes be chosen orthogonal?
+
+For generalized coordinates it costs effort to separate the two measurements above. An orthonormal eigenbasis makes coefficient extraction simply $q_i^*x$. What property of the original operator guarantees such a basis?
+
+**Hermitian spectral theorem.** A self-adjoint operator on a finite-dimensional real or complex inner-product space has an orthonormal eigenbasis and real eigenvalues. Conversely a real diagonal array of eigenvalues in an orthonormal basis gives a self-adjoint operator.
+
+**Proof.** Over $\mathbb C$ the characteristic polynomial has a root in positive dimension. If $Av=\lambda v$, then $v^*Av=\lambda\|v\|^2$ equals its conjugate, forcing $\lambda\in\mathbb R$. For real symmetric matrices apply this existence argument over $\mathbb C$; a nonzero real or imaginary part of the complex eigenvector is a real eigenvector for the same real $\lambda$. Normalize $v$. More generally, if $U$ is invariant and $x\perp U$, then $\langle Ax,u\rangle=\langle x,Au\rangle=0$ for $u\in U$. Thus $v^\perp$ is invariant and the restriction is self-adjoint with the inherited inner product. Induct on dimension and adjoin $v$ to the resulting basis. Conversely $(Q\Lambda Q^*)^*=Q\Lambda Q^*$ when $\Lambda$ is real diagonal. $\square$
+
+For $A_0$ this produces $q_1=(1,-1,0)^T/\sqrt2$, $q_2=(1,1,0)^T/\sqrt2$, $q_3=e_3$ with eigenvalues $1,3,9$. Orthogonality also follows directly for distinct eigenvalues by moving $A$ across the inner product. Within a repeated eigenspace any orthonormal basis works. A Hermitian operator is positive semidefinite when $x^*Ax\ge0$ for all $x$, and positive definite when the inequality is strict for every nonzero $x$. Expansion in this basis shows these are exactly the nonnegative and positive spectrum conditions, respectively.
+
+**Normal spectral theorem.** Over $\mathbb C$, $AA^*=A^*A$ if and only if $A=Q\Lambda Q^*$ for a unitary $Q$ and complex diagonal $\Lambda$.
+
+**Proof.** For any normal $N$, $\|Nx\|^2=x^*N^*Nx=x^*NN^*x=\|N^*x\|^2$. The shift $N=A-\lambda I$ is normal by expansion. Hence an eigenvector $v$ of $A$ is also an eigenvector of $A^*$ for $\bar\lambda$. Its orthogonal complement is invariant under both operators by the adjoint identity. The matrix splits orthogonally into a scalar and a block which still commutes with its adjoint. Induction beginning with a complex root of $\chi_A$ gives the unitary eigenbasis. Conversely diagonal matrices commute with their adjoints and unitary similarity preserves this identity. $\square$
+
+For a normal operator, components can acquire independent phases as well as independent magnitudes. For instance $\operatorname{diag}(i,2)$ is normal, although its first eigenvalue prevents self-adjointness. The real quarter-turn is unitary over $\mathbb C$ and orthogonal over $\mathbb R$; its complex eigenvalues have modulus one. In Session 2, $B$ has two distinct, nonorthogonal eigenlines, ruling out normality. The Jordan block lacks even an unrestricted eigenbasis.
+
+## Session 4 — Turning a scalar function into an operator
+
+In the Hermitian or complex normal case collect orthonormal eigenvectors for $\lambda$ in $Q_\lambda$. Then $P_\lambda=Q_\lambda Q_\lambda^*$ is self-adjoint. The product $Q_\lambda^*Q_\mu$ is the identity for equal groups and zero for distinct groups. Consequently $P_\lambda P_\mu=\delta_{\lambda\mu}P_\lambda$ and $\sum_\lambda P_\lambda=QQ^*=I$. The identity $A=\sum_\lambda\lambda P_\lambda$ specifies an action on every input: project into modes, scale, and sum.
+
+**Functional calculus.** For any diagonalizable $A$ and any polynomial $p$,
+$$
+p(A)=\sum_\lambda p(\lambda)P_\lambda.
+$$
+Indeed multiplication of two such expansions multiplies corresponding coefficients because the cross-products vanish. Induction gives the formula for powers, including $A^0=I$, and linearity gives it for polynomials. Over an orthogonal decomposition, Pythagoras further gives $\|p(A)\|=\max_\lambda |p(\lambda)|$, attained on a maximizing eigenvector. For a general diagonalizable operator the same norm argument fails at its first use of orthogonality.
+
+### An exact mode selector
+
+For distinct spectral points let $L_j(t)=\prod_{i\ne j}(t-\lambda_i)/(\lambda_j-\lambda_i)$. Evaluating at each eigenvalue gives $L_j(\lambda_i)=\delta_{ij}$, hence $L_j(A)=P_{\lambda_j}$. For $A_0$ the projector onto the vertical axis is $(A_0-I)(A_0-3I)/48$. A function $f$ specified only on this finite spectrum therefore gives the operator $\sum_j f(\lambda_j)P_{\lambda_j}$ by polynomial interpolation. Distinct eigenvalues that receive the same value under $f$ merge into a larger eigenspace of $f(A)$.
+
+| Choice on the spectrum | Meaning on a mode of eigenvalue $\lambda$ |
+|---|---|
+| $t^k$ | $k$ discrete time steps multiply it by $\lambda^k$. |
+| $e^{\tau t}$ | The power series converges in matrix norm and yields $e^{\tau\lambda}$. Thus $x'=Ax$ has solution $e^{\tau A}x(0)$. |
+| $1/t$ with $0\notin\sigma(A)$ | The resulting operator inverts $A$, verified by multiplying the expansions. |
+| $\sqrt t$ for Hermitian $A\ge0$ | The nonnegative spectral square root squares to $A$. Any positive semidefinite square root commutes with $A$ and restricts on each $E_\lambda$ to the scalar $\sqrt\lambda$ by its own spectral theorem. |
+
+If $A$ is diagonalizable its minimal polynomial, the monic polynomial of smallest degree annihilating $A$, is $\prod_j(t-\lambda_j)$: each factor is necessary by evaluation on eigenvectors and the product suffices. Polynomial evaluation thus depends only on remainders modulo this product. The list of values at the roots gives the Chinese remainder coordinates, and $L_j$ reconstructs one coordinate at a time. With a defective block $J=2I+N$, $N^2=0$, direct expansion gives $p(J)=p(2)I+p'(2)N$. The value at the eigenvalue alone has lost information. Exact projector formulas also presume exact spectral points. Tiny denominators for a cluster motivate selecting the entire cluster using interval information in Session 9.
+
+## Session 5 — Measuring an error when the answer is a space
+
+Two programs can return orthogonal eigenvectors in the same repeated eigenspace. To compare their spaces, use the orthogonal projector $P_U=Q_UQ_U^*$. Replacing $Q_U$ by $Q_US$ for a unitary $S$ leaves the projector unchanged. Pythagoras applied to $x-u=(I-P_U)x+(P_Ux-u)$ gives $\operatorname{dist}(x,U)=\|(I-P_U)x\|$. For unit vectors $x,y$ the angle between their lines lies in $[0,\pi/2]$ and satisfies $\cos\theta=|y^*x|$. Taking absolute value removes arbitrary signs or phases.
+
+### Deriving the principal directions
+
+Choose unit vectors $u\in U$, $w\in W$ maximizing $|u^*w|$, then repeat in the respective orthogonal complements of the previously chosen vectors. The successive maxima are cosines of the **principal angles** $0\le\theta_1\le\cdots\le\theta_s\le\pi/2$, $s=\min(\dim U,\dim W)$. In basis coordinates this maximizes $|a^*Cb|$ where $C=Q_U^*Q_W$. For fixed $b$, Cauchy–Schwarz gives maximum $\|Cb\|$. Its square is $b^*C^*Cb$, maximized on a top eigenvector of the positive semidefinite $C^*C$ by orthogonal expansion. For a positive maximum choose $a=Cb/\|Cb\|$. Orthogonal eigenvectors $b_i$ give orthogonal $Cb_i$, so removing each chosen pair leaves precisely the next largest stretch. Complete null directions arbitrarily. Thus $\cos\theta_i=\sigma_i(C)$, the decreasing singular values. This derivation uses only the Hermitian theorem and anticipates Session 8.
+
+**Projector distance theorem.** For equal positive dimensions, $\|P_U-P_W\|=\sin\theta_s$. To see the norm, take the paired principal vectors $u_i,w_i$ with $u_i^*w_j=c_i\delta_{ij}$, $c_i=\cos\theta_i$. Where $s_i=\sin\theta_i>0$, write $w_i=c_i u_i+s_i z_i$. Subtraction and normalization give orthonormal $z_i$ perpendicular to all $u_j$. On each resulting plane,
+$$
+P_U-P_W=\begin{pmatrix}s_i^2&-c_is_i\\-c_is_i&-s_i^2\end{pmatrix}.
+$$
+Its square is $s_i^2 I$. Common directions and the external complement contribute zero. The norm of the orthogonal block sum is its largest block norm. For unequal dimensions a larger space contains a unit vector perpendicular to the smaller, even if all paired angles vanish. For instance comparing a plane with a contained line gives projector distance one.
+
+**Example.** Take $U=\operatorname{span}(e_1,e_2)$ and $W=\operatorname{span}(e_1,\cos t\,e_2+\sin t\,e_3)$ for $0\le t\le\pi/2$. The common axis gives angle zero. The other angle is $t$. The worst error in projecting a unit vector from $W$ onto $U$ is $\sin t$, attained on the tilted direction.
+
+### A diagnostic when the target is unknown
+
+For a trial frame $Q$, $H=Q^*AQ$ gives $AQ=QH+R$ with $R=(I-QQ^*)AQ$. Thus $R=0$ exactly when the trial space is invariant. Under $Q\mapsto QS$ the residual becomes $RS$, preserving its norm. Zero residual can certify the wrong invariant space if the target was specified by a spectral window. Even for the right window, scale matters: take $A=\operatorname{diag}(1,1+\varepsilon)$ and the diagonal line at $45^\circ$. Its residual norm is $\varepsilon/2$, which tends to zero at fixed angle. Session 7 will identify the missing denominator.
+
+## Session 6 — Finding eigenvalues by optimizing a scalar measurement
+
+Let $A=A^*$ and $x=\sum_i c_iq_i\ne0$. Its **Rayleigh quotient** is
+$$
+\rho_A(x)=\frac{x^*Ax}{x^*x}=\frac{\sum_i\lambda_i|c_i|^2}{\sum_i|c_i|^2}.
+$$
+This weighted mean is unchanged by rescaling $x$. It lies between the smallest and largest eigenvalues. Equality at either end requires all nonzero coefficients to belong to that endpoint eigenspace. For $A_0$ and $x=q_2\cos t+q_3\sin t$ it is $3+6\sin^2t$. Intermediate values occur even though the spectrum is discrete.
+
+**Stationarity.** Vary a unit $x$ along $x+th$ for real $t$. Differentiating the quotient at zero gives $2\operatorname{Re}(h^*(Ax-\rho_A(x)x))$. Radial derivatives vanish. The vector $r=Ax-\rho_A(x)x$ is perpendicular to $x$ and therefore tangent to the sphere. Choosing $h=r$ proves that stationarity is equivalent to $r=0$. Along planes joining an interior eigenvector to a lower or higher mode, the quotient curves down or up. These stationary values can therefore be saddles.
+
+**Courant–Fischer.** Order by increasing algebraic value $\lambda_1\le\cdots\le\lambda_n$. Then
+$$
+\lambda_k=\min_{\dim S=k}\ \max_{0\ne x\in S}\rho_A(x)
+=\max_{\dim L=n-k+1}\ \min_{0\ne x\in L}\rho_A(x).
+$$
+
+**Proof.** Any $k$-space meets $\operatorname{span}(q_k,\dots,q_n)$ nontrivially since their dimensions sum to $n+1$. That direction has quotient at least $\lambda_k$. Thus all candidate maxima are at least $\lambda_k$. The first $k$ eigenvectors span a space with maximum exactly $\lambda_k$. Dually every $(n-k+1)$-space meets the span of the first $k$ eigenvectors, where the quotient is at most $\lambda_k$. The space of the last $n-k+1$ eigenvectors attains equality. $\square$
+
+For $A_0$, any plane must admit a vector of quotient at least $3$ and one of quotient at most $3$. The horizontal plane minimizes the worst energy, giving maximum $3$; the plane spanned by $q_2,q_3$ maximizes the least energy, giving minimum $3$. This explains how the middle eigenvalue can be characterized using extrema even though it is a saddle on the whole sphere.
+
+**Weighted geometry.** If $K=K^*$ and $M=M^*>0$, then $M^{-1}K$ is self-adjoint for $\langle x,y\rangle_M=y^*Mx$. Set $z=M^{1/2}x$. The generalized quotient $x^*Kx/(x^*Mx)$ becomes the ordinary quotient of $M^{-1/2}KM^{-1/2}$ at $z$. This invertible change of variables preserves subspace dimensions and transfers both min–max formulas. Generalized eigenvectors $Kx=\lambda Mx$ can be chosen $M$-orthonormal.
+
+## Session 7 — What spectral information can a trial space certify?
+
+In a large problem we can afford a few vectors as columns of $Q$. For orthonormal columns compress $A=A^*$ to $H=Q^*AQ$ and solve $Hy=\theta y$, $\|y\|=1$. The **Ritz pair** is $(\theta,u)$ with $u=Qy$. Its residual $r=Au-\theta u$ obeys
+$$
+Q^*r=Hy-\theta y=0.
+$$
+Conversely this orthogonality gives the reduced equations. It is the Galerkin condition from Module C: every test vector in the trial space measures zero error in the eigen-equation. In particular $u^*r=0$ gives $\theta=\rho_A(u)$. The compression represents the restriction exactly if the space is invariant. Otherwise projection discards part of $Au$.
+
+**Ritz interlacing.** For increasing algebraic order on both spectra, an $m$-dimensional compression has $\lambda_i\le\theta_i\le\lambda_{i+n-m}$ for $1\le i\le m$. Indeed $\rho_H(y)=\rho_A(Qy)$. Restricting the minimizing $i$-spaces in Courant–Fischer to subspaces of $\operatorname{range}Q$ can only increase the minimum. Restricting the maximizing $(m-i+1)$-spaces can only decrease the maximum, and the unrestricted maximum for that dimension equals $\lambda_{n-m+i}$. Both bounds include multiplicities.
+
+**Residual inclusion and identification.** For any unit $u=\sum c_iq_i$ and scalar $\theta$,
+$$
+\|Au-\theta u\|^2=\sum_i|\lambda_i-\theta|^2|c_i|^2
+\ge\operatorname{dist}(\theta,\sigma(A))^2.
+$$
+This gives proximity to *some* spectral value. To identify a target cluster $J$, assume $\delta=\min_{i\notin J}|\lambda_i-\theta|>0$. Keeping only the outside terms gives
+$$
+\|(I-P_J)u\|\le\|r\|/\delta .
+$$
+For a simple identified eigenvalue the left side is the sine of the angle to its eigenline. Multiplicity makes the whole eigenspace the intrinsic target. For a block of orthonormal Ritz vectors $u_j$ and common outside separation $\delta$, summing the squared inequalities bounds $\|(I-P_J)U\|_F\le\|AU-U\Theta\|_F/\delta$. With equal dimensions the operator norm on the left equals $\sin\theta_{\max}$ by the principal-plane construction and is bounded by this Frobenius estimate.
+
+**What converges quadratically?** For unit $u=q\cos t+w\sin t$, $w\perp q$, $\|w\|=1$, $Aq=\lambda q$, the cross terms vanish and
+$$
+\rho_A(u)-\lambda=(\rho_A(w)-\lambda)\sin^2t .
+$$
+There can be cancellation for interior eigenvalues. For two distinct modes of eigenvalues $\lambda,\mu$ the residual at the quotient has norm $|\mu-\lambda|\,|\sin t\cos t|$, obtained by resolving $Au$ along $u$ and the perpendicular direction in their plane. Near $t=0$ the quotient error is second order while the residual is first order. The example in Session 5 has small absolute errors in both measurements simply because its gap is small.
+
+**A compression you can audit.** Use $Q=[q_1,(q_2+q_3)/\sqrt2]$ for $A_0$. The reduced matrix is $\operatorname{diag}(1,6)$. The second Ritz vector has residual $3(q_3-q_2)/\sqrt2$, perpendicular to both columns. Its norm $3$ equals the distance from $6$ to the nearest spectrum, and $6$ sits midway between two modes. A solver could solve the reduced problem exactly and still deliver this residual.
+
+For a full-rank trial basis $Z$ in a generalized problem, orthogonality of $KZy-\theta MZy$ to every test column yields $Z^*KZy=\theta Z^*MZy$. The reduced mass matrix is positive definite because $Zy\ne0$ for $y\ne0$. A change of trial basis changes both small matrices by congruence and leaves the Ritz values unchanged.
+
+## Session 8 — Spectral geometry for maps between different spaces
+
+For $A:\mathbb C^n\to\mathbb C^m$, the squared output length is $x^*A^*Ax$. Hence directions of extreme amplification can be found in the *domain*. The Hermitian spectral theorem gives orthonormal $v_i$ with $A^*Av_i=\sigma_i^2v_i$, positive values first in decreasing order. The kernel of $A^*A$ equals $\ker A$ by the length identity. For each $\sigma_i>0$ set $u_i=Av_i/\sigma_i$. Then
+$$
+u_i^*u_j=\frac{v_i^*A^*Av_j}{\sigma_i\sigma_j}=\delta_{ij},\qquad
+Av_i=\sigma_i u_i,\qquad A^*u_i=\sigma_i v_i .
+$$
+Thus $AA^*u_i=\sigma_i^2u_i$. These $u_i$ span the image since all remaining $v_i$ are killed. Complete them by an orthonormal basis of $\ker A^*=(\operatorname{im}A)^\perp$. With $r=\operatorname{rank}A$ we have proved the **singular value decomposition**
+$$
+A=U\Sigma V^*=\sum_{i=1}^r\sigma_i u_iv_i^* .
+$$
+Here $U,V$ are square unitary matrices and $\Sigma$ is $m$ by $n$, diagonal in its rectangular shape. The first $r$ right vectors span $\operatorname{im}A^*=(\ker A)^\perp$, the remaining right vectors span $\ker A$. These two domain spaces and the two range spaces give the four fundamental subspaces.
+
+In input coordinates $v_i$, the unit ball maps to the solid ellipsoid with semiaxes $\sigma_i u_i$ in $\operatorname{im}A$. If $A$ is injective the unit sphere maps to the boundary relative to this image. A nontrivial kernel allows interior points too, since kernel components consume input length without affecting the output. The longest semiaxis gives $\|A\|=\sigma_1$. For invertible $A$, $\kappa_2(A)=\sigma_1/\sigma_n$. For a nonzero rank-deficient map, inversion restricted to $(\ker A)^\perp$ has worst gain $1/\sigma_r$.
+
+### Which inverse solves inconsistent data?
+
+Expand $b$ in left singular coordinates. Writing $x=\sum_i\xi_iv_i$ gives
+$$
+\|Ax-b\|^2=\sum_{i=1}^r|\sigma_i\xi_i-u_i^*b|^2+\|(I-U_rU_r^*)b\|^2 .
+$$
+The first $r$ coordinates of any minimizer are forced. Setting all remaining coordinates to zero uniquely minimizes $\|x\|$ among them. Thus $x=A^+b$ with $A^+=\sum_{i=1}^r\sigma_i^{-1}v_i u_i^*$. The products $AA^+=U_rU_r^*$ and $A^+A=V_rV_r^*$ are orthogonal projectors. These identities imply $AA^+A=A$, $A^+AA^+=A^+$ and self-adjointness of both products, the Moore–Penrose conditions. Small singular values amplify measurement errors in their corresponding coordinates.
+
+### What can any rank budget achieve?
+
+**Eckart–Young–Mirsky, spectral and Frobenius cases.** For $0\le k<r$ truncate the expansion after $k$ terms to obtain $A_k$. Its spectral error is $\sigma_{k+1}$ and its squared Frobenius error is $\sum_{i>k}\sigma_i^2$. Both are minimal over all matrices of rank at most $k$. For $k\ge r$ the error is zero.
+
+**Proof.** The residual expansion has orthogonal singular directions, giving the stated errors. For any competitor $B$ of rank at most $k$, its kernel meets $\operatorname{span}(v_1,\ldots,v_{k+1})$ in a unit vector $x$. Then $\|(A-B)x\|=\|Ax\|\ge\sigma_{k+1}$. For the second norm let $P$ project onto $\operatorname{im}B$. Orthogonally splitting every column gives $\|A-B\|_F^2\ge\|(I-P)A\|_F^2=\sum_i\sigma_i^2(1-\|Pu_i\|^2)$. Each weight $\|Pu_i\|^2$ lies in $[0,1]$ and their sum over all left basis vectors is $\operatorname{tr}P\le k$. Their weighted sum against decreasing $\sigma_i^2$ is at most $\sum_{i\le k}\sigma_i^2$: move any available weight to an earlier, larger coefficient until the first $k$ slots are filled or the weight is exhausted. Subtract this upper bound from $\|A\|_F^2$. $\square$
+
+**A rectangular calculation.** For $A=\left(\begin{smallmatrix}1&1&0\\0&0&1\end{smallmatrix}\right)$, right axes $(1,1,0)^T/\sqrt2,e_3$ map to $\sqrt2 e_1,e_2$ in the output plane. The antisymmetric input is invisible. The minimum-norm input for $(b_1,b_2)$ is $(b_1/2,b_1/2,b_2)$. Dropping the second mode costs exactly one in either norm. With many small trailing singular values the two errors can differ substantially: worst directional loss uses one tail value, while total squared loss counts the whole tail. This distinction drives choices of numerical rank and compression tolerance.
+
+## Session 9 — Designing a polynomial that improves a trial space
+
+Suppose the only expensive operation available is $X\mapsto AX$. A polynomial of degree $d$ can use $d$ such products. How should we allocate them? In an eigenbasis $p(A)=Xp(\Lambda)X^{-1}$, so the choice of polynomial sets the change in every modal amplitude. In a normal eigenbasis the coordinate norm also measures physical length.
+
+### First follow a line
+
+For this subsection order eigenvalues by decreasing **magnitude**. Let $A$ be normal, $|\lambda_1|>|\lambda_2|$ and $x_0=\sum_i c_iq_i$ with $c_1\ne0$. Repeated normalization $x_{j+1}=Ax_j/\|Ax_j\|$ represents the line of $A^{j+1}x_0$ while controlling scale. Dividing all coordinates of $A^jx_0$ by $c_1\lambda_1^j$ leaves its first coordinate one. Therefore
+$$
+\tan\angle(x_j,q_1)=
+\left(\sum_{i>1}|c_i/c_1|^2|\lambda_i/\lambda_1|^{2j}\right)^{1/2}
+\le |\lambda_2/\lambda_1|^j\tan\angle(x_0,q_1).
+$$
+Zero coefficients can give faster convergence. For Hermitian $A$ the Rayleigh error is bounded by the spectral width times the squared sine. A negative or complex dominant eigenvalue can change the phase at every step while the line converges. With zero initial overlap the missing mode stays missing. With tied magnitudes a unique direction need never emerge: $\operatorname{diag}(1,-1)$ alternates the line through $(1,1)^T$ with its perpendicular. For a diagonalizable nonnormal matrix the coordinate ratios still decay but angles require control of $X$ and $X^{-1}$.
+
+**Changing which mode wins.** Shift-and-invert uses $(A-\mu I)^{-1}$, $\mu\notin\sigma(A)$, whose mode factors are $(\lambda_i-\mu)^{-1}$. A solve per step targets the nearest eigenvalue if it is unique in distance and represented initially. Rayleigh quotient iteration updates $\mu=\rho_A(x)$ before each solve. Near an isolated Hermitian eigenline its shift error is $O(\sin^2 t)$ by Session 7. Provided the shifted systems are nonsingular, the unwanted-to-wanted amplification ratio is $O(\sin^2t)$, which multiplies the old tangent to give local cubic angular convergence. Check the residual before solving at an exact eigenpair.
+
+### Now follow a space
+
+Let $A$ be normal over $\mathbb C$ (real symmetric also suffices), and split an orthonormal eigenbasis into $Q_1,Q_2$ for wanted and unwanted groups with diagonal blocks $\Lambda_1,\Lambda_2$. Suppose a full-rank trial matrix $X$ has exactly $k=\dim\operatorname{range}Q_1$ columns. Write $X=Q_1C+Q_2D$. Full overlap means $C=Q_1^*X$ is invertible. Then the trial space is the graph
+$$
+\{Q_1z+Q_2Gz:z\in\mathbb C^k\},\qquad G=DC^{-1}.
+$$
+The vector over $z$ makes an angle with the target whose tangent is $\|Gz\|/\|z\|$. Taking the supremum gives $\tan\theta_{\max}=\|G\|$, since principal directions extremize projection loss. Full overlap is precisely the exclusion of a right angle. A change of trial basis multiplies $C,D$ on the right by the same invertible matrix, leaving $G$ intact.
+
+**Filtered contraction theorem.** Write $W,U$ for the wanted and unwanted spectral sets. If $\alpha=\min_{\lambda\in W}|p(\lambda)|>0$ and $\beta=\max_{\lambda\in U}|p(\lambda)|$, then
+$$
+G_{\mathrm{new}}=p(\Lambda_2)G_{\mathrm{old}}p(\Lambda_1)^{-1},\qquad
+\tan\theta_{\max}^{\mathrm{new}}\le\gamma_p\tan\theta_{\max}^{\mathrm{old}},
+\qquad \gamma_p=\beta/\alpha .
+$$
+
+**Proof.** After applying $p(A)$ the coefficient blocks become $p(\Lambda_1)C$ and $p(\Lambda_2)D$. The first is invertible by hypothesis. Multiply the new lower block by the inverse upper block and use the induced norm inequality. The norms of the two diagonal factors are exactly $\beta$ and $1/\alpha$. Orthonormalizing the columns preserves their span and therefore the graph. $\square$
+
+For $p(t)=t$ and the first $k$ modes in decreasing magnitude, the factor is $|\lambda_{k+1}|/|\lambda_k|$. A strict gap across the boundary suffices. Multiplicity *inside* the target is harmless. After $j$ repetitions the bound contains $\gamma_p^j$. Neither this estimate nor Ritz extraction requires the individual columns to converge. QR orthonormalization chooses a usable frame for the next product. Rayleigh–Ritz rotates this frame to diagonalize the compression and supplies residuals for individual approximate modes.
+
+The diagram distinguishes changing the space from changing its coordinates. The filter is the step that changes the graph. The reduced solve produces quantities that can be tested against the original operator.
+
+```{mermaid}
+flowchart TD
+    S["Trial basis"] --> F["Apply polynomial to block"]
+    F --> Q["Orthonormalize filtered block"]
+    Q --> H["Compress original operator"]
+    H --> R["Extract Ritz vectors"]
+    R --> T{"Residuals acceptable?"}
+    T -->|No| S
+    T -->|Yes| D["Report Ritz pairs"]
+```
+
+**Full-basis connection.** In unshifted QR iteration factor $A_j=U_jR_j$ and set $A_{j+1}=R_jU_j=U_j^*A_jU_j$. With $Z_j=U_0\cdots U_{j-1}$ one has $A_j=Z_j^*A Z_j$ and $AZ_j=Z_{j+1}R_j$. Thus the accumulated bases follow orthogonal iteration. The triangular factor gives simultaneous iteration of their leading subspaces when the corresponding blocks have full rank.
+
+### From a spectral window to a Chebyshev filter
+
+Suppose the unwanted real eigenvalues lie in $[a,b]$, $a<b$. We want a polynomial small on that entire interval and nonzero on the target. Affinely rescale by $s(t)=(2t-a-b)/(b-a)$. Define $T_0(x)=1$, $T_1(x)=x$ and $T_{j+1}(x)=2xT_j(x)-T_{j-1}(x)$. The cosine addition formula proves inductively that $T_j(\cos\phi)=\cos(j\phi)$. Thus $|T_j|\le1$ throughout $[-1,1]$. The hyperbolic addition formula similarly gives $T_j(\cosh u)=\cosh(ju)$. Parity gives $T_j(-x)=(-1)^jT_j(x)$. Beyond either endpoint the magnitude grows exponentially in degree at each fixed exterior point.
+
+**Why this shape?** For real $x_*>1$ and $d\ge1$, among real polynomials $h$ of degree at most $d$ satisfying $h(x_*)=1$, the least possible uniform norm on $[-1,1]$ is $1/T_d(x_*)$. It is attained by $g(x)=T_d(x)/T_d(x_*)$. If a competitor were strictly smaller in norm, $g-h$ would alternate signs at the $d+1$ extrema $\cos(j\pi/d)$, $j=0,\dots,d$. It would have $d$ distinct roots between them and another at $x_*$, impossible for a nonzero polynomial of degree at most $d$. Reflection handles $x_*<-1$. This minimax statement concerns a whole interval and one prescribed external value. A polynomial tailored to a few exactly known unwanted eigenvalues can annihilate all of them.
+
+Take $p_d(t)=T_d(s(t))$, optionally divided by its value at a desired exterior reference point. Normalization fixes the gain there and leaves $\gamma_p$ unchanged. For $A_0$, choose unwanted $[1,3]$ and wanted $9$. Then $s(t)=t-2$, $s(9)=7$, and $T_2(7)=97$. The normalized quadratic $p(t)=(2(t-2)^2-1)/97$ has values $(1/97,1/97,1)$. For every line overlapping $q_3$, its tangent to $q_3$ therefore shrinks by *exactly* $1/97$. Two ordinary power steps could shrink the slowest unwanted-to-wanted ratio only to $(3/9)^2=1/9$. Both use two matrix products. If an unaccounted unwanted mode lies at $10$, it maps to $8$ and gains $127/97>1$. An interval estimate can determine which subspace an algorithm finds.
+
+**Evaluating the filter.** For a block $X$, initialize $Y_0=X$, $Y_1=s(A)X=(2AX-(a+b)X)/(b-a)$. Induction using the scalar recurrence proves
+$$
+Y_{j+1}=2s(A)Y_j-Y_{j-1}=T_{j+1}(s(A))X .
+$$
+This uses matrix-block products, scalar combinations and two previous blocks. Forming powers of a large sparse matrix could destroy sparsity. Dividing the final result by the reference gain normalizes the mathematical polynomial; intermediate unnormalized blocks can still grow large. At moderate degrees this recurrence illustrates the exact action cleanly. For high degree one can propagate normalized blocks, with coefficients involving ratios of successive reference values.
+
+> **Which gap?** An additive distance $\delta$ from competing eigenvalues converts a residual into an angle bound. A multiplicative ratio $\gamma_p$ predicts improvement per filtering step. One is an accuracy certificate and the other a convergence estimate. Computing either from approximate spectral information introduces a separate estimation problem.
+
+## Session 10 — What survives beyond finite matrices?
+
+### Spectral values without eigenvectors
+
+For a bounded operator on a complex Banach space (a complete normed space), $\sigma(T)$ consists of $\lambda$ for which $T-\lambda I$ has no everywhere-defined bounded inverse. In finite dimensions injectivity, surjectivity and bounded invertibility coincide for an endomorphism. Infinite dimensions separate them.
+
+On $L^2(0,1)$ let $(Tf)(x)=xf(x)$. Its norm is at most one and moving the real multiplier across the inner product proves self-adjointness. An eigenfunction would have to vanish except where $x=\lambda$, a set of measure zero, hence represents zero. For $\lambda\notin[0,1]$, multiplication by $1/(x-\lambda)$ gives a bounded inverse. For $\lambda\in[0,1]$ normalize the indicator of $(0,1)\cap(\lambda-\varepsilon,\lambda+\varepsilon)$ to obtain a unit $f_\varepsilon$ with $\|(T-\lambda I)f_\varepsilon\|\le\varepsilon$. A bounded inverse would force $1\le\|(T-\lambda I)^{-1}\|\varepsilon$ for all $\varepsilon>0$. Consequently the entire interval is spectrum, with no eigenvalues. Projection onto functions supported in a subinterval plays the role of selecting a spectral band.
+
+A compact operator sends every bounded sequence to one whose images have a convergent subsequence. On $\ell^2$, $Te_j=e_j/j$ is compact: truncating its diagonal after $N$ gives a finite-rank map with operator error $1/(N+1)$, and norm limits of finite-rank operators are compact (finite-dimensional images of the unit ball have finite nets at every scale). Its eigenvalues are $1/j$. Zero is spectral because $\|Te_j\|\to0$, yet its kernel is trivial. Outside the closure of $\{1/j\}$ the inverse shifted diagonal is uniformly bounded. The compact self-adjoint spectral theorem gives an orthonormal eigenbasis on the closure of the range, completed by a basis of the kernel; nonzero eigenvalues have finite multiplicity and can accumulate only at zero. Module F1 develops the Hilbert-space setting and the compact-inverse route to PDE spectra.
+
+### From a vibrating string to a generalized eigenproblem
+
+Seek a nonzero $u$ satisfying $-u''=\lambda u$, $u(0)=u(1)=0$. Multiplication by $\bar u$ and integration by parts give $\int|u'|^2=\lambda\int|u|^2$, so $\lambda>0$: a function of zero derivative obeying the endpoints vanishes. The ODE solution is $a\sin(\sqrt\lambda x)+b\cos(\sqrt\lambda x)$. The first endpoint forces $b=0$, the second forces $\sqrt\lambda=j\pi$, $j\ge1$. Thus
+$$
+\lambda_j=j^2\pi^2,\qquad u_j(x)=\sqrt2\sin(j\pi x).
+$$
+Integrating the product of two sines verifies $L^2$-orthonormality. The string modes resemble the eigenvectors of $A_0$, but each is now a function.
+
+Multiply the ODE by $\bar v$ and integrate by parts for tests vanishing at both endpoints. The weak problem seeks $u\ne0$ in $H_0^1(0,1)$ (square-integrable functions with square-integrable weak derivative and zero endpoint traces) such that
+$$
+\int_0^1u'\overline{v'}\,dx=\lambda\int_0^1u\bar v\,dx
+\quad\text{for every }v\in H_0^1(0,1).
+$$
+Taking trial and test functions in the same finite-dimensional space with basis $\phi_j$ gives $Kc=\lambda Mc$ with $K_{ij}=\int\phi_j'\overline{\phi_i'}$, $M_{ij}=\int\phi_j\bar\phi_i$. $M$ records the physical inner product between basis functions. On a uniform grid of spacing $h$ the piecewise-linear hat basis yields diagonal $2/h$ and off-diagonal $-1/h$ in $K$, and $2h/3,h/6$ in $M$. On each interval the slopes have magnitude $1/h$ and opposite signs, while the two shape functions are $1-x/h,x/h$ in local coordinates. Integrating their products yields the entries after assembly. The continuous min–max principle for this Dirichlet problem, restricted to the trial space, bounds the exact eigenvalues from above by the conforming Ritz values. Session 7's dimension argument explains the direction of the bound. The laboratory separates trial-space error from algebraic solver residual.
+
+### When polynomials act like scalars
+
+Let $p(t)\cdot v=p(T)v$. Polynomial identities give $(pq)\cdot v=p\cdot(q\cdot v)$, distributivity in both arguments, and $1\cdot v=v$. Thus $V$ is an $\mathbb F[t]$-module, a vector space equipped with these additional scalar actions. A subspace is a submodule exactly when it is $T$-invariant: stability under $t$ is necessary, and stability under powers, sums and scalar multiples is sufficient. A map $S$ between operator spaces respects this action precisely when $ST=T'S$, since checking on the generator $t$ suffices. This recasts Module A's quotient diagram as a diagram of module maps.
+
+Starting from $v$, the first $k$ powers span $\mathcal K_k(T,v)=\operatorname{span}(v,Tv,\ldots,T^{k-1}v)$. When a power first depends on its predecessors the space stops growing and equals the cyclic submodule generated by $v$. The first monic relation is the minimal polynomial of $v$; the operator minimal polynomial annihilates all vectors. For $J$ in Session 1, $e_2$ generates both coordinates and $(J-2I)^2e_2=0$ while $(J-2I)e_2=e_1$. The module is $\mathbb F[t]/((t-2)^2)$, explaining why the eigenline and its quotient fit into an extension that does not split.
+
+More generally factor the minimal polynomial as $m=\prod_i f_i^{a_i}$ over distinct monic irreducibles. Put $g_i=m/f_i^{a_i}$. Coprimality supplies $b_i$ with $b_i g_i\equiv1\bmod f_i^{a_i}$ by Bézout's identity. The polynomials $b_ig_i$ are zero modulo every other factor. Their sum equals one modulo $m$, their pairwise products vanish modulo $m$, and each is idempotent modulo $m$. Evaluation at $T$ therefore gives complementary projectors. Their images equal $\ker f_i(T)^{a_i}$: multiplication by $f_i^{a_i}$ kills each image, and on that kernel the corresponding projector acts as the identity. For a split polynomial these are the generalized eigenspaces. Powers of a single linear factor permit Jordan chains within a primary component. Module F2 studies this decomposition via quotient rings and the Chinese remainder theorem.
+
+## Exercises
+
+Attempt these before consulting the solutions. For each claim, identify whether it uses a field, an inner product, or a separation assumption.
+
+1. **A line and a plane.** For $B=\left(\begin{smallmatrix}2&0&-3\\1&-1&-1\\0&0&-1\end{smallmatrix}\right)$ find both eigenspaces, their multiplicities, and the spectral projector for $2$. Decide if it is orthogonal.
+2. **What a quotient forgets.** Classify the invariant lines of $\left(\begin{smallmatrix}a&b\\0&a\end{smallmatrix}\right)$ as $b$ varies. Compute the quotient action by the first axis, and decide when the extension splits. Compare with a real quarter-turn after complexification.
+3. **Reconstruct the spectral theorem.** Starting with one complex eigenvector of a normal matrix, prove its orthogonal complement reduces the matrix (is invariant under both the matrix and its adjoint). Which extra hypothesis forces the eigenvalues to be real?
+4. **Separating a cluster.** For $A_0$ find the lowest-degree polynomial projection onto $\operatorname{span}(q_1,q_2)$. Compute $e^{-\tau A_0}e_1$. Which modes dominate at late time?
+5. **Distance and invariance.** For $U=\operatorname{span}(q_1,q_2)$ and $W=\operatorname{span}(q_1,q_2\cos t+q_3\sin t)$, $0<t<\pi/2$, compute both principal angles, the projector distance and the norm of the invariance residual of $W$ for $A_0$.
+6. **Min–max without coordinates.** If $B=A+vv^*$ with $A=A^*$, prove $\lambda_i(B)\ge\lambda_i(A)$ and $\lambda_i(B)\le\lambda_{i+1}(A)$ for $i<n$ in increasing algebraic order. Identify the dimension argument.
+7. **A misleading Ritz value.** For $\operatorname{diag}(-1,0,1)$ find a unit vector perpendicular to the zero eigenvector whose Rayleigh quotient is exactly zero. Calculate its residual and interpret the one-dimensional Ritz problem.
+8. **A residual certificate.** A Hermitian problem has one target eigenvalue in $[2.9,3.1]$ and all other eigenvalues outside $(1,5)$. A unit Ritz vector has $\theta=3.02$ and $\|r\|=0.01$. Bound its eigenvalue error and its angle to the target space. What changes if there are two eigenvalues in the target window?
+9. **A rectangular sensor.** Let $A$ have columns $(1,1,0)^T$ and $(0,0,2)^T$. Give a thin SVD, the minimum-norm least-squares solution for $b=(1,-1,4)^T$, and both optimal rank-one errors.
+10. **Power and graph coordinates.** For eigenvalues $(9,3,1)$ in an orthonormal eigenbasis start with the line through $(1,1,1)^T$ and then with the plane whose graph over the first two coordinates is $(1,1)$. Find the exact tangent after $j$ ordinary power steps in both cases.
+11. **Reconstruct the filter.** With unwanted $[1,3]$, normalize a degree-three Chebyshev filter at $9$. Bound its contraction and prove optimality for the continuous interval. Can an unwanted eigenvalue at $-6$ reverse the gain comparison?
+12. **A mesh with only two unknowns.** On $(0,1)$ take three equal elements with zero endpoints. Assemble $K,M$, solve for both eigenvalues, and verify mass orthogonality. Compare with the first two string eigenvalues.
+13. **Primary components.** Let $T=\operatorname{diag}(J,5)$ where $J$ is the size-two Jordan block at $2$. Give the minimal polynomial, a polynomial projector onto the $5$-space, and an explanation of why ordinary two-point linear interpolation fails.
+14. **Spectrum at a limit.** For $Te_j=e_j/j$ on $\ell^2$, exhibit an element outside its range. Explain why testing every basis vector for membership in the range would miss the obstruction.
+
+## Worked solutions
+
+1. The diagonal block structure gives $\chi_B=(t-2)(t+1)^2$. Solving $(B-2I)x=0$ gives $x_3=0$ and $x_1=3x_2$, so $E_2=\operatorname{span}((3,1,0)^T)$. For $-1$ the single constraint is $x_1=x_3$, giving $E_{-1}=\operatorname{span}(e_2,(1,0,1)^T)$. Geometric multiplicities equal the algebraic ones. The coefficient along $(3,1,0)^T$ is $(x_1-x_3)/3$ because removing that multiple leaves equal first and third coordinates. Hence $P_2=(3,1,0)^T(1,0,-1)/3=(B+I)/3$. Its kernel and image are not perpendicular, as the dot product of $e_2$ with $(3,1,0)^T$ is one.
+2. Every invariant line is an eigenline. For $b=0$ the matrix is scalar, so every line works and every complementary line splits off. For $b\ne0$ the kernel after subtracting $aI$ is the first axis, so no complementary invariant line exists. The quotient is scalar $a$ for every $b$. The real quarter-turn has no invariant real line and two distinct complex eigenlines since its polynomial $t^2+1$ splits into simple factors over $\mathbb C$. Field extension cures this rotation obstruction, while the Jordan obstruction survives it.
+3. Set $N=A-\lambda I$. Expansion shows $N^*N=NN^*$, so $Nv=0$ implies $\|N^*v\|=\|Nv\|=0$. Thus $A^*v=\bar\lambda v$. If $w\perp v$, moving $A$ or $A^*$ across the inner product proves both $Aw$ and $A^*w$ are perpendicular to $v$. The restriction is normal because both operators preserve the complement and still commute. Induction yields the orthonormal eigenbasis. Self-adjointness gives $\lambda=v^*Av/\|v\|^2\in\mathbb R$; conversely real eigenvalues in the unitary diagonalization imply self-adjointness.
+4. The polynomial $p(t)=1-(t-1)(t-3)/48$ is one at $1,3$ and zero at $9$. A linear function taking the same value at the first two points is constant, so degree two is minimal. Since $e_1=(q_1+q_2)/\sqrt2$, the solution is $(e^{-\tau}q_1+e^{-3\tau}q_2)/\sqrt2$. As $\tau\to\infty$ both decay and the relative amplitude of the second decays as $e^{-2\tau}$.
+5. The cross-Gram matrix is $\operatorname{diag}(1,\cos t)$, giving angles $0,t$ and distance $\sin t$. The first residual column vanishes. For the second, project onto the only excluded direction $-q_2\sin t+q_3\cos t$. Its coefficient is $(9-3)\sin t\cos t$. Hence the norm is $6\sin t\cos t$. Near $\pi/2$ the trial space again becomes nearly invariant while being far from $U$.
+6. The quotient of $B$ exceeds or equals that of $A$ pointwise because the difference is $|v^*x|^2/\|x\|^2$. Taking maxima and then minima proves the lower bound. Intersect the span of the first $i+1$ eigenvectors of $A$ with $v^\perp$. The intersection has dimension at least $i$. Choose an $i$-space there. Its $B$ quotient equals its $A$ quotient and is bounded above by $\lambda_{i+1}(A)$. Minimize over all $i$-spaces for $B$ to conclude.
+7. Take $u=(1,0,1)^T/\sqrt2$. The two energy contributions cancel. The single Ritz value is zero since $u^*Au=0$. The residual is $(-1,0,1)^T/\sqrt2$ with norm one. The Ritz value equals a true eigenvalue even though its vector has angle $\pi/2$ to that eigenline. Residual orthogonality here says $u^*Au=0$ and gives no smallness by itself.
+8. Eigenvalue inclusion gives a spectral point in $[3.01,3.03]$, necessarily the target. The nearest possible outside eigenvalue is at distance at least $\min(3.02-1,5-3.02)=1.98$. Hence $\sin t\le0.01/1.98$ and $t\le\arcsin(0.01/1.98)$, about $0.29^\circ$. With two target eigenvalues the same angle bound concerns their joint span. Identifying a particular eigenline requires separation within that span as well.
+9. The orthogonal columns have lengths $\sqrt2,2$. In decreasing order take right vectors $e_2,e_1$ and left vectors $e_3,(1,1,0)^T/\sqrt2$. The corresponding singular values are $2,\sqrt2$. The data component $(1,-1,0)^T$ is perpendicular to the range. Removing it and undoing the gain two gives $x=(0,2)^T$, the unique minimizer because the map is injective. Keeping the gain-two term leaves one singular value $\sqrt2$, so both optimal errors equal $\sqrt2$.
+10. Dividing the line coordinates by $9^j$ gives tangent $\sqrt{(3/9)^{2j}+(1/9)^{2j}}$. For the plane the lower block evolves with scalar $1$ while the upper block has powers $9^j,3^j$. The new graph row is $(9^{-j},3^{-j})$ and its norm is $\sqrt{9^{-2j}+3^{-2j}}$. Here the two asymptotic factors happen to be $1/3$ for different reasons: the line compares $3$ with $9$, the plane compares $1$ with $3$.
+11. $s(t)=t-2$ and $T_3(x)=4x^3-3x$, giving $p(t)=T_3(t-2)/1351$. The maximum unwanted gain is at most $1/1351$ and the wanted gain equals one. A smaller interval maximum would force the difference from $p$ to alternate signs at the four mapped extrema and vanish at $9$, hence have four distinct zeros at degree at most three. At $-6$ the mapped argument is $-8$ and $|T_3(-8)|=2024>1351$. That unwanted component could dominate the intended one.
+12. Here $K=\left(\begin{smallmatrix}6&-3\\-3&6\end{smallmatrix}\right)$ and $M=\left(\begin{smallmatrix}4&1\\1&4\end{smallmatrix}\right)/18$. The symmetric vector $(1,1)^T$ gives eigenvalue $3/(5/18)=10.8$. The antisymmetric vector $(1,-1)^T$ gives $9/(3/18)=54$. Their mass product vanishes since they are orthogonal and $M$ scales each vector. The exact values $\pi^2$ and $4\pi^2$ are smaller; the coarse trial space penalizes the more oscillatory mode more severely.
+13. The minimal polynomial is $(t-2)^2(t-5)$ because of the nilpotent part in $J$ and the independent scalar block. Take $p(t)=(t-2)^2/9$. This vanishes on the whole Jordan block and equals one at $5$. The linear selector $(t-2)/3$ only vanishes on the ordinary $2$-eigenspace: on the Jordan block it has residual action $N/3$. The derivative condition $p'(2)=0$ removes that action.
+14. The sequence $y_j=1/j$ is square summable. Its forced preimage has entries $1$ and is not in $\ell^2$. Each basis vector has preimage $j e_j$, whose norm grows without bound. Finite combinations are in the range and dense, explaining how a proper range can look surjective on every finite truncation.
+
+## Computational laboratory
+
+Run the cells in chapter order. The symbolic cells establish identities for the particular examples. The floating-point cells test quantitative predictions and print the quantities whose sizes matter. All figures are generated here. The optional HTML control varies the filter degree while the static figure compares representative degrees in print.
+
+```{python}
+#| label: d-lab-setup
+import numpy as np
+import sympy as sp
+import matplotlib.pyplot as plt
+from numpy.linalg import norm, eigh, qr, svd, solve
+
+np.set_printoptions(precision=5, suppress=True)
+A = np.array([[2., 1., 0.], [1., 2., 0.], [0., 0., 9.]])
+lam, V = eigh(A)  # Increasing algebraic order
+eye = np.eye(3)
+```
+
+### A. Count modes before computing directions
+
+A numerical eigensolver can return nearly parallel columns for a defective matrix. Exact nullspaces here distinguish a genuinely missing direction from a poorly scaled approximate basis. SymPy lists a basis for each eigenspace over the complex numbers.
+
+```{python}
+#| label: d-lab-structures
+examples = {
+    "Hermitian": sp.Matrix(A.astype(int)),
+    "oblique": sp.Matrix([[1, 2], [0, 3]]),
+    "Jordan": sp.Matrix([[2, 1], [0, 2]]),
+    "quarter turn": sp.Matrix([[0, -1], [1, 0]]),
+}
+for name, matrix in examples.items():
+    data = matrix.eigenvects()
+    for value, multiplicity, basis in data:
+        print(name, value, "algebraic", multiplicity, "geometric",
+              len(basis), "basis", [tuple(v) for v in basis])
+    print("Complex eigenbasis:", sum(len(b) for _, _, b in data) == matrix.rows)
+```
+
+### B. Reassemble a Hermitian operator from orthogonal projectors
+
+For $A_0$ each eigenvalue is simple. Dividing $vv^*$ by $v^*v$ makes the construction independent of the arbitrary eigenvector length. All the following checks are exact.
+
+```{python}
+#| label: d-lab-projectors
+S = examples["Hermitian"]
+projectors = {}
+for val, _, basis in S.eigenvects():
+    v = basis[0]
+    projectors[val] = v * v.H / (v.H * v)[0]
+for val, P in projectors.items():
+    assert P*P == P and P.H == P
+    for other, R in projectors.items():
+        if other != val:
+            assert P*R == sp.zeros(3)
+assert sum(projectors.values(), sp.zeros(3)) == sp.eye(3)
+assert sum((v*P for v, P in projectors.items()), sp.zeros(3)) == S
+print("Projector onto the antisymmetric mode:")
+print(projectors[1])
+```
+
+### C. Compare polynomial evaluation routes
+
+Here $p(t)=t^2-4t+2$ takes the same value on $1$ and $3$. The resulting matrix acts as a scalar throughout the horizontal plane. The interpolating polynomial for $9$ singles out the complementary axis.
+
+```{python}
+#| label: d-lab-calculus
+I = sp.eye(3)
+direct = S**2 - 4*S + 2*I
+modal = sum(((v**2 - 4*v + 2)*P for v, P in projectors.items()),
+            sp.zeros(3))
+assert direct == modal
+assert (S-I)*(S-3*I)/48 == projectors[9]
+print(direct)
+```
+
+### D. Rotate one direction in a plane
+
+Use the two planes from Exercise 5. At the endpoint $t=\pi/2$ the wrong plane is exactly invariant. @fig-d-planes shows why interpreting zero residual as recovery of a specified target would be a mistake. Dividing the residual by the gap keeps all curves on a common scale.
+
+```{python}
+#| label: fig-d-planes
+#| fig-cap: "Tilting one principal direction. The projector distance reaches one at the second invariant plane."
+def tilted_frame(t):
+    return np.column_stack((V[:, 0], np.cos(t)*V[:, 1] + np.sin(t)*V[:, 2]))
+
+target = V[:, :2]
+angles = np.linspace(0, np.pi/2, 151)
+distances, defects = [], []
+for t in angles:
+    Q = tilted_frame(t)
+    P = Q @ Q.T
+    cosines = svd(target.T @ Q, compute_uv=False)
+    principal = np.arccos(np.clip(cosines, 0, 1))
+    distance = norm(target @ target.T - P, 2)
+    assert abs(distance - np.sin(principal[-1])) < 5e-8
+    distances.append(distance)
+    defects.append(norm((eye-P) @ A @ Q, 2))
+fig, ax = plt.subplots(figsize=(6.4, 3.4))
+ax.plot(np.degrees(angles), distances, label="Projector distance")
+ax.plot(np.degrees(angles), np.array(defects)/6, label="Residual / gap")
+ax.set(xlabel="Tilt (degrees)", ylabel="Scaled magnitude")
+ax.legend()
+fig.tight_layout()
+plt.show()
+```
+
+### E. Follow the energy around a circle
+
+Restrict $A_0$ to the plane of modes $3,9$. The minimum and maximum of this restriction are attained at the axes. @fig-d-rayleigh also compares orders near the lower mode. Ratios to the indicated powers of $t$ tend to the gap $6$.
+
+```{python}
+#| label: fig-d-rayleigh
+#| fig-cap: "Rayleigh quotient along a unit circle and error orders near the mode of eigenvalue three."
+def energy_test(t):
+    x = V[:, 1]*np.cos(t) + V[:, 2]*np.sin(t)
+    rho = x @ A @ x / (x @ x)
+    return rho, norm(A @ x - rho*x)
+
+circle = np.linspace(0, 2*np.pi, 361)
+energies = [energy_test(t)[0] for t in circle]
+assert np.allclose([min(energies), max(energies)], [3, 9])
+small = np.geomspace(1e-5, 0.2, 60)
+energy, residual = np.array([energy_test(t) for t in small]).T
+fig, axes = plt.subplots(1, 2, figsize=(8, 3.3))
+axes[0].plot(np.degrees(circle), energies)
+axes[0].set(xlabel="Angle (degrees)", ylabel="Rayleigh quotient")
+axes[1].loglog(small, energy-3, label="Energy error")
+axes[1].loglog(small, residual, label="Residual")
+axes[1].set(xlabel="Angle (radians)", ylabel="Magnitude")
+axes[1].legend()
+fig.tight_layout()
+plt.show()
+```
+
+### F. Solve the reduced problem and test it in the full space
+
+Compare the residual within the trial space with its full norm. Checking only the smaller residual would miss the coupling to the excluded direction.
+
+```{python}
+#| label: d-lab-ritz
+Q = tilted_frame(np.pi/4)
+H = Q.T @ A @ Q
+ritz, Y = eigh(H)
+U = Q @ Y
+R = A @ U - U*ritz
+print("Compression:\n", H, "\nRitz values:", ritz)
+print("Full residual norms:", norm(R, axis=0))
+print("Projected residual norm:", norm(Q.T @ R))
+assert np.all(ritz >= lam[:2]-1e-12) and np.all(ritz <= lam[1:]+1e-12)
+assert norm(Q.T @ R) < 1e-12
+```
+
+### G. Keep only the strongest channel of a rectangular map
+
+The two singular-vector equations test input and output coordinates separately. The pseudoinverse discards the invisible antisymmetric input, while a rank-one approximation discards the weak output channel as well.
+
+```{python}
+#| label: d-lab-svd
+sensor = np.array([[1., 1., 0.], [0., 0., 1.]])
+left, sig, right_t = svd(sensor, full_matrices=False)
+assert np.allclose(sensor @ right_t.T, left*sig)
+assert np.allclose(sensor.T @ left, right_t.T*sig)
+pinv = (right_t.T / sig) @ left.T
+assert np.allclose(pinv, np.linalg.pinv(sensor))
+rank_one = sig[0]*np.outer(left[:, 0], right_t[0])
+error = sensor-rank_one
+assert np.allclose([norm(error, 2), norm(error, "fro")], [sig[1], sig[1]])
+print("Minimum-norm input for output (2,3):", pinv @ [2., 3.])
+print("Optimal rank-one error:", norm(error, 2))
+```
+
+### H. Compare vector and block convergence with predicted factors
+
+Use a rotated symmetric problem with prescribed spectrum. The graph norm below measures small angles without taking the inverse cosine of a number rounded close to one. For the vector the reference rate is $6/9$, for the two-dimensional space it is $3/6$. @fig-d-power includes upper bounds computed from the initial errors. A bound can overestimate the observed error if the starting overlap with the slow component is small.
+
+```{python}
+#| label: fig-d-power
+#| fig-cap: "Power and block iteration on a controlled spectrum. Dashed lines give exact-arithmetic tangent bounds."
+rng = np.random.default_rng(2718)
+basis, _ = qr(rng.normal(size=(6, 6)))
+values = np.array([9., 6., 3., 2., 1.5, 1.])
+B = (basis*values) @ basis.T
+initial, _ = qr(rng.normal(size=(6, 2)))
+
+def graph_tangent(X, k):
+    upper = basis[:, :k].T @ X
+    lower = basis[:, k:].T @ X
+    graph = solve(upper.T, lower.T).T
+    return norm(graph, 2)
+
+x = initial[:, :1].copy()
+X = initial.copy()
+line_err, plane_err, value_err = [], [], []
+for step in range(20):
+    line_err.append(graph_tangent(x, 1))
+    plane_err.append(graph_tangent(X, 2))
+    value_err.append(abs(values[0] - (x.T @ B @ x).item()))
+    x = B @ x
+    x /= norm(x)
+    X, _ = qr(B @ X)
+steps = np.arange(len(line_err))
+fig, ax = plt.subplots(figsize=(7, 3.9))
+for errors, ratio, name, color in [
+        (line_err, 6/9, "Line tangent", "tab:blue"),
+        (plane_err, 3/6, "Plane tangent", "tab:orange")]:
+    bound = errors[0]*ratio**steps
+    assert np.all(np.array(errors) <= bound + 1e-12)
+    ax.semilogy(steps, errors, color=color, label=name)
+    ax.semilogy(steps, bound, "--", color=color, label=f"Bound ({ratio:.2f})")
+ax.semilogy(steps, value_err, ":", color="black", label="Rayleigh error")
+ax.set(xlabel="Iteration", ylabel="Error or bound")
+ax.legend(ncol=2, fontsize=8)
+fig.tight_layout()
+plt.show()
+```
+
+### I. Change the degree and inspect the response
+
+Return to $A_0$ with the external reference point $9$. The following implementation handles constant and linear polynomials as well as higher degrees and accepts either a vector or a block. It uses unnormalized intermediate blocks, suitable for the modest degrees here. @fig-d-response shows the absolute gain on a logarithmic axis; exact filter zeros are displayed at a positive plotting floor.
+
+```{python}
+#| label: fig-d-response
+#| fig-cap: "Normalized Chebyshev gain. The shaded interval contains unwanted eigenvalues and the reference at nine has unit gain."
+def cheb_value(x, degree):
+    coeff = np.zeros(degree+1)
+    coeff[-1] = 1
+    return np.polynomial.chebyshev.chebval(x, coeff)
+
+def affine(t, a, b):
+    return (2*t-a-b)/(b-a)
+
+def filter_block(matrix, block, degree, a, b, reference):
+    def shifted_product(x):
+        return (2*(matrix @ x) - (a+b)*x)/(b-a)
+    if degree == 0:
+        return block.copy()
+    prev, curr = block, shifted_product(block)
+    for _ in range(1, degree):
+        prev, curr = curr, 2*shifted_product(curr) - prev
+    return curr/cheb_value(affine(reference, a, b), degree)
+
+grid = np.linspace(1, 9, 801)
+fig, ax = plt.subplots(figsize=(6.4, 3.7))
+for degree in (1, 2, 4):
+    gain = cheb_value(affine(grid, 1, 3), degree)/cheb_value(7., degree)
+    ax.semilogy(grid, np.maximum(np.abs(gain), 1e-7), label=f"Degree {degree}")
+    output = filter_block(A, V @ np.ones(3), degree, 1, 3, 9)
+    expected = cheb_value(lam-2, degree)/cheb_value(7., degree)
+    assert np.allclose(V.T @ output, expected)
+ax.axvspan(1, 3, alpha=.1, color="gray")
+ax.set(xlabel="Spectral value", ylabel="Absolute gain", ylim=(1e-7, 2))
+ax.legend()
+fig.tight_layout()
+plt.show()
+```
+
+::: {.content-visible when-format="html"}
+With Plotly installed, move the degree slider and hover just beyond the right endpoint. A degree increase suppresses in-band components relative to the reference, yet a mode beyond the reference gains more than one. The range extends to ten to expose that failure mechanism.
+
+```{python}
+#| label: d-filter-slider
+#| echo: false
+try:
+    import plotly.graph_objects as go
+    from IPython.display import HTML, display
+except ImportError:
+    pass  # The static figure above contains the degree comparison.
+else:
+    spectral_grid = np.linspace(1, 10, 901)
+    chart = go.Figure()
+    degrees = range(1, 7)
+    for d in degrees:
+        gain = cheb_value(spectral_grid-2, d)/cheb_value(7., d)
+        chart.add_scatter(x=spectral_grid, y=np.maximum(abs(gain), 1e-9),
+                          visible=(d == 1), mode="lines", name=f"Degree {d}")
+    controls = [dict(method="update", label=str(d),
+                     args=[{"visible": [j == d for j in degrees]}])
+                for d in degrees]
+    chart.update_layout(xaxis_title="Spectral value", yaxis_title="Absolute gain",
+                        yaxis_type="log", sliders=[dict(steps=controls,
+                        currentvalue=dict(prefix="Degree "))], height=420)
+    display(HTML(chart.to_html(full_html=False, include_plotlyjs=True)))
+```
+:::
+
+### J. Filter, orthonormalize, extract and diagnose
+
+Use the six-dimensional problem from H and select both leading modes. Enclose the other four in $[1,3]$, and normalize at $6$, the weaker of the two target eigenvalues under this filter. For degree two the outside minimum gain is one and the unwanted maximum is $1/T_2(4)=1/31$. Here “outside” refers to the target outside the unwanted interval. Inspect the bound alongside each measured tangent. The residual needs a separate computation with the original matrix.
+
+```{python}
+#| label: d-lab-filtered
+d, a, b, ref = 2, 1., 3., 6.
+gains = cheb_value(affine(values, a, b), d)/cheb_value(affine(ref, a, b), d)
+gamma = max(abs(gains[2:]))/min(abs(gains[:2]))
+X = initial.copy()
+start = graph_tangent(X, 2)
+print("Step  Ritz values          max residual   tangent      bound")
+for step in range(1, 8):
+    X, _ = qr(filter_block(B, X, d, a, b, ref))
+    theta, rotation = eigh(X.T @ B @ X)
+    X = X @ rotation
+    max_residual = max(norm(B @ X - X*theta, axis=0))
+    tangent = graph_tangent(X, 2)
+    predicted = start*gamma**step
+    assert tangent <= predicted + 1e-12
+    print(f"{step:>3}  {theta}  {max_residual:12.3e} "
+          f"{tangent:11.3e} {predicted:11.3e}")
+```
+
+Ritz values are printed in increasing algebraic order, so the leading pair approaches $(6,9)$. Measuring against a known target makes this a controlled experiment. For a large unknown problem, residuals and estimated separation are accessible, while the true tangent usually is not. FP64 data can follow the geometric estimate for a finite range of steps without establishing a theorem about rounding-error propagation.
+
+### K. Discretize a differential eigenproblem and refine the mesh
+
+Factor $M=LL^T$. The substitution $z=L^Tc$ changes $Kc=\lambda Mc$ into $L^{-1}KL^{-T}z=\lambda z$. Two triangular systems on opposite sides implement the change of coordinates; the code uses NumPy solves. The continuum error changes with refinement even when the algebraic residuals are tiny on every mesh.
+
+```{python}
+#| label: d-lab-mesh
+for elements in (4, 8, 16, 32):
+    n, h = elements-1, 1/elements
+    off = np.diag(np.ones(n-1), 1)
+    K = (2*np.eye(n) - off - off.T)/h
+    M = (4*np.eye(n) + off + off.T)*(h/6)
+    L = np.linalg.cholesky(M)
+    left_solved = solve(L, K)
+    standard = solve(L, left_solved.T).T
+    vals, Z = eigh(standard)
+    C = solve(L.T, Z[:, :2])
+    residual = K @ C - (M @ C)*vals[:2]
+    exact = (np.arange(1, 3)*np.pi)**2
+    print(f"{elements:2} elements  continuum errors {vals[:2]-exact}"
+          f"  residual {norm(residual):.2e}"
+          f"  mass orthogonality {norm(C.T @ M @ C-np.eye(2)):.2e}")
+    assert np.all(vals[:2] > exact)
+    assert np.allclose(C.T @ M @ C, np.eye(2))
+```
+
+These coefficient vectors have unit *mass* norm. Their ordinary Euclidean lengths depend on the mesh and basis. For the first mode, halving $h$ approximately quarters the eigenvalue error once the mesh resolves it. One can check this rate directly here: the discrete sine vector has stiffness factor $(2-2\cos(j\pi h))/h$ and mass factor $h(2+\cos(j\pi h))/3$. Taylor expansion of their ratio at fixed $j$ gives $(j\pi)^2+(j\pi)^4h^2/12+O(h^4)$. The algebraic residual tests the assembled equations and cannot detect this discretization term.
+
+## Synthesis — Which structure does the computation use?
+
+```{mermaid}
+flowchart TD
+    A["Invariant subspace"] --> B["Restriction and quotient"]
+    A --> C["Direct sum of eigenspaces"]
+    C --> D["Spectral projectors"]
+    D --> E["Polynomial action"]
+    C --> F["Orthogonal eigenbasis under normality"]
+    F --> G["Variational principles for Hermitian operators"]
+    G --> H["Ritz pairs and residuals"]
+    F --> I["Principal-angle estimates"]
+    E --> J["Filtered subspace iteration"]
+    I --> J
+    H --> J
+```
+
+Read the arrows as dependencies with hypotheses. A single invariant subspace always gives a restriction and quotient. Reaching the direct-sum branch requires enough eigenvectors. On the right, orthogonality supplies norm identities, Hermitian structure orders energies, and separation makes an angular certificate possible.
+
+| Class of operator | Available structure | Example or diagnostic |
+|---|---|---|
+| General endomorphism | Invariance gives block triangular form. | Jordan block has an eigenline and no invariant complement to it. |
+| Diagonalizable over $\mathbb F$ | Direct sum, dual coordinates, possibly oblique projectors. | $B$ from Session 2 has $P_1^*\ne P_1$. |
+| Complex normal | Unitary eigenbasis, orthogonal spectral projectors. | A quarter-turn has unit-modulus complex eigenvalues. |
+| Hermitian | Real spectrum and variational order. | $A_0$ has three orthogonal vibration modes. |
+| Hermitian positive definite | Strictly positive energies, invertible positive square root. | A mass matrix defines a metric on coefficients. |
+
+| Construction | Hypotheses | Quantity recovered |
+|---|---|---|
+| Algebraic projector | Diagonalizable, direct sum of eigenspaces | Component along the other eigenspaces; the kernel specifies the direction of projection. |
+| Orthogonal projector | Orthonormal frame of a subspace | Closest component in the subspace, kernel its perpendicular complement. |
+| Eigenvalue | Endomorphism over the chosen field | Scalar action on an invariant line; invariant under similarity. |
+| Singular value | Any map between finite-dimensional inner-product spaces | Gain between right and left axes; invariant under independent unitary basis changes. |
+| Principal angles | Two orthonormal frames | Singular values of their cross-Gram matrix give angle cosines. |
+| Courant–Fischer | Hermitian, increasing algebraic ordering | Ordered eigenvalues via extrema over subspaces. |
+| Ritz residual | Hermitian, orthonormal trial basis | A spectral inclusion; an angle bound after identifying an outside gap. |
+| Truncated SVD | Rank budget and spectral or Frobenius norm | Best approximation error given by the discarded singular values. |
+| Graph contraction | Normal, full target overlap, nonzero wanted gains | Worst tangent reduced by at most the unwanted-to-wanted gain ratio. |
+
+**Three diagnostic questions.** If a program returns different vectors after changing basis, compare projectors first: a repeated eigenspace has many bases. If a Ritz value looks accurate, compute the full residual and identify the neighboring spectrum: energy errors can cancel. If filtering stagnates, inspect the actual wanted and unwanted gains and the initial overlap before assigning the behavior to finite precision.
+
+### Integrated problem — Certify a filtered mode without its coordinates
+
+For $A_0$, start from $x=(q_2+q_3)/\sqrt2$. Construct the exact projector onto the highest mode, apply one degree-two interval filter, compute the resulting one-dimensional Ritz pair, then use its residual to certify the angle without inserting the exact eigenvector into the certificate. Compare the result with two ordinary power steps.
+
+**Solution.** The spectral projector is $(A_0-I)(A_0-3I)/48$ and maps $x$ to $q_3/\sqrt2$. The filter normalized at $9$ has gains $1/97,1/97,1$. The new unit vector is $u=(q_2+97q_3)/\sqrt{9410}$. Its tangent to the target is $1/97$. Its Ritz value is $\theta=9-6/9410$, and the two-mode residual formula gives $\|r\|=6\cdot97/9410$. Knowing only that the unwanted spectrum is at most $3$ gives $\delta=\theta-3$ and $\sin t\le\|r\|/(\theta-3)=1/97$. Direct geometry gives $\sin t=1/\sqrt{9410}$, verifying the certificate. Two ordinary power steps give tangent $1/9$. The exact polynomial projector, the interval filter and the residual answer three distinct questions: what the target component is, how to amplify it, and how to assess the extracted result.
+
+### Mastery assessment
+
+| Reconstruct without notes | A successful check |
+|---|---|
+| Restrict an operator and pass to its quotient. | Identify both diagonal blocks, exhibit a nonsplitting extension, and explain field dependence. |
+| Decide diagonalizability and recover projectors. | Count geometric multiplicities, compute the dual basis, and distinguish rank-one choices from whole eigenspaces. |
+| Prove both spectral theorems. | Explain why the orthogonal complement reduces the operator and where reality of eigenvalues enters. |
+| Derive polynomial functional calculus. | Construct a Lagrange projector and explain the derivative term on a Jordan block. |
+| Compare subspaces. | Derive the cross-Gram singular values and the principal-plane projector formula. |
+| Recover variational characterizations. | Derive quotient bounds and stationarity, then prove both min–max formulas by dimension counting. |
+| Certify a Ritz approximation. | Derive orthogonality, interlacing, spectral inclusion and an outside-gap angle bound, including the generalized metric. |
+| Construct an SVD. | Identify all four subspaces, solve minimum-norm least squares and prove both rank-truncation bounds. |
+| Explain exact iteration. | Derive the power factor, the graph update, full-overlap condition and largest-angle bound. |
+| Design a Chebyshev filter. | Map the interval, prove normalized minimax optimality, evaluate by recurrence and produce a failed-window example. |
+| Change the mathematical setting. | Derive stiffness and mass forms, distinguish spectrum from point spectrum, and identify submodules and primary projectors. |
+| Transfer to Module E. | Separate a predicted exact contraction, a measured residual, a gap estimate and the precision in which each was evaluated. |
+
+Module E starts where the last certificate becomes a practical question. A block product is computed with error, each Chebyshev recurrence step propagates earlier errors, and orthonormalization can lose accuracy. A residual evaluated in higher precision can reveal an accuracy floor hidden by a cheaper product. The exact contraction derived here supplies a reference curve against which mixed-precision arithmetic, communication costs and stopping criteria can be investigated.

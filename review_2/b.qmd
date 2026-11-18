@@ -1,0 +1,4309 @@
+---
+title: "Module B — Duality and Linear Measurements"
+---
+
+Dual spaces, dual bases, dual maps, transpose, annihilators, quotient duality, and exact sequences
+
+A self-contained study module connecting structural linear algebra to functional analysis, numerical methods, and abstract algebra.
+
+|                        |                                                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| **Level**              | Advanced undergraduate                                                                                   |
+| **Prerequisites**      | Module A: linear maps, kernels, images, bases, quotients, direct sums, and the first isomorphism theorem |
+| **Suggested duration** | 8 sessions, approximately 14–18 hours                                                                    |
+| **Next module**        | Module C: Inner-product geometry, Riesz representation, adjoints, projections, and SPD matrices          |
+
+## Introduction — A new perspective on linear algebra {#sec-module-b-introduction-a-new-perspective-on-linear-algebra}
+
+In Module A, we studied a linear transformation
+
+$$
+T:V\longrightarrow W
+$$
+
+by investigating what it does to vectors.
+
+We asked which vectors are annihilated, which outputs can be reached, and how the domain can be decomposed or quotiented to reveal an underlying isomorphism.
+
+Module B examines the same transformation from another perspective:
+
+**Instead of studying only vectors, we study the linear measurements that can be performed on those vectors.**
+
+This leads to the dual space $V^*$, whose elements are linear functionals
+
+$$
+f:V\longrightarrow\mathbb F.
+$$
+
+A vector $v\in V$ is an object that can be measured. A functional $f\in V^*$ is a linear rule for measuring it.
+
+The fundamental operation connecting them is
+
+$$
+\boxed{(f,v)\longmapsto f(v).}
+$$
+
+Once we introduce these measurements, several deeper connections emerge.
+
+A linear map $T:V\to W$ induces a map in the reverse direction,
+
+$$
+T^\vee:W^*\longrightarrow V^*,
+$$
+
+which pulls measurements backward through $T$.
+
+The transpose matrix turns out to be the coordinate representation of this dual map.
+
+The annihilator of a subspace describes all measurements that vanish on that subspace.
+
+And two remarkable relationships connect the dual map with the kernel and image of the original transformation:
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^\vee&=(\ker T)^0,\\
+  \ker T^\vee&=(\operatorname{im}T)^0.
+\end{aligned} }
+$$
+
+These are the central theorems of Module B.
+
+Later, the Riesz representation theorem will allow us to turn algebraic duality into inner-product geometry, producing the familiar relationships between kernels, adjoints, and orthogonal complements.
+
+## How Module B fits into the curriculum {#sec-module-b-how-module-b-fits-into-the-curriculum}
+
+**Module A — Structure of linear maps**
+
+Kernels, images, direct sums, quotients, isomorphisms
+
+**Module B — Duality**
+
+Linear measurements, dual bases, transposes, annihilators, exactness
+
+**Module C — Inner-product geometry**
+
+Riesz representation, adjoints, orthogonality, SPD matrices
+
+**Modules D–E — Spectral and numerical methods**
+
+Invariant subspaces, Rayleigh–Ritz, eigenvalue algorithms, Chebyshev filtering
+
+A fundamental distinction will guide the module:
+
+**Algebraic duality requires only vector-space structure. Orthogonality and adjoint operators require additional inner-product structure.**
+
+We will develop algebraic duality independently before introducing the geometric identifications associated with inner products.
+
+## Six dimensions of understanding {#sec-module-b-six-dimensions-of-understanding}
+
+As agreed in the overall curriculum, we will develop the material from six complementary perspectives.
+
+| Perspective             | Goal in Module B                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Rigorous                | Define dual spaces and prove their central properties                                                              |
+| Intuitive and geometric | Interpret covectors as linear measurements and families of level sets                                              |
+| Computational           | Construct dual bases, compute dual maps, annihilators, and transpose matrices                                      |
+| Structural              | Understand the relationship between duality, kernels, images, and quotients                                        |
+| Universal               | Explain contravariance, double duality, and dual exact sequences                                                   |
+| Applied                 | Connect duality to linear constraints, graph operators, variational formulations, and numerical eigenvalue methods |
+
+## Study roadmap {#sec-module-b-study-roadmap}
+
+| Session | Topic                                  | Main result                                                        |
+| ------- | -------------------------------------- | ------------------------------------------------------------------ |
+| 1 | [Linear functionals and their geometry](#sec-module-b-session-1) | $V^*=\operatorname{Hom}(V,\mathbb F)$ |
+| 2 | [Dual bases and coordinates](#sec-module-b-session-2) | $\varepsilon^i(v_j)=\delta_{ij}$ |
+| 3 | [Dual maps and transpose](#sec-module-b-session-3) | $T^\vee(f)=f\circ T$ |
+| 4 | [Annihilators and fundamental subspaces](#sec-module-b-session-4) | $\operatorname{im}T^\vee=(\ker T)^0$ |
+| 5 | [Quotient duality and exact sequences](#sec-module-b-session-5) | $(V/S)^*\cong S^0$ |
+| 6 | [Double duals and categorical structure](#sec-module-b-session-6) | $V\cong V^{**}$ in finite dimensions |
+| 7 | [Applications](#sec-module-b-session-7) | Graph operators, weak formulations, residuals, invariant subspaces |
+| 8 | [Synthesis, exercises, and computation](#sec-module-b-session-8) | Reconstruct the theory independently |
+
+Throughout the module, $V^*$ denotes the **algebraic dual**, and $T^\vee$ denotes the algebraic dual map. We reserve $T^*$ for the inner-product adjoint introduced in Module C.
+
+Unless otherwise indicated, the spaces are finite-dimensional over $\mathbb R$. Most algebraic results also hold over $\mathbb C$ or any other field.
+
+## Session 1 — Linear functionals and the geometry of dual spaces {#sec-module-b-session-1}
+
+### What is a linear functional? {#sec-module-b-session-1-what-is-a-linear-functional}
+
+Let $V$ be a vector space over $\mathbb F$.
+
+A **linear functional** is a linear transformation
+
+$$
+f:V\longrightarrow\mathbb F.
+$$
+
+This means that
+
+$$
+f(\alpha v+\beta w)=\alpha f(v)+\beta f(w)
+$$
+
+for all $v,w\in V$ and scalars $\alpha,\beta$.
+
+A functional differs from a general linear transformation only in that its codomain is the scalar field.
+
+For example, consider
+
+$$
+f:\mathbb R^3\to\mathbb R
+$$
+
+defined by
+
+$$
+f(x_1,x_2,x_3)=2x_1-3x_2+5x_3.
+$$
+
+This is a linear functional.
+
+It takes a vector containing three coordinates and returns one scalar.
+
+An important interpretation is that $f$ represents a **linear measurement**.
+
+We can think of it as a measuring instrument that extracts one scalar quantity from an input vector.
+
+### Why do linear functionals deserve their own space? {#sec-module-b-session-1-why-do-linear-functionals-deserve-their-own-space}
+
+The collection of all linear functionals on $V$ is denoted
+
+$$
+\boxed{ V^*=\operatorname{Hom}_{\mathbb F}(V,\mathbb F). }
+$$
+
+It is called the **dual space** of $V$.
+
+We can add functionals by defining
+
+$$
+(f+g)(v)=f(v)+g(v),
+$$
+
+and multiply them by scalars:
+
+$$
+(\alpha f)(v)=\alpha f(v).
+$$
+
+Both operations preserve linearity.
+
+The zero element is the zero functional
+
+$$
+0_{V^*}(v)=0
+$$
+
+for every $v\in V$.
+
+Therefore $V^*$ is itself a vector space.
+
+There is a conceptual change here.
+
+The elements of $V$ are vectors.
+
+The elements of $V^*$ are functions.
+
+Nevertheless, both collections are vector spaces because they satisfy the same algebraic axioms.
+
+This is one reason abstract linear algebra is more general than the geometry of arrows in Euclidean space.
+
+### The natural pairing {#sec-module-b-session-1-the-natural-pairing}
+
+We have a canonical operation
+
+$$
+V^*\times V\to\mathbb F
+$$
+
+defined by
+
+$$
+(f,v)\longmapsto f(v).
+$$
+
+This is called the **evaluation pairing** or **natural pairing**.
+
+We will occasionally write
+
+$$
+\boxed{\langle f,v\rangle_{\mathrm{eval}}=f(v).}
+$$
+
+It is bilinear:
+
+$$
+\langle\alpha f+\beta g,v\rangle_{\mathrm{eval}} = \alpha\langle f,v\rangle_{\mathrm{eval}} + \beta\langle g,v\rangle_{\mathrm{eval}},
+$$
+
+and
+
+$$
+\langle f,\alpha v+\beta w\rangle_{\mathrm{eval}} = \alpha\langle f,v\rangle_{\mathrm{eval}} + \beta\langle f,w\rangle_{\mathrm{eval}}.
+$$
+
+Notice that this is **not an inner product** in the usual sense.
+
+An inner product takes two vectors from the same space and returns a scalar.
+
+The evaluation pairing takes a functional from $V^*$ and a vector from $V$.
+
+It requires neither lengths nor angles nor any geometric metric.
+
+This pairing is the most fundamental operation in duality.
+
+### Geometric meaning: a covector as a family of parallel level sets {#sec-module-b-session-1-geometric-meaning-a-covector-as-a-family-of-parallel-level-sets}
+
+Let
+
+$$
+V=\mathbb R^2
+$$
+
+and consider
+
+$$
+f(x,y)=2x+y.
+$$
+
+Instead of representing $f$ by a row of coefficients, let's ask what the equation
+
+$$
+f(x,y)=c
+$$
+
+describes geometrically.
+
+It becomes
+
+$$
+2x+y=c,
+$$
+
+or
+
+$$
+y=-2x+c.
+$$
+
+For each scalar $c$, this is a straight line.
+
+Different values of $c$ produce parallel lines.
+
+In @fig-module-b-covector-level-sets, moving along a level line leaves the measurement unchanged. Moving from one level line to another changes its value. The arrow shows the Euclidean representing vector, which depends on the choice of inner product.
+
+```{dot}
+//| label: fig-module-b-covector-level-sets
+//| fig-cap: "Three level sets of f(x, y) = 2x + y. The central line is the kernel. The orange arrow represents f under the standard Euclidean dot product."
+//| fig-alt: "Three parallel lines of slope minus two are labeled f equals minus three, zero, and three. The line f equals zero passes through the origin. An arrow from the origin to (2, 1) is perpendicular to the lines."
+digraph covector_levels {
+  graph [id="module-b-level-set-graph", layout=neato, splines=line,
+         outputorder=edgesfirst, bgcolor="#f8fafc", pad=0.19]
+  node [shape=point, width=0, height=0, label="", id="module-b-level-node-\N"]
+  edge [arrowsize=0.65, id="module-b-level-edge-\T-\H"]
+
+  x_left  [pos="-2.56,0!"]
+  x_right [pos="2.58,0!"]
+  y_low   [pos="0,-1.57!"]
+  y_high  [pos="0,1.85!"]
+  minus_high [pos="-2.21,1.42!"]
+  minus_low  [pos="-0.79,-1.42!"]
+  zero_high  [pos="-0.71,1.42!"]
+  zero_low   [pos="0.71,-1.42!"]
+  plus_high  [pos="0.79,1.42!"]
+  plus_low   [pos="2.21,-1.42!"]
+  origin     [pos="0,0!"]
+  a          [pos="2,1!"]
+
+  x_left -> x_right [color="#7f8b9c"]
+  y_low -> y_high [color="#7f8b9c"]
+  minus_high -> minus_low [dir=none, color="#309789", penwidth=1.6]
+  zero_high -> zero_low [dir=none, color="#0f766e", penwidth=2.7]
+  plus_high -> plus_low [dir=none, color="#309789", penwidth=1.6]
+  origin -> a [color="#b45309", penwidth=2.7]
+
+  node [shape=plaintext, width=0, height=0, margin=0, fontname="sans-serif",
+        fontsize=13, fontcolor="#334155"]
+  x_label     [pos="2.64,-0.15!", label="x"]
+  y_label     [pos="0.15,1.89!", label="y"]
+  origin_label [pos="-0.14,-0.14!", label="0"]
+  minus_label [pos="-2.17,1.63!", label="f = −3", fontcolor="#165e57"]
+  zero_label  [pos="-0.75,1.63!", label="f = 0", fontcolor="#165e57"]
+  plus_label  [pos="0.83,1.63!", label="f = 3", fontcolor="#165e57"]
+  a_label     [pos="2.06,1.24!", label="a = (2, 1)", fontcolor="#9a4309"]
+}
+```
+
+This gives a more intrinsic geometric interpretation of a covector.
+
+**A nonzero covector on a two-dimensional real vector space can be visualized through its family of parallel level lines, with scalar labels indicating the measurement.**
+
+In three dimensions, the level sets are parallel planes.
+
+In $n$ dimensions, they are affine hyperplanes of dimension $n-1$.
+
+#### The kernel consists of invisible directions {#module-b-session-1-geometric-meaning-a-covector-as-a-family-of-parallel-level-sets-the-kernel-consists-of-invisible-directions}
+
+The kernel of $f$ is
+
+$$
+\ker f=\{v\in V:f(v)=0\}.
+$$
+
+For our example,
+
+$$
+\ker f = \{(x,y):2x+y=0\} = \operatorname{span}\{(1,-2)\}.
+$$
+
+Now let $k\in\ker f$. Then
+
+$$
+f(v+k)=f(v)+f(k)=f(v).
+$$
+
+Thus adding a kernel vector leaves the measurement unchanged.
+
+This leads to a useful interpretation:
+
+$$
+\boxed{ \ker f=\text{the directions invisible to the measurement }f. }
+$$
+
+For a nonzero functional on an $n$-dimensional space, rank–nullity gives
+
+$$
+\dim\ker f=n-1.
+$$
+
+So a single independent linear measurement removes one degree of freedom.
+
+The kernel contains all the remaining directions that the measurement cannot distinguish.
+
+### Is a covector just an ordinary vector? {#sec-module-b-session-1-is-a-covector-just-an-ordinary-vector}
+
+In Euclidean space, we can write
+
+$$
+f(x,y)=2x+y
+$$
+
+as
+
+$$
+f(x,y)= \begin{pmatrix}
+  2&1
+\end{pmatrix} \begin{pmatrix}
+  x\\
+  y
+\end{pmatrix}.
+$$
+
+Using the standard dot product, this equals
+
+$$
+f(v)=\langle v,a\rangle
+$$
+
+for
+
+$$
+a=(2,1).
+$$
+
+This makes it tempting to identify the functional $f$ with the vector $a$.
+
+But that identification uses an inner product.
+
+Without an inner product, there is no distinguished way to convert a functional into a vector belonging to $V$.
+
+The covector remains a perfectly well-defined algebraic object even when no lengths or angles have been introduced.
+
+This is the distinction that the Riesz representation theorem will clarify in Module C.
+
+### Why the evaluation pairing is nondegenerate {#sec-module-b-session-1-why-the-evaluation-pairing-is-nondegenerate}
+
+The pairing has two important properties.
+
+If
+
+$$
+f(v)=0
+$$
+
+for every $v\in V$, then $f$ is the zero functional.
+
+Conversely, if
+
+$$
+f(v)=0
+$$
+
+for every $f\in V^*$, then $v=0$.
+
+To prove the second claim, suppose $v\ne0$.
+
+Extend the one-element independent set $\{v\}$ to a basis of $V$.
+
+Define a functional that takes the value $1$ on $v$ and $0$ on the remaining basis vectors, then extend it linearly.
+
+This functional satisfies $f(v)=1$.
+
+Therefore every nonzero vector can be detected by some linear functional.
+
+This is called **nondegeneracy of the evaluation pairing**.
+
+It tells us that the family of all linear measurements distinguishes every vector in $V$, even though an individual measurement generally cannot.
+
+### Checkpoint 1 {#module-b-checkpoint-1 .unnumbered .unlisted}
+
+Prove that every nonzero functional $f:\mathbb R^n\to\mathbb R$ is surjective.
+
+Then explain geometrically why its kernel is an $(n-1)$-dimensional hyperplane.
+
+Finally, distinguish carefully between the functional $f$, its kernel, and a vector representing $f$ through an inner product.
+
+## Session 2 — Dual bases and coordinate representations {#sec-module-b-session-2}
+
+The dual space may initially appear quite abstract because its elements are functions rather than ordinary coordinate vectors.
+
+Dual bases provide a systematic way to describe those functions computationally.
+
+### Every basis defines coordinate measurements {#sec-module-b-session-2-every-basis-defines-coordinate-measurements}
+
+Let
+
+$$
+\mathcal B=(v_1,\ldots,v_n)
+$$
+
+be a basis of $V$.
+
+Every vector has a unique expansion
+
+$$
+v=a_1v_1+\cdots+a_nv_n.
+$$
+
+We can define a functional for each coordinate.
+
+Let
+
+$$
+\varepsilon^i(v)=a_i.
+$$
+
+In other words, $\varepsilon^i$ extracts the $i$-th coordinate of $v$ relative to the basis $\mathcal B$.
+
+Each $\varepsilon^i$ is linear because coordinates depend linearly on vectors.
+
+By construction,
+
+$$
+\boxed{ \varepsilon^i(v_j)=\delta_{ij}, }
+$$
+
+where
+
+$$
+\delta_{ij}= \begin{cases}
+  1,&i=j,\\
+  0,&i\ne j.
+\end{cases}
+$$
+
+The collection
+
+$$
+\boxed{ \mathcal B^*=(\varepsilon^1,\ldots,\varepsilon^n) }
+$$
+
+is called the **dual basis**.
+
+#### Interpretation {#module-b-session-2-every-basis-defines-coordinate-measurements-interpretation}
+
+The basis vectors are the building blocks of vectors.
+
+The dual basis functionals are the measuring devices that recover the coefficients of those building blocks.
+
+The relation
+
+$$
+\varepsilon^i(v_j)=\delta_{ij}
+$$
+
+means that the $i$-th coordinate measurement recognizes the $i$-th basis vector and ignores all others.
+
+### The dual basis theorem {#sec-module-b-session-2-the-dual-basis-theorem}
+
+**Theorem.** If $(v_1,\ldots,v_n)$ is a basis of $V$, then its dual functionals $(\varepsilon^1,\ldots,\varepsilon^n)$ form a basis of $V^*$.
+
+Moreover, every $f\in V^*$ has the unique expansion
+
+$$
+\boxed{ f=\sum_{i=1}^n f(v_i)\varepsilon^i. }
+$$
+
+#### Proof {#module-b-session-2-the-dual-basis-theorem-proof}
+
+For any $v\in V$, write
+
+$$
+v=\sum_{j=1}^n a_jv_j.
+$$
+
+Then
+
+$$
+f(v)=\sum_{j=1}^n a_jf(v_j).
+$$
+
+But
+
+$$
+a_j=\varepsilon^j(v).
+$$
+
+Therefore,
+
+$$
+f(v)=\sum_{j=1}^n f(v_j)\varepsilon^j(v).
+$$
+
+Since this holds for every $v$,
+
+$$
+f=\sum_{j=1}^n f(v_j)\varepsilon^j.
+$$
+
+Thus the $\varepsilon^j$ span $V^*$.
+
+For independence, suppose
+
+$$
+\sum_{i=1}^n c_i\varepsilon^i=0.
+$$
+
+Evaluate at $v_j$:
+
+$$
+0=\sum_{i=1}^n c_i\varepsilon^i(v_j)=c_j.
+$$
+
+As $j$ was arbitrary, every coefficient is zero.
+
+Hence the dual functionals are linearly independent and form a basis.
+
+A consequence is
+
+$$
+\boxed{\dim V^*=\dim V}
+$$
+
+when $V$ is finite-dimensional.
+
+### A nonstandard basis in $\mathbb R^2$ {#sec-module-b-session-2-a-nonstandard-basis-in}
+
+Consider
+
+$$
+v_1=(1,0),\qquad v_2=(1,1).
+$$
+
+These form a basis of $\mathbb R^2$.
+
+We want to construct the corresponding dual basis.
+
+Take an arbitrary vector
+
+$$
+v=(x,y).
+$$
+
+Write
+
+$$
+(x,y)=a v_1+b v_2.
+$$
+
+Then
+
+$$
+(x,y)=(a+b,b).
+$$
+
+Thus
+
+$$
+b=y,\qquad a=x-y.
+$$
+
+The coordinate-extraction functionals are
+
+$$
+\boxed{ \begin{aligned}
+  \varepsilon^1(x,y)&=x-y,\\
+  \varepsilon^2(x,y)&=y.
+\end{aligned} }
+$$
+
+Let's verify the defining relation:
+
+|                     | $v_1=(1,0)$ | $v_2=(1,1)$ |
+| ------------------- | --------------- | --------------- |
+| $\varepsilon^1$ | $1$         | $0$         |
+| $\varepsilon^2$ | $0$         | $1$         |
+
+Thus $(\varepsilon^1,\varepsilon^2)$ is the dual basis.
+
+Notice that neither functional has to be represented by the corresponding original basis vector.
+
+The basis vectors and dual basis functionals play complementary roles.
+
+### How to calculate a dual basis using matrix inversion {#sec-module-b-session-2-how-to-calculate-a-dual-basis-using-matrix-inversion}
+
+Let
+
+$$
+B=(v_1\ \cdots\ v_n)
+$$
+
+be the matrix whose columns are the basis vectors, expressed in standard coordinates.
+
+Suppose $x$ has coordinate column $a$ in this basis.
+
+Then
+
+$$
+x=Ba.
+$$
+
+Therefore,
+
+$$
+a=B^{-1}x.
+$$
+
+The $i$-th coordinate is the $i$-th row of $B^{-1}$ applied to $x$.
+
+Hence:
+
+$$
+\boxed{ \text{Rows of }B^{-1} = \text{coordinate rows of the dual basis functionals}. }
+$$
+
+If we represent functional coefficient arrays as columns instead, the dual basis representatives are the columns of
+
+$$
+B^{-T}.
+$$
+
+For our example,
+
+$$
+B= \begin{pmatrix}
+  1&1\\
+  0&1
+\end{pmatrix}, \qquad B^{-1}= \begin{pmatrix}
+  1&-1\\
+  0&1
+\end{pmatrix}.
+$$
+
+Its rows represent
+
+$$
+\varepsilon^1(x,y)=x-y,\qquad \varepsilon^2(x,y)=y.
+$$
+
+This is a general computational method for constructing a dual basis.
+
+### Why vectors and covectors transform differently {#sec-module-b-session-2-why-vectors-and-covectors-transform-differently}
+
+Now suppose we change coordinates.
+
+Let the original basis be $\mathcal B$, and let $\mathcal C$ be a new basis.
+
+Let $S$ be the change-of-coordinate matrix satisfying
+
+$$
+[x]_{\mathcal B}=S[x]_{\mathcal C}.
+$$
+
+Then vector coordinates transform according to
+
+$$
+\boxed{ [x]_{\mathcal C}=S^{-1}[x]_{\mathcal B}. }
+$$
+
+What happens to a functional?
+
+Suppose its coefficient column in the original dual basis is $c_{\mathcal B}$, so that
+
+$$
+f(x)=c_{\mathcal B}^T[x]_{\mathcal B}.
+$$
+
+Substituting the coordinate transformation gives
+
+$$
+f(x)=c_{\mathcal B}^TS[x]_{\mathcal C}.
+$$
+
+Therefore,
+
+$$
+f(x)=(S^Tc_{\mathcal B})^T[x]_{\mathcal C}.
+$$
+
+So the new coefficient column is
+
+$$
+\boxed{ c_{\mathcal C}=S^Tc_{\mathcal B}. }
+$$
+
+Compare the two rules:
+
+$$
+\boxed{ \begin{aligned}
+  [x]_{\mathcal C}&=S^{-1}[x]_{\mathcal B},\\
+  c_{\mathcal C}&=S^Tc_{\mathcal B}.
+\end{aligned} }
+$$
+
+Vectors and covectors have complementary transformation laws.
+
+This is the mathematical origin of the terminology *contravariant* and *covariant* components, although conventions depend on which basis-change matrix is being specified.
+
+#### Worked example {#module-b-session-2-why-vectors-and-covectors-transform-differently-worked-example}
+
+In standard coordinates, let
+
+$$
+f(x,y)=2x+y.
+$$
+
+Its coefficient column is
+
+$$
+c_{\mathrm{standard}}= \begin{pmatrix}
+  2\\
+  1
+\end{pmatrix}.
+$$
+
+Now use the basis
+
+$$
+v_1=(1,0),\qquad v_2=(1,1),
+$$
+
+with basis matrix
+
+$$
+B= \begin{pmatrix}
+  1&1\\
+  0&1
+\end{pmatrix}.
+$$
+
+The functional coefficients in the new dual basis are
+
+$$
+c_{\mathrm{new}} = B^Tc_{\mathrm{standard}} = \begin{pmatrix}
+  1&0\\
+  1&1
+\end{pmatrix} \begin{pmatrix}
+  2\\
+  1
+\end{pmatrix} = \begin{pmatrix}
+  2\\
+  3
+\end{pmatrix}.
+$$
+
+This matches the dual-basis theorem:
+
+$$
+f(v_1)=2,\qquad f(v_2)=3.
+$$
+
+Indeed,
+
+$$
+\boxed{f=2\varepsilon^1+3\varepsilon^2.}
+$$
+
+The functional itself has not changed.
+
+Only its coordinate representation has changed.
+
+#### Why this distinction matters {#module-b-session-2-why-vectors-and-covectors-transform-differently-why-this-distinction-matters}
+
+In numerical linear algebra, vectors often represent states, while covectors represent residual functionals, constraints, or derivatives of scalar-valued quantities.
+
+Coordinate changes must preserve the scalar evaluation $f(x)$.
+
+The complementary coordinate transformations of vectors and covectors are what guarantee that invariance.
+
+Later, an inner product will provide a mechanism for translating between the two kinds of coordinates.
+
+That mechanism is precisely what underlies metric matrices, Gram matrices, and Riesz representation.
+
+### Checkpoint 2 {#module-b-checkpoint-2 .unnumbered .unlisted}
+
+Let
+
+$$
+v_1=(1,1),\qquad v_2=(1,-1).
+$$
+
+Construct the dual basis explicitly.
+
+Then calculate the coordinates of
+
+$$
+f(x,y)=3x+y
+$$
+
+in that dual basis, both by evaluating $f(v_1),f(v_2)$ and by using the basis-change matrix.
+
+## Session 3 — Dual maps and the meaning of transpose {#sec-module-b-session-3}
+
+We now arrive at a central idea of the module.
+
+A linear transformation does not merely map vectors from one space into another. It also induces a transformation between the corresponding dual spaces.
+
+Surprisingly, that induced transformation goes in the opposite direction.
+
+### Pulling a measurement backward {#sec-module-b-session-3-pulling-a-measurement-backward}
+
+Let
+
+$$
+T:V\to W
+$$
+
+be linear.
+
+Suppose $g\in W^*$. Thus,
+
+$$
+g:W\to\mathbb F
+$$
+
+is a linear measurement on the output space.
+
+We can turn it into a measurement on the input space by first applying $T$:
+
+$$
+v\longmapsto T(v)\longmapsto g(T(v)).
+$$
+
+The composition
+
+$$
+g\circ T:V\to\mathbb F
+$$
+
+is a linear functional on $V$. The two routes in @fig-module-b-pullback define the same scalar measurement.
+
+```{mermaid}
+%%| label: fig-module-b-pullback
+%%| fig-cap: "Measuring after applying T gives the same scalar as applying the pulled-back measurement directly."
+%%| fig-alt: "Two routes run from V to the scalar field. One applies T from V to W and then g. The dashed route applies the composite g composed with T."
+flowchart LR
+  domain["V"] -->|"T"| target["W"]
+  target -->|"g"| scalars["𝔽"]
+  domain -.->|"g ∘ T"| scalars
+```
+
+This motivates the definition of the **dual map**:
+
+$$
+\boxed{ \begin{aligned}
+  T^\vee:W^*&\longrightarrow V^*,\\
+  g&\longmapsto g\circ T.
+\end{aligned} }
+$$
+
+Notice the reversal:
+
+$$
+T:V\to W, \qquad T^\vee:W^*\to V^*.
+$$
+
+Vectors are pushed forward by $T$; linear measurements are pulled backward by $T^\vee$.
+
+The dual map is linear. Indeed, for $g,h\in W^*$,
+
+$$
+\begin{aligned}
+  T^\vee(\alpha g+\beta h) &=(\alpha g+\beta h)\circ T\\
+  &=\alpha(g\circ T)+\beta(h\circ T)\\
+  &=\alpha T^\vee(g)+\beta T^\vee(h).
+\end{aligned}
+$$
+
+### Deriving the transpose matrix {#sec-module-b-session-3-deriving-the-transpose-matrix}
+
+Let
+
+$$
+T:\mathbb R^n\to\mathbb R^m
+$$
+
+be represented by $A\in\mathbb R^{m\times n}$.
+
+Write a functional $g\in(\mathbb R^m)^*$ as
+
+$$
+g(y)=c^Ty, \qquad c\in\mathbb R^m.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  T^\vee(g)(x) &=g(Ax)\\
+  &=c^TAx\\
+  &=(A^Tc)^Tx.
+\end{aligned}
+$$
+
+Thus the coefficient column of the pulled-back functional is $A^Tc$.
+
+We conclude:
+
+$$
+\boxed{ [T^\vee]=A^T }
+$$
+
+when the domain and codomain dual bases correspond to the bases used to represent $T$.
+
+This is the intrinsic meaning of the transpose.
+
+**The transpose is the matrix representation of the operation that pulls linear measurements backward through a linear transformation.**
+
+It is not originally a geometric operation involving perpendicular vectors.
+
+Those geometric interpretations arise only after introducing inner products.
+
+For complex vector spaces, the algebraic dual map is still represented by the ordinary transpose $A^T$, without complex conjugation.
+
+The conjugate transpose $A^H$ belongs to the later theory of Hilbert-space adjoints.
+
+### A concrete example {#sec-module-b-session-3-a-concrete-example}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  1&2\\
+  0&1
+\end{pmatrix}.
+$$
+
+It represents
+
+$$
+T(x_1,x_2)=(x_1+2x_2,x_2).
+$$
+
+Suppose we want to measure the first output coordinate:
+
+$$
+g(y_1,y_2)=y_1.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  T^\vee(g)(x_1,x_2) &=g(T(x_1,x_2))\\
+  &=x_1+2x_2.
+\end{aligned}
+$$
+
+So the output measurement $y_1$ is equivalent to the input measurement $x_1+2x_2$.
+
+Let's verify using the transpose.
+
+The coefficient column of $g$ is
+
+$$
+c=\begin{pmatrix}
+  1\\
+  0
+\end{pmatrix}.
+$$
+
+Then
+
+$$
+A^Tc= \begin{pmatrix}
+  1&0\\
+  2&1
+\end{pmatrix} \begin{pmatrix}
+  1\\
+  0
+\end{pmatrix} = \begin{pmatrix}
+  1\\
+  2
+\end{pmatrix}.
+$$
+
+The result represents precisely
+
+$$
+x\longmapsto x_1+2x_2.
+$$
+
+The transpose rule is therefore a consequence of composition, not an independent formula to memorize.
+
+### The dual map of our running matrix {#sec-module-b-session-3-the-dual-map-of-our-running-matrix}
+
+Recall from Module A:
+
+$$
+A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix} :\mathbb R^4\to\mathbb R^3.
+$$
+
+Its algebraic dual map is
+
+$$
+A^\vee:(\mathbb R^3)^*\to(\mathbb R^4)^*.
+$$
+
+In standard dual bases, it is represented by
+
+$$
+A^T= \begin{pmatrix}
+  1&2&3\\
+  2&4&6\\
+  -1&1&0\\
+  3&9&12
+\end{pmatrix}.
+$$
+
+Take the output functional
+
+$$
+g(y_1,y_2,y_3)=y_1-2y_2+y_3.
+$$
+
+Its coefficient column is
+
+$$
+c=(1,-2,1)^T.
+$$
+
+The pulled-back functional has coefficients
+
+$$
+A^Tc= \begin{pmatrix}
+  0\\
+  0\\
+  -3\\
+  -3
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\boxed{ A^\vee(g)(x_1,x_2,x_3,x_4) =-3x_3-3x_4. }
+$$
+
+We can also verify this directly.
+
+Since
+
+$$
+Ax= \begin{pmatrix}
+  x_1+2x_2-x_3+3x_4\\
+  2x_1+4x_2+x_3+9x_4\\
+  3x_1+6x_2+12x_4
+\end{pmatrix},
+$$
+
+substituting into $g$ gives exactly $-3x_3-3x_4$.
+
+The dual map converts measurements of outputs into equivalent measurements of inputs.
+
+### Composition reverses order {#sec-module-b-session-3-composition-reverses-order}
+
+Suppose
+
+$$
+V\xrightarrow{T}W\xrightarrow{S}Z.
+$$
+
+Their composition is
+
+$$
+S\circ T:V\to Z.
+$$
+
+What is its dual map?
+
+For $h\in Z^*$,
+
+$$
+\begin{aligned}
+  (S\circ T)^\vee(h) &=h\circ(S\circ T)\\
+  &=(h\circ S)\circ T\\
+  &=T^\vee(S^\vee(h)).
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{ (S\circ T)^\vee=T^\vee\circ S^\vee. }
+$$
+
+The order of composition is reversed.
+
+In coordinates, if $T$ has matrix $A$ and $S$ has matrix $B$, this becomes
+
+$$
+\boxed{(BA)^T=A^TB^T.}
+$$
+
+So the familiar transpose identity is an expression of a more fundamental structural principle.
+
+#### Categorical interpretation {#module-b-session-3-composition-reverses-order-categorical-interpretation}
+
+The assignment
+
+$$
+V\longmapsto V^*, \qquad T\longmapsto T^\vee
+$$
+
+is a **contravariant functor**.
+
+For now, that terminology means that taking duals preserves identity maps but reverses the order of composition:
+
+$$
+(\operatorname{id}_V)^\vee = \operatorname{id}_{V^*},
+$$
+
+$$
+(S\circ T)^\vee=T^\vee\circ S^\vee.
+$$
+
+This is our first substantial encounter with a functorial construction.
+
+It is particularly useful because the same pattern appears in other settings, including pullbacks of functions, differential forms, and mappings of geometric and algebraic structures.
+
+### Checkpoint 3 {#module-b-checkpoint-3 .unnumbered .unlisted}
+
+Derive
+
+$$
+(BA)^T=A^TB^T
+$$
+
+by considering the dual map of a composition, rather than by calculating individual matrix entries.
+
+Then explain why this works over $\mathbb C$ without complex conjugation.
+
+## Session 4 — Annihilators and the four fundamental subspaces {#sec-module-b-session-4}
+
+Module A introduced kernels and images.
+
+Duality allows us to study those spaces through the functionals that vanish on them.
+
+This leads to the notion of an annihilator.
+
+### The annihilator of a subspace {#sec-module-b-session-4-the-annihilator-of-a-subspace}
+
+Let $S\subseteq V$ be a subspace.
+
+Define
+
+$$
+\boxed{ S^0= \{f\in V^*:f(s)=0\text{ for every }s\in S\}. }
+$$
+
+This is called the **annihilator** of $S$.
+
+It is a subspace of $V^*$.
+
+The annihilator contains all linear measurements that are insensitive to every vector in $S$.
+
+#### Example {#module-b-session-4-the-annihilator-of-a-subspace-example}
+
+Let
+
+$$
+S=\operatorname{span}\{(1,1,0)\} \subseteq\mathbb R^3.
+$$
+
+An arbitrary functional has the form
+
+$$
+f(x_1,x_2,x_3)=ax_1+bx_2+cx_3.
+$$
+
+For $f$ to annihilate $S$, it must satisfy
+
+$$
+f(1,1,0)=a+b=0.
+$$
+
+Therefore,
+
+$$
+b=-a.
+$$
+
+Every functional in the annihilator has the form
+
+$$
+f(x)=a(x_1-x_2)+cx_3.
+$$
+
+Thus
+
+$$
+\boxed{ S^0=\operatorname{span}\{\varepsilon^1-\varepsilon^2,\ \varepsilon^3\}, }
+$$
+
+where the $\varepsilon^i$ are the standard coordinate functionals.
+
+Notice that $S^0$ is a space of functionals, not a subspace of ordinary vectors unless we deliberately identify functionals with coordinate arrays.
+
+### The dimension of an annihilator {#sec-module-b-session-4-the-dimension-of-an-annihilator}
+
+**Theorem.** If $V$ is finite-dimensional and $S\subseteq V$, then
+
+$$
+\boxed{\dim S^0=\dim V-\dim S.}
+$$
+
+#### Proof {#module-b-session-4-the-dimension-of-an-annihilator-proof}
+
+Suppose $\dim V=n$ and $\dim S=k$.
+
+Choose a basis
+
+$$
+(s_1,\ldots,s_k)
+$$
+
+of $S$ and extend it to a basis
+
+$$
+(s_1,\ldots,s_k,u_1,\ldots,u_{n-k})
+$$
+
+of $V$.
+
+Let
+
+$$
+(\varepsilon^1,\ldots,\varepsilon^n)
+$$
+
+be the corresponding dual basis.
+
+Any functional $f\in V^*$ can be written uniquely as
+
+$$
+f=\sum_{i=1}^n a_i\varepsilon^i.
+$$
+
+It annihilates $S$ precisely when
+
+$$
+f(s_j)=0
+$$
+
+for $j=1,\ldots,k$.
+
+But
+
+$$
+f(s_j)=a_j.
+$$
+
+Therefore the first $k$ coefficients must vanish.
+
+Hence
+
+$$
+S^0= \operatorname{span}\{\varepsilon^{k+1},\ldots,\varepsilon^n\},
+$$
+
+so
+
+$$
+\dim S^0=n-k.
+$$
+
+This is a dual counterpart of the quotient dimension formula.
+
+### Fundamental properties of annihilators {#sec-module-b-session-4-fundamental-properties-of-annihilators}
+
+The annihilator reverses inclusion.
+
+If
+
+$$
+S\subseteq U,
+$$
+
+then every functional annihilating $U$ also annihilates $S$.
+
+Thus
+
+$$
+\boxed{U^0\subseteq S^0.}
+$$
+
+This is an example of **order reversal**.
+
+We also have
+
+$$
+\boxed{ (S+U)^0=S^0\cap U^0. }
+$$
+
+Indeed, a functional vanishes on every sum $s+u$ precisely when it vanishes on both subspaces.
+
+Another useful identity in finite dimensions is
+
+$$
+\boxed{ (S\cap U)^0=S^0+U^0. }
+$$
+
+One way to prove it is to apply the first identity, together with the finite-dimensional double-annihilator theorem developed in Session 6. It can also be proved by a dimension argument.
+
+These relationships mirror the behavior of sums and intersections, but in the reverse direction.
+
+The annihilator turns a sum into an intersection and an intersection into a sum.
+
+### First fundamental theorem of duality {#sec-module-b-session-4-first-fundamental-theorem-of-duality}
+
+Let
+
+$$
+T:V\to W
+$$
+
+be linear.
+
+Then
+
+$$
+\boxed{ \operatorname{im}T^\vee=(\ker T)^0 }
+$$
+
+for finite-dimensional vector spaces.
+
+In words:
+
+**The image of the dual map consists precisely of the linear functionals on $V$ that vanish on the kernel of $T$.**
+
+Let's prove this carefully.
+
+#### Inclusion 1 {#module-b-session-4-first-fundamental-theorem-of-duality-inclusion-1}
+
+Suppose
+
+$$
+f\in\operatorname{im}T^\vee.
+$$
+
+Then $f=T^\vee(g)$ for some $g\in W^*$.
+
+Thus
+
+$$
+f=g\circ T.
+$$
+
+If $v\in\ker T$, then
+
+$$
+f(v)=g(Tv)=g(0)=0.
+$$
+
+Therefore,
+
+$$
+f\in(\ker T)^0.
+$$
+
+We have shown
+
+$$
+\operatorname{im}T^\vee\subseteq(\ker T)^0.
+$$
+
+#### Inclusion 2 {#module-b-session-4-first-fundamental-theorem-of-duality-inclusion-2}
+
+Now let
+
+$$
+f\in(\ker T)^0.
+$$
+
+We want to express $f$ as $g\circ T$ for some $g\in W^*$.
+
+First define a functional
+
+$$
+g_0:\operatorname{im}T\to\mathbb F
+$$
+
+by
+
+$$
+\boxed{g_0(Tv)=f(v).}
+$$
+
+We must show this is well-defined.
+
+If $Tv=Tw$, then
+
+$$
+v-w\in\ker T.
+$$
+
+Since $f$ vanishes on $\ker T$,
+
+$$
+f(v-w)=0,
+$$
+
+so $f(v)=f(w)$.
+
+Thus $g_0$ is independent of the chosen preimage.
+
+It is also linear.
+
+Now extend $g_0$ to a functional $g\in W^*$.
+
+In finite dimensions, this is always possible: extend a basis of $\operatorname{im}T$ to a basis of $W$, and assign arbitrary values to the additional basis vectors.
+
+For every $v\in V$,
+
+$$
+g(Tv)=g_0(Tv)=f(v).
+$$
+
+Therefore,
+
+$$
+f=g\circ T=T^\vee(g).
+$$
+
+Hence
+
+$$
+(\ker T)^0\subseteq\operatorname{im}T^\vee.
+$$
+
+Combining both inclusions,
+
+$$
+\boxed{\operatorname{im}T^\vee=(\ker T)^0.}
+$$
+
+#### What does the theorem mean? {#module-b-session-4-first-fundamental-theorem-of-duality-what-does-the-theorem-mean}
+
+Suppose $T$ loses some information about its input.
+
+A functional $f$ can be reconstructed from the output $Tv$ only if it does not depend on the information that $T$ loses.
+
+That is, $f$ must vanish on $\ker T$.
+
+The theorem says this condition is also sufficient.
+
+Every input measurement that ignores the kernel can be performed entirely on the output.
+
+This is a dual version of the first isomorphism theorem.
+
+### Second fundamental theorem of duality {#sec-module-b-session-4-second-fundamental-theorem-of-duality}
+
+We also have
+
+$$
+\boxed{ \ker T^\vee=(\operatorname{im}T)^0. }
+$$
+
+This one follows immediately from the definitions.
+
+Let $g\in W^*$.
+
+Then
+
+$$
+\begin{aligned}
+  g\in\ker T^\vee &\iff T^\vee(g)=0\\
+  &\iff g(Tv)=0\quad\forall v\in V\\
+  &\iff g(w)=0\quad\forall w\in\operatorname{im}T\\
+  &\iff g\in(\operatorname{im}T)^0.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^\vee&=(\ker T)^0,\\
+  \ker T^\vee&=(\operatorname{im}T)^0.
+\end{aligned} }
+$$
+
+These identities reveal a symmetry between kernels and images under duality.
+
+### The four fundamental subspaces without inner products {#sec-module-b-session-4-the-four-fundamental-subspaces-without-inner-products}
+
+We can now reconstruct the four fundamental subspaces in a purely algebraic way.
+
+For a matrix
+
+$$
+A:\mathbb R^n\to\mathbb R^m,
+$$
+
+we have the original kernel and image:
+
+$$
+\ker A\subseteq\mathbb R^n, \qquad \operatorname{im}A\subseteq\mathbb R^m.
+$$
+
+The dual transformation has
+
+$$
+\ker A^\vee\subseteq(\mathbb R^m)^*, \qquad \operatorname{im}A^\vee\subseteq(\mathbb R^n)^*.
+$$
+
+Under standard dual-coordinate representations, these last two spaces are represented by the null space and image of $A^T$.
+
+This produces the familiar four subspaces.
+
+| Subspace                      | Algebraic meaning                                         | Dimension when $\operatorname{rank}A=r$ |
+| ----------------------------- | --------------------------------------------------------- | ------------------------------------------- |
+| $\ker A$                  | Invisible input directions                                | $n-r$                                   |
+| $\operatorname{im}A$      | Attainable outputs                                        | $r$                                     |
+| $\operatorname{im}A^\vee$ | Measurements ignoring $\ker A$                        | $r$                                     |
+| $\ker A^\vee$             | Output measurements vanishing on $\operatorname{im}A$ | $m-r$                                   |
+
+The usual *row space* is the coordinate representation of $\operatorname{im}A^\vee$, and the *left null space* is the coordinate representation of $\ker A^\vee$.
+
+The equalities above require no inner product.
+
+### Worked example using our running matrix {#sec-module-b-session-4-worked-example-using-our-running-matrix}
+
+Recall
+
+$$
+A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix}.
+$$
+
+Its kernel is
+
+$$
+K=\operatorname{span}\{(-2,1,0,0),(-4,0,-1,1)\}.
+$$
+
+What is its annihilator $K^0$?
+
+An arbitrary functional on $\mathbb R^4$ has the form
+
+$$
+f(x)=c_1x_1+c_2x_2+c_3x_3+c_4x_4.
+$$
+
+To annihilate the first kernel basis vector, it must satisfy
+
+$$
+-2c_1+c_2=0.
+$$
+
+To annihilate the second, it must satisfy
+
+$$
+-4c_1-c_3+c_4=0.
+$$
+
+Therefore,
+
+$$
+c_2=2c_1,\qquad c_4=4c_1+c_3.
+$$
+
+Every coefficient column has the form
+
+$$
+c= c_1\begin{pmatrix}
+  1\\
+  2\\
+  0\\
+  4
+\end{pmatrix} + c_3\begin{pmatrix}
+  0\\
+  0\\
+  1\\
+  1
+\end{pmatrix}.
+$$
+
+Thus, in coefficient coordinates,
+
+$$
+\boxed{ K^0= \operatorname{span} \left\{ \begin{pmatrix}
+  1\\
+  2\\
+  0\\
+  4
+\end{pmatrix}, \begin{pmatrix}
+  0\\
+  0\\
+  1\\
+  1
+\end{pmatrix} \right\}. }
+$$
+
+These are the nonzero rows of the RREF, expressed as coefficient columns.
+
+They span the row space of $A$.
+
+Therefore, we have verified concretely that
+
+$$
+\operatorname{im}A^\vee=(\ker A)^0.
+$$
+
+Now consider the image of $A$.
+
+Every output satisfies
+
+$$
+y_3=y_1+y_2.
+$$
+
+Thus the functional
+
+$$
+g(y_1,y_2,y_3)=y_3-y_1-y_2
+$$
+
+vanishes on $\operatorname{im}A$.
+
+Its coefficient column is
+
+$$
+(-1,-1,1)^T.
+$$
+
+Since the image is two-dimensional, its annihilator has dimension one. Hence
+
+$$
+\boxed{ (\operatorname{im}A)^0 = \operatorname{span}\{(-1,-1,1)\}. }
+$$
+
+This is precisely the kernel of the transpose matrix $A^T$, in standard dual coordinates.
+
+We have recovered all four fundamental subspaces from the two annihilator identities.
+
+### A useful rank consequence {#sec-module-b-session-4-a-useful-rank-consequence}
+
+Apply rank–nullity to the dual map
+
+$$
+T^\vee:W^*\to V^*.
+$$
+
+Since
+
+$$
+\ker T^\vee=(\operatorname{im}T)^0,
+$$
+
+we have
+
+$$
+\dim\ker T^\vee = \dim W-\dim\operatorname{im}T.
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
+  \operatorname{rank}T^\vee &=\dim W^*-\dim\ker T^\vee\\
+  &=\dim W-(\dim W-\operatorname{rank}T)\\
+  &=\operatorname{rank}T.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{\operatorname{rank}T^\vee=\operatorname{rank}T.}
+$$
+
+For matrices, this becomes the familiar theorem
+
+$$
+\boxed{\operatorname{rank}A^T=\operatorname{rank}A.}
+$$
+
+The equality of row rank and column rank is therefore another manifestation of algebraic duality.
+
+### Checkpoint 4 {#module-b-checkpoint-4 .unnumbered .unlisted}
+
+Prove directly that
+
+$$
+(S+U)^0=S^0\cap U^0.
+$$
+
+Then explain why the two identities
+
+$$
+\operatorname{im}T^\vee=(\ker T)^0, \qquad \ker T^\vee=(\operatorname{im}T)^0
+$$
+
+are dual statements about what a transformation forgets and what it can reach.
+
+## Session 5 — Quotient duality and exact sequences {#sec-module-b-session-5}
+
+Module A established that quotient spaces identify vectors differing by elements of a given subspace.
+
+Now we can ask a natural question:
+
+**Which linear measurements remain meaningful after making those identifications?**
+
+The answer leads to quotient duality.
+
+### A functional on a quotient {#sec-module-b-session-5-a-functional-on-a-quotient}
+
+Let $S\subseteq V$, and let
+
+$$
+q:V\to V/S
+$$
+
+be the quotient map.
+
+Suppose
+
+$$
+\ell:V/S\to\mathbb F
+$$
+
+is a linear functional on the quotient.
+
+Composing with $q$, we obtain a functional on $V$:
+
+$$
+f=\ell\circ q.
+$$
+
+For every $s\in S$,
+
+$$
+f(s)=\ell(q(s))=\ell(S)=0.
+$$
+
+Thus
+
+$$
+f\in S^0.
+$$
+
+So every measurement on the quotient corresponds to a measurement on $V$ that annihilates $S$.
+
+Is the converse true?
+
+Yes.
+
+### The quotient duality theorem {#sec-module-b-session-5-the-quotient-duality-theorem}
+
+**Theorem.** If $S\subseteq V$, then
+
+$$
+\boxed{(V/S)^*\cong S^0.}
+$$
+
+The isomorphism is given by
+
+$$
+\boxed{ q^\vee(\ell)=\ell\circ q. }
+$$
+
+#### Proof {#module-b-session-5-the-quotient-duality-theorem-proof}
+
+First, we know that $\ell\circ q$ annihilates $S$, so the map takes values in $S^0$.
+
+It is linear.
+
+To prove injectivity, suppose
+
+$$
+\ell\circ q=0.
+$$
+
+Because $q$ is surjective, every element of $V/S$ equals $q(v)$ for some $v$.
+
+Therefore,
+
+$$
+\ell(q(v))=0
+$$
+
+for every coset, implying $\ell=0$.
+
+To prove surjectivity onto $S^0$, take any $f\in S^0$.
+
+Define
+
+$$
+\ell(v+S)=f(v).
+$$
+
+This is well-defined: if $v-w\in S$, then $f(v-w)=0$, so $f(v)=f(w)$.
+
+The map $\ell$ is linear and satisfies
+
+$$
+q^\vee(\ell)=f.
+$$
+
+Hence $q^\vee$ is an isomorphism onto $S^0$.
+
+### Geometric meaning of quotient duality {#sec-module-b-session-5-geometric-meaning-of-quotient-duality}
+
+Recall the example
+
+$$
+V=\mathbb R^2, \qquad S=\operatorname{span}\{(1,0)\}.
+$$
+
+The quotient $V/S$ consists of horizontal lines.
+
+A functional on this quotient must assign the same scalar to all points on a given horizontal line.
+
+Therefore, when expressed as a functional on $\mathbb R^2$, it cannot depend on the horizontal coordinate.
+
+It must have the form
+
+$$
+f(x,y)=cy
+$$
+
+for some scalar $c$.
+
+But these are precisely the functionals annihilating $S$.
+
+Thus
+
+$$
+(\mathbb R^2/S)^*\cong S^0.
+$$
+
+This illustrates the general principle:
+
+**Measurements on a quotient space are exactly the measurements on the original space that ignore the subspace being collapsed.**
+
+### Example in three dimensions {#sec-module-b-session-5-example-in-three-dimensions}
+
+Let
+
+$$
+S=\operatorname{span}\{(1,1,1)\} \subseteq\mathbb R^3.
+$$
+
+Then
+
+$$
+\dim(\mathbb R^3/S)=2.
+$$
+
+A functional
+
+$$
+f(x,y,z)=ax+by+cz
+$$
+
+annihilates $S$ precisely when
+
+$$
+a+b+c=0.
+$$
+
+Therefore $S^0$ has dimension two.
+
+One basis is given by the functionals
+
+$$
+f_1(x,y,z)=x-y,
+$$
+
+$$
+f_2(x,y,z)=x-z.
+$$
+
+They induce well-defined functionals on the quotient:
+
+$$
+\overline f_1((x,y,z)+S)=x-y,
+$$
+
+$$
+\overline f_2((x,y,z)+S)=x-z.
+$$
+
+Adding the same constant to $x,y,z$ changes neither difference.
+
+Thus these are genuine measurements of equivalence classes rather than of particular representatives.
+
+### Duality and subspaces {#sec-module-b-session-5-duality-and-subspaces}
+
+Now consider the inclusion map
+
+$$
+i:S\hookrightarrow V.
+$$
+
+Its dual is
+
+$$
+i^\vee:V^*\to S^*.
+$$
+
+What does $i^\vee$ do?
+
+It takes a functional on $V$ and restricts it to $S$:
+
+$$
+\boxed{i^\vee(f)=f|_S.}
+$$
+
+What is its kernel?
+
+A functional restricts to zero on $S$ precisely when it annihilates $S$.
+
+Thus
+
+$$
+\boxed{\ker i^\vee=S^0.}
+$$
+
+In finite dimensions, $i^\vee$ is surjective.
+
+Indeed, every functional on $S$ can be extended to a functional on $V$ by extending a basis of $S$ to one of $V$.
+
+Applying the first isomorphism theorem gives
+
+$$
+\boxed{ V^*/S^0\cong S^*. }
+$$
+
+Compare the two identities:
+
+$$
+\boxed{ \begin{aligned}
+  (V/S)^*&\cong S^0,\\
+  V^*/S^0&\cong S^*.
+\end{aligned} }
+$$
+
+These express complementary aspects of duality.
+
+The first says that the dual of a quotient consists of functionals vanishing on the collapsed subspace.
+
+The second says that functionals on a subspace arise by restricting functionals on the ambient space, with ambiguity measured by the annihilator.
+
+### Exact sequences under duality {#sec-module-b-session-5-exact-sequences-under-duality}
+
+Recall the canonical short exact sequence
+
+$$
+\boxed{ 0\longrightarrow S \xrightarrow{i}V \xrightarrow{q}V/S \longrightarrow0. }
+$$
+
+Taking algebraic duals reverses the arrows:
+
+$$
+\boxed{ 0\longrightarrow(V/S)^* \xrightarrow{q^\vee}V^* \xrightarrow{i^\vee}S^* \longrightarrow0. }
+$$
+
+Let's verify exactness.
+
+Since $q$ is surjective, $q^\vee$ is injective.
+
+We know that
+
+$$
+\operatorname{im}q^\vee=S^0.
+$$
+
+We also know that
+
+$$
+\ker i^\vee=S^0.
+$$
+
+Hence
+
+$$
+\operatorname{im}q^\vee=\ker i^\vee.
+$$
+
+Finally, $i^\vee$ is surjective because every functional on $S$ extends to $V$.
+
+Thus the dual sequence is exact.
+
+This gives an important theorem:
+
+**For finite-dimensional vector spaces, taking duals sends a short exact sequence to another short exact sequence, with arrows reversed.**
+
+This is one of the simplest examples of how a contravariant functor interacts with algebraic structure.
+
+The statement also holds for algebraic duals of arbitrary vector spaces with the usual basis-extension principle. For continuous duals of infinite-dimensional topological vector spaces, additional hypotheses matter.
+
+### Duality and the first isomorphism theorem {#sec-module-b-session-5-duality-and-the-first-isomorphism-theorem}
+
+Recall the factorization
+
+$$
+V\longrightarrow V/\ker T \xrightarrow{\cong}\operatorname{im}T \longrightarrow W.
+$$
+
+Taking duals reverses the direction.
+
+An output functional first restricts to the image, is transferred across the isomorphism, and is then pulled back to the original domain.
+
+The kernel of the dual map consists of functionals that vanish on the entire image.
+
+Its image consists of functionals that vanish on the kernel.
+
+This is exactly what we proved in Session 4:
+
+$$
+\boxed{ \begin{aligned}
+  \ker T^\vee&=(\operatorname{im}T)^0,\\
+  \operatorname{im}T^\vee&=(\ker T)^0.
+\end{aligned} }
+$$
+
+Thus the first isomorphism theorem, annihilators, quotient duality, and exact sequences are not unrelated results.
+
+They express the same structure from different directions.
+
+### Checkpoint 5 {#module-b-checkpoint-5 .unnumbered .unlisted}
+
+Let $S\subseteq V$.
+
+Prove that the dual of the quotient map
+
+$$
+q^\vee:(V/S)^*\to V^*
+$$
+
+is injective.
+
+Then prove that the dual of the inclusion
+
+$$
+i^\vee:V^*\to S^*
+$$
+
+is surjective in finite dimensions.
+
+Explain why their image and kernel fit together into an exact sequence.
+
+## Session 6 — Double duals and the universal structure of duality {#sec-module-b-session-6}
+
+We now examine a subtle question that clarifies why dual spaces are genuinely different from the original spaces.
+
+In finite dimensions,
+
+$$
+\dim V=\dim V^*.
+$$
+
+So $V$ and $V^*$ are isomorphic.
+
+But is there a natural, basis-independent isomorphism between them?
+
+In general, no.
+
+Remarkably, there *is* a canonical isomorphism between $V$ and its **double dual** $V^{**}$.
+
+Understanding this distinction is fundamental to the structural viewpoint we're developing.
+
+### What is the double dual? {#sec-module-b-session-6-what-is-the-double-dual}
+
+The dual space $V^*$ is itself a vector space.
+
+We can therefore form its dual:
+
+$$
+\boxed{ V^{**}=(V^*)^*. }
+$$
+
+An element of $V^{**}$ is a linear functional acting on elements of $V^*$.
+
+So there are three levels:
+
+$$
+\begin{aligned}
+  v&\in V &&\text{a vector},\\
+  f&\in V^* &&\text{a measurement of vectors},\\
+  F&\in V^{**} &&\text{a measurement of functionals}.
+\end{aligned}
+$$
+
+At first, this may seem like an unnecessary proliferation of objects.
+
+But there is a very natural way for a vector $v$ to define a functional on $V^*$.
+
+### Every vector defines an evaluation functional {#sec-module-b-session-6-every-vector-defines-an-evaluation-functional}
+
+Fix $v\in V$.
+
+Define
+
+$$
+J_V(v):V^*\to\mathbb F
+$$
+
+by
+
+$$
+\boxed{ J_V(v)(f)=f(v). }
+$$
+
+In words, $J_V(v)$ takes a functional $f$ and asks for its value at the vector $v$.
+
+It is linear in $f$:
+
+$$
+\begin{aligned}
+  J_V(v)(\alpha f+\beta g) &=(\alpha f+\beta g)(v)\\
+  &=\alpha f(v)+\beta g(v).
+\end{aligned}
+$$
+
+Thus $J_V(v)\in V^{**}$.
+
+We have constructed a map
+
+$$
+\boxed{ J_V:V\to V^{**}, \qquad v\longmapsto J_V(v). }
+$$
+
+This map is called the **canonical evaluation map**.
+
+It requires no basis and no inner product.
+
+### The double-dual theorem {#sec-module-b-session-6-the-double-dual-theorem}
+
+**Theorem.** If $V$ is finite-dimensional, then
+
+$$
+\boxed{J_V:V\to V^{**}}
+$$
+
+is a linear isomorphism.
+
+#### Proof {#module-b-session-6-the-double-dual-theorem-proof}
+
+First, $J_V$ is linear:
+
+$$
+\begin{aligned}
+  J_V(\alpha v+\beta w)(f) &=f(\alpha v+\beta w)\\
+  &=\alpha f(v)+\beta f(w)\\
+  &=(\alpha J_V(v)+\beta J_V(w))(f).
+\end{aligned}
+$$
+
+Next, we prove injectivity.
+
+Suppose
+
+$$
+J_V(v)=0.
+$$
+
+Then
+
+$$
+f(v)=0
+$$
+
+for every $f\in V^*$.
+
+But we proved in Session 1 that linear functionals distinguish vectors.
+
+Therefore $v=0$.
+
+Hence $J_V$ is injective.
+
+Finally, since $V$ is finite-dimensional,
+
+$$
+\dim V^{**}=\dim V^*=\dim V.
+$$
+
+An injective linear map between spaces of the same finite dimension is surjective.
+
+Therefore $J_V$ is an isomorphism.
+
+### Why is $V\cong V^{**}$ different from $V\cong V^*$? {#sec-module-b-session-6-why-is-different-from}
+
+The distinction is **canonicity**.
+
+A basis provides an isomorphism $V\cong V^*$ by matching the original basis with its dual basis.
+
+But a different basis generally produces a different identification.
+
+An inner product also gives an identification between $V$ and $V^*$, but that depends on the chosen inner product.
+
+By contrast,
+
+$$
+J_V(v)(f)=f(v)
+$$
+
+is determined entirely by the evaluation operation.
+
+No choices are involved.
+
+This is why $V\to V^{**}$ is called canonical.
+
+It is an example of a *natural* construction.
+
+### Naturality of the double-dual identification {#sec-module-b-session-6-naturality-of-the-double-dual-identification}
+
+Let
+
+$$
+T:V\to W
+$$
+
+be linear.
+
+Taking duals twice produces
+
+$$
+T^{\vee\vee}:V^{**}\to W^{**}.
+$$
+
+The commutativity of @fig-module-b-double-dual is the identity
+
+$$
+\boxed{J_W\circ T=T^{\vee\vee}\circ J_V.}
+$$
+
+```{mermaid}
+%%| label: fig-module-b-double-dual
+%%| fig-cap: "The two paths from V to W∗∗ agree. The evaluation maps J_V and J_W give the same result whether applied before or after transporting the vector."
+%%| fig-alt: "A commuting diagram has one route from V to W via T and then from W to its double dual via J sub W. The other route starts with J sub V and then applies the double dual of T."
+flowchart LR
+  domain["V"] -->|"T"| target["W"]
+  domain -->|"J_V"| domainDual["V∗∗"]
+  target -->|"J_W"| targetDual["W∗∗"]
+  domainDual -->|"T∨∨"| targetDual
+```
+
+Let's verify this.
+
+Take $v\in V$ and $g\in W^*$.
+
+Evaluating the left side gives
+
+$$
+J_W(Tv)(g)=g(Tv).
+$$
+
+For the right side,
+
+$$
+\begin{aligned}
+  (T^{\vee\vee}(J_V(v)))(g) &=J_V(v)(T^\vee g)\\
+  &=(T^\vee g)(v)\\
+  &=g(Tv).
+\end{aligned}
+$$
+
+Both expressions agree for every $g$, hence
+
+$$
+J_W(Tv)=T^{\vee\vee}(J_V(v)).
+$$
+
+This is a concrete example of a **natural isomorphism**.
+
+It says that the identification of a vector with its double-dual evaluation functional is compatible with every linear transformation.
+
+This compatibility is stronger than merely knowing that two spaces happen to have equal dimensions.
+
+### Double annihilators {#sec-module-b-session-6-double-annihilators}
+
+Recall that for $S\subseteq V$,
+
+$$
+S^0\subseteq V^*.
+$$
+
+We can form its annihilator again:
+
+$$
+S^{00}=(S^0)^0\subseteq V^{**}.
+$$
+
+Every $s\in S$ determines an element $J_V(s)\in V^{**}$.
+
+If $f\in S^0$, then $f(s)=0$.
+
+Therefore
+
+$$
+J_V(s)(f)=0
+$$
+
+for every $f\in S^0$, so
+
+$$
+J_V(S)\subseteq S^{00}.
+$$
+
+In finite dimensions,
+
+$$
+\dim S^{00} = \dim V^*-\dim S^0.
+$$
+
+Since
+
+$$
+\dim S^0=\dim V-\dim S,
+$$
+
+we obtain
+
+$$
+\dim S^{00}=\dim S.
+$$
+
+The inclusion is therefore an equality:
+
+$$
+\boxed{ J_V(S)=S^{00}. }
+$$
+
+After identifying $V$ canonically with $V^{**}$, this is commonly written
+
+$$
+\boxed{S^{00}=S.}
+$$
+
+This is the **double-annihilator theorem**.
+
+It says that a subspace can be recovered from all the functionals that vanish on it.
+
+This mirrors the nondegeneracy of the evaluation pairing.
+
+### Duality reverses sums and intersections {#sec-module-b-session-6-duality-reverses-sums-and-intersections}
+
+We already proved that
+
+$$
+(S+U)^0=S^0\cap U^0.
+$$
+
+We can now establish the companion identity:
+
+$$
+\boxed{ (S\cap U)^0=S^0+U^0. }
+$$
+
+Here is a short structural proof using double annihilators.
+
+Apply the first identity inside $V^*$:
+
+$$
+(S^0+U^0)^0=S^{00}\cap U^{00}.
+$$
+
+Under the canonical identification with $V^{**}$, the right-hand side corresponds to $S\cap U$.
+
+Taking annihilators once more, and using the finite-dimensional double-annihilator theorem, gives
+
+$$
+S^0+U^0=(S\cap U)^0.
+$$
+
+Together,
+
+$$
+\boxed{ \begin{aligned}
+  (S+U)^0&=S^0\cap U^0,\\
+  (S\cap U)^0&=S^0+U^0.
+\end{aligned} }
+$$
+
+This is a duality between the subspace lattice operations of sum and intersection.
+
+### Duality and invariant subspaces {#sec-module-b-session-6-duality-and-invariant-subspaces}
+
+Here is a connection to spectral theory that is especially relevant to your Numerical Linear Algebra course.
+
+Let
+
+$$
+T:V\to V
+$$
+
+be a linear operator and let $U\subseteq V$ be invariant:
+
+$$
+T(U)\subseteq U.
+$$
+
+Consider its annihilator $U^0\subseteq V^*$.
+
+**Claim:** $U^0$ is invariant under the dual operator $T^\vee$.
+
+#### Proof {#module-b-session-6-duality-and-invariant-subspaces-proof}
+
+Take $f\in U^0$.
+
+For every $u\in U$,
+
+$$
+(T^\vee f)(u)=f(Tu).
+$$
+
+Since $U$ is invariant,
+
+$$
+Tu\in U.
+$$
+
+And since $f$ annihilates $U$,
+
+$$
+f(Tu)=0.
+$$
+
+Therefore $T^\vee f$ also annihilates $U$.
+
+Hence
+
+$$
+\boxed{ T^\vee(U^0)\subseteq U^0. }
+$$
+
+This is a purely algebraic relationship between invariant subspaces of a transformation and its dual.
+
+When an inner product is introduced, it becomes a relationship involving invariant orthogonal complements and adjoints.
+
+For self-adjoint operators, this is particularly important because invariant subspaces and their orthogonal complements can be used to decompose the operator.
+
+### Invariant subspaces also define quotient operators {#sec-module-b-session-6-invariant-subspaces-also-define-quotient-operators}
+
+Suppose again that $T(U)\subseteq U$.
+
+We can define
+
+$$
+\overline T:V/U\to V/U
+$$
+
+by
+
+$$
+\boxed{ \overline T(v+U)=Tv+U. }
+$$
+
+Why is this well-defined?
+
+If $v-w\in U$, then
+
+$$
+T(v-w)\in U
+$$
+
+by invariance, so
+
+$$
+Tv+U=Tw+U.
+$$
+
+Thus $T$ induces a linear operator on the quotient.
+
+This is another important structural phenomenon:
+
+An invariant subspace permits us to study both the restriction
+
+$$
+T|_U:U\to U
+$$
+
+and the induced transformation
+
+$$
+\overline T:V/U\to V/U.
+$$
+
+In a basis adapted to $U$, the matrix of $T$ is block upper triangular:
+
+$$
+[T]= \begin{pmatrix}
+  B&C\\
+  0&D
+\end{pmatrix}.
+$$
+
+Here $B$ represents $T|_U$, while $D$ represents the induced quotient operator $\overline T$ in corresponding quotient coordinates.
+
+Thus invariant-subspace structure gives a systematic way to simplify linear operators.
+
+### Checkpoint 6 {#module-b-checkpoint-6 .unnumbered .unlisted}
+
+Explain why the canonical isomorphism $V\cong V^{**}$ does not require an inner product.
+
+Then prove that if $U$ is invariant under $T$, its annihilator $U^0$ is invariant under $T^\vee$.
+
+Finally, explain why $T$ induces a well-defined transformation on $V/U$.
+
+## Session 7 — Applications of duality {#sec-module-b-session-7}
+
+We now connect the abstract theory to mathematical computation.
+
+The key idea is to recognize that many scientific problems do not merely manipulate state vectors. They also involve linear measurements, constraints, weak equations, and residual functionals.
+
+Duality gives us a language for describing these objects before choosing an inner product or a particular coordinate representation.
+
+### Application I — Compatibility conditions for linear systems {#sec-module-b-session-7-application-i-compatibility-conditions-for-linear-systems}
+
+Consider a linear system
+
+$$
+Ax=b.
+$$
+
+We know from Module A that a solution exists precisely when
+
+$$
+b\in\operatorname{im}A.
+$$
+
+Duality provides another way to express this condition.
+
+Recall that
+
+$$
+\ker A^\vee=(\operatorname{im}A)^0.
+$$
+
+Thus a functional $g\in\ker A^\vee$ vanishes on every attainable output.
+
+If $b=Ax$, then
+
+$$
+g(b)=g(Ax)=0.
+$$
+
+Therefore, solvability requires
+
+$$
+g(b)=0
+$$
+
+for every $g\in\ker A^\vee$.
+
+In finite dimensions, this condition is also sufficient.
+
+Indeed, if $b\notin\operatorname{im}A$, we can extend a basis of $\operatorname{im}A$ by adding $b$, then construct a functional that vanishes on $\operatorname{im}A$ but takes the value $1$ on $b$.
+
+Consequently,
+
+$$
+\boxed{ Ax=b\text{ is solvable} \iff g(b)=0\quad\forall g\in\ker A^\vee. }
+$$
+
+This is an algebraic form of a solvability or compatibility condition.
+
+#### Running-matrix example {#module-b-session-7-application-i-compatibility-conditions-for-linear-systems-running-matrix-example}
+
+Recall
+
+$$
+A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix}.
+$$
+
+We found
+
+$$
+\ker A^\vee = \operatorname{span}\{g\},
+$$
+
+where
+
+$$
+g(b_1,b_2,b_3)=b_3-b_1-b_2.
+$$
+
+Thus
+
+$$
+Ax=b
+$$
+
+is solvable exactly when
+
+$$
+\boxed{b_3=b_1+b_2.}
+$$
+
+This condition can be understood in two equivalent ways.
+
+Computationally, it arises because the third row of $A$ is the sum of the first two rows.
+
+Structurally, it arises because the functional $g$ belongs to the kernel of the dual map and therefore annihilates all attainable outputs.
+
+The second interpretation generalizes beyond matrices.
+
+#### Connection to the Fredholm alternative {#module-b-session-7-application-i-compatibility-conditions-for-linear-systems-connection-to-the-fredholm-alternative}
+
+In functional analysis, related compatibility principles are associated with the **Fredholm alternative**.
+
+Under appropriate hypotheses on an operator $T$, solvability of $Tx=b$ can be characterized by orthogonality or annihilation conditions involving the kernel of an adjoint operator.
+
+Our finite-dimensional duality identity is the algebraic foundation of that phenomenon.
+
+In infinite-dimensional spaces, whether such conditions completely characterize solvability depends on the operator and the topology of its image. For example, bounded operators between Hilbert spaces may have nonclosed ranges.
+
+That distinction belongs to Module F1.
+
+### Application II — Graph gradients, edge measurements, and discrete divergence {#sec-module-b-session-7-application-ii-graph-gradients-edge-measurements-and-discrete-divergence}
+
+Let's revisit the path graph from Module A, shown in @fig-module-b-graph-gradient.
+
+```{mermaid}
+%%| label: fig-module-b-graph-gradient
+%%| fig-cap: "The edge orientation sets the sign of the potential differences used by D."
+%%| fig-alt: "A path of three vertices with potentials p one, p two, and p three. The first edge gives p two minus p one. The second gives p three minus p two."
+flowchart LR
+  v1(("p₁")) -->|"p₂ − p₁"| v2(("p₂"))
+  v2 -->|"p₃ − p₂"| v3(("p₃"))
+```
+
+Suppose a scalar potential $p_i$ is assigned to each vertex.
+
+Define the discrete gradient operator
+
+$$
+D= \begin{pmatrix}
+  -1&1&0\\
+  0&-1&1
+\end{pmatrix} :\mathbb R^3\to\mathbb R^2.
+$$
+
+Then
+
+$$
+Dp= \begin{pmatrix}
+  p_2-p_1\\
+  p_3-p_2
+\end{pmatrix}.
+$$
+
+The output consists of the potential differences along the edges.
+
+We already know that
+
+$$
+\ker D=\operatorname{span}\{(1,1,1)\}.
+$$
+
+Thus $D$ cannot detect constant shifts of the potential.
+
+#### What does the dual map do? {#module-b-session-7-application-ii-graph-gradients-edge-measurements-and-discrete-divergence-what-does-the-dual-map-do}
+
+Let $g$ be a linear functional on the edge-difference space:
+
+$$
+g(d_1,d_2)=c_1d_1+c_2d_2.
+$$
+
+The pulled-back functional is
+
+$$
+D^\vee(g)(p)=g(Dp).
+$$
+
+Expanding,
+
+$$
+\begin{aligned}
+  g(Dp) &=c_1(p_2-p_1)+c_2(p_3-p_2)\\
+  &=-c_1p_1+(c_1-c_2)p_2+c_2p_3.
+\end{aligned}
+$$
+
+Thus the coefficient column of the pulled-back functional is
+
+$$
+\boxed{ D^T \begin{pmatrix}
+  c_1\\
+  c_2
+\end{pmatrix} = \begin{pmatrix}
+  -c_1\\
+  c_1-c_2\\
+  c_2
+\end{pmatrix}. }
+$$
+
+Notice that the coefficients always sum to zero:
+
+$$
+-c_1+(c_1-c_2)+c_2=0.
+$$
+
+This is exactly what our annihilator theorem predicts.
+
+Because
+
+$$
+\ker D=\operatorname{span}\{\mathbf1\},
+$$
+
+we have
+
+$$
+\operatorname{im}D^\vee=(\ker D)^0.
+$$
+
+The annihilator of the constant-vector subspace consists of functionals whose coefficients sum to zero.
+
+Therefore every edge-based measurement, when pulled back to the vertices, is insensitive to a common constant shift.
+
+#### A concrete interpretation {#module-b-session-7-application-ii-graph-gradients-edge-measurements-and-discrete-divergence-a-concrete-interpretation}
+
+Take
+
+$$
+g(d_1,d_2)=d_1+d_2.
+$$
+
+Then
+
+$$
+g(Dp) =(p_2-p_1)+(p_3-p_2) =p_3-p_1.
+$$
+
+So the measurement of the sum of both edge differences becomes the measurement of the potential difference between the endpoints.
+
+Its coefficient column is
+
+$$
+D^T \begin{pmatrix}
+  1\\
+  1
+\end{pmatrix} = \begin{pmatrix}
+  -1\\
+  0\\
+  1
+\end{pmatrix}.
+$$
+
+This illustrates how transpose matrices arise naturally when measurements are transferred through discrete operators.
+
+#### Relation to divergence {#module-b-session-7-application-ii-graph-gradients-edge-measurements-and-discrete-divergence-relation-to-divergence}
+
+The operator $D$ measures potential differences as head minus tail on each oriented edge. If $c$ gives the flows in those orientations, $D^Tc$ gives net inflow at each vertex. With the convention that divergence measures net outflow, the discrete divergence is $-D^T$.
+
+This gradient–divergence relationship is an elementary example of a general duality between discrete differential operators.
+
+It appears in finite-element and finite-volume methods, graph Laplacians, electrical networks, and conservation laws.
+
+### Application III — Variational formulations and finite elements {#sec-module-b-session-7-application-iii-variational-formulations-and-finite-elements}
+
+This is one of the most important applications for your longer-term study of functional analysis and numerical PDEs.
+
+Suppose $V$ is a real vector space of admissible functions.
+
+Let
+
+$$
+a:V\times V\to\mathbb R
+$$
+
+be a bilinear form.
+
+For example,
+
+$$
+a(u,v)=\int_0^1 u'(x)v'(x)\,dx.
+$$
+
+Let
+
+$$
+F\in V^*
+$$
+
+be a linear functional, for example
+
+$$
+F(v)=\int_0^1 f(x)v(x)\,dx.
+$$
+
+We want to find $u\in V$ satisfying
+
+$$
+\boxed{ a(u,v)=F(v)\qquad\forall v\in V. }
+$$
+
+This is an abstract variational equation.
+
+#### Why dual spaces arise naturally {#module-b-session-7-application-iii-variational-formulations-and-finite-elements-why-dual-spaces-arise-naturally}
+
+For fixed $u$, the map
+
+$$
+v\longmapsto a(u,v)
+$$
+
+is a linear functional.
+
+Therefore it belongs to $V^*$.
+
+We can define a linear operator
+
+$$
+\boxed{ \mathcal A:V\to V^* }
+$$
+
+by
+
+$$
+(\mathcal Au)(v)=a(u,v).
+$$
+
+The variational problem becomes
+
+$$
+\boxed{\mathcal Au=F.}
+$$
+
+This is a linear equation, but notice that the operator maps a vector or function $u$ into a functional.
+
+Its codomain is the dual space.
+
+This is extremely common in functional analysis and numerical PDE theory.
+
+#### Example: the one-dimensional Poisson equation {#module-b-session-7-application-iii-variational-formulations-and-finite-elements-example-the-one-dimensional-poisson-equation}
+
+Consider
+
+$$
+-u''(x)=f(x), \qquad 0<x<1,
+$$
+
+with homogeneous Dirichlet boundary conditions
+
+$$
+u(0)=u(1)=0.
+$$
+
+Multiply the differential equation by a smooth test function $v$ with $v(0)=v(1)=0$, and integrate:
+
+$$
+-\int_0^1u''(x)v(x)\,dx = \int_0^1f(x)v(x)\,dx.
+$$
+
+Integration by parts gives
+
+$$
+\int_0^1u'(x)v'(x)\,dx = \int_0^1f(x)v(x)\,dx.
+$$
+
+This is the weak or variational form.
+
+Here,
+
+$$
+a(u,v)=\int_0^1u'v', \qquad F(v)=\int_0^1fv.
+$$
+
+The equation says that two linear functionals of $v$ are equal for every admissible test function.
+
+For a rigorous functional-analytic treatment, the natural setting is a Sobolev space such as $H_0^1(0,1)$, but understanding that space is not necessary for the present algebraic point.
+
+#### Finite-dimensional approximation {#module-b-session-7-application-iii-variational-formulations-and-finite-elements-finite-dimensional-approximation}
+
+Let
+
+$$
+V_h=\operatorname{span}\{\phi_1,\ldots,\phi_n\} \subseteq V
+$$
+
+be a finite-dimensional trial and test space.
+
+We seek
+
+$$
+u_h=\sum_{j=1}^n c_j\phi_j
+$$
+
+satisfying
+
+$$
+a(u_h,v_h)=F(v_h) \qquad\forall v_h\in V_h.
+$$
+
+It suffices to impose this condition on the basis functions:
+
+$$
+a(u_h,\phi_i)=F(\phi_i), \qquad i=1,\ldots,n.
+$$
+
+Substituting the expansion,
+
+$$
+\sum_{j=1}^n c_j a(\phi_j,\phi_i)=F(\phi_i).
+$$
+
+Define the stiffness matrix
+
+$$
+K_{ij}=a(\phi_j,\phi_i)
+$$
+
+and the load vector
+
+$$
+b_i=F(\phi_i).
+$$
+
+Then
+
+$$
+\boxed{Kc=b.}
+$$
+
+Thus a familiar numerical linear system emerges from an operator equation involving a dual space.
+
+#### Residuals as functionals {#module-b-session-7-application-iii-variational-formulations-and-finite-elements-residuals-as-functionals}
+
+Define the residual functional
+
+$$
+R_h=F-\mathcal A u_h.
+$$
+
+It belongs to $V^*$.
+
+The Galerkin condition is
+
+$$
+R_h(v_h)=0 \qquad\forall v_h\in V_h.
+$$
+
+Therefore,
+
+$$
+\boxed{R_h\in V_h^0.}
+$$
+
+This is an annihilator statement.
+
+It says that the residual functional vanishes on every direction belonging to the chosen finite-dimensional test space.
+
+Once inner products are introduced, related formulations can be expressed through geometric orthogonality.
+
+The dual-space formulation, however, already makes sense algebraically.
+
+#### Why this matters {#module-b-session-7-application-iii-variational-formulations-and-finite-elements-why-this-matters}
+
+This example connects several of our concepts:
+
+- A differential equation becomes an operator equation.
+- The operator may naturally map into a dual space.
+- A finite-dimensional test space determines which measurements are imposed.
+- The residual is a functional.
+- The Galerkin condition says that the residual belongs to an annihilator.
+- Choosing bases converts the variational problem into a matrix equation.
+
+This provides a direct bridge from Module B to functional analysis, finite-element methods, and numerical linear algebra.
+
+### Application IV — Dual bases and spectral decompositions {#sec-module-b-session-7-application-iv-dual-bases-and-spectral-decompositions}
+
+We now establish a particularly useful connection to numerical eigenvalue algorithms.
+
+Suppose $A:V\to V$ is diagonalizable and $V$ has dimension $n$.
+
+Let
+
+$$
+(v_1,\ldots,v_n)
+$$
+
+be a basis of eigenvectors, with
+
+$$
+Av_i=\lambda_i v_i.
+$$
+
+Let
+
+$$
+(\ell^1,\ldots,\ell^n)
+$$
+
+be the corresponding dual basis.
+
+Thus
+
+$$
+\ell^i(v_j)=\delta_{ij}.
+$$
+
+Every vector $x\in V$ has the expansion
+
+$$
+\boxed{ x=\sum_{i=1}^n\ell^i(x)v_i. }
+$$
+
+The coefficient of each eigenvector is obtained by applying a dual-basis functional.
+
+This is an important conceptual observation:
+
+**Spectral coordinates are themselves linear measurements.**
+
+### Left eigenfunctionals {#sec-module-b-session-7-left-eigenfunctionals}
+
+Let's investigate how the dual operator acts on the dual eigenbasis.
+
+For any $v_j$,
+
+$$
+\begin{aligned}
+  (A^\vee\ell^i)(v_j) &=\ell^i(Av_j)\\
+  &=\ell^i(\lambda_jv_j)\\
+  &=\lambda_j\delta_{ij}\\
+  &=\lambda_i\delta_{ij}.
+\end{aligned}
+$$
+
+But
+
+$$
+\lambda_i\ell^i(v_j)=\lambda_i\delta_{ij}.
+$$
+
+Since two functionals agreeing on a basis agree everywhere,
+
+$$
+\boxed{ A^\vee\ell^i=\lambda_i\ell^i. }
+$$
+
+Therefore, the dual basis functionals are eigenvectors of the dual operator.
+
+In matrix terminology, they correspond to **left eigenvectors** of $A$.
+
+The original eigenvectors $v_i$ are right eigenvectors.
+
+This gives a very natural explanation of the distinction between left and right eigenvectors.
+
+### Spectral projectors from dual bases {#sec-module-b-session-7-spectral-projectors-from-dual-bases}
+
+Define
+
+$$
+P_i:V\to V
+$$
+
+by
+
+$$
+\boxed{ P_i(x)=\ell^i(x)v_i. }
+$$
+
+This map extracts the component of $x$ along $v_i$.
+
+Let's verify its algebraic properties.
+
+For $i,j$,
+
+$$
+\begin{aligned}
+  P_i(P_j(x)) &=P_i(\ell^j(x)v_j)\\
+  &=\ell^j(x)\ell^i(v_j)v_i\\
+  &=\delta_{ij}\ell^j(x)v_i.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{ P_iP_j= \begin{cases}
+  P_i,&i=j,\\
+  0,&i\ne j.
+\end{cases} }
+$$
+
+In particular,
+
+$$
+P_i^2=P_i.
+$$
+
+So each $P_i$ is a projection.
+
+Furthermore,
+
+$$
+\boxed{ I=\sum_{i=1}^nP_i, }
+$$
+
+because the right-hand side reconstructs every vector from its eigenbasis coordinates.
+
+We also have
+
+$$
+\boxed{ A=\sum_{i=1}^n\lambda_iP_i. }
+$$
+
+Indeed,
+
+$$
+Ax=\sum_i\lambda_i\ell^i(x)v_i.
+$$
+
+This is a spectral decomposition written in terms of dual bases and projections.
+
+### Polynomial filtering revisited {#sec-module-b-session-7-polynomial-filtering-revisited}
+
+Let $p$ be a polynomial.
+
+Since $P_i$ extracts the component along $v_i$,
+
+$$
+\boxed{ p(A)=\sum_{i=1}^n p(\lambda_i)P_i. }
+$$
+
+Therefore,
+
+$$
+p(A)x = \sum_{i=1}^n p(\lambda_i)\ell^i(x)v_i.
+$$
+
+The polynomial multiplies each spectral coefficient by $p(\lambda_i)$.
+
+This is the algebraic mechanism underlying polynomial eigenvalue filters.
+
+#### What changes for symmetric matrices? {#module-b-session-7-polynomial-filtering-revisited-what-changes-for-symmetric-matrices}
+
+If $A$ is real symmetric, we can choose an orthonormal eigenbasis.
+
+Then
+
+$$
+\ell^i(x)=v_i^Tx,
+$$
+
+because the coordinate functional of an orthonormal basis is represented by the dot product with the corresponding basis vector.
+
+Therefore,
+
+$$
+P_i=v_iv_i^T.
+$$
+
+These are orthogonal spectral projections.
+
+For a general diagonalizable but nonsymmetric matrix, the corresponding projections are generally oblique.
+
+They are built using left and right eigenvectors rather than one orthonormal eigenbasis.
+
+This distinction has major numerical implications.
+
+For nonnormal matrices, the eigenvector basis can be poorly conditioned, and the spectral coordinate functionals may be very sensitive to perturbations.
+
+For symmetric or Hermitian matrices, the orthonormal eigenbasis avoids this particular problem.
+
+#### Connection to HASC {#module-b-session-7-polynomial-filtering-revisited-connection-to-hasc}
+
+In Chebyshev-filtered subspace iteration, we apply a polynomial $p(A)$ to vectors or subspaces in order to amplify desired spectral components relative to unwanted components.
+
+The formula
+
+$$
+p(A)x = \sum_i p(\lambda_i)\ell^i(x)v_i
+$$
+
+shows exactly how filtering works when the matrix is diagonalizable.
+
+For Hermitian matrices, this takes the especially convenient form
+
+$$
+p(A)x=\sum_i p(\lambda_i)(v_i^Hx)v_i
+$$
+
+using an orthonormal eigenbasis.
+
+Thus the concepts from Module B—dual bases, dual maps, and spectral coordinate functionals—connect directly to the mathematical mechanism behind the seminar's eigenvalue methods.
+
+The more advanced questions of convergence, stability, finite precision, and inexact polynomial evaluation belong to Modules D and E.
+
+### Checkpoint 7 {#module-b-checkpoint-7 .unnumbered .unlisted}
+
+Prove that for a diagonalizable operator,
+
+$$
+I=\sum_iP_i
+$$
+
+and
+
+$$
+A=\sum_i\lambda_iP_i.
+$$
+
+Then derive the polynomial filtering formula.
+
+Finally, explain why the spectral projectors for a nonsymmetric diagonalizable matrix need not be orthogonal, even though they are idempotent.
+
+## Session 8 — Consolidation, exercises, and proof reconstruction {#sec-module-b-session-8}
+
+The goal of this final session is to consolidate the theory.
+
+At this stage, you should be able to recognize a common structural pattern:
+
+$$
+\boxed{ \begin{gathered}
+  \text{A transformation acts on vectors}\\
+  T:V\to W\\
+  \downarrow\\
+  \text{It induces a transformation on measurements}\\
+  T^\vee:W^*\to V^*\\
+  \downarrow\\
+  \text{Its kernel and image determine}\\
+  \text{which measurements vanish or factor through it}.
+\end{gathered} }
+$$
+
+The following exercises test definitions, proofs, computations, structural understanding, and applications.
+
+Try solving them before consulting the [worked solutions](#sec-module-b-worked-solutions).
+
+### Exercise 1 — Construct a dual basis {#module-b-exercise-1}
+
+Let
+
+$$
+v_1=(1,1),\qquad v_2=(1,-1)
+$$
+
+be a basis of $\mathbb R^2$.
+
+Find the dual basis $(\varepsilon^1,\varepsilon^2)$.
+
+Verify its defining properties.
+
+Then express the functional
+
+$$
+f(x,y)=3x+y
+$$
+
+as a linear combination of the dual basis functionals.
+
+### Exercise 2 — Change of coordinates for covectors {#module-b-exercise-2}
+
+Let $B\in\mathbb R^{n\times n}$ be an invertible basis matrix.
+
+Prove that the coordinate column of a vector transforms by $B^{-1}$, while the coefficient column of a functional transforms by $B^T$, when moving from standard to $B$-basis coordinates.
+
+Explain why the scalar evaluation of the functional must remain unchanged.
+
+### Exercise 3 — Calculate a dual map {#module-b-exercise-3}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&2&0\\
+  0&1&1
+\end{pmatrix} :\mathbb R^3\to\mathbb R^2.
+$$
+
+Define the output functional
+
+$$
+g(y_1,y_2)=3y_1-2y_2.
+$$
+
+Compute $A^\vee(g)$ directly by composition.
+
+Then verify the answer using $A^T$.
+
+### Exercise 4 — Find an annihilator {#module-b-exercise-4}
+
+Let
+
+$$
+S= \operatorname{span}\{(1,1,0),(0,1,1)\} \subseteq\mathbb R^3.
+$$
+
+Find a basis of $S^0$.
+
+Verify the dimension formula
+
+$$
+\dim S^0=\dim V-\dim S.
+$$
+
+### Exercise 5 — Verify the fundamental duality identities {#module-b-exercise-5}
+
+For the matrix $A$ from Exercise 3, calculate
+
+$$
+\ker A,\qquad \operatorname{im}A,
+$$
+
+and the kernel and image of its dual map.
+
+Verify explicitly that
+
+$$
+\operatorname{im}A^\vee=(\ker A)^0
+$$
+
+and
+
+$$
+\ker A^\vee=(\operatorname{im}A)^0.
+$$
+
+### Exercise 6 — Dual of a quotient {#module-b-exercise-6}
+
+Let
+
+$$
+S=\operatorname{span}\{(1,1,1)\} \subseteq\mathbb R^3.
+$$
+
+Find a basis of $S^0$.
+
+Construct the corresponding functionals on the quotient $\mathbb R^3/S$.
+
+Explain why they are well-defined.
+
+### Exercise 7 — Dual exact sequences {#module-b-exercise-7}
+
+Consider the short exact sequence
+
+$$
+0\to S\xrightarrow{i}V\xrightarrow{q}V/S\to0.
+$$
+
+Prove that the dual sequence
+
+$$
+0\to(V/S)^* \xrightarrow{q^\vee}V^* \xrightarrow{i^\vee}S^* \to0
+$$
+
+is exact when $V$ is finite-dimensional.
+
+Identify the kernel and image of each nontrivial map.
+
+### Exercise 8 — The double-dual map {#module-b-exercise-8}
+
+Define
+
+$$
+J_V(v)(f)=f(v).
+$$
+
+Prove that $J_V:V\to V^{**}$ is a linear isomorphism for finite-dimensional $V$.
+
+Then prove that for every linear map $T:V\to W$,
+
+$$
+J_W\circ T=T^{\vee\vee}\circ J_V.
+$$
+
+Explain why this is called a natural identification.
+
+### Exercise 9 — Graph duality {#module-b-exercise-9}
+
+Let
+
+$$
+D= \begin{pmatrix}
+  -1&1&0\\
+  0&-1&1
+\end{pmatrix}.
+$$
+
+Consider the edge functional
+
+$$
+g(d_1,d_2)=2d_1-d_2.
+$$
+
+Calculate $D^\vee(g)$.
+
+Show that it annihilates the constant-vector subspace.
+
+Then explain the relationship to the theorem
+
+$$
+\operatorname{im}D^\vee=(\ker D)^0.
+$$
+
+### Exercise 10 — Left eigenvectors and spectral projections {#module-b-exercise-10}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  2&1\\
+  0&3
+\end{pmatrix}.
+$$
+
+Its right eigenvectors can be chosen as
+
+$$
+v_1=(1,0),\qquad v_2=(1,1).
+$$
+
+Construct their dual basis.
+
+Prove that the corresponding functionals are eigenfunctionals of $A^\vee$.
+
+Construct the two spectral projectors $P_1,P_2$, verify
+
+$$
+P_1+P_2=I,
+$$
+
+and show that
+
+$$
+A=2P_1+3P_2.
+$$
+
+Finally, determine $p(A)$ for
+
+$$
+p(t)=t-2
+$$
+
+using the spectral projectors rather than ordinary matrix arithmetic.
+
+## Worked solutions {#sec-module-b-worked-solutions}
+
+### Solution 1 — Dual basis {#module-b-solution-1}
+
+The basis matrix is
+
+$$
+B= \begin{pmatrix}
+  1&1\\
+  1&-1
+\end{pmatrix}.
+$$
+
+Its inverse is
+
+$$
+B^{-1} = \frac12 \begin{pmatrix}
+  1&1\\
+  1&-1
+\end{pmatrix}.
+$$
+
+The rows of $B^{-1}$ give the dual basis:
+
+$$
+\boxed{ \varepsilon^1(x,y)=\frac{x+y}{2}, \qquad \varepsilon^2(x,y)=\frac{x-y}{2}. }
+$$
+
+Evaluating at the basis vectors gives
+
+$$
+\begin{array}{c|cc}
+  &v_1&v_2\\
+  \hline \varepsilon^1&1&0\\
+  \varepsilon^2&0&1
+\end{array}
+$$
+
+as required.
+
+For
+
+$$
+f(x,y)=3x+y,
+$$
+
+the dual basis coefficients are
+
+$$
+f(v_1)=4,\qquad f(v_2)=2.
+$$
+
+Therefore,
+
+$$
+\boxed{f=4\varepsilon^1+2\varepsilon^2.}
+$$
+
+Indeed,
+
+$$
+4\frac{x+y}{2}+2\frac{x-y}{2}=3x+y.
+$$
+
+### Solution 2 — Coordinate transformations {#module-b-solution-2}
+
+Let $x_{\mathrm{std}}$ denote the standard coordinate column and $x_B$ its coordinates in the basis matrix $B$.
+
+Then
+
+$$
+x_{\mathrm{std}}=Bx_B,
+$$
+
+so
+
+$$
+\boxed{x_B=B^{-1}x_{\mathrm{std}}.}
+$$
+
+For a functional with standard coefficient column $c_{\mathrm{std}}$,
+
+$$
+f(x)=c_{\mathrm{std}}^Tx_{\mathrm{std}}.
+$$
+
+Substituting,
+
+$$
+f(x)=c_{\mathrm{std}}^TBx_B =(B^Tc_{\mathrm{std}})^Tx_B.
+$$
+
+Thus
+
+$$
+\boxed{c_B=B^Tc_{\mathrm{std}}.}
+$$
+
+The two transformation rules ensure that the scalar $f(x)$ is independent of the coordinate system.
+
+### Solution 3 — Dual map {#module-b-solution-3}
+
+We have
+
+$$
+Ax= \begin{pmatrix}
+  x_1+2x_2\\
+  x_2+x_3
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
+  A^\vee(g)(x) &=g(Ax)\\
+  &=3(x_1+2x_2)-2(x_2+x_3)\\
+  &=3x_1+4x_2-2x_3.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{ A^\vee(g)(x_1,x_2,x_3) =3x_1+4x_2-2x_3. }
+$$
+
+Using the coefficient column $c=(3,-2)^T$,
+
+$$
+A^Tc= \begin{pmatrix}
+  1&0\\
+  2&1\\
+  0&1
+\end{pmatrix} \begin{pmatrix}
+  3\\
+  -2
+\end{pmatrix} = \begin{pmatrix}
+  3\\
+  4\\
+  -2
+\end{pmatrix}.
+$$
+
+The two computations agree.
+
+### Solution 4 — Annihilator {#module-b-solution-4}
+
+Since the two generators of $S$ are independent,
+
+$$
+\dim S=2.
+$$
+
+Therefore,
+
+$$
+\dim S^0=3-2=1.
+$$
+
+Write
+
+$$
+f(x,y,z)=ax+by+cz.
+$$
+
+The conditions for $f\in S^0$ are
+
+$$
+a+b=0,\qquad b+c=0.
+$$
+
+Thus
+
+$$
+a=c=-b.
+$$
+
+Choosing $a=1$, we obtain
+
+$$
+\boxed{ S^0=\operatorname{span}\{f\}, \qquad f(x,y,z)=x-y+z. }
+$$
+
+The annihilator has dimension one, as predicted.
+
+### Solution 5 — Fundamental duality identities {#module-b-solution-5}
+
+For
+
+$$
+A= \begin{pmatrix}
+  1&2&0\\
+  0&1&1
+\end{pmatrix},
+$$
+
+the kernel equations are
+
+$$
+x_1+2x_2=0,\qquad x_2+x_3=0.
+$$
+
+Therefore,
+
+$$
+\boxed{\ker A=\operatorname{span}\{(-2,1,-1)\}.}
+$$
+
+The two rows of $A$ are independent, so $A$ has rank two.
+
+Its image equals $\mathbb R^2$:
+
+$$
+\boxed{\operatorname{im}A=\mathbb R^2.}
+$$
+
+Since $A^\vee$ is represented by $A^T$, its image is represented by
+
+$$
+\boxed{ \operatorname{im}A^\vee = \operatorname{span}\{(1,2,0),(0,1,1)\} }
+$$
+
+in standard coefficient coordinates.
+
+Both coefficient vectors annihilate the kernel vector $(-2,1,-1)$:
+
+$$
+(1,2,0)\cdot(-2,1,-1)=0,
+$$
+
+$$
+(0,1,1)\cdot(-2,1,-1)=0.
+$$
+
+The annihilator of a one-dimensional subspace of $\mathbb R^3$ has dimension two.
+
+Thus
+
+$$
+\operatorname{im}A^\vee=(\ker A)^0.
+$$
+
+Finally, since $A^T:\mathbb R^2\to\mathbb R^3$ is injective,
+
+$$
+\ker A^\vee=\{0\}.
+$$
+
+Since $\operatorname{im}A=\mathbb R^2$, its annihilator is also zero:
+
+$$
+(\operatorname{im}A)^0=\{0\}.
+$$
+
+Hence the second identity holds.
+
+### Solution 6 — Quotient duality {#module-b-solution-6}
+
+A functional on $\mathbb R^3$ has the form
+
+$$
+f(x,y,z)=ax+by+cz.
+$$
+
+To annihilate $S$, we require
+
+$$
+a+b+c=0.
+$$
+
+A convenient basis is
+
+$$
+f_1(x,y,z)=x-y,
+$$
+
+$$
+f_2(x,y,z)=y-z.
+$$
+
+Thus
+
+$$
+\boxed{S^0=\operatorname{span}\{f_1,f_2\}.}
+$$
+
+They induce functionals on the quotient:
+
+$$
+\overline f_1((x,y,z)+S)=x-y,
+$$
+
+$$
+\overline f_2((x,y,z)+S)=y-z.
+$$
+
+Adding $t(1,1,1)$ to a representative leaves both expressions unchanged.
+
+Therefore they are well-defined.
+
+They are independent and span the two-dimensional dual space $(\mathbb R^3/S)^*$.
+
+### Solution 7 — Dual exact sequence {#module-b-solution-7}
+
+The sequence is
+
+$$
+0\to(V/S)^* \xrightarrow{q^\vee}V^* \xrightarrow{i^\vee}S^* \to0.
+$$
+
+Since $q$ is surjective, $q^\vee$ is injective:
+
+$$
+\ker q^\vee=\{0\}.
+$$
+
+Its image is
+
+$$
+\operatorname{im}q^\vee=S^0.
+$$
+
+The map $i^\vee$ restricts a functional on $V$ to $S$.
+
+Therefore,
+
+$$
+\ker i^\vee=S^0.
+$$
+
+Hence
+
+$$
+\operatorname{im}q^\vee=\ker i^\vee.
+$$
+
+Finally, $i^\vee$ is surjective because every linear functional on $S$ extends to a linear functional on $V$.
+
+Thus the sequence is exact.
+
+### Solution 8 — Double dual {#module-b-solution-8}
+
+Define
+
+$$
+J_V(v)(f)=f(v).
+$$
+
+The map is linear because
+
+$$
+J_V(\alpha v+\beta w)(f) =\alpha f(v)+\beta f(w).
+$$
+
+If $J_V(v)=0$, then every functional vanishes on $v$.
+
+By nondegeneracy of evaluation, $v=0$. Thus $J_V$ is injective.
+
+Since
+
+$$
+\dim V=\dim V^{**},
+$$
+
+it is also surjective.
+
+Therefore $J_V$ is an isomorphism.
+
+For naturality, let $T:V\to W$. For every $g\in W^*$,
+
+$$
+\begin{aligned}
+  (T^{\vee\vee}(J_V(v)))(g) &=J_V(v)(T^\vee g)\\
+  &=(T^\vee g)(v)\\
+  &=g(Tv)\\
+  &=J_W(Tv)(g).
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{ T^{\vee\vee}\circ J_V=J_W\circ T. }
+$$
+
+The identification is natural because it commutes with every linear map without depending on a choice of basis or inner product.
+
+### Solution 9 — Graph duality {#module-b-solution-9}
+
+The coefficient column of the edge functional is
+
+$$
+c=\begin{pmatrix}
+  2\\
+  -1
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+D^Tc = \begin{pmatrix}
+  -1&0\\
+  1&-1\\
+  0&1
+\end{pmatrix} \begin{pmatrix}
+  2\\
+  -1
+\end{pmatrix} = \begin{pmatrix}
+  -2\\
+  3\\
+  -1
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+\boxed{ D^\vee(g)(p_1,p_2,p_3) =-2p_1+3p_2-p_3. }
+$$
+
+On a constant vector $p=t(1,1,1)$,
+
+$$
+D^\vee(g)(p)=(-2+3-1)t=0.
+$$
+
+Therefore the pulled-back functional annihilates $\ker D$.
+
+For any edge functional $g$, the equality $g(Dp)=g(0)=0$ for $p\in\ker D$ gives
+
+$$
+\operatorname{im}D^\vee\subseteq(\ker D)^0.
+$$
+
+The two rows of $D$ are independent, so $\operatorname{im}D^\vee$ has dimension two. The annihilator of the one-dimensional space $\ker D$ also has dimension two. Thus the inclusion is an equality.
+
+### Solution 10 — Spectral projectors {#module-b-solution-10}
+
+The right eigenvectors are
+
+$$
+v_1=(1,0),\qquad v_2=(1,1).
+$$
+
+Their dual basis is
+
+$$
+\ell^1(x,y)=x-y, \qquad \ell^2(x,y)=y.
+$$
+
+These are left eigenfunctionals:
+
+$$
+A^\vee\ell^1=2\ell^1, \qquad A^\vee\ell^2=3\ell^2.
+$$
+
+The spectral projectors are
+
+$$
+P_1(x,y)=\ell^1(x,y)v_1=(x-y,0),
+$$
+
+and
+
+$$
+P_2(x,y)=\ell^2(x,y)v_2=(y,y).
+$$
+
+Therefore,
+
+$$
+\boxed{ P_1= \begin{pmatrix}
+  1&-1\\
+  0&0
+\end{pmatrix}, \qquad P_2= \begin{pmatrix}
+  0&1\\
+  0&1
+\end{pmatrix}. }
+$$
+
+Adding,
+
+$$
+P_1+P_2=I.
+$$
+
+Furthermore,
+
+$$
+2P_1+3P_2 = \begin{pmatrix}
+  2&1\\
+  0&3
+\end{pmatrix} =A.
+$$
+
+For $p(t)=t-2$,
+
+$$
+p(2)=0,\qquad p(3)=1.
+$$
+
+Thus
+
+$$
+p(A)=p(2)P_1+p(3)P_2=P_2.
+$$
+
+Therefore,
+
+$$
+\boxed{ p(A)= \begin{pmatrix}
+  0&1\\
+  0&1
+\end{pmatrix}. }
+$$
+
+Notice that $P_1,P_2$ are projections but not orthogonal projections under the standard Euclidean inner product.
+
+This is a concrete example of spectral decomposition using a right eigenbasis and its dual left eigenbasis.
+
+## Computational laboratory — MATLAB {#sec-module-b-computational-laboratory-matlab}
+
+The following laboratory connects the abstract theory with explicit matrix computations.
+
+Its purpose is to verify how bases, dual bases, annihilators, and spectral projectors are represented numerically.
+
+```matlab
+%% Module B — Duality and Linear Measurements
+clear; clc;
+
+%% 1. Dual basis of a nonstandard basis
+B = [1 1;
+     0 1];
+
+% Rows of B^(-1) represent the dual basis
+DualRows = inv(B);
+
+disp('Dual basis coefficient rows:');
+disp(DualRows);
+
+% Verify dual basis evaluation
+disp('DualRows * B (should be identity):');
+disp(DualRows * B);
+
+% Coordinate transformation of a functional
+c_old = [2; 1];
+c_new = B.' * c_old;
+
+disp('Functional coefficients in new dual basis:');
+disp(c_new);
+
+%% 2. Fundamental duality identities
+A = [1 2 -1 3;
+     2 4  1 9;
+     3 6  0 12];
+
+% Basis of ker(A)
+K = [-2 -4;
+      1  0;
+      0 -1;
+      0  1];
+
+% Basis of image(A^vee), as coefficient columns
+R = rref(A);
+RowDual = R(1:2, :).';
+
+% Basis of ker(A^vee)
+LeftNull = [-1; -1; 1];
+
+fprintf('||A*K|| = %.3e\n', norm(A*K));
+fprintf('||K^T*RowDual|| = %.3e\n', norm(K.'*RowDual));
+fprintf('||A^T*LeftNull|| = %.3e\n', norm(A.'*LeftNull));
+
+fprintf('rank(A) = %d\n', rank(A));
+fprintf('rank(A^T) = %d\n', rank(A.'));
+
+%% 3. Dual of a graph gradient
+D = [-1  1  0;
+      0 -1  1];
+
+edge_measurement = [2; -1];
+vertex_measurement = D.' * edge_measurement;
+
+disp('Pulled-back vertex measurement:');
+disp(vertex_measurement);
+
+fprintf('Sum of coefficients = %.3e\n', ...
+    sum(vertex_measurement));
+
+%% 4. Left and right eigenvectors
+A2 = [2 1;
+      0 3];
+
+% Right eigenvector basis
+X = [1 1;
+     0 1];
+
+% Rows of X^(-1) are the dual eigenfunctionals
+LeftRows = inv(X);
+
+P1 = X(:,1) * LeftRows(1,:);
+P2 = X(:,2) * LeftRows(2,:);
+
+disp('Spectral projector P1:');
+disp(P1);
+
+disp('Spectral projector P2:');
+disp(P2);
+
+fprintf('||P1^2-P1|| = %.3e\n', norm(P1*P1-P1));
+fprintf('||P2^2-P2|| = %.3e\n', norm(P2*P2-P2));
+fprintf('||P1+P2-I|| = %.3e\n', ...
+    norm(P1+P2-eye(2)));
+
+fprintf('||A2-(2P1+3P2)|| = %.3e\n', ...
+    norm(A2-(2*P1+3*P2)));
+
+% Polynomial p(t) = t-2
+pA = A2-2*eye(2);
+
+fprintf('||p(A2)-P2|| = %.3e\n', norm(pA-P2));
+```
+
+### Interpret the numerical results {#module-b-computational-laboratory-matlab-interpret-the-numerical-results}
+
+In the first experiment, $B^{-1}B=I$ verifies the defining relation between a basis and its dual basis. Each row of $B^{-1}$ is a functional that extracts one coordinate in the chosen basis.
+
+In the second experiment, the matrix products verify annihilation relationships. For instance,
+
+$$
+K^T\operatorname{RowDual}=0
+$$
+
+means that every row-space functional annihilates every kernel vector.
+
+In the graph experiment, the coefficients of the pulled-back vertex measurement sum to zero, reflecting its insensitivity to constant potential shifts.
+
+In the spectral experiment, the left and right eigenvector bases construct projections satisfying
+
+$$
+P_i^2=P_i,\qquad P_1+P_2=I.
+$$
+
+This is the algebraic mechanism underlying spectral decomposition.
+
+For larger floating-point problems, the equalities will generally hold only up to numerical roundoff. Moreover, when the eigenvector basis is ill-conditioned, computing its inverse can magnify numerical errors. This will become important when studying nonnormal matrices and eigenvalue conditioning.
+
+## Final conceptual synthesis {#sec-module-b-final-conceptual-synthesis}
+
+We can now summarize Module B through one central idea:
+
+**Duality studies a mathematical object through the linear measurements that can be performed on it.**
+
+The original space $V$ contains vectors.
+
+The dual space $V^*$ contains scalar-valued linear observations of those vectors.
+
+A transformation $T:V\to W$ maps vectors forward, while its dual $T^\vee:W^*\to V^*$ pulls observations backward.
+
+Annihilators describe measurements that vanish on prescribed subspaces, and quotient duality describes measurements that remain meaningful after certain vector differences have been identified.
+
+**Linear map**
+
+$$
+T:V\to W
+$$
+
+**Dual map**
+
+$$
+T^\vee:W^*\to V^*
+$$
+
+**Kernel–image duality**
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^\vee&=(\ker T)^0,\\
+  \ker T^\vee&=(\operatorname{im}T)^0
+\end{aligned} }
+$$
+
+**Quotients and exact sequences**
+
+$$
+(V/S)^*\cong S^0
+$$
+
+### The essential relationships {#sec-module-b-final-conceptual-synthesis-the-essential-relationships}
+
+| Concept              | Central result                             | Meaning                                 |
+| -------------------- | ------------------------------------------ | --------------------------------------- |
+| Dual space           | $V^*=\operatorname{Hom}(V,\mathbb F)$ | Space of linear measurements            |
+| Dual basis           | $\varepsilon^i(v_j)=\delta_{ij}$      | Coordinate extraction                   |
+| Dual map             | $T^\vee(g)=g\circ T$                   | Pulling measurements backward           |
+| Transpose            | $[T^\vee]=[T]^T$ in dual bases         | Matrix representation of the pullback   |
+| Annihilator          | $S^0=\{f:f\rvert_S=0\}$                 | Measurements invisible on $S$       |
+| Kernel–image duality | $\operatorname{im}T^\vee=(\ker T)^0$   | Recoverable input measurements          |
+| Dual kernel          | $\ker T^\vee=(\operatorname{im}T)^0$   | Measurements vanishing on all outputs   |
+| Quotient duality     | $(V/S)^*\cong S^0$                    | Measurements respecting identifications |
+| Double dual          | $V\cong V^{**}$                      | Canonical evaluation identification     |
+| Contravariance       | $(S\circ T)^\vee=T^\vee\circ S^\vee$   | Composition reverses                    |
+| Spectral dual basis  | $P_i(x)=\ell^i(x)v_i$                  | Extracting spectral components          |
+
+### Module B mastery checklist {#sec-module-b-final-conceptual-synthesis-module-b-mastery-checklist}
+
+Before beginning Module C, aim to complete the following without referring to the study material.
+
+- [ ] Define dual spaces and the evaluation pairing, and explain their geometric significance.
+- [ ] Prove the dual basis theorem and calculate dual bases in nonstandard coordinates.
+- [ ] Derive the dual map and the transpose rule from composition of functionals.
+- [ ] Prove both fundamental identities involving annihilators, kernels, and images.
+- [ ] Explain quotient duality and why dualizing a finite-dimensional short exact sequence preserves exactness.
+- [ ] Prove the canonical double-dual isomorphism and understand its naturality.
+- [ ] Explain duality in at least two applications: graph operators, variational problems, or solvability conditions.
+- [ ] Construct left eigenfunctionals and spectral projectors using a right eigenbasis and its dual.
+
+## Transition to Module C — Inner-product geometry {#sec-module-b-transition-to-module-c-inner-product-geometry}
+
+Module B has developed duality without requiring inner products.
+
+Module C will add inner-product structure and investigate what new possibilities it creates.
+
+The central question will be:
+
+**If covectors are linear measurements, how can an inner product represent each covector by a uniquely determined vector?**
+
+The Riesz representation theorem answers this question.
+
+For a finite-dimensional real inner-product space $V$, every $f\in V^*$ has a unique representing vector $a_f\in V$ such that
+
+$$
+\boxed{ f(v)=\langle v,a_f\rangle \qquad\forall v\in V. }
+$$
+
+This creates an isomorphism between the space of vectors and the space of linear measurements.
+
+It transforms the algebraic relationships of Module B into geometric ones.
+
+For example,
+
+$$
+\operatorname{im}T^\vee=(\ker T)^0
+$$
+
+becomes, under the Riesz identifications,
+
+$$
+\boxed{ \operatorname{im}T^*=(\ker T)^\perp, }
+$$
+
+where $T^*$ is now the inner-product adjoint.
+
+Similarly, annihilators correspond to orthogonal complements, and the dual map corresponds to the adjoint.
+
+That is the bridge to orthogonal projections, self-adjoint matrices, positive definiteness, least squares, and spectral theory.
+
+One particularly important connection deserves emphasis:
+
+In Module B, we constructed spectral coefficients using dual eigenfunctionals,
+
+$$
+x=\sum_i\ell^i(x)v_i.
+$$
+
+For a Hermitian matrix with an orthonormal eigenbasis, Riesz representation allows those functionals to be written as inner products:
+
+$$
+\ell^i(x)=v_i^Hx.
+$$
+
+Therefore,
+
+$$
+\boxed{ x=\sum_i(v_i^Hx)v_i. }
+$$
+
+This is the familiar orthonormal spectral expansion.
+
+It is also the foundation for Rayleigh–Ritz approximation, orthogonal spectral projections, and the Hermitian eigenvalue algorithms relevant to your HASC seminar.
+
+**The central achievement of Module B is understanding that algebraic duality comes first: inner-product geometry provides a particularly powerful way to represent it, but does not create it.**

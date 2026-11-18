@@ -1,0 +1,474 @@
+# Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory {#sec-f2-structural-algebra}
+
+Suppose a solver returns two different potentials for the same electric field. Their difference might be a constant. Which object should hold the answer? A quotient records precisely the ambiguity. Now suppose an eigensolver returns two different bases for the same eigenspace. Here the natural answer is a subspace, and, given a complementary spectral subspace, a projector onto it. Why does one problem call for a quotient and the other for a projector? The distinction is visible in the maps each answer must support.
+
+Module A traced the information lost by a linear map. Module B followed measurements backward through it. Module C used an inner product to turn measurements into vectors. Module D studied the subspaces preserved by an operator. We will vary the structure that maps must preserve and see which of these arguments survive. This is a parallel extension of Review II. The main spectral payoff comes in Session 6, where a single polynomial congruence constructs a projector even for a matrix with a defective eigenvalue.
+
+**Conventions.** $\mathbb F$ denotes a field. $V^*=V^\vee$ is the algebraic dual, $T^\vee$ the dual map, $U^0$ the annihilator. For complex inner products we follow Module C and take $\langle x,y\rangle=y^Hx$ in standard coordinates. $T^*$ denotes the inner-product adjoint. Composition $gf$ means apply $f$ first. Infinite-dimensional algebraic basis arguments use the usual basis-extension principle.
+
+## Session 1 — Which maps preserve the problem?
+
+### From changing coordinates to changing categories
+
+Take the point set $\mathbb R^2$. A translation preserves Euclidean distances. It preserves the vector-space origin only when the translation is zero. An invertible shear fixes the origin and respects addition and scaling, yet changes lengths. Before calling two descriptions equivalent, we must decide which operations, relations, or measurements matter.
+
+| Setting | Objects | Morphisms | What an inverse must preserve |
+|---|---|---|---|
+| $\mathbf{Set}$ | Sets | Functions | A bijection suffices |
+| $\mathbf{Grp}$ | Groups | Homomorphisms | Multiplication |
+| $\mathbf{Vect}_{\mathbb F}$ | Spaces over one field | $\mathbb F$-linear maps | Addition and scalar multiplication |
+| Unital rings | Rings with identity | Unital ring maps | Addition, multiplication, and identity |
+| $R$-modules | Left modules over a fixed ring | $R$-linear maps | Addition and the action of every scalar |
+| Normed spaces | Normed spaces over $\mathbb R$ or $\mathbb C$ | Bounded linear maps | Both directions must be bounded |
+| $\mathbf{Top}$ | Topological spaces | Continuous maps | Both directions must be continuous |
+
+A **group** has an associative multiplication, an identity and inverses. A **ring** has an abelian group of additions and an associative multiplication distributing over addition. We take rings with identity. A field additionally permits division by every nonzero scalar and has commutative multiplication. A **left module** is an abelian group with a scalar action of a ring satisfying the familiar vector-space distributivity, associativity and unit axioms. Over $\mathbb Z$, integer scaling just means repeated addition and its negative. Over a matrix ring, the order of scalar multiplication matters. A bounded linear map satisfies $\|Tx\|\le C\|x\|$ for a fixed $C$ and all $x$. Composition preserves this condition because the bounds multiply.
+
+**Two tests of equivalence.** The sets underlying $\mathbb Q$ and $\mathbb Q^2$ are both countably infinite, so there is a bijection. A linear map from $\mathbb Q$ has image spanned by the image of $1$, hence cannot cover $\mathbb Q^2$. For an example on literally the same set, equip $\mathbb R$ once with the discrete topology and once with the usual topology. Every singleton is open in the former. A homeomorphism takes open sets to open sets, so no homeomorphism exists between the two. The choice of morphisms changes the answer even before we write any coordinates.
+
+### What a diagram asserts
+
+A **category** specifies objects, morphisms $\operatorname{Hom}(X,Y)$ with specified source and target, an identity $1_X$ at each object, and a composite $gf:X\to Z$ whenever $f:X\to Y$, $g:Y\to Z$. The laws are $h(gf)=(hg)f$ and $1_Y f=f=f1_X$. An isomorphism has a two-sided inverse in the category. The inverse is unique since two inverses $g,h$ satisfy $g=g(fh)=(gf)h=h$.
+
+The diagram $V\xrightarrow{T}W$ records the type of a map. A **commutative** diagram additionally equates compositions along paths with common endpoints. For example, let $T(x,y)=x-y$ and $D=\{(a,a)\}$. The following square is a claim that can be tested on an arbitrary input:
+
+$$
+\begin{array}{ccc}
+\mathbb R^2&\xrightarrow{T}&\mathbb R\\
+{\scriptstyle q}\downarrow &&\downarrow{\scriptstyle 1}\\
+\mathbb R^2/D&\xrightarrow{\bar T}&\mathbb R .
+\end{array}
+$$
+
+Here $q(x,y)=[(x,y)]$. Changing a representative to $(x+a,y+a)$ leaves $x-y$ unchanged. Thus the lower arrow exists and both paths give $x-y$. One elementwise calculation constructs a map; the equation $\bar Tq=T$ then describes how to use it with every input map $X\to\mathbb R^2$ at once.
+
+Reversing all arrows and reversing the order of composition gives the **opposite category** $\mathcal C^{\mathrm{op}}$. Its objects are the same and $\operatorname{Hom}_{\mathcal C^{\mathrm{op}}}(X,Y)=\operatorname{Hom}_{\mathcal C}(Y,X)$. Associativity and the unit laws still hold. This permits us to reverse a whole statement about arrows. It gives the product/coproduct pairing in the next session. Constructing actual dual *spaces* and *maps* requires extra mathematics.
+
+## Session 2 — Three problems that determine their own objects
+
+### Identifying inputs while preserving all admissible measurements
+
+Let $U\le V$. The relation $v\sim v'$ if $v-v'\in U$ partitions $V$ into affine translates of $U$. Addition and scaling on classes are well defined because differences stay in $U$. Let $q(v)=v+U$.
+
+**Quotient factorization theorem.** For every $W$, composition with $q$ gives a bijection
+$$
+\operatorname{Hom}(V/U,W)\longrightarrow
+\{f:V\to W\text{ linear}\mid f|_U=0\}.
+$$
+**Proof.** For $h:V/U\to W$, $hq$ kills $U$. Conversely define $\bar f([v])=f(v)$. Equivalent representatives differ by $u\in U$, so linearity of $f$ gives equal values. The quotient operations make $\bar f$ linear, and $\bar f q=f$. Any solution $h$ must take $[v]=q(v)$ to $f(v)$, which proves uniqueness. The constructions undo one another. $\square$
+
+It is the quantifier *for every target and every admissible map* that makes this property universal. There is even a computational prescription. For $U=\operatorname{span}(1,1)$ take quotient coordinate $d=x-y$. Every matrix killing $U$ has columns $b,-b$, hence sends $(x,y)$ to $bd$. Once $d$ is known one can change the output space or $b$ without recovering a representative.
+
+**Why universality determines the answer.** If $q':V\to Q'$ also kills $U$ and satisfies the same property, factor $q'$ through $q$ to obtain $a$, and $q$ through $q'$ to obtain $b$. Then $baq=q=1q$. Uniqueness gives $ba=1$; exchanging the roles gives $ab=1$. Exactly one isomorphism satisfies $aq=q'$. The compatibility clause matters: the underlying spaces may admit many other isomorphisms.
+
+For a group $G$, the same reasoning uses cosets of a **normal** subgroup $N$ (one satisfying $gNg^{-1}=N$). Normality makes coset multiplication well defined. Every homomorphism killing $N$ factors uniquely by $[g]\mapsto f(g)$. For a ring, the required additive subgroup is a two-sided **ideal**, closed under multiplication from either side, so the multiplication of classes is well defined. These hypotheses tell us precisely when the proposed identification respects the operations.
+
+### Assembling outputs and prescribing inputs
+
+Suppose two instruments read $f:X\to V$ and $g:X\to W$. Their joint reading is the unique map $\langle f,g\rangle:X\to V\times W$, $x\mapsto(f(x),g(x))$, whose projections give $f,g$. Existence follows from the formula; uniqueness follows because the coordinates determine a pair. This argument works for arbitrary sets or for vector spaces with componentwise operations. In any category this mapping problem defines a **product** $(P,\pi_1,\pi_2)$ whenever a solution exists.
+
+Turn the problem around. Given linear rules $a:V\to X$, $b:W\to X$, can we extend both rules to a common domain? In the external direct sum $V\oplus W$ insert each input using $i_1(v)=(v,0)$ and $i_2(w)=(0,w)$. Define $[a,b](v,w)=a(v)+b(w)$. This is linear and restricts correctly. Every pair is $i_1(v)+i_2(w)$, forcing the formula. The object and its insertions satisfy the **coproduct** property. Reversing the product's arrows gives exactly this uniqueness problem. The preceding two-factor uniqueness proof for quotients adapts verbatim by requiring the comparison maps to commute with both structure arrows.
+
+For a matrix example take $f=[1\ 2]$, $g=[0\ 3]$ on $\mathbb R^2$. Pairing them stacks their rows. Given column maps $a=(1,2)^T$, $b=(3,0)^T$ out of $\mathbb R$, extending them places their columns side by side. Composition computes $af+bg$. This is the origin of block matrix multiplication.
+
+The common finite object is a **biproduct**. Its identities
+$$
+\pi_j i_k=\delta_{jk}1\quad (0\text{ for }j\ne k),\qquad
+i_1\pi_1+i_2\pi_2=1
+$$
+recover the two universal maps as $i_1f+i_2g$ and $a\pi_1+b\pi_2$. The formulas apply to any finite number of factors. In sets the coproduct is a *tagged disjoint union*: define the outgoing function separately on each tag. Two singleton sets have a one-element product and a two-element coproduct. For infinitely many vector spaces the product permits arbitrary families, whereas the coproduct consists of finitely supported families. Finite support is what makes the extension $\sum_j a_j(v_j)$ meaningful algebraically.
+
+### Adding subspaces in an ambient space
+
+Given $U,W\le V$, the external sum maps onto the internal sum by $s(u,w)=u+w$. Its kernel consists of $(z,-z)$ for $z\in U\cap W$. Thus the addition map identifies $U\oplus W$ with $U+W$ precisely when the intersection vanishes. For three subspaces one needs $U_i\cap\sum_{j\ne i}U_j=0$ for each $i$: a nonzero component of a zero sum witnesses failure. The two coordinate axes and the diagonal in $\mathbb R^2$ test why pairwise intersections alone do not suffice. In the partially ordered category of subspaces of *a fixed* $V$ (one arrow for inclusion), $U+W$ is itself the coproduct: any subspace containing both contains all sums. Changing the category has changed the universal problem.
+
+## Session 3 — Kernels, obstructions and splitting
+
+For $T:V\to W$, the inclusion $k:K=\ker T\hookrightarrow V$ is universal among maps $h:X\to V$ with $Th=0$. Indeed $h(x)\in K$, so corestrict $h$ to $K$; injectivity of $k$ forces uniqueness. Conversely the projection $c:W\to W/\operatorname{im}T$ is universal among maps $g:W\to Y$ with $gT=0$. The premise exactly says $g$ kills the image, so the quotient theorem supplies the unique map. This is the **cokernel**. Both constructions require a notion of zero morphism; a zero object, simultaneously initial and terminal, supplies one by $X\to0\to Y$. In vector spaces the zero-dimensional space serves.
+
+| Object | Where it lives | Question concerning $Tv=w$ |
+|---|---|---|
+| $\ker T$ | Subspace of the domain | How do solutions differ? |
+| $\operatorname{im}T$ | Subspace of the target | Which right-hand sides occur? |
+| $\operatorname{coker}T$ | Quotient of the target | Which class $[w]$ obstructs solvability? |
+
+A **monomorphism** $m$ is left cancellable ($ma=mb\Rightarrow a=b$). An **epimorphism** $e$ is right cancellable ($ae=be\Rightarrow a=b$). In vector spaces injectivity gives left cancellation pointwise. If $0\ne v\in\ker m$, the two maps from $\mathbb F$ given by $s\mapsto sv$ and zero disprove it. Surjectivity gives right cancellation by testing on preimages. If the image is proper, the nonzero cokernel projection and zero agree after composition with $e$. The same cancellation characterizations hold in modules, using maps out of $R$ instead of $\mathbb F$. They need care in other categories: the inclusion $\mathbb Z\to\mathbb Q$ is epic among commutative unital rings, since any two outgoing ring maps agreeing on integers agree on $m/n$ by preservation of inverses.
+
+A pair $A\xrightarrow{f}B\xrightarrow{g}C$ is **exact at $B$** if $\operatorname{im} f=\ker g$. Composition zero only proves one inclusion. In a short exact sequence $0\to A\xrightarrow{i}B\xrightarrow{p}C\to0$, $i$ is injective, $p$ surjective, and $p$ identifies $B/i(A)$ with $C$: $[b]\mapsto p(b)$ is well defined, injective by exactness, and onto. Exactness describes the ambiguity in lifting $c$ to $b$. A **section** $s:C\to B$ with $ps=1$ makes one lift linear in $c$.
+
+**Splitting theorem.** Such a section exists exactly when there is a compatible decomposition $B\simeq A\oplus C$. Given $s$, send $(a,c)\mapsto i(a)+s(c)$. For $b$ put $c=p(b)$; $b-s(c)$ is in $\ker p=i(A)$ and determines a unique $a$. This gives a linear inverse. Conversely the second coordinate injection in a compatible decomposition is a section. A retraction $r:B\to A$ with $ri=1$ also suffices: $p|_{\ker r}$ is bijective since $b-i r(b)$ has the same image as $b$ and $\ker r\cap i(A)=0$. Its inverse is a section.
+
+Over a field choose a basis of $C$, lift its members separately along $p$, then extend linearly. This proves every such sequence splits. Two sections differ by $ih$ with $h:C\to A$, since $p(s_1-s_2)=0$. The choice can be substantial. Over $\mathbb Z$ consider
+$$0\to\mathbb Z\xrightarrow{\times2}\mathbb Z\xrightarrow{\bmod 2}\mathbb Z/2\to0.$$
+The even integers are exactly the kernel. A section would send $[1]$ to an odd integer $n$ satisfying $2n=s(2[1])=0$, an impossibility. Exactness alone cannot produce independent coordinates compatible with the scalar action.
+
+**Why the first isomorphism theorem recurs.** Define the coimage as the cokernel of $k$, and the image as the kernel of $c$. In vector spaces these are $V/\ker T$ and $\operatorname{im}T$. The unique induced map $[v]\mapsto Tv$ is onto by definition and has zero kernel since $Tv=0$ gives $[v]=0$. Thus $T$ factors canonically as quotient, isomorphism, inclusion. An **abelian category** abstracts this situation: morphisms can be added as abelian groups, composition distributes, finite biproducts and kernels and cokernels exist, and the canonical coimage-to-image map is always invertible. Modules over a ring satisfy these conditions even when sequences fail to split. Exactness and splitting express different properties.
+
+## Session 4 — Pulling measurements back
+
+An output measurement $\lambda:W\to\mathbb F$ gives an input measurement without solving an inverse problem: apply $T$ and then $\lambda$. In general, given $a:V'\to V$, $b:W\to W'$, define
+$$
+\operatorname{Hom}(V,W)\to\operatorname{Hom}(V',W'),\qquad h\mapsto bha .
+$$
+Postcomposition moves with the output arrow (covariance); precomposition moves against the input arrow (contravariance). Both operations preserve addition and commute with one another by associativity. Setting $W=\mathbb F$ and fixing the output gives $T^\vee\lambda=\lambda T$. Evaluating on $v$ gives $(ST)^\vee\mu(v)=\mu(STv)=(T^\vee S^\vee\mu)(v)$, and $1^\vee=1$. In dual bases $(T^\vee\epsilon^j)(e_i)=\epsilon^j(Te_i)=A_{ji}$, so the dual matrix is $A^T$ over any field, including $\mathbb C$.
+
+### Evaluation and its limitations
+
+A vector determines a way to read every measurement: $\iota_V(v)(\lambda)=\lambda(v)$. This is linear in $\lambda$ and in $v$. If $v\ne0$, extend $v$ to a basis and take its coordinate functional; thus $\iota_V$ is injective. In finite dimension the dual basis gives $\dim V^{\vee\vee}=\dim V$, hence bijectivity. For any $T:V\to W$ we have a commutative square:
+$$
+\begin{array}{ccc}
+V&\xrightarrow{T}&W\\
+{\scriptstyle\iota_V}\downarrow&&\downarrow{\scriptstyle\iota_W}\\
+V^{\vee\vee}&\xrightarrow{T^{\vee\vee}}&W^{\vee\vee}.
+\end{array}
+$$
+Indeed both routes evaluated at $\mu\in W^\vee$ give $\mu(Tv)$. This proof needs no finiteness assumption. Finiteness is used to turn the vertical arrows into isomorphisms.
+
+For a concrete failure of surjectivity take $V=\mathbb F^{(\mathbb N)}$, finite sequences extended by zeros. Its dual consists of **all** sequences, acting by finite dot products. On the subspace of eventually constant sequences define $L(a)$ to be their eventual value; extend $L$ linearly to the entire dual by basis extension. If $L=\iota_V(v)$, testing on each coordinate sequence forces every $v_i=0$. But $L(1,1,\ldots)=1$. This double-dual element is invisible to every candidate vector.
+
+What would identify $V$ with $V^\vee$? A basis supplies the bilinear pairing $\sum x_i y_i$ in those coordinates; changing the basis generally changes the pairing. Even invariance under all changes of basis is too much to demand over $\mathbb R$: invariance of a bilinear form $B$ under $2I$ gives $B(v,w)=4B(v,w)$, hence $B=0$. An inner product supplies extra data. In finite dimension, or for the **continuous** dual of a Hilbert space by Riesz representation, $R_V(y)=\langle\,\cdot\,,y\rangle$ identifies the two spaces, conjugate-linearly over $\mathbb C$. The identity $T^\vee R_W=R_VT^*$ follows by evaluating on $x$. In Hilbert spaces take $T$ bounded and restrict to continuous functionals. This is how $A^H$ enters in orthonormal coordinates. Reversing arrows in a category, pulling back scalar measurements, and forming a Hilbert adjoint are three distinct operations linked by these identities.
+
+### Exactness seen by measurements
+
+Dualizing a short exact sequence gives
+$$
+0\to C^\vee\xrightarrow{p^\vee}B^\vee\xrightarrow{i^\vee}A^\vee\to0.
+$$
+Surjectivity of $p$ makes $p^\vee$ injective. A measurement on $B$ vanishing on $i(A)$ factors uniquely through $p$, giving exactness in the middle and $(B/i(A))^\vee\simeq i(A)^0$. Every measurement on $A$ extends to $B$ by making it zero on a chosen complement. This proves surjectivity at the right, including in algebraic infinite dimension under basis extension. The set of extensions is canonical, even though an individual extension can require a choice.
+
+For modules $\operatorname{Hom}_R(-,M)$ always gives injectivity at the left and exactness in the middle by the same factorization. Extension can fail. Applying $\operatorname{Hom}_{\mathbb Z}(-,\mathbb Z)$ to the multiplication-by-two sequence gives restriction represented by multiplication by two on $\mathbb Z$, which misses $1$. Splitting of the original sequence would guarantee extension for every $M$.
+
+## Session 5 — When constructions respect changes of data
+
+Consider computing a kernel before and after changing a linear system. The relevant input is a map, and a change consists of a commuting square $bT=T'a$. For $v\in\ker T$, $T'av=bTv=0$. Thus $a$ restricts to a map of kernels. Restrictions of identities are identities, and restrictions compose. This is more informative than the bare association $T\mapsto\ker T$: it specifies exactly which changes can be transported.
+
+A **functor** $F:\mathcal C\to\mathcal D$ assigns an object $FX$ to each object and a morphism $Ff:FX\to FY$ to each $f:X\to Y$, preserving identities and composition. A contravariant functor is an ordinary functor from $\mathcal C^{\mathrm{op}}$. The kernel example has the *arrow category* as source: its objects are linear maps, its arrows the squares just used, and squares compose by composing their two sides. Forgetting scalars gives a functor to abelian groups; forgetting the addition too gives one to sets. Both keep the underlying function. Fixing $X$ gives the covariant functor $\operatorname{Hom}(X,-)$ and fixing $Y$ gives the contravariant $\operatorname{Hom}(-,Y)$. The dual functor is the latter at $Y=\mathbb F$, keeping the vector-space structure on the outputs; applying it twice restores the direction.
+
+For two functors $F,G:\mathcal C\to\mathcal D$, a **natural transformation** is a family $\eta_X:FX\to GX$ satisfying $Gf\,\eta_X=\eta_Y Ff$ for every $f:X\to Y$. Think of two ways to transport an answer: translate it into the other description first, or first change the input. Naturality says these give identical results. If each $\eta_X$ is invertible, its inverses are natural as well (multiply the identity on both sides by the inverses). This is a natural isomorphism. The evaluation square proves that $\iota$ is a natural transformation everywhere and a natural isomorphism on finite-dimensional spaces.
+
+In contrast, an ordered basis $B$ gives a coordinate isomorphism $c_B:V\to\mathbb F^n$. Replacing $B$ by $BS$ changes $c_B$ to $S^{-1}c_B$. If one tried to keep coordinate outputs fixed under *all* automorphisms $S$ of $V$, the condition $c_B S=c_B$ would force $S=1$. Transporting the basis together with the space makes coordinates meaningful again. To test a claim of canonicity, specify the input data, the permitted maps, and the equation they must satisfy.
+
+### Why a mapping problem can have an object as its answer
+
+Fix $V,U$. The rule $H(W)=\{f:V\to W\mid f(U)=0\}$ transports a solution forward by postcomposition. Session 2 identified it with $\operatorname{Hom}(V/U,W)$. This identification is natural in $W$: factoring $bf$ gives $b\bar f$, since they agree after composition with $q$. A functor of this form is called **represented** by its source object. Its universal element is the solution corresponding to the identity, here $q$.
+
+There is a short reason the identity contains so much information. Given a covariant set-valued functor $H$ and natural maps $\Phi_X:\operatorname{Hom}(Q,X)\to H(X)$, put $u=\Phi_Q(1_Q)$. Naturality along $g:Q\to X$ forces $\Phi_X(g)=H(g)(u)$. Conversely every $u\in H(Q)$ gives such a family because $H(bg)=H(b)H(g)$. These operations are inverse. This is the covariant form of the **Yoneda lemma** for a category with sets of morphisms. It gives a practical proof strategy: construct one universal element, then show each solution is its unique transport. The tensor product will use exactly this strategy with a bilinear universal element.
+
+## Session 6 — A linear operator is a polynomial action
+
+### Why enlarge the scalars?
+
+Suppose an algorithm is allowed to add vectors, scale them, and repeatedly apply one fixed operator $T$. From a starting vector $v$ it can build exactly $p(T)v$ as $p$ ranges over $\mathbb F[t]$. We can record all three permitted operations in one scalar action. For a ring $R$, a left action on an abelian group satisfies
+$$
+(r+s)v=rv+sv,\quad r(v+w)=rv+rw,\quad (rs)v=r(sv),\quad 1v=v .
+$$
+These rules include ordinary vector spaces, abelian groups with integer scalars, $R$ acting on itself by multiplication, and $M_n(\mathbb F)$ acting on column vectors. A module can have torsion: a nonzero scalar can kill a nonzero element, as $2[1]=0$ in $\mathbb Z/2$. Such a module cannot have a basis over $\mathbb Z$, since a free abelian group has no nonzero torsion elements.
+
+Set $p(t)v=p(T)v$, where $p(T)=\sum_j a_jT^j$ and $T^0=I$. Polynomial evaluation preserves sums, products and identity: for products expand and use $T^jT^k=T^{j+k}$. Each $p(T)$ is linear. These facts prove every module axiom. Conversely, an $\mathbb F[t]$-module restricts to a vector space using constant polynomials, and the action of $t$ recovers $T$. A linear map $L$ between two such spaces is a module map precisely when $LT=SL$: necessity follows by taking $p=t$, sufficiency by induction on powers and linearity. An invertible intertwiner is exactly a similarity of operators.
+
+**Invariant-subspace theorem.** An $\mathbb F$-subspace $U$ is a submodule iff $T(U)\subseteq U$. Closure under the action implies closure under $t$; conversely invariance under $T$ gives invariance under its powers and linear combinations. In particular $T$ induces $\bar T[v]=[Tv]$ on $V/U$: changing the representative adds $Tu\in U$. A section of the quotient is a *module* section precisely when it also intertwines $\bar T$ and $T$. Its image is then an invariant complement.
+
+### Cyclic modules, Krylov spaces and annihilators
+
+For $v\ne0$ consider the module map $\phi_v:\mathbb F[t]\to V$, $p\mapsto p(T)v$. Its image is the cyclic submodule generated by $v$. Its kernel is an ideal. Every nonzero ideal of $\mathbb F[t]$ has a monic generator: pick a nonzero polynomial of least degree, scale it to be monic and divide any ideal member by it; the remainder lies in the ideal and must vanish. Polynomial division uses the field assumption. A commutative integral domain in which all ideals have a single generator is called a **principal ideal domain** (PID).
+
+In finite dimension some powers $v,Tv,\dots,T^nv$ are dependent. Thus the kernel has a unique monic generator $m_v$, the vector minimal polynomial. The first isomorphism theorem gives
+$$
+\mathbb F[t]v\simeq\mathbb F[t]/(m_v).
+$$
+If $\deg m_v=d$, residues $1,\ldots,t^{d-1}$ are a basis by polynomial division and minimality. Hence $\dim\mathcal K_j(T,v)=\min(j,d)$ for $j\ge1$. The first dependent Krylov column yields the coefficients of $m_v$, and the space stops growing because the dependence expresses $T^dv$ in terms of earlier powers. In this basis the matrix is a companion matrix: it shifts all but the last basis vector and the last column is the recurrence.
+
+The operator annihilator is the intersection of the vector annihilators. Testing on a basis $e_i$ suffices, so its monic generator $m_T$ is $\operatorname{lcm}_i m_{e_i}$. Consequently $p(T)=0$ iff $m_T\mid p$. Two filters with equal residues modulo $m_T$ act identically on *all* vectors. On one starting vector it suffices to reduce modulo $m_v$, which can have much smaller degree.
+
+### A two-dimensional extension that refuses to split
+
+Let $T=\left(\begin{smallmatrix}2&1\\0&2\end{smallmatrix}\right)$ on $\mathbb R^2$. Then $(T-2I)e_2=e_1$ and $(T-2I)e_1=0$. The vector $e_2$ generates the whole space with $m_{e_2}=(t-2)^2$; $e_1$ generates a line killed by $t-2$. The quotient by that line is also killed by $t-2$. An invariant complementary line would be another eigenline, yet $\ker(T-2I)=\mathbb R e_1$. Thus the extension splits linearly and fails to split as a polynomial module. Two copies of the same one-dimensional factor can assemble into a Jordan block. The coupling is the single off-diagonal entry.
+
+### Coprime annihilators give genuine projectors
+
+Suppose $m_T=ab$ with $a,b$ monic and coprime. The Euclidean algorithm gives $u a+v b=1$. Put $P_a=v(T)b(T)$, $P_b=u(T)a(T)$. Then $P_a+P_b=I$ and $P_aP_b=P_bP_a=0$ because $ab$ annihilates $T$. Multiplication by $P_a$ proves $P_a^2=P_a$. Its image lies in $\ker a(T)$ and it is the identity there because $P_b$ vanishes there. Similarly $\operatorname{im}P_b=\ker b(T)$. Thus
+$$ V=\ker a(T)\oplus\ker b(T). $$
+The projectors commute with $T$ and are independent of the Bézout coefficients: $P_a$ is prescribed as identity on one summand and zero on the other. Equivalently, the residue of $vb$ is $1$ modulo $a$ and $0$ modulo $b$. This proves the two-factor **Chinese remainder theorem** here: the residue map $\mathbb F[t]/(ab)\to\mathbb F[t]/(a)\times\mathbb F[t]/(b)$ has zero kernel by coprimality, and $(r,s)$ lifts to $rvb+sua$.
+
+Iterating for $m_T=\prod_i p_i^{d_i}$ gives the **primary decomposition** into $\ker p_i(T)^{d_i}$ for distinct monic irreducibles $p_i$. A linear factor gives a generalized eigenspace; $\ker(T-\lambda I)$ itself is the eigenspace. If all factors are distinct and linear, each primary space is an eigenspace, hence an eigenbasis exists. Conversely for a diagonal matrix a polynomial vanishes iff it vanishes at every distinct diagonal entry, so the minimal polynomial is the product of their distinct linear factors. This proves the diagonalizability criterion over the stated field. For simple factors the projectors use ordinary Lagrange interpolation, $P_i=\prod_{j\ne i}(T-\lambda_jI)/(\lambda_i-\lambda_j)$. A real plane rotation by $90^\circ$ has $m_T=t^2+1$, square-free but irreducible over $\mathbb R$: the field matters.
+
+**Three-dimensional computation.** Take the matrix from the eigenspace example
+$$
+A=\begin{pmatrix}2&0&-3\\1&-1&-1\\0&0&-1\end{pmatrix}.
+$$
+Its $2$-eigenspace is $\operatorname{span}(3,1,0)$ and its $-1$-eigenspace is $\{(x,y,x)\}$. They span $\mathbb R^3$, so $m_A=(t-2)(t+1)$. For any $x=(x_1,x_2,x_3)$, the projector $(A+I)/3$ returns $(x_1-x_3)(1,1/3,0)$. Subtracting this from $x$ leaves first and third coordinates equal. It projects *along the other eigenspace*, which explains its oblique geometry. A single vector in either eigenspace has a degree-one annihilator; a vector with both components nonzero needs both factors.
+
+### Why Jordan blocks arise, and what the minimal polynomial omits
+
+**Structure theorem used without proof.** A finitely generated torsion module over a PID is a finite direct sum of cyclic modules $R/(d_j)$, with nonunit invariant factors $d_1\mid\cdots\mid d_r$, unique up to multiplication by units. Finite-dimensional $V$ is generated by any vector-space basis and is torsion under $\mathbb F[t]$ by the annihilator argument above. A proof of the general theorem uses reduction of a presentation matrix to Smith normal form; no claim below requires assuming that every invariant subspace splits.
+
+The cyclic and coprime-factor results already proved split these summands into prime powers. When the polynomial splits over $\mathbb F$, each piece is $\mathbb F[t]/((t-\lambda)^k)$. Write $u=t-\lambda$ and order the basis as $u^{k-1},\ldots,u,1$. Multiplication by $t$ acts as $\lambda I$ plus a backward shift killing the first vector. Its matrix is exactly one Jordan block. This derives Jordan form from the stated theorem. The largest block at $\lambda$ gives the exponent in $m_T$; smaller blocks can be present. More precisely a length-$s$ block contributes $\min(j,s)$ to $\dim\ker(T-\lambda I)^j$, and blocks at other eigenvalues contribute zero. Successive differences count blocks of length at least $j$. These counts recover information absent from $m_T$.
+
+**Four-dimensional computation.** Let $A=J_2(2)\oplus[2]\oplus[-1]$. Then $\chi_A=(t-2)^3(t+1)$ and $m_A=(t-2)^2(t+1)$. The $2$-eigenspace is spanned by $e_1,e_3$ and its primary space also contains $e_2$. To project onto the $-1$ line, take $p(t)=(t-2)^2/9$. It is zero modulo $(t-2)^2$ and equals $1$ at $-1$. Hence $p(A)=\operatorname{diag}(0,0,0,1)$. Merely imposing $p(2)=0$ would leave a term proportional to $p'(2)$ on the Jordan block: $p(2I+N)=p(2)I+p'(2)N$ when $N^2=0$. Repeated factors require interpolation with multiplicity. This explains a concrete difference between filtering a normal matrix and filtering a defective one.
+
+## Session 7 — Turning bilinear rules into linear maps
+
+The product $B(x,y)=xy$ on $\mathbb R\times\mathbb R$ is linear in each argument separately. Joint linearity would imply $B(1,1)=B(1,0)+B(0,1)=0$, whereas $B(1,1)=1$. In fact *every* jointly linear bilinear map is zero by that argument. The direct sum therefore solves the wrong extension problem. We need a space generated by symbols for pairs, in which a linear map can reproduce exactly the separate linearity rules.
+
+Take the free vector space $L$ on the set $V\times W$: elements are finite formal sums of basis symbols $[v,w]$. Quotient by the span of the relations
+$$
+[av+bv',w]-a[v,w]-b[v',w],\qquad
+[v,aw+bw']-a[v,w]-b[v,w'] .
+$$
+Write the resulting space $V\otimes W$ and the class of $[v,w]$ as $v\otimes w$. The defining map $\tau(v,w)=v\otimes w$ is bilinear by construction. Given bilinear $B:V\times W\to Z$, extend $[v,w]\mapsto B(v,w)$ linearly to $L$. It kills the displayed relations, so quotient factorization gives a unique $\tilde B$ on $V\otimes W$. Conversely any linear $h$ gives a bilinear $h\tau$. Since the pure tensors span, these operations are inverse:
+$$
+\operatorname{Bil}(V,W;Z)\simeq\operatorname{Hom}(V\otimes W,Z).
+$$
+The isomorphism is linear and natural in $Z$ by postcomposition. The proof also constructs a tensor product over a commutative ring using free modules and the corresponding relations with ring scalars.
+
+**Coordinates and rank.** Given bases $e_i,f_j$, bilinearity expands $v\otimes w=\sum_{ij}v_iw_j e_i\otimes f_j$. These elementary tensors span. For independence apply the functional induced by $(v,w)\mapsto e^k(v)f^\ell(w)$: it returns precisely coefficient $(k,\ell)$. Thus dimensions multiply in finite dimension. In $\mathbb R^2\otimes\mathbb R^2$, the coefficients of a pure tensor form the rank-at-most-one matrix $vw^T$. The tensor $e_1\otimes e_1+e_2\otimes e_2$ has coefficient matrix $I_2$ and cannot be expressed as one pure tensor. Arbitrary finite sums are essential.
+
+**Maps and Kronecker matrices.** For $A:V\to V'$, $B:W\to W'$, the bilinear rule $(v,w)\mapsto Av\otimes Bw$ gives $A\otimes B$. Its $(i,j)$ input basis column has coefficients $A_{ki}B_{\ell j}$. With the second index varying fastest the matrix is the block array $(A_{ki}B)_{ki}$, the Kronecker product. On each pure tensor $(C\otimes D)(A\otimes B)=CA\otimes DB$; spanning proves the identity everywhere. The abstract map is independent of ordering, its array depends on ordering.
+
+**Why outer products build operators.** The canonical map $\Phi:V^\vee\otimes W\to\operatorname{Hom}(V,W)$ sends $\lambda\otimes w$ to $x\mapsto\lambda(x)w$. If $V$ is finite dimensional, an inverse sends $T$ to $\sum_i e^i\otimes T(e_i)$. Applying the two composites to $x$ and to $\lambda\otimes w$ respectively gives $T(x)$ and $\sum_i\lambda(e_i)e^i\otimes w=\lambda\otimes w$. Thus the inverse is independent of the basis used to compute it. In arbitrary dimension the image is exactly the finite-rank maps: every finite sum has finite-dimensional image, and reading coordinates in a basis for a finite-dimensional range supplies the reverse inclusion. In particular the infinite-dimensional identity lies outside the image. Likewise $V^\vee\otimes W^\vee\to(V\otimes W)^\vee$ pairs elementary tensors by multiplication of evaluations; it is an isomorphism for finite-dimensional factors by the basis calculation. The universal description of bilinear forms as $(V\otimes W)^\vee$ holds in every dimension.
+
+**A discretization you can assemble without a full matrix.** On a rectangular grid with separable boundary conditions take one-dimensional second-difference matrices $L_x,L_y$. Write an array $U$ with the $y$ index down columns, and stack columns into $\operatorname{vec}U$. Acting on each $x$ or $y$ fiber gives
+$$
+(I_x\otimes L_y+L_x\otimes I_y)\operatorname{vec}U
+=\operatorname{vec}(L_yU+UL_x^T).
+$$
+Check this first on $U=wv^T$, for which $\operatorname{vec}U=v\otimes w$, then use linearity. The tensor product explains why independent coordinate actions extend to general grid data. Applying the two small matrices to arrays is the computational benefit. A general mesh or variable coefficient need not have this two-term separable representation.
+
+## Session 8 — When zero composition leaves a hole
+
+Orient the triangle edges $a:1\to2$, $b:2\to3$, $c:3\to1$. Regard edge flows as elements of $C_1=\mathbb R^3$ and vertex loads as $C_0=\mathbb R^3$. Send an edge to head minus tail:
+$$
+D_1=\begin{pmatrix}-1&0&1\\1&-1&0\\0&1&-1\end{pmatrix}.
+$$
+Then $D_1(x,y,z)=0$ exactly when $x=y=z$. A circulating flow has zero net load everywhere. The image is the plane of zero-sum vertex loads: each column sums to zero, and the first two columns are independent. The graph alone has no faces, so it contains a cycle that is the boundary of no available face.
+
+Now fill the triangle. Take $C_2=\mathbb R$ and send its oriented face to $a+b+c$, so $D_2=(1,1,1)^T$. Then $D_1D_2=0$. The circulation is still present, but now every circulation bounds a face multiple. The distinction cannot be seen from $D_1$ alone.
+
+A **chain complex** consists of maps $d_k:C_k\to C_{k-1}$ with $d_kd_{k+1}=0$. Every boundary $d_{k+1}x$ therefore belongs to $Z_k=\ker d_k$, the cycles. Put $B_k=\operatorname{im}d_{k+1}$. Two cycles define the same homology class when their difference bounds:
+$$
+H_k=Z_k/B_k,\qquad \dim H_k=\dim C_k-\operatorname{rank}d_k-\operatorname{rank}d_{k+1}
+$$
+in finite-dimensional vector spaces. The dimension formula follows by rank-nullity and quotient dimension. Exactness at $C_k$ is equivalent to $H_k=0$. Taking $d_0=0$, the triangle graph has dimensions $(\dim H_0,\dim H_1)=(1,1)$. Filling it gives $(1,0,0)$ in degrees zero through two, since $D_2$ is injective. The surviving $H_0$ measures total load; more generally each connected component contributes one independent total since differences of vertices along paths are edge boundaries.
+
+### From chains to differential operators
+
+Transposing the incidence matrix sends vertex potentials to oriented edge differences. A discrete potential $u$ gives $g=D_1^Tu$. The sum around the face is $D_2^Tg=0$ since it telescopes. This is the direction of a **cochain** complex: the degree increases. With inner products, the adjoint of the gradient gives a divergence up to sign, and mass matrices encode the chosen inner products. The incidence identity itself only uses orientations.
+
+For smooth scalar and vector fields on an open subset of $\mathbb R^3$, the gradient, curl and divergence are successive arrows with zero composites by equality of mixed partials. Their common generalization on differential forms is the exterior derivative $d$ satisfying $d^2=0$, the **de Rham complex**. Exactness asks whether every closed field has a potential of the appropriate degree. On $\mathbb R^2\setminus\{0\}$, $F=(-y,x)/(x^2+y^2)$ has zero scalar curl by differentiation. Its circulation on $(\cos t,\sin t)$ is $\int_0^{2\pi}1\,dt=2\pi$, whereas a global gradient integrates to zero on a closed path. Smoothness alone cannot fill the missing point. On a star-shaped domain, for a smooth curl-free field and star center $0$, set $u(x)=\int_0^1 F(tx)\cdot x\,dt$. Differentiating in $x_i$ and using $\partial_i F_j=\partial_j F_i$ makes the integrand $\frac{d}{dt}(tF_i(tx))$, hence $\partial_i u=F_i(x)$. This proves exactness at this position under a concrete geometric hypothesis.
+
+A compatible discretization chooses spaces and discrete derivatives forming a complex. If interpolation or projection maps $\Pi_k$ satisfy $d_h\Pi_k=\Pi_{k+1}d$, differentiating interpolated data agrees with interpolating its derivative. For instance the difference of scalar values at an edge's endpoints equals the edge integral of its gradient. This is a commuting square with a numerical meaning. Stability estimates and approximation rates require additional analysis; the commuting equation alone establishes an algebraic identity.
+
+## Session 9 — Four problems seen through several constructions
+
+### A. Recovering a potential from measurements
+
+Take $T=D_1^T$ from the triangle, so $Tu=(u_2-u_1,u_3-u_2,u_1-u_3)$. Let $K=\mathbb R(1,1,1)$ and $S=\{g:\sum_i g_i=0\}$. A lift of $(a,b,-a-b)$ is $(0,a,a+b)$; every other lift adds a constant. Thus the two short exact sequences are
+$$
+0\to K\to\mathbb R^3\xrightarrow{T} S\to0,\qquad
+0\to S\to\mathbb R^3\xrightarrow{\sum}\mathbb R\to0 .
+$$
+In the first sequence $T$ is corestricted to $S$. The induced quotient isomorphism $[u]\mapsto Tu$ is canonical. In the second, the sum gives explicit coordinates on the cokernel. On dualizing, $0\to S^\vee\to(\mathbb R^3)^\vee\to K^\vee\to0$ describes the potential measurements insensitive to constants as exactly the pulled-back edge measurements. The second dual sequence says that two ambient edge measurements restricting equally to $S$ differ by a multiple of the sum functional. Choosing $u_1=0$ selects a section; choosing mean-zero potentials selects another, singled out by the Euclidean geometry and its symmetry under relabeling. Both recover the same quotient class.
+
+### B. What a Krylov process can recover
+
+Return to $A=J_2(2)\oplus[2]\oplus[-1]$ and take $v=e_2+e_4$. Its two nonzero primary components have annihilators $(t-2)^2$ and $t+1$. A polynomial kills their sum iff it kills each component, so $m_v=m_A$ and the Krylov dimension stabilizes at three. Yet $e_3$ can never appear: every polynomial image lies in $\operatorname{span}(e_1,e_2,e_4)$. Knowing the full minimal polynomial does not make a single starting vector cyclic for the entire space. A block with a second start $e_3$ supplies the missing direction. The CRT filter $p(A)$ from Session 6 extracts $e_4$ from $v$ in one polynomial application.
+
+For a Hermitian operator with orthonormal eigenbasis, $q(A)v=\sum_i q(\lambda_i)c_i u_i$. If the wanted and unwanted spectral sets have $\min_{\mathrm{wanted}}|q|=\alpha>0$ and $\max_{\mathrm{unwanted}}|q|=\beta$, then the ratio of unwanted to wanted component norms after filtering is at most $\beta/\alpha$ times its initial value, provided the wanted component is nonzero. This follows by squaring and summing coefficients in each orthogonal subspace. A Chebyshev filter exploits small values on an unwanted interval and large values on the desired part. Exact CRT interpolation presupposes detailed spectral data; interval filtering can use bounds. Both use the polynomial action, while their information requirements and numerical behavior differ.
+
+### C. A mesh with one remaining circulation
+
+In a square, orient edges $12,23,34,41$ cyclically and add diagonal $13$. Attach only face $123$. The boundary vectors of the two triangular loops in edge coordinates are $z=(1,1,0,0,-1)$ and $w=(0,0,1,1,1)$. The incidence matrix and face column are
+$$
+D=\begin{pmatrix}-1&0&0&1&-1\\1&-1&0&0&0\\0&1&-1&0&1\\0&0&1&-1&0\end{pmatrix},
+\qquad E=\begin{pmatrix}1\\1\\0\\0\\-1\end{pmatrix},
+$$
+where the columns of $D$ follow the stated edge order. Direct multiplication gives $Dz=Dw=0$ when loops are columns. The first three edge columns are independent (a path on four vertices), and zero column sums bound the rank by three. Thus $z,w$ form a basis of the two-dimensional kernel. Quotienting by $\operatorname{im}E$ leaves one class $[w]$; the outer boundary $z+w$ represents that same class. A zero face-sum constraint on edge differences enforces local compatibility on the filled triangle. The remaining loop integral tests a second, global compatibility condition for a vertex potential.
+
+### D. From a quotient to an operator equation
+
+A real weak problem seeks $u\in V$ with $a(u,v)=\ell(v)$ for all $v\in V$. A bounded bilinear form gives a bounded operator $\mathcal A:V\to V'$ by $(\mathcal Au)(v)=a(u,v)$, where the prime denotes continuous dual. For the pure Neumann energy $a(u,v)=\int_\Omega\nabla u\cdot\nabla v$ on $H^1(\Omega)$ of a bounded connected Lipschitz domain, constants are killed in both slots. Necessarily $\ell(1)=0$. Then the form and load descend to the quotient by constants, and its elements describe potentials up to an additive constant. Existence and bounded dependence use a Poincaré inequality and coercivity on that quotient (analytical results used here without proof). In a Galerkin subspace $V_h$ the residual $\ell-\mathcal Au_h$ vanishes on all test vectors in $V_h$: this is membership in an annihilator.
+
+For a generalized eigenproblem $Kx=\lambda Mx$ with $K=K^H$ and $M$ Hermitian positive definite, $M$ identifies coefficient vectors with dual loads in matrix coordinates. $T=M^{-1}K$ is self-adjoint for $\langle x,y\rangle_M=y^HMx$, since $MT=T^HM=K$. Polynomials in $T$ preserve its eigenspaces, and orthogonal projectors use the $M$ geometry. In particular for a full-column-rank basis $Q$ of a subspace, $Q(Q^HMQ)^{-1}Q^HM$ gives the $M$-orthogonal projector: its output lies in the range of $Q$ and its error is annihilated by $Q^HM$. Applying $T$ computationally can be realized by solving with $M$.
+
+### Bridge to F1 — Where topology changes the answer
+
+For a normed space $X$ the quotient seminorm is $\|[x]\|=\inf_{u\in U}\|x-u\|$. It vanishes precisely when $x\in\overline U$, so a normed quotient needs $U$ closed; a Banach space modulo a closed subspace is Banach. If a bounded $f$ kills $U$, continuity makes it kill $\overline U$, and $\|\bar f[x]\|\le\|f\|\inf_{u\in U}\|x-u\|$ proves bounded quotient factorization. Thus the cokernel of a bounded $T$ in Banach spaces is the quotient by the **closure** of its range.
+
+For example $D:\ell^2\to\ell^2$, $(Dx)_n=x_n/n$, is bounded and injective. Its range contains all finitely supported sequences, hence is dense, but misses $(1/n)$ because its preimage would be the constant sequence $1$. Its Banach-space cokernel is zero although its algebraic cokernel is nonzero. Its inverse on the range is unbounded since $\|De_n\|=1/n$. Kernels of bounded maps are always closed by continuity. Algebraic exactness alone gives no closed-range estimate.
+
+A topological direct sum requires bounded coordinate projections. For a bounded idempotent $P$, $X=\operatorname{im}P\oplus\ker P$ with closed summands since the image is $\ker(I-P)$. Conversely a decomposition into two closed subspaces of a Banach space has bounded projections: the addition map from the Banach product onto $X$ is a bounded bijection, so its inverse is bounded by the bounded inverse theorem. This argument assumes a complement exists. Hilbert spaces provide a bounded orthogonal projection onto each closed subspace; general Banach spaces need not. Finally, algebraic functionals need not be bounded: on the finite sequences with $\ell^2$ norm the map $x\mapsto\sum n x_n$ sends the unit vectors to $n$. An algebraic dual construction, a continuous dual construction and a choice of geometric representative answer different questions.
+
+## Exercises
+
+Try these in order with the solutions covered. For each factorization identify the arrow whose existence is claimed and the property that forces uniqueness.
+
+1. **Quotients in stages.** For $U\subseteq W\subseteq V$, construct a canonical isomorphism $(V/U)/(W/U)\simeq V/W$ using universal properties. Derive the first isomorphism theorem as a factorization.
+2. **A product that changes with its category.** Compute the product and coproduct of two singleton sets. For vector spaces derive the product and coproduct formulas from the biproduct identities alone. Explain where addition is used.
+3. **Gluing measurements.** Given $\alpha:U\to X$, $\beta:W\to X$ on subspaces of $V$, determine exactly when there is a linear $h:U+W\to X$ extending both.
+4. **A cokernel compatibility test.** For $T(x,y,z)=(x+y,2x+2y,z)$, compute kernel, image and cokernel. Give a compatible section on the image and all solutions for $(3,6,4)$.
+5. **Splitting depends on the scalars.** Classify sections of $(x,y)\mapsto x$ on $\mathbb R^2$. Decide which sections are module maps when the domain operator is $(x,y)\mapsto(x,x+y)$ and the target operator is the identity. Compare reduction modulo $n$ on $\mathbb Z$, $n>1$.
+6. **Dualizing the gradient.** With $Tu=(u_2-u_1,u_3-u_2,u_1-u_3)$, pull back the measurement $(a,b,c)$ and find all measurements pulling back to zero. Verify double-dual naturality on this example.
+7. **A functor that detects obstructions.** A square $bT=T'a$ induces a map of cokernels. Construct it and verify functoriality and naturality of the cokernel projections.
+8. **Krylov recurrence.** For $A=J_2(2)\oplus[-1]$ find $m_v$ for $v=e_1$, $e_2$, $e_1+e_3$, $e_2+e_3$. Predict the first index of Krylov stagnation in each case.
+9. **Interpolation with a repeated node.** Construct the projector onto the generalized $2$-eigenspace for the operator in Exercise 8. Verify its action on the Jordan chain and explain why a degree-one filter cannot work.
+10. **Reading block sizes.** A nilpotent $N$ on a six-dimensional space has nullities $3,5,6$ for its first three powers. Determine the blocks, the minimal polynomial, and a module presentation as a sum of cyclic modules.
+11. **A bilinear rule and its matrix.** Factor $B(v,w)=v_1w_2-v_2w_1$ through $\mathbb R^2\otimes\mathbb R^2$. Determine its kernel. Decide whether $e_1\otimes e_2-e_2\otimes e_1$ is pure.
+12. **The effect of a second face.** In the square example, attach face $134$ with column $w$. Compute all homology dimensions. What happens if the second face instead duplicates the first with the same boundary?
+13. **Moving homology classes.** Suppose maps $f_k:C_k\to C'_k$ commute with boundaries, $d'_k f_k=f_{k-1}d_k$. Construct their action on $H_k$, prove it is well defined, and check what inclusion of the triangle boundary into the filled triangle does in degrees zero and one.
+14. **An analytic counterexample.** Show that any two bounded maps out of $\ell^2$ into a normed space agreeing after composition with $D(x)_n=x_n/n$ agree everywhere. Why does the proof fail for arbitrary algebraic maps?
+
+## Worked solutions
+
+**1.** The map $v\mapsto[v]_W$ kills $U$, so it factors uniquely through $V/U$. Its factor sends $[v]_U$ to $[v]_W$, kills exactly $W/U$, and is onto. Factoring once more gives $[[v]_U]\mapsto[v]_W$. An inverse sends $[v]_W$ to $[[v]_U]$ since changing $v$ by $w\in W$ changes the middle class by an element of $W/U$. Both composites fix every represented class. For an arbitrary $T$, corestrict to $\operatorname{im}T$ and factor through $V/\ker T$. The factor is onto by corestriction and injective because $Tv=Tw$ means $v-w\in\ker T$. Uniqueness after composition with the quotient singles out this isomorphism.
+
+**2.** The product is a singleton, since every pair of incoming maps is the sole pair of constant functions. The coproduct has two tagged points; arbitrary outgoing functions specify one value at each point independently. For a biproduct, incoming $f,g$ induce $h=i_1f+i_2g$. Projecting returns $f,g$. Conversely any $h'$ with these projections satisfies $h'=(i_1\pi_1+i_2\pi_2)h'=h$. Outgoing $a,b$ extend to $k=a\pi_1+b\pi_2$, and $k'=k'(i_1\pi_1+i_2\pi_2)=k$ for any other extension. Both constructions used addition of parallel maps and distributivity of composition.
+
+**3.** Necessity follows by restricting $h$ to $U\cap W$. For sufficiency define $H(u,w)=\alpha(u)+\beta(w)$ on the external sum. It kills every $(z,-z)$ for $z\in U\cap W$ precisely when the restrictions agree. These pairs form the entire kernel of addition, so $H$ factors uniquely through $U+W$. This gluing property is called a pushout of the two inclusions from $U\cap W$: it allows independent rules once they agree on their shared inputs.
+
+**4.** Vanishing requires $x=-y,z=0$, giving kernel $\operatorname{span}(1,-1,0)$. Outputs fill the plane $(a,2a,b)$ because $(a,0,b)$ is a lift. The functional $(r,s,t)\mapsto s-2r$ is onto and kills exactly that plane, hence provides a coordinate on the cokernel. The lift just given is linear and is a section on the plane. All solutions are $(3,0,4)+h(1,-1,0)$.
+
+**5.** A section is $s_c(x)=(x,cx)$ with arbitrary $c\in\mathbb R$. Intertwining would require $(x,(1+c)x)=(x,cx)$ for every $x$, impossible at $x=1$. In the integer example a section must send $[1]$ to some $k\equiv1\bmod n$ with $nk=0$ in $\mathbb Z$. This forces $k=0$, a contradiction. The two failures arise from preserving an additional operation: the operator action in the first example and integer addition in the second.
+
+**6.** Expanding $a(u_2-u_1)+b(u_3-u_2)+c(u_1-u_3)$ gives coefficients $(c-a,a-b,b-c)$. All are zero exactly when $a=b=c$. For $\mu=(a,b,c)$ and $u$, $T^{\vee\vee}\iota(u)$ evaluated at $\mu$ is $\iota(u)(T^\vee\mu)=(c-a)u_1+(a-b)u_2+(b-c)u_3$. The expansion shows this equals $\mu(Tu)=\iota(Tu)(\mu)$ for every measurement.
+
+**7.** Define $\hat b([w])=[bw]$. A difference $Tx$ is sent to $bTx=T'ax$, which vanishes in the new quotient. This proves independence of representative. The identity square fixes all classes, and two successive squares send $[w]$ to $[b'bw]$, the action of their composite. Write $q_T$ for the quotient; $\hat b q_T=q_{T'}b$ by evaluation at $w$. These are the naturality squares from the functor taking an arrow to its codomain to the cokernel functor.
+
+**8.** On $e_1$, $t-2$ suffices. On $e_2$, $t-2$ produces $e_1$ and applying it again kills $e_1$, so $(t-2)^2$ is minimal. A nonzero $e_3$ component contributes $t+1$; the two coprime factors must both divide any annihilator of a sum from the distinct primary subspaces. Thus the last two answers are $(t-2)(t+1)$ and $(t-2)^2(t+1)$. The first $j$ with $\mathcal K_{j+1}=\mathcal K_j$ is respectively $1,2,2,3$ by polynomial division.
+
+**9.** Take $q(t)=1-(t-2)^2/9$. Then $q(-1)=0$ and $q\equiv1\bmod(t-2)^2$. Acting on $e_1,e_2$ the squared term vanishes, while on $e_3$ it is $9I$. Thus $q(A)=\operatorname{diag}(1,1,0)$, whose square equals itself. A linear polynomial $r$ satisfying $r(2)=1,r(-1)=0$ has slope $1/3$; it sends $e_2$ to $e_2+e_1/3$ and fails to fix the entire primary space.
+
+**10.** Differences from the initial nullity zero are $3,2,1$. These count blocks of length at least one, two, and three. Since all six dimensions have appeared by the third power there are none longer. Subtracting consecutive counts gives one block of each length $1,2,3$. The largest length gives $m_N=t^3$ and the module is $\mathbb F[t]/(t)\oplus\mathbb F[t]/(t^2)\oplus\mathbb F[t]/(t^3)$.
+
+**11.** In pair order $11,12,21,22$ the induced row is $(0,1,-1,0)$ by evaluation on elementary tensors. Its kernel consists of coefficient arrays with $c_{12}=c_{21}$, spanned by the two diagonal tensors and $e_1\otimes e_2+e_2\otimes e_1$. The proposed difference has coefficient matrix with determinant $1$ and hence rank two. A single pure tensor has rank at most one.
+
+**12.** The independent columns $z,w$ span $\ker D$, so $H_1=0$, and the face map is injective so $H_2=0$. Vertices and edges have not changed, giving $\dim H_0=1$. With duplicate columns the span has dimension one and $[w]$ survives in $H_1$. The difference of the two face generators spans the kernel in degree two. The dimensions are then $(1,1,1)$; the duplicate attachment is interpreted as a second two-cell, not a second copy of a simplex in an abstract simplicial complex.
+
+**13.** For a cycle $x$, $d'_kf_kx=f_{k-1}d_kx=0$, so $f_kx$ is a cycle. Replacing $x$ by $x+d_{k+1}y$ changes its image by $d'_{k+1}f_{k+1}y$, a boundary. Hence $[x]\mapsto[f_kx]$ is well defined and linear. Identities and composition pass to classes. Under inclusion the three vertices and edges keep their names, so total load gives the identity on $H_0\simeq\mathbb R$; the old generator of $H_1$ becomes a face boundary, giving the zero map.
+
+**14.** If $gD=hD$, $g-h$ vanishes on the dense range. For any $y$, approximate it by its finite truncations, all in the range, and use continuity to get $(g-h)y=0$. Thus $D$ is epic among bounded maps even though it misses $(1/n)$. Algebraically the map to $\ell^2/\operatorname{im}D$ is nonzero and vanishes after $D$. It detects the missing class because algebraic factorization requires no continuity.
+
+## Computational laboratory — Exact identities in MATLAB
+
+Use a single MATLAB script with Symbolic Math Toolbox. Each block continues the script. Enter the matrices as exact integers before division. The assertions test structural equations independently of the particular basis returned by a null-space routine. In a floating-point experiment a rank decision would also require a scale and tolerance.
+
+### 1. Compute quotient coordinates and factor a map
+
+~~~matlab
+T = sym([1 1 0; 2 2 0; 0 0 1]);
+K = null(T);
+[~, pivot] = rref(T);
+B = T(:,pivot);                 % basis for the range
+Q = sym([1 1 0; 0 0 1]);       % coordinates on the domain modulo K
+C = sym([-2 1 0]);             % quotient coordinate on the codomain
+S = sym([1 0; 0 0; 0 1]);      % lift a pair of quotient coordinates
+assert(isequal(B*Q,T))
+assert(isequal(Q*S,sym(eye(2))))
+assert(isequal(Q*K,sym(zeros(2,1))))
+assert(isequal(C*T,sym(zeros(1,3))))
+assert(rank(B)==2 && rank(C)==1)
+disp(K), disp(B)
+~~~
+
+The columns of $B$ span the solvable loads. Rank plus $CB=0$ proves $\operatorname{im}B=\ker C$. The matrices $B,Q$ represent two different maps even though the factorization passes through the same coordinate space $\mathbb F^2$. Alter the lift $S$ by adding a column of $K$ to either column. Predict which assertion detects this change. None should: adding a kernel vector leaves quotient coordinates unchanged.
+
+### 2. Separate primary spaces and measure Krylov growth
+
+~~~matlab
+A = sym([2 1 0 0; 0 2 0 0; 0 0 2 0; 0 0 0 -1]);
+I = sym(eye(4));
+P = (A-2*I)^2/9;
+assert(isequal(P*P,P) && isequal(P*A,A*P))
+assert(isequal(P,diag(sym([0 0 0 1]))))
+assert(isequal((A-2*I)^2*(A+I),sym(zeros(4))))
+v = sym([0;1;0;1]);
+Y = [v,A*v,A^2*v,A^3*v];
+dims = arrayfun(@(j) double(rank(Y(:,1:j))),1:4);
+assert(isequal(dims,[1 2 3 3]))
+assert(isequal(Y*sym([4;0;-3;1]),sym(zeros(4,1))))
+disp(P*v), disp(dims)
+~~~
+
+The last relation reads $A^3v-3A^2v+4v=0$, the expansion of $(t-2)^2(t+1)$. The first three columns are independent, proving minimality on this vector. Repeating with $e_3$ gives immediate stagnation. Using $e_3$ as an additional block start instead raises the final reachable dimension to four.
+
+### 3. Identify tensor coordinates
+
+~~~matlab
+L = sym([2 1; 0 3]);
+M = sym([1 -1; 2 0]);
+v = sym([1;2]); w = sym([3;-1]);
+U = w*v.';
+assert(isequal(kron(v,w),U(:)))
+assert(isequal(kron(L,M)*kron(v,w),kron(L*v,M*w)))
+Vgrid = M*U+U*L.';
+Ksum = kron(sym(eye(2)),M)+kron(L,sym(eye(2)));
+assert(isequal(Ksum*U(:),Vgrid(:)))
+~~~
+
+MATLAB stacks columns, so the second factor varies fastest. The dot transpose here implements a bilinear coordinate identity. Reversing the factor order without changing the vectorization convention would apply the operators along the wrong axes.
+
+### 4. Count classes before and after attaching faces
+
+~~~matlab
+D = sym([-1 0 0 1 -1; 1 -1 0 0 0; 0 1 -1 0 1; 0 0 1 -1 0]);
+z = sym([1;1;0;0;-1]); w = sym([0;0;1;1;1]);
+faces = {z,[z w],[z z]};
+expected = [1 1 0; 1 0 0; 1 1 1];
+for j = 1:numel(faces)
+    E = faces{j};
+    assert(isequal(D*E,sym(zeros(4,size(E,2)))))
+    b = [size(D,1)-rank(D), size(D,2)-rank(D)-rank(E), ...
+         size(E,2)-rank(E)];
+    assert(isequal(double(b),expected(j,:)))
+    disp(b)
+end
+~~~
+
+Observe that $DE=0$ succeeds in all three complexes. Only the ranks reveal whether a surviving cycle bounds. To test whether the particular cycle $w$ survives, compare $\operatorname{rank}[E\ w]$ with $\operatorname{rank}E$. The class is zero exactly when the ranks are equal.
+
+## Final synthesis — Choosing the object that answers the question
+
+Return to the potential problem. If measurements must ignore constants, the quotient is forced by how maps *leave* the potential space. If the question is which loads can be solved, the appropriate subspace is the image, and its inclusion describes which maps *land in* the solvable loads. If we need a test for failure, we project to the cokernel. Once a representative is wanted for plotting or numerical solution, a section enters. The input admits many sections; an inner product or a prescribed reference vertex can supply the missing choice. This one problem explains why universal constructions can be canonical even when the arrays produced by a solver depend on conventions.
+
+The spectral problem adds another datum, $T$. Respecting that datum restricts the allowed maps to intertwiners. A vector-space splitting can thereby cease to be a splitting, as the Jordan chain shows. Conversely a relatively prime factorization gives more than a dimension count: it constructs actual intertwiners $p(T)$ selecting invariant components. A Krylov basis, an exact spectral projector and a polynomial filter use the same polynomial action. Their objectives are respectively to represent a cyclic space, to split a module, and to change the relative sizes of spectral components.
+
+| Structural concept | Concrete manifestation | Equation to reconstruct |
+|---|---|---|
+| Universal factorization | Descending a map to a quotient | $\bar f q=f$ |
+| Product | Joint output of several measurements | $\pi_jh=f_j$ |
+| Coproduct | Extending from independent inputs | $hi_j=f_j$ |
+| Biproduct | A finite direct sum supporting both operations | $\sum i_j\pi_j=I$ |
+| Kernel | Null space with its inclusion | $Th=0\Rightarrow h=k\bar h$ uniquely |
+| Cokernel | Codomain modulo the range | $gT=0\Rightarrow g=\bar g c$ uniquely |
+| Exactness | Every compatible datum at a position is produced upstream | $\operatorname{im}f=\ker g$ |
+| Splitting | Coherent choice of a lift | $ps=I$ |
+| Contravariant functor | Pullback of measurements | $(ST)^\vee=T^\vee S^\vee$ |
+| Natural transformation | Evaluation into the double dual | $T^{\vee\vee}\iota_V=\iota_W T$ |
+| Polynomial module | Operator acting as a scalar generator | $t v=T v$ |
+| Tensor product | Linear representation of a bilinear rule | $\tilde B(v\otimes w)=B(v,w)$ |
+| Chain complex | Successive boundary maps | $d_k d_{k+1}=0$ |
+| Homology | Closed data modulo boundaries | $H_k=\ker d_k/\operatorname{im}d_{k+1}$ |
+
+**Logical dependencies.** Composition and equality of paths suffice to formulate products and coproducts. Zero arrows allow one to pose kernel and cokernel problems. The vector-space theory of exactness uses images and kernels; homology also needs their quotient. Functoriality asks how any of these constructions responds to changing its input, so it runs across the branches. Polynomial modules require a scalar action and polynomial arithmetic; they can be studied without homology. Tensor products begin with bilinear maps; their construction here uses a free space and quotient. Analytic applications add bounds, closedness and completeness at the point where passage to limits is required.
+
+For further study, abstract algebra asks which features of $\mathbb F[t]$ made classification possible. Category theory asks which mapping problems admit representing objects. Homological algebra studies how failure of exactness propagates through constructions such as $\operatorname{Hom}$. Functional analysis asks whether a factor, inverse or projection is bounded. Numerical mathematics asks how accurately and economically these maps can be applied when data are approximate. Each direction can be entered through an explicit example already worked above.
+
+## Mastery assessment
+
+Use a blank page for the proofs. For computations, write down the space containing the answer before choosing coordinates.
+
+- [ ] Give the objects, arrows and composition of two categories on familiar data. Exhibit a bijection that fails to give a structural isomorphism and explain why.
+- [ ] Prove quotient factorization from representatives, then prove uniqueness of the representing pair using only arrows.
+- [ ] Recover pairing and extension maps from biproduct identities. Explain the finite-support condition for an infinite coproduct.
+- [ ] Prove the kernel and cokernel universal properties in opposite directions. Use each on a concrete linear system.
+- [ ] Given a zero composite, decide what else must be checked for exactness. Construct a section when possible and distinguish its choice from the quotient isomorphism.
+- [ ] Produce two nonsplitting examples, one over the integers and one involving an invariant subspace. Identify the operation a candidate section fails to preserve.
+- [ ] Derive the dual matrix in dual bases, the double-dual naturality square, and the role of conjugation in the Riesz map.
+- [ ] State a functor's action on morphisms and check its laws. Prove the map induced on cokernels by a commuting square is well defined.
+- [ ] Reconstruct the universal-element argument by evaluating a natural family on an identity map.
+- [ ] Derive the polynomial module axioms and characterize intertwiners, invariant subspaces and quotient operators.
+- [ ] Starting from a Krylov dependence, find a vector annihilator and prove minimality. Explain why an operator minimal polynomial alone cannot count all Jordan blocks.
+- [ ] Construct complementary polynomial projectors by Bézout's identity. Explain the extra interpolation condition at a defective eigenvalue.
+- [ ] Construct a tensor product from bilinearity relations, prove the basis theorem and derive a Kronecker matrix in a declared ordering.
+- [ ] Compute homology from two successive boundary matrices and determine whether a specific cycle represents zero. Interpret the dual compatibility condition on potentials.
+- [ ] For a bounded operator with dense proper range, compare algebraic solvability, topological cokernel and bounded inversion.
+- [ ] In a new numerical example, identify which parts use only uniqueness and factorization, which need an inner product, and which require an estimate.

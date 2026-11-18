@@ -1,0 +1,749 @@
+---
+jupyter: python3
+---
+
+# Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods {#sec-module-c}
+
+A sensor reports $(1,2,4)$ although every noise-free reading satisfies $b_3=b_1+b_2$. Algebra detects the inconsistency: the functional $b\mapsto b_3-b_1-b_2$ returns $1$. What is the smallest correction that makes the data possible? A second question arises after we correct the readings: if many inputs explain them, which input has the smallest size? To answer the first question we need a geometry on **outputs**. To answer the second we need a geometry on **inputs**. There is no reason these geometries should have the same units, dimension or weights.
+
+A second experiment replaces the sensors by a finite-element mesh. There we will have two genuinely different ways of measuring the same function: its mean-square size and the energy in its derivative. Understanding why a single discretization needs both is the route from duality to the generalized eigenproblem $Kx=\lambda Mx$.
+
+**Conventions and starting point.** Work over $\mathbb R$ or $\mathbb C$. As in the regenerated Module B, $\langle x,y\rangle$ is linear in $x$ and conjugate-linear in $y$. In coordinates $\langle x,y\rangle_G=y^HGx$, where $H$ denotes conjugate transpose. In texts linear in the second argument the same scalar is written $\langle y,x\rangle_G$. Write $T^\vee g=g\circ T$ for algebraic pullback, $T^*$ for the adjoint between specified inner-product spaces and $A^H$ for an operation on an array. All dimension-dependent assertions below refer to finite dimension unless a function space is specified. We use the algebraic fact that $Tx=b$ is solvable precisely for $b\in\operatorname{im}T$ and then its solutions are $x_0+\ker T$, since equal outputs mean that the difference of inputs is killed.
+
+## Session 1 — How much change is one unit?
+
+An **inner product** is linear in its first argument, satisfies $\langle x,y\rangle=\overline{\langle y,x\rangle}$, and obeys $\langle x,x\rangle>0$ for every $x\ne0$. These axioms imply $\langle x,x\rangle$ is real, $\langle 0,y\rangle=0$, and $\langle x,ay+bz\rangle=\bar a\langle x,y\rangle+\bar b\langle x,z\rangle$. Over the reals the form is symmetric and bilinear. Over the complex numbers a bilinear form cannot be positive on all nonzero vectors: replacing $x$ by $ix$ would change the sign of its diagonal value.
+
+Write $\|x\|=\sqrt{\langle x,x\rangle}$ and say $x\perp y$ when $\langle x,y\rangle=0$. Expanding the square gives
+$$
+\|x+y\|^2=\|x\|^2+2\operatorname{Re}\langle x,y\rangle+\|y\|^2 .
+$$
+This gives Pythagoras for perpendicular vectors. Over $\mathbb C$ a single Pythagorean equality only forces the real part to vanish. Testing also with $iy$ detects the imaginary part.
+
+::: {#thm-ip-cs}
+**Cauchy–Schwarz.** $|\langle x,y\rangle|\le\|x\|\|y\|$, with equality exactly when $x,y$ are linearly dependent.
+:::
+
+::: {.proof}
+The case $y=0$ satisfies both assertions. Otherwise write $x=\alpha y+z$ with $\alpha=\langle x,y\rangle/\|y\|^2$. The choice kills $\langle z,y\rangle$. Pythagoras then gives $\|x\|^2=|\langle x,y\rangle|^2/\|y\|^2+\|z\|^2$. Dropping the last term proves the bound; equality requires $z=0$. This also finds the multiple of $y$ closest to $x$: any other coefficient adds the squared length of a component along $y$.
+:::
+
+Positivity gives definiteness of the norm, and sesquilinearity gives $\|ax\|=|a|\|x\|$. Applying Cauchy–Schwarz to the cross term bounds $\|x+y\|^2$ by $(\|x\|+\|y\|)^2$, proving the triangle inequality. Thus $d(x,y)=\|x-y\|$ is a distance. For nonzero real vectors the bound permits the definition $\cos\theta=\langle x,y\rangle/(\|x\|\|y\|)$ with $0\le\theta\le\pi$.
+
+**Can a given norm come from an inner product?** Adding the expansions for $x+y$ and $x-y$ cancels the cross terms:
+$$
+\|x+y\|^2+\|x-y\|^2=2\|x\|^2+2\|y\|^2 .
+$$
+The parallelogram law characterizes inner-product norms. Here is why the converse works. On the underlying real space put $q(x)=\|x\|^2$ and $B(x,y)=(q(x+y)-q(x-y))/4$. It is symmetric and $B(0,y)=0$. Applying the parallelogram law to $(x+y,z)$ and $(x-y,z)$ and subtracting gives $B(x+z,y)+B(x-z,y)=2B(x,y)$. Taking $z=x$ gives doubling. Taking $x=(u+v)/2$, $z=(u-v)/2$ then gives additivity. Rational homogeneity follows by addition and division; continuity of the norm extends it to real scalars. Finally $B(x,x)=q(x)$. In a complex space $B(ix,iy)=B(x,y)$ since $\|iw\|=\|w\|$, hence $B(ix,y)=-B(x,iy)$. Then $B(x,y)-iB(ix,y)$ is linear in the first slot, conjugate symmetric, and has diagonal $q(x)$. Over $\mathbb R^2$, the $1$-norm fails the law on $e_1,e_2$ (left side $8$, right side $4$).
+
+### Change the measuring instrument
+
+For Hermitian $G=G^H$, $y^HGx$ is conjugate symmetric. It defines an inner product precisely when $x^HGx>0$ for $x\ne0$, i.e. $G$ is **Hermitian positive definite** (HPD; SPD in the real symmetric case). A semidefinite weight can assign zero size to a nonzero direction. Our recurring metric is
+$$
+G=\begin{pmatrix}2&1\\1&2\end{pmatrix},\qquad x^TGx=x_1^2+x_2^2+(x_1+x_2)^2.
+$$
+The coordinate axes are perpendicular in Euclidean geometry. Here they have length $\sqrt2$ and make angle $\pi/3$. The vectors $(1,1)$ and $(1,-1)$ are eigenvectors of $G$ of eigenvalues $3,1$. Measuring along the corresponding Euclidean unit directions gives ellipse semiaxes $1/\sqrt3,1$. Thus a highly weighted direction displaces less far on paper before using up one unit of length.
+
+**Checkpoint.** Is $(1,-2)$ perpendicular to $e_1$ in this metric? Its first weighted component is $2-2=0$. Its ordinary first component is $1$. The meaning of a right angle changes with the metric.
+
+## Session 2 — How do coordinates remember the geometry?
+
+Suppose software stores coefficients in a basis $B=(b_1,\dots,b_n)$. Multiplying coordinate columns entry by entry measures lengths correctly only in a particular kind of basis. Expand $u=\sum_j x_jb_j$, $v=\sum_i y_i b_i$. Sesquilinearity gives
+$$
+\langle u,v\rangle=\sum_{ij}\bar y_i\,\langle b_j,b_i\rangle x_j=y^HG_Bx,\qquad (G_B)_{ij}=\langle b_j,b_i\rangle.
+$$
+The order of the indices follows our convention. This **Gram matrix** is Hermitian. For any list of vectors, $x^HG_Bx=\|\sum_j x_j b_j\|^2\ge0$, with equality precisely when the combination vanishes. Thus its Gram matrix is positive definite exactly when the list is independent. An orthogonal basis gives a positive diagonal Gram matrix, an orthonormal basis gives the identity. For an orthogonal basis the coordinates are $\langle u,b_j\rangle/\|b_j\|^2$, as pairing the expansion with $b_j$ shows.
+
+Let the columns of $B'=BP$ specify a new basis relative to the old, so $x=Px'$. Substitution gives
+$$
+G_{B'}=P^HG_BP .
+$$
+This **congruence** changes the description of the same geometry. Replacing $G_B$ by a new metric while keeping the same basis instead changes which vectors are perpendicular. Neither operation is the similarity $P^{-1}AP$ for an endomorphism.
+
+For the oblique basis $b_1=(1,0)^T,b_2=(1,1)^T$ of Module B in Euclidean space,
+$$
+G_B=B^TB=\begin{pmatrix}1&1\\1&2\end{pmatrix}.
+$$
+The vector $(3,2)^T$ has coefficients $(1,2)^T$, and the Gram formula gives $13$, its squared length. Ordinary coordinate squaring in this basis would give $5$. If the physical geometry is instead the metric $G$ of Session 1, the same basis has $B^TGB=\left(\begin{smallmatrix}2&3\\3&6\end{smallmatrix}\right)$ and the squared length becomes $38$. The vector and its coordinates did not move.
+
+### Constructing coordinates in which lengths are simple
+
+Given independent $b_1,\ldots,b_n$, define successively
+$$
+w_j=b_j-\sum_{i<j}\langle b_j,q_i\rangle q_i,\qquad q_j=w_j/\|w_j\|.
+$$
+If the preceding $q_i$ are orthonormal, pairing with each proves $w_j$ is perpendicular to their span. It is nonzero because the preceding $q_i$ span exactly the preceding $b_i$ and $b_j$ is independent of them. Induction proves that **Gram–Schmidt** produces an orthonormal basis preserving every initial span. In Euclidean matrix coordinates this is thin $B=QR$, where $r_{ij}=q_i^Hb_j$ for $i\le j$, and the positive diagonal of $R$ consists of the norms of the remainders. The triangular $R$ converts trial coefficients to orthonormal coefficients. In exact arithmetic $B^HB=R^HR$. Numerical QR implementations can use orthogonal Householder transformations to avoid the loss of orthogonality that direct subtraction can suffer with nearly dependent input columns.
+
+**Checkpoint.** For an independent list of functions $\phi_i$ on $[0,1]$, in the $L^2$ inner product the same expansion gives entries $\int\phi_j\bar\phi_i$. This Gram matrix will reappear as the mass matrix. Which geometry would give entries involving derivatives instead?
+
+## Session 3 — Which vector represents a fixed functional?
+
+A functional $f\in V^\vee$ already assigns a number to every vector. We now want a vector $a_f$ with $f(x)=\langle x,a_f\rangle$. Define the **Riesz map** $R_V(a)=\langle\,\cdot\,,a\rangle$. Over $\mathbb C$, $R_V(\alpha a)=\bar\alpha R_V(a)$. Over $\mathbb R$ it is linear.
+
+::: {#thm-ip-riesz}
+**Finite-dimensional Riesz representation.** Every linear functional has exactly one such representative. The dual norm $\|f\|_{\mathrm{dual}}=\sup_{\|x\|\le1}|f(x)|$ equals $\|a_f\|$.
+:::
+
+::: {.proof}
+Choose an orthonormal basis $q_i$ and set $a_f=\sum_i\overline{f(q_i)}q_i$. For $x=\sum_i x_iq_i$, pairing with $a_f$ gives $\sum_i x_i f(q_i)=f(x)$. Two representatives would have a difference orthogonal to every $x$, hence to itself, so coincide. Cauchy–Schwarz gives the norm upper bound. For $a_f\ne0$ take $x=a_f/\|a_f\|$ to attain it; for $a_f=0$ both norms vanish.
+:::
+
+In arbitrary coordinates let the algebraic row be $c^T$, exactly as in Module B. Equating $a_f^HGx=c^Tx$ for all $x$ gives
+$$
+Ga_f=\bar c,\qquad \|f\|_{\mathrm{dual}}^2=c^TG^{-1}\bar c.
+$$
+Thus a positive definite solve changes a **functional's coefficients** into a **vector's coordinates**. If the functional is instead given as $d^Hx$, the right side of the solve is $d$. For the $i$th coordinate functional in a basis, take $c=e_i$. The representatives have coordinate columns $G_B^{-1}e_i$ and satisfy $\langle b_j,a_i\rangle=\delta_{ij}$. Only for an orthonormal basis is each $b_i$ its own coordinate functional's representative.
+
+Consider $f(x_1,x_2)=x_1$ over the reals. Its Euclidean representative is $e_1$. In the metric of Session 1 its representative is $(2,-1)^T/3$ and its norm is $\sqrt{2/3}$. It gives the same reading on every input. Its kernel is still the vertical axis, and $\langle s,a_f\rangle_G=0$ for every vertical $s$. The vector $a_f/\|a_f\|_G$ points in the direction of largest increase per *weighted* unit displacement. For a differentiable real scalar field this construction applied to $df_x$ defines its gradient in that metric. In real coordinates $dF_x(h)=(\nabla F)^Th=(\nabla_G F)^TGh$ for every $h$, so $\nabla_G F=G^{-1}\nabla F$. An optimization method that changes metric can change its search direction even at the very same point.
+
+@fig-ip-ellipse shows both unit boundaries and their supporting lines for $f$. Each marked point maximizes the first coordinate on its own boundary. The tangent there is vertical in both drawings. The slanted radius is perpendicular to that tangent in the weighted metric.
+
+```{python}
+#| label: fig-ip-ellipse
+#| fig-cap: "Unit boundaries and maximizers of the same coordinate functional under two metrics."
+#| echo: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+G = np.array([[2., 1.], [1., 2.]])
+angles = np.linspace(0, 2*np.pi, 400)
+circle = np.vstack((np.cos(angles), np.sin(angles)))
+L = np.linalg.cholesky(G)
+ellipse = np.linalg.solve(L.T, circle)
+fig, ax = plt.subplots(figsize=(5.6, 4), constrained_layout=True)
+for curve, metric, color, label in [(circle, np.eye(2), "#365d81", "Euclidean"),
+                                     (ellipse, G, "#b25b27", "Weighted")]:
+    a = np.linalg.solve(metric, [1., 0.])
+    tip = a / np.sqrt(a @ metric @ a)
+    ax.plot(*curve, color=color, label=label)
+    ax.plot([tip[0], tip[0]], [-1.1, 1.1], ":", color=color)
+    ax.annotate("", tip, (0, 0), arrowprops=dict(arrowstyle="->", color=color))
+    ax.scatter(*tip, color=color)
+ax.set(xlabel="first coordinate", ylabel="second coordinate", aspect="equal")
+ax.legend(loc="lower left")
+plt.show()
+```
+
+**Checkpoint.** With $G=I$ over $\mathbb C$ and $f(z_1,z_2)=iz_1+z_2$, the representative is $(-i,1)^T$. Check at $(i,0)$ that the conjugation is essential. Both the measurement and inner product give $-1$.
+
+## Session 4 — How should an output direction be pulled back?
+
+Let $T:V\to W$ be linear. Module B pulled back an output *measurement* $g$ by composing it with $T$. Given an output *vector* $y$, first decide what it measures: $R_Wy$ acts by $w\mapsto\langle w,y\rangle_W$. Pull that measurement back to $V$ and find its input representative.
+
+::: {#thm-ip-adjoint}
+**Adjoint.** In finite-dimensional inner-product spaces there is a unique linear $T^*:W\to V$ such that
+$$
+\langle Tx,y\rangle_W=\langle x,T^*y\rangle_V,\qquad
+T^*=R_V^{-1}T^\vee R_W .
+$$
+:::
+
+::: {.proof}
+For fixed $y$, the left side is a linear functional of $x$. By @thm-ip-riesz its representing vector exists and is unique. This gives the displayed composition, since the functional is $(R_Wy)\circ T$. Its dependence on $y$ is linear: over $\mathbb C$ the two Riesz factors are conjugate-linear and the middle factor is linear. Equality of pairings with every $x$ forces equality of the representing vectors, hence uniqueness of the operator.
+:::
+
+```{mermaid}
+flowchart TD
+  W["Output vectors"] -->|adjoint| V["Input vectors"]
+  W -->|output Riesz map| WD["Output measurements"]
+  V -->|input Riesz map| VD["Input measurements"]
+  WD -->|algebraic pullback| VD
+```
+
+Composition on the lower path depends only on $T$. Both vertical maps depend on geometry. In coordinates equate $y^HG_WAx$ and $([T^*]y)^HG_Vx$:
+$$
+[T^*]=G_V^{-1}A^HG_W .
+$$
+Ordinary orthonormal coordinates on both spaces give $A^H$, and over $\mathbb R$ this becomes $A^T$. In corresponding **dual** bases $T^\vee$ always has matrix $A^T$, including when $A$ is complex. Even orthonormal coordinates do not identify the two complex operations: multiplication by $i$ has algebraic pullback matrix $[i]$ and adjoint matrix $[-i]$.
+
+Consider $T(x,y)=x$ with the weighted input geometry $G$ and the usual scalar output. Then $T^*t=t(2,-1)^T/3$ while $T^\vee$ sends an output coefficient $t$ to the functional with row $(t,0)$ over $\mathbb R$. The weighted result is familiar: pulling back the identity measurement gives precisely the representer in Session 3. Changing **only the output metric** to $\langle s,t\rangle=4\bar t s$ multiplies the adjoint by four. The primal map and all attainable readings stay fixed.
+
+**Adjoint identities.** Conjugating the defining relation and interchanging arguments gives $\langle T^*y,x\rangle_V=\langle y,Tx\rangle_W$. Uniqueness implies $(T^*)^*=T$. For $S:W\to Z$ pair $STx$ with $z$ and pass first $S$, then $T$, across the pairing to obtain $(ST)^*=T^*S^*$. The identity is its own adjoint. Applying the composition rule to both inverse identities gives $(T^{-1})^*=(T^*)^{-1}$ for an isomorphism. Scalar factors conjugate: $(\alpha T)^*=\bar\alpha T^*$. Each middle space here carries the same inner product in both occurrences.
+
+**Checkpoint.** If only the coordinates change and $A'=Q^{-1}AP$, show that the new adjoint matrix is $P^{-1}[T^*]Q$. Substitute $P^HG_VP,Q^HG_WQ$ into the weighted formula and cancel the inverse factors. The Gram matrices repair exactly the coordinate dependence of raw conjugate transposition.
+
+## Session 5 — What makes one point in a subspace the closest?
+
+Let $S$ be a subspace of $V$. Define $S^\perp=\{z:\langle s,z\rangle=0\ \forall s\in S\}$. By conjugate symmetry either order tests orthogonality. By definition $R_V(S^\perp)=S^0$ in finite dimension, where $S^0$ consists of functionals vanishing on $S$. The annihilator is fixed by $S$. Its representing vectors move when we change the inner product.
+
+::: {#thm-ip-projection}
+**Orthogonal decomposition and best approximation.** In finite dimension every $x$ has a unique expression $x=p+r$ with $p\in S$ and $r\in S^\perp$. The point $p=P_Sx$ is the unique minimizer of $\|x-s\|$ over $s\in S$.
+:::
+
+::: {.proof}
+Choose an orthonormal basis $q_1,\ldots,q_k$ of $S$ and set $p=\sum_i\langle x,q_i\rangle q_i$. Direct testing against the basis gives $x-p\perp S$. For uniqueness subtract two decompositions: their difference in $S$ belongs to $S^\perp$, so its squared norm is zero. For any $s\in S$ the two terms of $x-s=(x-p)+(p-s)$ are perpendicular. Consequently
+$$
+\|x-s\|^2=\|x-p\|^2+\|p-s\|^2 .
+$$
+This identifies the minimum and its unique point of attainment, even for $S=0$ or $S=V$.
+:::
+
+The formula proves linearity of $P_S$. It fixes $S$, kills $S^\perp$, and hence $P_S^2=P_S$. Decompose both arguments to see $\langle P_Sx,y\rangle=\langle P_Sx,P_Sy\rangle=\langle x,P_Sy\rangle$. Conversely, any idempotent $P$ splits $V$ into image and kernel by $x=Px+(x-Px)$. If also $P=P^*$ then $\langle Pu,k\rangle=\langle u,Pk\rangle=0$ for every kernel vector, so this is the orthogonal decomposition. Other complementary directions give **oblique projectors**. Also $(S^\perp)^\perp=S$: decompose $x=s+r$, and if $x\perp S^\perp$, testing against $r$ gives $\|r\|^2=0$.
+
+### Compute the projection without first orthogonalizing
+
+Let $B$ have independent columns spanning $S$. The condition on $p=Bc$ in coordinates is $B^HG(x-Bc)=0$. The Gram matrix is HPD, so
+$$
+P_S=B(B^HGB)^{-1}B^HG .
+$$
+In an orthonormal trial basis $Q$ this becomes $QQ^HG$, since $Q^HGQ=I$. The inverse in the formula denotes a solve. Geometrically $S^\perp$ selects the minimum-length representative in every class $[x]\in V/S$: write $x=p+r$, then $x+S=r+S$ and $\|r+s\|^2=\|r\|^2+\|s\|^2$.
+
+For the array from A and B, with Euclidean input geometry, a kernel basis matrix is
+$$
+N=\begin{pmatrix}-2&-4\\1&0\\0&-1\\0&1\end{pmatrix},\qquad
+N^TN=\begin{pmatrix}5&8\\8&18\end{pmatrix}.
+$$
+For $x=e_1$, solve $(N^TN)c=N^Te_1=(-2,-4)^T$ to get $c=(-2,-2)^T/13$. The orthogonal kernel component is $(12,-2,2,-2)^T/13$. Subtracting it gives $(1,2,-2,2)^T/13$, the minimum-length input with the same data as $e_1$. The RREF complement $\operatorname{span}(e_1,e_3)$ instead selects $e_1$ itself. Both choices explain the reading; only the perpendicular one minimizes Euclidean input norm.
+
+### Four subspaces and one closure
+
+Test $y$ on all $Tx$. Then $T^*y=0$ iff $y\perp\operatorname{im}T$. Apply the same argument to $T^*$ and use $(T^*)^*=T$. Taking double perpendiculars in finite dimension gives all four identities:
+$$
+\begin{aligned}
+\ker T^*&=(\operatorname{im}T)^\perp,&
+\ker T&=(\operatorname{im}T^*)^\perp,\\
+\operatorname{im}T^*&=(\ker T)^\perp,&
+\operatorname{im}T&=(\ker T^*)^\perp .
+\end{aligned}
+$$
+For example $R_V(\operatorname{im}T^*)=\operatorname{im}T^\vee=(\ker T)^0$ by the Riesz square. This recovers Module B's input measurement criterion in geometric form.
+
+For a bounded operator between Hilbert spaces the first line remains exact; the images on the left of the second line acquire closures. The projection theorem in a Hilbert space applies to **closed** subspaces and yields $S^{\perp\perp}=\overline S$. For example $(Tx)_j=x_j/j$ on real $\ell^2$ has trivial kernel, is self-adjoint by termwise pairing, and its range contains every finite sequence. Yet $(1/j)_{j\ge1}$ has no square-summable preimage. Its distance to the image is zero by truncation without a closest image point. Completeness of the ambient space alone cannot make this range closed.
+
+**Checkpoint.** The projection $P(x,y)=(x-y,0)$ fixes the horizontal axis. Its kernel is the diagonal line. Can it minimize Euclidean distance to the axis for all inputs? Test $e_2$. Then identify an inner product in which this decomposition *is* orthogonal by declaring its two spanning directions orthonormal.
+
+## Session 6 — Which transformations respect the geometry?
+
+For an endomorphism $H$, the following definitions refer to the selected inner product.
+
+| Property | Defining identity | Geometric consequence |
+|---|---|---|
+| Self-adjoint | $H^*=H$ | The operator may pass between arguments without changing the pairing |
+| Skew-adjoint | $H^*=-H$ | $\operatorname{Re}\langle Hx,x\rangle=0$ |
+| Normal | $H^*H=HH^*$ | $\|Hx\|=\|H^*x\|$ for all $x$ |
+| Unitary (orthogonal over $\mathbb R$) | $H^*H=HH^*=I$ | Pairings, hence lengths and distances, are preserved |
+| Positive semidefinite | Self-adjoint and $\langle Hx,x\rangle\ge0$ | Quadratic energy may vanish on nonzero directions |
+| Positive definite | Self-adjoint and $\langle Hx,x\rangle>0$ for $x\ne0$ | $\langle Hx,y\rangle$ defines a new inner product |
+
+**Why does self-adjointness constrain eigenvectors?** If $Hv=\lambda v$ with $v\ne0$, $\lambda\|v\|^2=\langle Hv,v\rangle=\langle v,Hv\rangle=\bar\lambda\|v\|^2$, so $\lambda$ is real. For $Hw=\mu w$, the same calculation yields $(\lambda-\bar\mu)\langle v,w\rangle=0$. Distinct eigenvalues force perpendicular eigenvectors. If $U$ is invariant and $z\perp U$, then $\langle Hz,u\rangle=\langle z,Hu\rangle=0$ for $u\in U$, hence $U^\perp$ is invariant too. An invariant subspace and its orthogonal complement therefore give a block diagonal decomposition.
+
+**Why is there an entire orthonormal eigenbasis?** On a nonzero finite-dimensional real or complex space the real function $\langle Hx,x\rangle$ attains a maximum $\lambda$ on the compact unit sphere. At a maximizer $v$ consider the quotient $\rho(v+tw)=\langle H(v+tw),v+tw\rangle/\|v+tw\|^2$ for real $t$. Its derivative at zero is $2\operatorname{Re}\langle Hv-\lambda v,w\rangle$. This must vanish for every $w$; in particular take $w=Hv-\lambda v$ to obtain an eigenvector equation. Restrict to $v^\perp$, which is invariant and whose restriction is again self-adjoint. Induction on dimension yields the finite-dimensional spectral theorem. This proof links spectral decomposition to optimization; Module D develops the consequences.
+
+In that basis, if $x=\sum c_i v_i\ne0$,
+$$
+\rho_H(x)=\frac{\sum_i\lambda_i|c_i|^2}{\sum_i|c_i|^2}
+\in[\lambda_{\min},\lambda_{\max}].
+$$
+The Rayleigh quotient is the coefficient of the best approximation to $Hx$ along $x$. It measures directional energy per squared unit length. The weighted-average identity proves that a Hermitian matrix is positive definite precisely when all eigenvalues are positive, and semidefinite when all are nonnegative. Invertibility alone only excludes zero. For instance $\operatorname{diag}(1,-1)$ is invertible and indefinite.
+
+### Two sources of positive matrices
+
+For a linear $T$ between possibly different spaces, $T^*T$ is self-adjoint by the composition rule and $\langle T^*Tx,x\rangle=\|Tx\|^2\ge0$. This proves $\ker(T^*T)=\ker T$: one inclusion follows by applying $T^*$ to zero, the reverse by testing the quadratic form. It is positive definite precisely when $T$ is injective. Likewise $TT^*$ is positive definite precisely when $T$ is onto in finite dimension. These facts determine whether normal equations have a unique solution.
+
+A Hermitian positive definite matrix admits a **Cholesky factorization** $G=LL^H$ with lower triangular $L$ of positive real diagonal. For existence take the positive square root from an orthonormal eigenbasis and factor $G^{1/2}=QR$ by QR with positive diagonal. Then $G=R^HR$, so $L=R^H$. Computational Cholesky obtains the triangular factor directly by matching columns, without an eigensolve. In Session 1,
+$$
+G=\begin{pmatrix}\sqrt2&0\\1/\sqrt2&\sqrt{3/2}\end{pmatrix}
+\begin{pmatrix}\sqrt2&1/\sqrt2\\0&\sqrt{3/2}\end{pmatrix}.
+$$
+Thus $\|x\|_G=\|L^Hx\|_2$, and a solve with $G$ reduces to two triangular solves. The transformation $x\mapsto L^Hx$ sends the weighted ellipse to a Euclidean circle.
+
+Finally take $M=\operatorname{diag}(2,1)$ and $K=\left(\begin{smallmatrix}2&1\\1&2\end{smallmatrix}\right)$. The operator $H=M^{-1}K=\left(\begin{smallmatrix}1&1/2\\1&2\end{smallmatrix}\right)$ satisfies $MH=K=H^HM$. It is self-adjoint in $M$ even though its standard-coordinate matrix is nonsymmetric. Its quadratic energy there is $x^HKx$. Changing the geometry can reveal a symmetry obscured by looking only at the entries of $H$.
+
+**Checkpoint.** For the last example, which object is an operator and which records a form on two vectors? Under a basis change $P$, $H$ changes by similarity and $K$ by congruence. Verify that the identity $MH=K$ is preserved.
+
+## Session 7 — When the equations disagree, what exactly should be minimized?
+
+Return to the sensors. The possible outputs form a subspace $I=\operatorname{im}A$. In Euclidean output geometry, the unique closest reading is $\hat b=P_I b$. Every input satisfying $Ax=\hat b$ is a least-squares minimizer. Thus an answer always exists in finite dimensions, but a unique **fitted output** need not come from a unique **input**.
+
+::: {#thm-ip-ls}
+**Normal equations and the minimum-norm solution.** The minimizers of $\|Ax-b\|_2$ are exactly the solutions of $A^HAx=A^Hb$. They form $x_0+\ker A$. Exactly one lies in $(\ker A)^\perp$, and it is the unique minimizer of input norm among all least-squares minimizers.
+:::
+
+::: {.proof}
+By orthogonal projection the fitted output is characterized by $b-Ax\perp\operatorname{im}A$, equivalently $A^H(b-Ax)=0$. Conversely this condition gives a global minimum by Pythagoras. Fix one preimage of the projection; all others differ by a kernel vector. Resolve this preimage into its perpendicular and kernel components. Dropping the kernel component leaves its fitted data unchanged. Any kernel addition to the perpendicular representative increases its squared norm by the squared norm of that addition.
+:::
+
+For a calculus derivation let $J(x)=\|Ax-b\|^2$ and perturb by $th$ for real $t$. Expansion gives
+$$
+J(x+th)-J(x)=2t\operatorname{Re}\big(h^HA^H(Ax-b)\big)+t^2\|Ah\|^2 .
+$$
+Stationarity for every $h$, in particular $h=A^H(Ax-b)$, gives the normal equations even for complex variables. Conversely at a stationary point the remaining term is nonnegative in every direction. Full column rank makes the minimizer unique, including for inconsistent data. A small residual alone need not imply small input error: for $A=\operatorname{diag}(1,\epsilon)$ an error of one in the second setting changes the residual by only $|\epsilon|$.
+
+### A complete inverse problem with two projections
+
+Use the original sensor array
+$$
+A=\begin{pmatrix}1&2&-1&3\\2&4&1&9\\3&6&0&12\end{pmatrix},\quad
+n=(-1,-1,1)^T,\quad b=(1,2,4)^T .
+$$
+Its columns span the plane $n^Ty=0$ (the first and third are independent). Since $n^Tb=1$, projection gives $\hat b=b-n/3=(4,7,11)^T/3$, with residual $n/3$. Now seek a preimage supported in coordinates 1 and 3. Those columns are $(1,2,3)^T$ and $(-1,1,0)^T$; matching the third and first readings gives $x_0=(11,0,-1,0)^T/9$. The entire family is $x_0+Nz$, with $N$ from Session 5. Its minimum-norm member is
+$$
+x^\dagger=(I-P_{\ker A})x_0,\qquad
+P_{\ker A}=N(N^TN)^{-1}N^T .
+$$
+The output residual lies in $\ker A^T$; the selected input lies in $\operatorname{im}A^T$. These perpendicularity conditions live in different spaces. With compatible $b=(1,2,3)^T$ the first projection is the identity on $b$ and the second still changes $e_1$ to the shorter representative from Session 5. Experiment G computes both the singular-case family and the exact minimum-norm answer.
+
+The resulting map $b\mapsto x^\dagger$ is the **Moore–Penrose pseudoinverse** $A^\dagger$: project onto the image and invert $A$ restricted to $(\ker A)^\perp$. This restriction is bijective onto the image by the decomposition theorem. Hence $AA^\dagger=P_{\operatorname{im}A}$ and $A^\dagger A=P_{(\ker A)^\perp}$. Their self-adjointness and their action on the two subspaces also give $AA^\dagger A=A$ and $A^\dagger AA^\dagger=A^\dagger$. With a compact singular value decomposition $A=U_r\Sigma_r V_r^H$ (orthonormal columns, positive singular values), $A^\dagger=V_r\Sigma_r^{-1}U_r^H$: read the attainable components, undo their stretch and reconstruct with no kernel component.
+
+### Why the equations we derive can differ from the algorithm we run
+
+For full column rank thin QR, $A=QR$ gives $R x=Q^Hb$, since $QQ^Hb$ is the fitted output. For example take columns $(1,1,0)^T$ and $(0,0,1)^T$ and $b=(1,3,2)^T$. Normalizing the columns gives $R=\operatorname{diag}(\sqrt2,1)$, $Q^Hb=(4/\sqrt2,2)^T$, hence $x=(2,2)^T$. The fitted output $(2,2,2)^T$ and residual $(-1,1,0)^T$ are perpendicular; both measurements on the residual vanish. The same matrix with $b=(1,1,2)^T$ fits exactly.
+
+For full column rank the extreme eigenvalues of $A^HA$ are $\sigma_{\max}^2,\sigma_{\min}^2$, so $\kappa_2(A^HA)=\kappa_2(A)^2$. Forming the Gram matrix can lose information about nearly parallel columns; explicitly inverting it introduces unnecessary work. Solving normal equations with Cholesky can be efficient for a well-conditioned tall matrix. QR avoids forming the Gram matrix. SVD exposes small stretches and permits a numerical rank decision for nearly singular problems. Thresholding singular values changes which directions count as resolved. In Experiment F we compare *coefficient error* as well as residual size, which can conceal the difference.
+
+### What if different sensors have different costs?
+
+For HPD output weight $W$, minimize $(Ax-b)^HW(Ax-b)$. Repeating the perpendicularity argument in that geometry gives $A^HWAx=A^HWb$. Equivalently solve ordinary least squares for $L^HAx\approx L^Hb$ where $W=LL^H$. An input weight $G$ changes the adjoint to $G^{-1}A^HW$. It cancels from the stationarity equations but changes minimum-input-norm selection when there is a kernel. For the sensor plane, the residual now runs along the Riesz representative $W^{-1}n$, and
+$$
+\hat b_W=b-W^{-1}n\,\frac{n^Tb}{n^TW^{-1}n}.
+$$
+For $W=\operatorname{diag}(1,1,4)$ this gives residual $(-4,-4,1)^T/9$; the expensive third reading is adjusted by $1/9$ instead of $1/3$. The original compatibility functional $n^T$ is exactly the same.
+
+**Checkpoint.** For which $b$ does changing $W$ leave the optimal residual exactly zero? Precisely the attainable $b$: every positive definite norm vanishes only on the zero residual.
+
+## Session 8 — How can a differential equation ask for a closest point?
+
+Consider the real boundary-value problem $-u''=f$ on $(0,1)$ with $u(0)=u(1)=0$. A piecewise linear trial function has jumps in slope and generally no classical second derivative at the mesh nodes. Can we still test whether it approximately solves the equation? Multiply a smooth solution's equation by a test function $v$ vanishing at both endpoints and integrate by parts:
+$$
+\int_0^1 -u''v=-[u'v]_0^1+\int_0^1u'v'=\int_0^1 f v .
+$$
+After this step only first derivatives occur. Let $V=H_0^1(0,1)$. On this interval its elements have absolutely continuous representatives, endpoint values zero and square-integrable first derivative. Equivalently it is the completion of smooth compactly supported tests in the norm $(\|v\|_{L^2}^2+\|v'\|_{L^2}^2)^{1/2}$. A weak derivative $g$ satisfies $\int v\varphi'=-\int g\varphi$ for all smooth compactly supported $\varphi$. Continuous piecewise linear hats have the piecewise constant slopes as weak derivatives because interior endpoint terms cancel.
+
+Set $a(u,v)=\int u'v'$, $m(u,v)=\int uv$ and $F(v)=\int fv$, with all integrals over $[0,1]$. The mass product $m$ measures amplitudes; the energy form $a$ measures slopes. If $a(v,v)=0$, then $v$ is constant and its zero boundary value forces zero. More quantitatively,
+$$
+|v(t)|=\left|\int_0^t v'(s)\,ds\right|\le\sqrt t\,\|v'\|_{L^2},
+\qquad \|v\|_{L^2}\le \|v'\|_{L^2}/\sqrt2.
+$$
+This Poincaré bound (sharpness is unnecessary) makes $\|v\|_a=\|v'\|_{L^2}$ equivalent to the complete $H^1$ norm on $V$. Thus $V$ is Hilbert in the energy geometry. For $f\in L^2$, Cauchy–Schwarz and Poincaré give $|F(v)|\le\|f\|_{L^2}\|v\|_a/\sqrt2$. Hilbert-space Riesz representation of this **continuous** functional provides a unique $u\in V$ with $a(u,v)=F(v)$ for every $v$. This is the weak solution; smoothness sufficient to recover the classical differential equation is a separate question. Lax–Milgram extends the existence argument to bounded coercive forms, including nonsymmetric real forms for which exact orthogonal projection need not hold.
+
+### A mesh with two unknowns
+
+On nodes $0,1/3,2/3,1$ use the two interior hats $\phi_i$ with value one at node $i$, zero at the other nodes and linear on each element. The trial space $V_h$ is their span; the test space is also $V_h$. Seek $u_h=\sum_j c_j\phi_j$ satisfying $a(u_h,\phi_i)=F(\phi_i)$ for every test index. Thus $K_{ij}=a(\phi_j,\phi_i)$ and $b_i=F(\phi_i)$. On an element of length $h$, the two slopes are $-1/h,1/h$, so the local stiffness is $\frac1h\left(\begin{smallmatrix}1&-1\\-1&1\end{smallmatrix}\right)$. For $f=1$ each adjacent half-hat contributes $h/2$ to the load. Adding adjacent contributions, with endpoint unknowns removed, gives
+$$
+K=3\begin{pmatrix}2&-1\\-1&2\end{pmatrix},\qquad
+b=\tfrac13\binom11,\qquad c=\tfrac19\binom11 .
+$$
+This is a Gram matrix in the energy product: $c^TKc=\|\sum_j c_j\phi_j\|_a^2>0$ for nonzero $c$ by linear independence. The exact solution $u(t)=t(1-t)/2$ happens to match the nodal values. Its nonzero curvature between nodes ensures that the approximate function still has nonzero energy error.
+
+**Galerkin orthogonality.** Subtract the discrete and continuous equations for an arbitrary $v_h\in V_h$. The common right side cancels, giving $a(u-u_h,v_h)=0$. For any $w_h\in V_h$, split $u-w_h=(u-u_h)+(u_h-w_h)$ to obtain
+$$
+\|u-w_h\|_a^2=\|u-u_h\|_a^2+\|u_h-w_h\|_a^2 .
+$$
+Thus $u_h$ is exactly the energy-orthogonal projection of $u$. It can be computed without knowing $u$ because the equation supplies its readings on tests. This reasoning uses a conforming trial space, the same test space and an energy inner product. Orthogonality in $L^2$ would solve a different minimization problem.
+
+On a mesh element the interpolant's slope equals the average of $u'$ on that element. Since $u'$ is affine of slope $-1$, the integrated squared slope error is $h^3/12$. Moreover the slope error integrates to zero against every constant trial slope, so the interpolant satisfies Galerkin orthogonality and is indeed $u_h$. On a uniform mesh the total energy error is $h/\sqrt{12}$ even though the nodal error vanishes. This gives a check on the refinement experiment independent of the matrix solver.
+
+**What happens with Neumann data?** For zero imposed endpoint derivatives, tests need not vanish at the endpoints. Constants now lie in the kernel of $a$. Testing with $v=1$ forces $\int f=0$. Conversely in one dimension, integrating $u'(t)=-\int_0^t f(s)\,ds$ gives both endpoint derivative conditions precisely when the integral is zero. Integrating again leaves a free constant. On $H^1/\mathbb R$ the derivative form is positive definite and the load descends exactly when it kills constants. Choosing the zero-mean representative fixes a normalization. The null direction from Module A, the compatibility test from B and the geometry from C are three aspects of the same boundary condition.
+
+**Checkpoint.** Can solving $Kc=b$ more accurately remove the between-node slope error? Even an exact solve gives $h/\sqrt{12}$ on this mesh. Enlarging the trial space changes the approximation itself.
+
+## Session 9 — How does a mass matrix enter an eigenvalue problem?
+
+A vibration mode must balance restoring energy against mass. In the real weak problem $a(u,v)=\lambda m(u,v)$ for every test $v$, scale cancels from the ratio $a(u,u)/m(u,u)$. Testing a finite trial expansion against basis vectors gives $Kx=\lambda Mx$, with $K_{ij}=a(\phi_j,\phi_i)$ and $M_{ij}=m(\phi_j,\phi_i)$. Integration of the products of the two linear shape functions gives the local mass matrix $\frac{h}{6}\left(\begin{smallmatrix}2&1\\1&2\end{smallmatrix}\right)$: the diagonal integrals are $h/3$, the cross integral $h/6$. For the previous two-hat mesh,
+$$
+M=\tfrac1{18}\begin{pmatrix}4&1\\1&4\end{pmatrix}.
+$$
+The same shapes therefore produce **two** Gram matrices. The vector $(1,1)^T$ has $Kx=3x$ and $Mx=(5/18)x$, so its vibration eigenvalue is $54/5$, not the stiffness eigenvalue $3$. The antisymmetric vector $(1,-1)^T$ gives $54$. Their mass pairing vanishes. The first value approximates $\pi^2$, the lowest Dirichlet eigenvalue of $-u''$ on the unit interval.
+
+### A self-adjoint operator behind a Hermitian pair
+
+For Hermitian $K$ and HPD $M$, the operator $T=M^{-1}K$ is $M$-self-adjoint since $T^HM=MT=K$. Its Rayleigh quotient is
+$$
+\rho_{K,M}(x)=\frac{\langle Tx,x\rangle_M}{\langle x,x\rangle_M}
+=\frac{x^HKx}{x^HMx}.
+$$
+The spectral theorem in the $M$-geometry supplies an $M$-orthonormal eigenbasis and real eigenvalues, even for indefinite $K$. Alternatively factor $M=LL^H$ and substitute $z=L^Hx$:
+$$
+(L^{-1}KL^{-H})z=\lambda z.
+$$
+The transformed matrix is Hermitian. Orthonormal $z_i$ map back to $x_i=L^{-H}z_i$ with $x_i^HMx_j=\delta_{ij}$. Distinct modes obey this orthogonality directly by subtracting the two paired eigenvalue equations. Implement the transformations with triangular solves.
+
+### Rayleigh–Ritz asks fewer questions than the full eigenproblem
+
+If columns of $Q$ form an independent trial basis, choose $x=Qy\ne0$ and require the residual of $Tx-\theta x$ to be $M$-orthogonal to the trial space. For any test $Qz$ this reads
+$$
+0=(Qz)^HM(TQy-\theta Qy)=z^HQ^H(KQy-\theta MQy).
+$$
+Arbitrary $z$ gives the reduced generalized eigenproblem
+$$
+Q^HKQy=\theta Q^HMQy.
+$$
+The reduced mass is HPD by independence. If $Q^HMQ=I$, it drops from the right side. With $M=I$ we obtain ordinary Rayleigh–Ritz, or $Q^HKQy=\theta y$ for Euclidean orthonormal $Q$. Two residuals have distinct coordinate types: $r=Kx-\theta Mx$ is a residual in test readings with $Q^Hr=0$; $M^{-1}r=Tx-\theta x$ is its vector representative, perpendicular in $M$. A zero *projected* residual only says the selected tests cannot detect the remaining defect.
+
+For one trial column $q=e_1$ on the two-hat mesh the Ritz value is $6/(4/18)=27$. The residual is $(0,-9/2)^T$: testing the first hat succeeds exactly but testing the other fails. In an $M$-orthonormal eigenbasis the quotient is a weighted average of the true eigenvalues, so even the single trial value lies in the spectral interval. The smallest Ritz value minimizes the quotient over the trial subspace; enlarging that subspace can only reduce this minimum. The derivative argument in Session 6 restricted to trial perturbations recovers the same reduced equation.
+
+**Bridge to the seminar.** In subspace iteration or a Krylov method a basis can change while the trial space is fixed. Replacing $Q$ by $QP$ with $P$ invertible changes the reduced pair by congruence and gives exactly the same Ritz vectors in the original space after converting coefficients. Filtering by $p(T)$ generally changes the space: each mode's amplitude is multiplied by $p(\lambda_i)$, as follows by applying powers of $T$ to an eigenvector. A Chebyshev polynomial can be scaled to stay small on an unwanted spectral interval while growing on a separated target region. After filtering, orthonormalization restores a usable basis and Rayleigh–Ritz reads out approximate eigenpairs. In computation the Gram product, orthogonalization, and independent residual checks cost differently and can lose different amounts of accuracy. Modules D and E build the spectral and numerical arguments on this geometry.
+
+**Checkpoint.** For a full-rank trial basis, a Ritz pair makes $Q^Hr=0$. When does that force $r=0$? Certainly when $Q$ spans the entire space; also for the corresponding Ritz vectors when the trial space is invariant under $M^{-1}K$. Invariance puts the vector residual in the trial space as well as its perpendicular.
+
+## Computational laboratory — Check the geometry as well as the equations
+
+Use a Python 3 Jupyter kernel with NumPy, SymPy and Matplotlib. Run the cells in document order. Experiments B–E and G use exact arithmetic to check identities. The floating-point experiments report residuals, condition numbers or errors with their mathematical interpretation.
+
+### A. Weighted unit directions
+
+@fig-ip-ellipse was generated by mapping the Euclidean circle through $L^{-H}$. Check the unit lengths, and predict the largest Euclidean radius by minimizing the quadratic form on the Euclidean unit circle.
+
+```{python}
+stretches = np.linalg.eigvalsh(G)
+weighted_lengths_sq = np.sum(ellipse * (G @ ellipse), axis=0)
+assert np.allclose(weighted_lengths_sq, 1.)
+print("Metric eigenvalues:", stretches)
+print("Euclidean semiaxis lengths:", 1/np.sqrt(stretches))
+print("Pairing of coordinate axes in G:", G[0, 1])
+```
+
+The eigenvalues are $1,3$ and their reciprocals' square roots give the radii. The off-diagonal entry is a measured angle term, distinct from either stretch.
+
+### B. Re-encode the same geometry
+
+```{python}
+import sympy as sp
+
+metric = sp.Matrix([[2, 1], [1, 2]])
+basis = sp.Matrix([[1, 1], [0, 1]])
+gram = basis.T*metric*basis
+v = sp.Matrix([3, 2])
+coords = basis.inv()*v
+assert (coords.T*gram*coords)[0] == (v.T*metric*v)[0]
+print("New Gram matrix:", gram.tolist(), "coordinates:", list(coords))
+print("Squared physical length:", (v.T*metric*v)[0])
+```
+
+Congruence preserves the quadratic value on the same physical vector. Reusing the old matrix with new coordinates would compute a different value.
+
+### C. Represent one complex measurement in two metrics
+
+```{python}
+c = sp.Matrix([1, sp.I])
+complex_metric = sp.Matrix([[2, sp.I], [-sp.I, 2]])
+for weight in [sp.eye(2), complex_metric]:
+    representative = weight.inv()*c.conjugate()
+    assert representative.H*weight == c.T
+    print("Representative:", list(representative),
+          "squared dual norm:", (representative.H*weight*representative)[0].simplify())
+```
+
+The second matrix is HPD (leading minors $2,3$). Equality of rows proves equality on all inputs. Compare each reported norm with the supremum on that metric's unit ball.
+
+### D. Pull back through different domain and codomain geometries
+
+```{python}
+A = sp.Matrix([[1, 2, 0], [0, 1, 1]])
+domain = sp.diag(1, 2, 3)
+target = metric
+adj = domain.inv()*A.T*target
+assert adj.T*domain == target*A
+for u, y in [(sp.Matrix([1, 2, 3]), sp.Matrix([1, -1])),
+             (sp.Matrix([0, -1, 2]), sp.Matrix([3, 0]))]:
+    assert (y.T*target*A*u)[0] == ((adj*y).T*domain*u)[0]
+print("Weighted adjoint:", adj.tolist())
+print("Transpose:", A.T.tolist())
+```
+
+The first assertion checks the identity for all inputs and output directions. The two numerical substitutions also illustrate the order of applications for a rectangular map.
+
+### E. Two projections onto the same plane
+
+```{python}
+plane = sp.eye(3)[:, :2]
+Porth = plane*(plane.T*plane).inv()*plane.T
+Poblique = sp.Matrix([[1, 0, -1], [0, 1, 0], [0, 0, 0]])
+v3 = sp.Matrix([2, 1, 2])
+for projector in [Porth, Poblique]:
+    assert projector**2 == projector and projector*plane == plane
+    residual = v3-projector*v3
+    print("Point:", list(projector*v3), "squared distance:", residual.dot(residual),
+          "residual readings on plane:", list(plane.T*residual))
+```
+
+Both maps fix the plane. At this input the squared distances are $4$ and $8$. The second rule discards direction $(1,0,1)^T$; only the first residual has zero pairing with both plane basis vectors.
+
+In @fig-ip-foot we intersect the plane with the slice $y=1$ through the input. The plane appears edge-on. Its perpendicular direction is vertical in this slice; the discarded oblique direction has equal horizontal and vertical components. The extra squared distance is the squared separation of the two feet.
+
+```{python}
+#| label: fig-ip-foot
+#| fig-cap: "Cross-section of the two projections at y = 1. Distances are drawn at equal scale."
+#| echo: false
+fig, ax = plt.subplots(figsize=(5.5, 3.2), constrained_layout=True)
+ax.axhline(0, color="0.45", label="target plane in slice")
+for foot, color, label in [(2, "#365d81", "orthogonal"), (0, "#b25b27", "oblique")]:
+    ax.plot([2, foot], [2, 0], color=color, label=label)
+    ax.scatter([foot], [0], color=color)
+ax.scatter([2], [2], color="black")
+ax.text(2.08, 2, "input")
+ax.set(xlim=(-.5, 3), ylim=(-.35, 2.5), xlabel="x", ylabel="z", aspect="equal")
+ax.legend(loc="upper left", fontsize=8)
+plt.show()
+```
+
+### F. Compare normal equations, QR and SVD
+
+```{python}
+def compare_solvers(design, rhs, reference):
+    Q, R = np.linalg.qr(design, mode="reduced")
+    estimates = {"QR": np.linalg.solve(R, Q.T @ rhs),
+                 "SVD": np.linalg.pinv(design) @ rhs}
+    try:
+        estimates["normal"] = np.linalg.solve(design.T @ design, design.T @ rhs)
+    except np.linalg.LinAlgError:
+        print("Rounded normal matrix is singular.")
+    print(f"cond(A) = {np.linalg.cond(design):.3e}")
+    for method, estimate in estimates.items():
+        err = np.linalg.norm(estimate-reference)
+        res = np.linalg.norm(design @ estimate-rhs)
+        print(f"{method:6s}  coefficient error {err:.3e}   residual {res:.3e}")
+
+design = np.array([[1., 0.], [1., 0.], [0., 1.]])
+compare_solvers(design, np.array([1., 3., 2.]), np.array([2., 2.]))
+t = np.linspace(-1., 1., 40)
+near = np.column_stack((np.ones_like(t), 1.+1e-6*t))
+reference = np.array([1., -1.])
+compare_solvers(near, near @ reference, reference)
+```
+
+For the first problem all three methods should attain residual $\sqrt2$, which is forced by the data. The second problem uses nearly parallel columns and consistent constructed data. The response along $(1,-1)^T$ is tiny. Compare the absolute coefficient errors even if all residuals appear small. Last digits can vary by platform; the predicted vulnerability is squaring the singular-value ratio in the normal system.
+
+### G. Select the minimum-norm input for incompatible data
+
+```{python}
+sensor = sp.Matrix([[1, 2, -1, 3], [2, 4, 1, 9], [3, 6, 0, 12]])
+N = sp.Matrix.hstack(*sensor.nullspace())
+bad = sp.Matrix([1, 2, 4])
+x0 = sp.Matrix([11, 0, -1, 0])/9
+Pk = N*(N.T*N).inv()*N.T
+xmin = sensor.pinv()*bad
+assert xmin == (sp.eye(4)-Pk)*x0
+assert N.T*xmin == sp.zeros(2, 1)
+assert sensor.T*(bad-sensor*xmin) == sp.zeros(4, 1)
+z = sp.Matrix(sp.symbols("s t"))
+assert (sensor*(xmin+N*z)-sensor*xmin).applyfunc(sp.simplify) == sp.zeros(3, 1)
+print("Minimum-norm input:", list(xmin))
+print("Fitted data:", list(sensor*xmin), "residual:", list(bad-sensor*xmin))
+```
+
+The normal equations alone accept the whole two-parameter family $x^\dagger+Nz$. The additional two independent conditions $N^Tx^\dagger=0$ select a single input. They characterize the pseudoinverse solution independently of the algorithm used to compute it.
+
+### H. Assemble the Poisson equation and measure the slope error
+
+```{python}
+def poisson_matrices(elements):
+    h = 1/elements
+    n = elements+1
+    stiffness = np.zeros((n, n))
+    mass = np.zeros((n, n))
+    load = np.zeros(n)
+    for j in range(elements):
+        element = slice(j, j+2)
+        stiffness[element, element] += np.array([[1., -1.], [-1., 1.]])/h
+        mass[element, element] += h*np.array([[2., 1.], [1., 2.]])/6
+        load[element] += h/2
+    return stiffness[1:-1, 1:-1], mass[1:-1, 1:-1], load[1:-1]
+
+def poisson_solution(elements):
+    K, M, load = poisson_matrices(elements)
+    values = np.r_[0., np.linalg.solve(K, load), 0.]
+    return np.linspace(0., 1., elements+1), values
+
+for count in [3, 6, 12]:
+    nodes, vals = poisson_solution(count)
+    h = 1/count
+    mids = (nodes[1:]+nodes[:-1])/2
+    slopes = np.diff(vals)/h
+    # Two-point Gauss integrates the squared affine slope error exactly.
+    offsets = np.array([-1., 1.])*h/(2*np.sqrt(3))
+    diff = .5-(mids[:, None]+offsets)-slopes[:, None]
+    energy_error = np.sqrt(h/2*np.sum(diff**2))
+    assert np.isclose(energy_error, h/np.sqrt(12))
+    print(count, "elements; energy error", round(energy_error, 7))
+```
+
+```{python}
+#| label: fig-ip-fem
+#| fig-cap: "Poisson solution and its piecewise linear Galerkin approximations. The right panel shows the slope error, which persists between exact nodal values."
+#| echo: false
+fig, axes = plt.subplots(1, 2, figsize=(8.3, 3.4), constrained_layout=True)
+t = np.linspace(0, 1, 300)
+axes[0].plot(t, t*(1-t)/2, color="black", label="exact")
+for count, color in [(3, "#ae5829"), (6, "#296285")]:
+    nodes, vals = poisson_solution(count)
+    axes[0].plot(nodes, vals, ".-", color=color, label=f"{count} elements")
+    for j, slope in enumerate(np.diff(vals)*count):
+        bounds = nodes[j:j+2]
+        axes[1].plot(bounds, .5-bounds-slope, color=color)
+axes[0].legend()
+axes[0].set(xlabel="position", ylabel="solution")
+axes[1].axhline(0, color="0.6", lw=.8)
+axes[1].set(xlabel="position", ylabel="exact slope − discrete slope")
+plt.show()
+```
+
+Each segment of the slope-error graph in @fig-ip-fem integrates to zero. Halving the mesh length halves the energy error, even though nodal-value comparisons alone would already report machine-level accuracy.
+
+### I. Compute generalized eigenpairs and test a proper trial subspace
+
+```{python}
+def hermitian_pair(K, M):
+    L = np.linalg.cholesky(M)
+    left = np.linalg.solve(L, K)
+    transformed = np.linalg.solve(L, left.T).T
+    vals, Z = np.linalg.eigh(transformed)
+    return vals, np.linalg.solve(L.T, Z)
+
+K, M, load = poisson_matrices(3)
+vals, modes = hermitian_pair(K, M)
+assert np.allclose(modes.T @ M @ modes, np.eye(2))
+assert np.allclose(K @ modes, (M @ modes)*vals)
+Q = np.array([[1.], [0.]])
+ritz, small_modes = hermitian_pair(Q.T @ K @ Q, Q.T @ M @ Q)
+xr = Q @ small_modes[:, 0]
+rr = K @ xr-ritz[0]*(M @ xr)
+assert np.allclose(Q.T @ rr, 0.) and np.linalg.norm(rr) > 1.
+print("Generalized eigenvalues:", vals, "one-dimensional Ritz value:", ritz)
+print("Residual per unit first coefficient:", rr/xr[0])
+```
+
+This routine uses real symmetric matrices, so transposes in the implementation are ordinary transposes. The returned vectors are normalized in $M$. Dividing the residual by the first coefficient recovers the hand calculation for the unnormalized $e_1$. Neither normalization alters the Ritz value.
+
+## Exercises — Reconstruct, calculate, transfer
+
+### Geometry from measurements
+
+1. **Identify an inner product.** On $\mathbb R^2$ let $g_t(x,y)=y^T\left(\begin{smallmatrix}1&t\\t&1\end{smallmatrix}\right)x$. For which real $t$ is this an inner product? Determine when the coordinate axes are perpendicular. Give a nonzero null direction at each endpoint of the admissible interval.
+2. **Rebuild the inequalities.** Minimize $\|x-\alpha y\|^2$ over complex $\alpha$ and deduce Cauchy–Schwarz, its equality case and the triangle inequality. Use the parallelogram law to test $\|\cdot\|_\infty$ on $\mathbb R^2$.
+3. **A dual basis in an oblique grid.** In Euclidean $\mathbb R^2$ take $b_1=(1,0),b_2=(1,1)$. Find both Riesz representatives of the dual basis in physical coordinates and in basis coordinates. Explain why just normalizing the original axes cannot solve the problem.
+4. **A weighted complex measurement.** For $f(x)=ix_1+2x_2$ and $G=\operatorname{diag}(4,1)$ find the Riesz representative, the dual norm and a maximizing unit input. Prove the existence and uniqueness statement for an arbitrary finite-dimensional functional.
+5. **Adjoints without orthonormal coordinates.** Let $T$ have standard real matrix $\operatorname{diag}(2,3)$ with Euclidean physical geometry. Use the oblique basis of problem 3 on both sides. Compute its coordinate matrix and its adjoint matrix there. Derive the general formula from the Riesz square.
+
+### Approximation and operator structure
+
+6. **Detect a closest point.** Project $(2,1)$ onto the horizontal axis first in the Euclidean metric and then in $G=\left(\begin{smallmatrix}2&1\\1&2\end{smallmatrix}\right)$. Give an oblique projector that returns a third answer. Prove the best-approximation criterion for any subspace in finite dimension.
+7. **Reconstruct the four subspaces.** For $T(x,y,z)=(x+y,z)$ with Euclidean metrics compute the four spaces in the orthogonality theorem. Reprove the result in general. Identify exactly the step that gives only a closure in Hilbert space.
+8. **Positive versus invertible.** For the $M,K$ pair at the end of Session 6, verify weighted self-adjointness and find the two eigenvalues and the range of the generalized Rayleigh quotient. Give an invertible self-adjoint matrix with a nonzero vector of zero quadratic energy.
+9. **Inconsistent but unique.** For $A=(1,1)^T$ and $b=(0,3)^T$ compute the minimizer in output weight $W=\operatorname{diag}(1,w)$, $w>0$. Derive the weighted normal equations and explain what happens as $w$ increases.
+10. **A second source of nonuniqueness.** For $A=\left(\begin{smallmatrix}1&1\\2&2\\0&0\end{smallmatrix}\right)$, $b=(1,2,3)^T$, find every least-squares minimizer. Select the shortest in Euclidean input geometry, then the shortest in $\operatorname{diag}(4,1)$. Explain why the fitted reading does not change.
+11. **A vanished normal-equation pivot.** For columns $(1,0,0)^T$ and $(1,\epsilon,0)^T$, compute the Gram determinant in exact arithmetic. Explain what can happen if $1+\epsilon^2$ rounds to one. What quantity is still present in the input available to QR?
+
+### From tests to modes
+
+12. **Two variational geometries.** Assemble the one-interior-hat stiffness, mass and load for $-u''=1$ with homogeneous Dirichlet data on the mesh $0,1/2,1$. Find the Galerkin coefficient and its generalized Rayleigh quotient. Prove the energy best-approximation property for any conforming space.
+13. **The missing boundary condition.** For homogeneous Neumann data determine which of $f=1$, $f=2t-1$ admit weak solutions. For the compatible case construct the solution family, describe the quotient and give the zero-mean representative.
+14. **A Ritz value invisible to one test.** For the two-hat $K,M$ from Session 9 choose trial vector $q=(1,2)^T$. Find $\theta$, the full residual $r$, and verify its test equation. Decide whether $q$ is a full eigenvector.
+15. **The price of a nonclosed range.** For the diagonal operator $(Tx)_j=x_j/j$ on $\ell^2$, produce data for which the least-squares infimum is zero but there is no minimizer. Explain which orthogonality criterion still holds and what fails.
+
+## Worked solutions
+
+**1.** The eigenvectors $(1,1)$ and $(1,-1)$ have eigenvalues $1+t$ and $1-t$. Decomposition along these perpendicular directions proves positivity precisely for $-1<t<1$. Bilinearity and symmetry hold for every $t$. The coordinate pairing is $t$, so the axes are perpendicular exactly at $t=0$. At $t=1$ the difference direction is null; at $t=-1$ the sum direction is null.
+
+**2.** For $y\ne0$ choose $\alpha_0=\langle x,y\rangle/\|y\|^2$. Then $z=x-\alpha_0 y\perp y$, and $\|x-\alpha y\|^2=\|z\|^2+|\alpha_0-\alpha|^2\|y\|^2$, proving the minimizing claim. At $\alpha=0$ this yields $|\langle x,y\rangle|^2\le\|x\|^2\|y\|^2$, equality iff $z=0$. If $y=0$ equality always holds. Expanding $\|x+y\|^2$ and bounding twice the real part gives the triangle inequality. For $e_1,e_2$ in the max norm the parallelogram left side is $2$, while the right side is $4$. This norm cannot be an inner-product norm.
+
+**3.** The dual basis rows in physical coordinates are $(1,-1),(0,1)$, the rows of $B^{-1}$. In Euclidean geometry the representing columns are their transposes. Applying $B^{-1}$ to them gives $(2,-1)^T,(-1,1)^T$, the columns of $(B^TB)^{-1}$. The first representative must kill $b_2$ and the second must kill $b_1$. Rescaling a basis vector can set its own length, but cannot turn its nonzero pairing with the other axis into zero.
+
+**4.** $Ga_f=(-i,2)^T$ gives $a_f=(-i/4,2)^T$. The squared norm is $1/4+4=17/4$, so $2a_f/\sqrt{17}$ is a maximizing input of unit length. For existence expand in an orthonormal basis and use conjugated coefficients $\overline{f(q_i)}$ for the representative; pairing with each $q_i$ returns $f(q_i)$, hence the two functionals agree by linearity everywhere. The difference of two possible representatives pairs to zero with itself, proving uniqueness.
+
+**5.** Directly $A=B^{-1}\operatorname{diag}(2,3)B=\left(\begin{smallmatrix}2&-1\\0&3\end{smallmatrix}\right)$. From $T^*=R_V^{-1}T^\vee R_W$, its output on $y$ represents the functional $x\mapsto y^HG_WAx$. Therefore $G_V[T^*]y=A^HG_Wy$. Here $G_V=G_W=B^TB$ and $G_V^{-1}A^TG_V=A$. This agrees with physical self-adjointness while $A^T\ne A$. Using an ordinary transpose in this basis would represent the wrong operator.
+
+**6.** The Euclidean foot is $(2,0)$. In $G$, orthogonality to $e_1$ means $2(2-c)+1=0$, giving $(5/2,0)$. The idempotent $(x,y)\mapsto(x-y,0)$ gives $(1,0)$; its discarded direction is $(1,1)$. Generally construct $p$ by summing the components of $x$ on an orthonormal basis of the target. Then $x-p\perp S$, and the squared distance to any other $s$ increases by $\|p-s\|^2$. Conversely any minimizer must equal $p$ by this strict increase. This proves both necessity and sufficiency.
+
+**7.** The kernel is spanned by $(1,-1,0)$, and the image is $\mathbb R^2$. The adjoint sends $(a,b)$ to $(a,a,b)$, so its kernel is zero and its image is the plane $x=y$. In general $z\in\ker T^*$ iff $\langle v,T^*z\rangle=0$ for all $v$ iff $z\perp\operatorname{im}T$. Apply this to $T^*$ for the second kernel identity; taking perpendiculars gives the image identities because finite-dimensional subspaces equal their double perpendiculars. In a Hilbert space the double perpendicular recovers the closure. Problem 15 shows how this changes solvability.
+
+**8.** $T=M^{-1}K$ has $MT=K=K^H=T^HM$. The characteristic equation for the pair is $(2-2\lambda)(2-\lambda)-1=0$, giving $\lambda_\pm=(3\pm\sqrt3)/2$. The quotient ranges over the closed interval between these values, since in an $M$-orthonormal eigenbasis it is a convex combination with weights $|c_i|^2/\sum|c_i|^2$; varying the two coefficients attains every weight. The Euclidean matrix $\operatorname{diag}(1,-1)$ has nonzero determinant and zero energy on $(1,1)^T$.
+
+**9.** The minimized expression is $|x|^2+w|x-3|^2$. Vanishing derivative (or weighted perpendicularity) gives $x=3w/(1+w)$. More generally, the fitted residual is $W$-perpendicular to every $Ah$ iff $h^HA^HW(Ax-b)=0$ for every $h$. This is equivalent to the weighted normal equations. The column is independent, giving uniqueness despite incompatibility. As $w$ increases the fit approaches the second reading.
+
+**10.** The first two rows are compatible when $x_1+x_2=1$; the unavoidable third residual is $3$. Hence the full line is minimizing. Its Euclidean shortest point is $(1/2,1/2)$ by perpendicularity to $(1,-1)$. In the weighted input norm the condition is $4x_1-x_2=0$. Solving with the sum condition gives $(1/5,4/5)$. Both map to $(1,2,0)$ because changing the representative along the kernel cannot change a fitted reading.
+
+**11.** The Gram matrix has rows $(1,1),(1,1+\epsilon^2)$, so the determinant is $\epsilon^2$. If the last diagonal rounds to one, the explicitly formed matrix is singular even for $\epsilon\ne0$. This is consistent with squaring the condition number. QR applied to the original columns has the independent second-row entry $\epsilon$ available: subtracting the first column from the second leaves $(0,\epsilon,0)^T$ in exact arithmetic. This advantage does not remove the original input sensitivity when $\epsilon$ is tiny.
+
+**12.** The hat slopes are $2,-2$, giving $K=4$. The integrated squared hat is $1/3$, so $M=1/3$; the area gives load $1/2$. The Galerkin coefficient is $1/8$ and the generalized quotient is $12$. For any conforming subspace, subtract the test equations to obtain $a(u-u_h,v_h)=0$ for all tests there. Testing against $u_h-w_h$ kills the cross term in the energy expansion. The squared error for $w_h$ exceeds that for $u_h$ by $\|u_h-w_h\|_a^2$. Positivity gives uniqueness.
+
+**13.** Testing with the constant $1$ excludes $f=1$. For $2t-1$ the integral vanishes. Integration gives $u'(t)=t-t^2$, zero at both endpoints, and $u(t)=t^2/2-t^3/3+C$. The integral of the nonconstant part is $1/6-1/12=1/12$, hence zero mean fixes $C=-1/12$. Adding any constant gives the same weak equation. The energy norm is definite on classes modulo constants.
+
+**14.** We have $Kq=(0,9)^T$ and $Mq=(6,9)^T/18$. Hence $\theta=18/(24/18)=27/2$. The residual is $(-9/2,9/4)^T$, whose pairing with $(1,2)$ is zero. Its second component is nonzero, so this is a Ritz vector only. An exact eigenvector would pass every test in the full two-dimensional space.
+
+**15.** Set $b_j=1/j$. Truncation to the first $n$ entries produces $b^{(n)}=Tx^{(n)}$ for an input with $n$ entries equal to one and the rest zero. Then $\|b-b^{(n)}\|^2=\sum_{j>n}j^{-2}\to0$, while no $\ell^2$ input with every entry equal to one exists. The range has zero perpendicular and the adjoint has zero kernel, so the kernel identity holds. Double perpendicular gives the whole space, the closure of the range. If a minimizer existed it would have zero residual and yield the excluded preimage.
+
+## Integrated mastery problem — One instrument, two geometries, one reduced model
+
+On the two-interior-hat mesh, an instrument reads the displacement at the first interior node: $F(v)=v(1/3)$. In nodal coordinates its row is $(1,0)$. Compare the following operations.
+
+1. Construct its Riesz representatives and dual norms in mass and energy geometry. Interpret the adjoint of the instrument in both metrics with ordinary scalar output.
+2. Apply this point load and solve the energy equation. Restrict the calculation to the one-dimensional trial space spanned by $q=(1,1)^T$. Derive the reduced displacement, its error and the residual load. Distinguish a residual **functional** from its energy **representative**.
+3. Compute the generalized Ritz value for the same trial space. Explain why this trial space gives an exact vibration mode although it only approximates the static response. Decide which conclusions change under rescaling of $q$.
+
+### Worked reconstruction
+
+From Session 9 take $K=\left(\begin{smallmatrix}6&-3\\-3&6\end{smallmatrix}\right)$ and $M=\frac1{18}\left(\begin{smallmatrix}4&1\\1&4\end{smallmatrix}\right)$. Put $d=e_1$. On the finite element space, the Riesz vectors are
+$$
+a_K=K^{-1}d=(2,1)^T/9,\qquad
+a_M=M^{-1}d=(24,-6)^T/5 .
+$$
+Their own squared norms equal their first components, since $a^HGa=d^Ha$. The dual norms are therefore $\sqrt2/3$ and $\sqrt{24/5}$. In either geometry the adjoint of the scalar instrument sends $t$ to $t a_G$. These are finite-dimensional mass and energy representatives. On the full $L^2$ space point evaluation is not even well-defined on equivalence classes modulo changes on sets of measure zero. On the one-dimensional endpoint-zero energy space it is continuous by the estimate in Session 8.
+
+The static response solves $Ku=d$, so $u=a_K$. The reduced response is $u_Q=cq$, where $(q^TKq)c=q^Td$. Here $Kq=3q$, giving $c=1/6$. Hence
+$$
+u-u_Q=(1,-1)^T/18,\qquad d-Ku_Q=(1,-1)^T/2 .
+$$
+The residual row represented in algebraic coefficient coordinates by $d-Ku_Q$ vanishes on $q$. Solving with $K$ maps that functional to the error vector. Its energy dual norm equals the error's energy norm, since this solve is Riesz representation. In fact $\|u-u_Q\|_K^2=(u-u_Q)^T(d-Ku_Q)=1/18$. Every other displacement on the trial line has greater energy error by the projection theorem.
+
+For vibration, $Mq=(5/18)q$, so $Kq=(54/5)Mq$. The Ritz residual vanishes on *every* test. The one-dimensional trial space contains this exact mode, but the load also excites the antisymmetric mode: the load has $F((1,-1)^T)=1$. This missing direction accounts for the static error. Replacing $q$ by $\alpha q$, $\alpha\ne0$, rescales $c$ by $1/\alpha$ and both reduced Gram entries by $|\alpha|^2$. It changes neither displacement, eigenvalue nor either residual in the original space.
+
+## Synthesis — Which structure made each conclusion possible?
+
+```{mermaid}
+flowchart TD
+  D["Linear functional and pullback"] --> R["Riesz representation"]
+  G["Chosen inner products"] --> R
+  R --> A["Adjoint operator"]
+  G --> P["Orthogonal projection"]
+  A --> N["Residual tests and normal equations"]
+  P --> N
+  P --> E["Galerkin energy approximation"]
+  E --> M["Stiffness and mass pair"]
+  M --> Q["Rayleigh–Ritz modes"]
+```
+
+Projection occurs more than once, with different ambient spaces. Least squares projects noisy **data** onto attainable outputs. Minimum norm projects an **input representative** off the kernel. Galerkin projects an unknown **function** in the energy geometry using only load measurements. Rayleigh–Ritz projects an **operator action** and tests an eigenpair residual. Specifying what is being projected and which pairing tests the residual determines the appropriate equation in each case.
+
+| Construction | Conclusion | Data or assumptions required |
+|---|---|---|
+| Algebraic complement $H$ of $S$ | Unique decomposition into $S$ and $H$ | A choice with $V=S\oplus H$ |
+| Annihilator $S^0$ | All functionals insensitive to $S$ | $S$ inside $V$, no metric |
+| Orthogonal complement $S^\perp$ | Minimum-length representatives modulo $S$ | Inner product; finite dimension or closed $S$ in Hilbert space |
+| Algebraic dual $T^\vee$ | Composition $g\mapsto gT$, represented by $A^T$ | Linear map and corresponding dual bases for coordinates |
+| Adjoint $T^*$ | Pullback represented on vectors | Inner products on both spaces; bounded operator in Hilbert setting |
+| Cauchy–Schwarz and Riesz | Norm of a measurement equals length of its representative | Positive definite product; continuous dual and completeness in Hilbert Riesz |
+| Gram change | $G'=P^HGP$ | Invertible change of basis for the same geometry |
+| Orthogonal projection | Unique best approximation, idempotent and self-adjoint | Subspace in finite dimension; closed subspace in Hilbert space |
+| Spectral theorem used here | Orthonormal eigenbasis and real spectrum | Finite-dimensional self-adjoint operator |
+| Least squares and pseudoinverse | Unique fitted data, unique shortest minimizing input | Finite dimensions; unique minimizer without tie-break iff injective |
+| Galerkin energy projection | Error is energy-perpendicular to conforming trial space | Positive symmetric energy form, same trial and test space |
+| Generalized Rayleigh–Ritz | Reduced Hermitian pair and residual test $Q^Hr=0$ | $K=K^H$, $M$ HPD, independent trial columns |
+
+**What is determined?** A functional and its kernel are determined by the linear rule. Its representative and its norm are determined after choosing geometry. The same dependence holds for adjoints, perpendicular complements and closest points. Once the geometry and subspace are fixed, the orthogonal projection requires no further basis choice. Bases, matrix entries and Cholesky factors are coordinate descriptions. Module F2's natural evaluation $V\to V^{\vee\vee}$ uses no metric; the Riesz identification with the single dual instead respects maps preserving the chosen geometry.
+
+| Common error | A calculation that detects it |
+|---|---|
+| Treating a Gram change as a change of physical length | Transform coordinates as well and compare $x^HGx$ |
+| Identifying covector coefficients and vector coordinates | Solve $Ga=\bar c$ and test $a^HGx=c^Tx$ |
+| Calling every idempotent orthogonal | Test $P^HG=GP$ in the specified metric |
+| Inferring a small solution error from a small residual | Check the smallest resolved stretch and any kernel component |
+| Inferring zero PDE error from exact nodal values | Measure slopes or the energy integral between nodes |
+| Interpreting a Ritz residual with the wrong metric | Distinguish $Q^Hr=0$ from $Q^HMr=0$; identify whether $r$ is a load or a vector |
+| Claiming existence of a closest point from an infimum | In infinite dimensions check closedness of the approximating subspace |
+
+### Mastery checklist
+
+- [ ] Reconstruct Cauchy–Schwarz and the triangle inequality from a one-dimensional projection.
+- [ ] Compute a Gram matrix, transform it under a basis change and distinguish this from changing the metric.
+- [ ] Prove Riesz representation and calculate a weighted gradient and dual norm, including complex conjugation.
+- [ ] Derive an adjoint from algebraic pullback and verify its defining identity between different metrics.
+- [ ] Rebuild the four fundamental subspace identities and identify where closure enters.
+- [ ] Construct an orthogonal projector, characterize it algebraically and prove its best-approximation property.
+- [ ] Recognize weighted self-adjointness and positivity, and explain the existence of perpendicular eigenmodes.
+- [ ] Derive both normal-equation proofs, describe every minimizer and select the minimum-norm one.
+- [ ] Explain the difference in conditioning between QR and explicitly forming a Gram matrix.
+- [ ] Derive the weak Poisson equation, assemble the stiffness and mass matrices, and prove Galerkin orthogonality.
+- [ ] Derive generalized Rayleigh–Ritz and distinguish residual orthogonality from an exact eigenpair.
+
+**Transition to Module D.** In Euclidean orthonormal eigen-coordinates a Hermitian operator has $A=U\Lambda U^H$, hence $p(A)=\sum_i p(\lambda_i)u_i u_i^H$. The matrices $u_i u_i^H$ project onto perpendicular modes. Summing over a repeated eigenvalue gives the projector onto its entire eigenspace, independent of which orthonormal basis spans it. Module D asks how much of that subspace can be identified from approximate data and how a polynomial filter can amplify it before Rayleigh–Ritz extraction.

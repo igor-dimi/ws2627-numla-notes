@@ -1,0 +1,230 @@
+# Module A - Structural Linear Algebra
+
+Linear maps, kernels, images, direct sums, quotients, isomorphism theorems, and their applications
+
+## Introduction: The central idea
+
+The purpose of this module is to develop a structural understanding of linear algebra.
+
+In an introductory course, we learn how to solve linear systems, calculate ranks, compute null spaces, and manipulate matrices.
+
+Here, we will ask a deeper question:
+
+What do these computations reveal about the mathematical structure of a linear transformation?
+
+Given a linear map:
+
+$$
+T:V\longrightarrow W,
+$$
+
+we want to understand what information it preserves, what information it loses, how it organizes the domain and codomain into subspaces, and why these constructions generalize far beyond matrices.
+
+One of the most important results we will establish is
+
+$$
+\boxed{V/\ker T\cong\operatorname{im}T.}
+$$
+
+This equation connects several concepts:
+- The kernel describes which distinctions between inputs disappear under $T$.
+- The quotient identifies inputs that $T$ cannot distinguish.
+- The image describes all outputs that $T$ can produce.
+- The isomorphism tells us that, after identifying indistinguishable inputs, the transformation becomes bijective onto its image.
+
+We will derive this result rigorously, interpret it geometrically, compute it in concrete examples, and investigate its manifestations in numerical linear algebra, differential equations, and scientific computing.
+
+## The six perspectives
+
+Every major concept will be developed through the following perspectives.
+
+
+| Perspective | What we want to understand |
+|---|---|
+| **Rigorous** | Definitions, assumptions, statements, and proofs |
+| **Intuitive and geometric** | What the construction represents and why it is natural |
+| **Computational** | How to construct, calculate, or implement it |
+| **Structural** | How it relates to other concepts and theorems |
+| **Universal** | How it generalizes to abstract algebra and category theory |
+| **Applied** | How it appears in numerical methods, functional analysis, PDEs, and scientific computing |
+
+
+## Session 1 - The structure of a linear Transformation
+
+### From matrices to linear maps
+
+Let $V,W$ be vector spaces over a field $\mathbb F$, usually $\mathbb R$ or $\mathbb C$.
+
+A transformation
+$$
+T:V\to W
+$$
+
+is linear if
+$$
+T(\alpha v+\beta w)=\alpha T(v)+\beta T(w)
+$$
+
+for every $v,w\in V$ and $\alpha,\beta\in\mathbb F$.
+
+The property implies
+$$
+T\left(\sum_{i=1}^k a_iv_i\right)
+=\sum_{i=1}^k a_iT(v_i).
+$$
+
+In particular, if $(v_1,\ldots,v_n)$ is a basis of $V$, knowing the images $T(v_1),\ldots,T(v_n)$ determines the transformation completely.
+
+Indeed, every $v\in V$ has a unique expansion
+$$
+v=\sum_{i=1}^n a_iv_i,
+$$
+
+and therefore
+$$
+T(v)=\sum_{i=1}^n a_iT(v_i).
+$$
+
+This is the fundamental reason we can represent linear maps using matrices.
+
+**A matrix is a coordinate representation of a linear map, not the linear map itself**. Once bases are chosen in the domain and codomain, the columns of the matrix record the coordinates of the images of the domain basis vectors.
+
+This distinction becomes important when studying changes of basis, eigenvalues, and numerical algorithms
+
+### The kernel: indistinguishable inputs
+
+The **kernel** of a linear map is
+
+$$
+\boxed{\ker T=\{v\in V:T(v)=0\}.}
+$$
+
+It is a subspace of $V$.
+
+The most illuminating property of the kernel is
+$$
+\boxed{
+T(v)=T(w)\iff v-w\in\ker T.
+}
+$$
+
+Proof
+By linearity,
+$$
+\begin{aligned}
+T(v)=T(w)
+&\iff T(v)-T(w)=0\\
+&\iff T(v-w)=0\\
+&\iff v-w\in\ker T.
+\end{aligned}
+$$
+
+This tells us exactly what information a linear map loses.
+
+Two inputs produce the same output if and only if they differ by an element of the kernel.
+
+**Example**:
+
+Consider
+$$
+T:\mathbb R^3\to\mathbb R^2,
+\qquad
+T(x,y,z)=(x+y,z).
+$$
+
+To find the kernel, solve
+$$
+(x+y,z)=(0,0).
+$$
+
+Thus
+$$
+x=-y,\qquad z=0.
+$$
+
+Therefore,
+$$
+\boxed{
+\ker T=\operatorname{span}\{(1,-1,0)\}.
+}
+$$
+
+The transformation observes the sum $x+y$, but cannot distinguish different pairs with the same sum.
+
+For example,
+$$
+T(2,3,4)=T(5,0,4)=(5,4).
+$$
+
+Their difference is
+$$
+(-3,3,0)\in\ker T.
+$$
+
+The kernel contains precisely the directions invisible to the transformation.
+
+**Injectivity**
+
+A linear map is injective if and only if its kernel is trivial:
+$$
+\boxed{
+T\text{ injective}\iff\ker T=\{0\}.
+}
+$$
+
+To prove the forward direction, observe that $T(v)=0=T(0)$ implies $v=0$ when $T$ is injective.
+
+For the converse, if $T(v)=T(w)$, then $v-w\in\ker T$. A trivial kernel therefore implies $v=w$.
+
+### The image: attainable outputs
+
+The **image** of $T$ is
+$$
+\boxed{\operatorname{im}T=\{T(v):v\in V\}.}
+$$
+
+It is a subspace of $W$.
+
+The kernel tells us what the transformation loses; the image tells us what it can produce.
+
+For our example,
+$$
+T(x,y,z)=(x+y,z),
+$$
+
+we have
+$$
+\operatorname{im}T=\mathbb R^2,
+$$
+
+because every $(a,b)\in\mathbb R^2$ is obtained as
+$$
+T(a,0,b)=(a,b).
+$$
+
+Thus $T$ is surjective, although not injective.
+
+Notice the distinction between the **codomain** $W$ and the **image** $\operatorname{im}T$. The codomain is part of the specification of $T$, whereas the image consists of its actually attainable outputs.
+
+### Rank-nullity
+
+Assume $V$ is finite-dimensional.
+
+Define
+$$
+\operatorname{nullity}(T)=\dim\ker T,
+$$
+
+$$
+\operatorname{rank}(T)=\dim\operatorname{im}T.
+$$
+
+The **rank–nullity** theorem states that
+$$
+\boxed{
+\dim V
+=
+\operatorname{nullity}(T)+\operatorname{rank}(T).
+}
+$$
+

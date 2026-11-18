@@ -1,0 +1,5605 @@
+---
+title: "Module C — Inner-Product Geometry"
+---
+
+Riesz Representation, Adjoint Operators, Orthogonal Projections, Self-Adjointness, Positive Definiteness, and Least Squares
+
+*Advanced undergraduate · 8 study sessions · Approximately 16–22 hours*
+
+|                         |                                                                                                                      |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Prerequisites**       | Modules A and B: linear maps, kernels, images, direct sums, quotient spaces, dual bases, dual maps, and annihilators |
+| **Main emphasis**       | Rigorous foundations, geometry, constructive methods, and applications                                               |
+| **Applied connections** | Least squares, SVD, Galerkin methods, numerical PDEs, generalized eigenvalue problems, and spectral algorithms       |
+| **Next module**         | Module D: Spectral Theory                                                                                            |
+
+## Introduction — From algebraic structure to geometry {#sec-module-c-introduction-from-algebraic-structure-to-geometry}
+
+In Module A, we studied linear transformations through their kernels, images, quotients, and direct-sum decompositions.
+
+In Module B, we introduced the dual space $V^*$, whose elements are linear measurements of vectors. We learned that a map
+
+$$
+T:V\longrightarrow W
+$$
+
+induces a dual map
+
+$$
+T^\vee:W^*\longrightarrow V^*, \qquad T^\vee(f)=f\circ T.
+$$
+
+We also established the fundamental algebraic duality identities
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^\vee&=(\ker T)^0,\\
+  \ker T^\vee&=(\operatorname{im}T)^0.
+\end{aligned} }
+$$
+
+These results require only vector-space structure.
+
+**Module C asks what additional mathematical structure becomes available when we equip vector spaces with inner products.**
+
+The answer is substantial. Inner products allow us to introduce lengths, angles, orthogonality, distances, and geometric projections.
+
+More surprisingly, they allow us to represent linear functionals by vectors. This is the content of the Riesz representation theorem.
+
+That identification turns algebraic dual maps into adjoint operators and annihilators into orthogonal complements.
+
+From there we obtain self-adjoint matrices, positive definiteness, least-squares approximation, and the geometry underlying numerical eigenvalue methods.
+
+The central conceptual progression is:
+
+**Algebraic duality**
+
+$V^*,\qquad T^\vee,\qquad S^0$ — Module B
+
+Introduce an inner product and Riesz representation
+
+**Inner-product geometry**
+
+$V\cong V^*,\qquad T^*,\qquad S^\perp$ — Module C
+
+Develop self-adjointness and orthogonal approximation
+
+**Numerical and variational methods**
+
+Least squares · SVD · Galerkin methods · Rayleigh–Ritz · Eigenvalue algorithms
+
+## Learning outcomes {#sec-module-c-learning-outcomes}
+
+By completing the module, you should be able to understand its main concepts from six perspectives.
+
+| Perspective                 | Expected achievement                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Rigorous**                | Prove finite-dimensional Riesz representation, derive adjoints, and establish orthogonal decomposition theorems             |
+| **Intuitive and geometric** | Interpret inner products as geometry, adjoints as pulled-back measurements, and projections as closest-point approximations |
+| **Computational**           | Construct Gram matrices, weighted adjoints, orthogonal projectors, least-squares solutions, and Ritz approximations         |
+| **Structural**              | Connect annihilators with orthogonal complements, dual maps with adjoints, and direct sums with projections                 |
+| **Universal**               | Distinguish algebraic duality from inner-product-dependent identifications and understand the extension to Hilbert spaces   |
+| **Applied**                 | Recognize these concepts in numerical linear algebra, weak PDE formulations, finite elements, and spectral methods          |
+
+## Study roadmap {#sec-module-c-study-roadmap}
+
+| Session | Main topic                                             | Central result                                      |
+| ------- | ------------------------------------------------------ | --------------------------------------------------- |
+| 1 | [Inner products, norms, and Gram matrices](#sec-module-c-session-1) | Geometry encoded by bilinear forms |
+| 2 | [Riesz representation theorem](#sec-module-c-session-2) | $V^*$ represented by vectors |
+| 3 | [Adjoint operators and fundamental subspaces](#sec-module-c-session-3) | $\operatorname{im}T^*=(\ker T)^\perp$ |
+| 4 | [Orthogonal projections and decompositions](#sec-module-c-session-4) | Closest-point approximation |
+| 5 | [Self-adjoint and positive definite operators](#sec-module-c-session-5) | Spectral theorem, quadratic forms, and SPD geometry |
+| 6 | [Least squares, pseudoinverses, and numerical stability](#sec-module-c-session-6) | Normal equations and minimum-norm solutions |
+| 7 | [Functional analysis, variational methods, and PDEs](#sec-module-c-session-7) | Galerkin orthogonality and energy minimization |
+| 8 | [Generalized eigenproblems and HASC connections](#sec-module-c-session-8) | Rayleigh–Ritz and spectral filtering |
+
+Exercises, worked solutions, a MATLAB laboratory, and a mastery checklist follow.
+
+#### Conventions {#module-c-study-roadmap-conventions}
+
+We will work primarily with finite-dimensional **real** inner-product spaces. This lets us concentrate on the mathematics without repeatedly introducing complex conjugation.
+
+In the real case, inner products are symmetric and bilinear.
+
+For complex spaces, we use the convention
+
+$$
+\langle x,y\rangle=y^Hx,
+$$
+
+which is linear in the first argument and conjugate-linear in the second. Under this convention, a complex linear functional is represented as
+
+$$
+f(x)=\langle x,a_f\rangle.
+$$
+
+The same adjoint identity will hold:
+
+$$
+\langle Tx,y\rangle=\langle x,T^*y\rangle.
+$$
+
+In standard orthonormal coordinates, the adjoint matrix is the conjugate transpose $A^H$, rather than the ordinary transpose $A^T$.
+
+We will return to the complex case when it adds something conceptually important.
+
+## Session 1 — Inner products: introducing geometry into vector spaces {#sec-module-c-session-1}
+
+### Why introduce an inner product? {#sec-module-c-session-1-why-introduce-an-inner-product}
+
+A vector space has addition and scalar multiplication.
+
+Those operations are sufficient for discussing linear independence, bases, kernels, images, and quotient spaces.
+
+But a vector-space structure alone does not tell us:
+
+- How long a vector is.
+- Whether two vectors are perpendicular.
+- How far apart two vectors are.
+- Which vector in a subspace best approximates a given vector.
+
+An inner product provides this additional geometric structure.
+
+### Definition of an inner product {#sec-module-c-session-1-definition-of-an-inner-product}
+
+Let $V$ be a real vector space.
+
+An **inner product** on $V$ is a function
+
+$$
+\langle\cdot,\cdot\rangle:V\times V\to\mathbb R
+$$
+
+satisfying the following properties for all $x,y,z\in V$ and $\alpha,\beta\in\mathbb R$:
+
+**Bilinearity**
+
+$$
+\langle\alpha x+\beta y,z\rangle = \alpha\langle x,z\rangle+\beta\langle y,z\rangle,
+$$
+
+with linearity in the other argument as well.
+
+**Symmetry**
+
+$$
+\boxed{\langle x,y\rangle=\langle y,x\rangle.}
+$$
+
+**Positive definiteness**
+
+$$
+\boxed{ \langle x,x\rangle\ge0, \qquad \langle x,x\rangle=0\iff x=0. }
+$$
+
+The ordinary Euclidean inner product on $\mathbb R^n$ is
+
+$$
+\boxed{\langle x,y\rangle=x^Ty.}
+$$
+
+But it is not the only possible inner product.
+
+That fact will become central later.
+
+### From inner products to lengths and angles {#sec-module-c-session-1-from-inner-products-to-lengths-and-angles}
+
+An inner product defines a norm:
+
+$$
+\boxed{\|x\|=\sqrt{\langle x,x\rangle}.}
+$$
+
+It also defines a distance:
+
+$$
+d(x,y)=\|x-y\|.
+$$
+
+Two vectors are called **orthogonal** if
+
+$$
+\boxed{x\perp y\iff\langle x,y\rangle=0.}
+$$
+
+For nonzero real vectors, we can define the angle $\theta\in[0,\pi]$ between them by
+
+$$
+\cos\theta = \frac{\langle x,y\rangle}{\|x\|\|y\|}.
+$$
+
+Why is the right-hand side always between $-1$ and $1$?
+
+Because of the Cauchy–Schwarz inequality.
+
+### The Cauchy–Schwarz inequality {#sec-module-c-session-1-the-cauchy-schwarz-inequality}
+
+**Theorem.** For all $x,y$ in an inner-product space,
+
+$$
+\boxed{ |\langle x,y\rangle| \le\|x\|\|y\|. }
+$$
+
+#### Proof {#module-c-session-1-the-cauchy-schwarz-inequality-proof}
+
+If $y=0$, the statement is immediate.
+
+Suppose $y\ne0$.
+
+For any $t\in\mathbb R$,
+
+$$
+0\le\|x-ty\|^2.
+$$
+
+Expanding,
+
+$$
+\begin{aligned}
+  \|x-ty\|^2 &=\langle x-ty,x-ty\rangle\\
+  &=\|x\|^2-2t\langle x,y\rangle+t^2\|y\|^2.
+\end{aligned}
+$$
+
+Choose
+
+$$
+t=\frac{\langle x,y\rangle}{\|y\|^2}.
+$$
+
+Substituting gives
+
+$$
+0\le \|x\|^2- \frac{\langle x,y\rangle^2}{\|y\|^2}.
+$$
+
+Therefore,
+
+$$
+\langle x,y\rangle^2 \le\|x\|^2\|y\|^2.
+$$
+
+Taking square roots proves the result.
+
+Equality holds precisely when $x$ and $y$ are linearly dependent.
+
+#### Why this theorem matters {#module-c-session-1-the-cauchy-schwarz-inequality-why-this-theorem-matters}
+
+Cauchy–Schwarz establishes much of the basic geometry of inner-product spaces.
+
+For example, it gives the triangle inequality:
+
+$$
+\begin{aligned}
+  \|x+y\|^2 &=\|x\|^2+2\langle x,y\rangle+\|y\|^2\\
+  &\le(\|x\|+\|y\|)^2.
+\end{aligned}
+$$
+
+Hence
+
+$$
+\boxed{\|x+y\|\le\|x\|+\|y\|.}
+$$
+
+Thus the norm induced by an inner product really is a norm.
+
+It also implies that, for fixed $a$,
+
+$$
+f(x)=\langle x,a\rangle
+$$
+
+is a continuous linear functional.
+
+This observation will be essential in the Riesz representation theorem.
+
+### Orthogonality and the Pythagorean theorem {#sec-module-c-session-1-orthogonality-and-the-pythagorean-theorem}
+
+If $x\perp y$, then
+
+$$
+\langle x,y\rangle=0.
+$$
+
+Consequently,
+
+$$
+\begin{aligned}
+  \|x+y\|^2 &=\langle x+y,x+y\rangle\\
+  &=\|x\|^2+2\langle x,y\rangle+\|y\|^2\\
+  &=\|x\|^2+\|y\|^2.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{ x\perp y \Longrightarrow \|x+y\|^2=\|x\|^2+\|y\|^2. }
+$$
+
+Unlike many elementary geometric presentations, this result does not require a diagram of a triangle.
+
+It follows directly from the algebraic properties of the inner product.
+
+This is how Euclidean geometry generalizes to arbitrary inner-product spaces, including spaces of functions.
+
+### Positive definite matrices define inner products {#sec-module-c-session-1-positive-definite-matrices-define-inner-products}
+
+Now consider a real symmetric matrix
+
+$$
+G\in\mathbb R^{n\times n}
+$$
+
+satisfying
+
+$$
+x^TGx>0 \qquad\text{for every }x\ne0.
+$$
+
+Such a matrix is called **symmetric positive definite**, or SPD.
+
+Define
+
+$$
+\boxed{\langle x,y\rangle_G=x^TGy.}
+$$
+
+Let's verify that this is an inner product.
+
+Bilinearity follows from matrix multiplication.
+
+Symmetry follows because
+
+$$
+x^TGy=y^TG^Tx=y^TGx.
+$$
+
+Positive definiteness follows from the assumption
+
+$$
+x^TGx>0
+$$
+
+for nonzero $x$.
+
+Therefore every SPD matrix defines an inner product.
+
+Conversely, every inner product on $\mathbb R^n$, once a basis is fixed, can be represented using an SPD matrix.
+
+This is an important result:
+
+**An SPD matrix can encode the geometry of a vector space.**
+
+### Different inner products give different geometries {#sec-module-c-session-1-different-inner-products-give-different-geometries}
+
+Consider
+
+$$
+G= \begin{pmatrix}
+  4&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Then
+
+$$
+\langle x,y\rangle_G =4x_1y_1+x_2y_2.
+$$
+
+The induced norm is
+
+$$
+\|x\|_G=\sqrt{4x_1^2+x_2^2}.
+$$
+
+The vectors of unit norm satisfy
+
+$$
+4x_1^2+x_2^2=1.
+$$
+
+That is the ellipse shown in @fig-module-c-unit-curves.
+
+```{dot}
+//| label: fig-module-c-unit-curves
+//| fig-cap: "The Euclidean unit circle (blue) and the weighted unit ellipse (orange) share their vertical intercepts. On the horizontal axis their positive intercepts are 1 and 1/2."
+//| fig-alt: "On equally scaled coordinate axes, the circle of radius one contains an ellipse with horizontal semiaxis one half and vertical semiaxis one."
+digraph norms {
+  graph [layout=neato, splines=line, outputorder=edgesfirst, pad=0.17, bgcolor="#ffffff", id="module-c-norms"]
+  node [shape=point, width=0, height=0, label="", id="c-norm-node-\N"]
+  edge [color="#64748b", arrowsize=0.55, id="c-norm-edge-\T-\H"]
+  left [pos="-1.85,0!"]; right [pos="1.88,0!"]
+  bottom [pos="0,-1.65!"]; top [pos="0,1.65!"]
+  left -> right; bottom -> top
+  node [shape=ellipse, fixedsize=true, penwidth=2.5]
+  circle [pos="0,0!", width=2.8, height=2.8, color="#24589b"]
+  ellipse [pos="0,0!", width=1.4, height=2.8, color="#bb5913"]
+  node [shape=plaintext, fixedsize=false, width=0, height=0, margin=0, fontsize=12, fontname="sans-serif", fontcolor="#273548"]
+  x [pos="1.89,-0.16!", label="x₁"]
+  y [pos="0.18,1.65!", label="x₂"]
+  half [pos="0.58,-0.18!", label="½", fontcolor="#9a4309"]
+  one [pos="1.52,-0.18!", label="1", fontcolor="#24589b"]
+  origin [pos="-0.12,-0.14!", label="0"]
+}
+```
+
+The same coordinate plane can carry different inner-product geometries. The weighted norm assigns a larger cost to displacement in the first coordinate direction.
+
+The two coordinate axes remain orthogonal in this example, but this need not hold for an arbitrary SPD matrix.
+
+For example, if
+
+$$
+G= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix},
+$$
+
+then
+
+$$
+\langle e_1,e_2\rangle_G=1.
+$$
+
+Thus the standard coordinate axes are **not** orthogonal in the $G$-inner product.
+
+Orthogonality depends on the chosen geometry.
+
+### Gram matrices of nonorthonormal bases {#sec-module-c-session-1-gram-matrices-of-nonorthonormal-bases}
+
+There is another reason SPD matrices arise naturally.
+
+Let $V$ be an inner-product space with basis
+
+$$
+\mathcal B=(v_1,\ldots,v_n).
+$$
+
+Define its **Gram matrix**
+
+$$
+\boxed{G_{ij}=\langle v_i,v_j\rangle.}
+$$
+
+Suppose
+
+$$
+x=\sum_i a_iv_i,\qquad y=\sum_j b_jv_j.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  \langle x,y\rangle &=\sum_{i,j}a_ib_j\langle v_i,v_j\rangle\\
+  &=a^TGb.
+\end{aligned}
+$$
+
+Thus the matrix of the inner product in a possibly nonorthonormal basis is its Gram matrix.
+
+The Gram matrix is symmetric.
+
+It is positive definite because, for $a\ne0$,
+
+$$
+a^TGa = \left\|\sum_i a_iv_i\right\|^2>0.
+$$
+
+The strict inequality follows from linear independence of the basis.
+
+If the basis vectors are columns of an invertible matrix $B$ in ordinary Euclidean coordinates, then
+
+$$
+\boxed{G=B^TB.}
+$$
+
+#### Example {#module-c-session-1-gram-matrices-of-nonorthonormal-bases-example}
+
+Let
+
+$$
+v_1=(1,0),\qquad v_2=(1,1).
+$$
+
+Then
+
+$$
+G= \begin{pmatrix}
+  \langle v_1,v_1\rangle&\langle v_1,v_2\rangle\\
+  \langle v_2,v_1\rangle&\langle v_2,v_2\rangle
+\end{pmatrix} = \boxed{ \begin{pmatrix}
+  1&1\\
+  1&2
+\end{pmatrix}. }
+$$
+
+The matrix is SPD.
+
+The two basis vectors are not orthogonal, which is reflected in the nonzero off-diagonal entries.
+
+#### Connection to numerical methods {#module-c-session-1-gram-matrices-of-nonorthonormal-bases-connection-to-numerical-methods}
+
+Gram matrices occur whenever we represent geometric or functional-analytic information in a finite-dimensional basis.
+
+Examples include least-squares normal equations, finite-element mass matrices, weighted projections, and generalized eigenvalue problems.
+
+This leads to an important distinction:
+
+**An inner product is an abstract geometric structure. A Gram matrix is its representation in a chosen basis.**
+
+The matrix changes when the basis changes, even if the underlying inner product remains the same.
+
+### Checkpoint 1 {#module-c-checkpoint-1 .unnumbered .unlisted}
+
+Given the basis
+
+$$
+v_1=(1,1),\qquad v_2=(1,-1),
+$$
+
+calculate its Gram matrix under the standard Euclidean inner product.
+
+Then explain why orthonormal bases have Gram matrix $I$, and why a basis need not be orthonormal to have an invertible Gram matrix.
+
+## Session 2 — The Riesz representation theorem {#sec-module-c-session-2}
+
+We now reach the conceptual bridge between Modules B and C.
+
+Module B taught us that a covector is a linear functional
+
+$$
+f:V\to\mathbb R.
+$$
+
+We also emphasized that a covector is not inherently an ordinary vector.
+
+But once an inner product is available, we can associate vectors with functionals.
+
+The Riesz representation theorem says that this correspondence is complete and unique.
+
+### Every vector defines a linear functional {#sec-module-c-session-2-every-vector-defines-a-linear-functional}
+
+Fix $a\in V$.
+
+Define
+
+$$
+f_a:V\to\mathbb R
+$$
+
+by
+
+$$
+\boxed{f_a(x)=\langle x,a\rangle.}
+$$
+
+Linearity of the inner product implies that $f_a$ is a linear functional.
+
+Therefore,
+
+$$
+f_a\in V^*.
+$$
+
+This defines a map
+
+$$
+\boxed{ R_V:V\to V^*, \qquad R_V(a)=f_a. }
+$$
+
+For real spaces, $R_V$ is linear.
+
+The question is whether every linear functional arises this way.
+
+### Finite-dimensional Riesz representation theorem {#sec-module-c-session-2-finite-dimensional-riesz-representation-theorem}
+
+**Theorem.** Let $V$ be a finite-dimensional real inner-product space.
+
+For every linear functional
+
+$$
+f:V\to\mathbb R,
+$$
+
+there exists a unique vector $a_f\in V$ such that
+
+$$
+\boxed{ f(x)=\langle x,a_f\rangle \qquad\forall x\in V. }
+$$
+
+The vector $a_f$ is called the **Riesz representative** of $f$.
+
+Equivalently,
+
+$$
+\boxed{R_V:V\to V^*\text{ is an isomorphism}.}
+$$
+
+This is a fundamental identification between vectors and linear measurements.
+
+It depends on the chosen inner product.
+
+### Proof using an orthonormal basis {#sec-module-c-session-2-proof-using-an-orthonormal-basis}
+
+Choose an orthonormal basis
+
+$$
+(e_1,\ldots,e_n)
+$$
+
+of $V$.
+
+Recall that orthonormality means
+
+$$
+\langle e_i,e_j\rangle=\delta_{ij}.
+$$
+
+Take an arbitrary functional $f\in V^*$.
+
+Define
+
+$$
+\boxed{ a_f=\sum_{i=1}^n f(e_i)e_i. }
+$$
+
+We claim that
+
+$$
+f(x)=\langle x,a_f\rangle.
+$$
+
+Write
+
+$$
+x=\sum_{i=1}^n x_ie_i.
+$$
+
+Then
+
+$$
+f(x)=\sum_{i=1}^n x_if(e_i).
+$$
+
+On the other hand,
+
+$$
+\begin{aligned}
+  \langle x,a_f\rangle &= \left\langle \sum_i x_ie_i, \sum_j f(e_j)e_j \right\rangle\\
+  &= \sum_{i,j}x_if(e_j)\langle e_i,e_j\rangle\\
+  &=\sum_i x_if(e_i)\\
+  &=f(x).
+\end{aligned}
+$$
+
+Thus a representing vector exists.
+
+#### Uniqueness {#module-c-session-2-proof-using-an-orthonormal-basis-uniqueness}
+
+Suppose both $a,b\in V$ represent the same functional:
+
+$$
+\langle x,a\rangle=\langle x,b\rangle \qquad\forall x\in V.
+$$
+
+Subtracting,
+
+$$
+\langle x,a-b\rangle=0 \qquad\forall x\in V.
+$$
+
+Choose $x=a-b$.
+
+Then
+
+$$
+\|a-b\|^2=0.
+$$
+
+Positive definiteness implies $a=b$.
+
+Therefore the representing vector is unique.
+
+This completes the proof.
+
+### Geometric interpretation {#sec-module-c-session-2-geometric-interpretation}
+
+Suppose $f\ne0$.
+
+Its kernel is a hyperplane:
+
+$$
+\ker f=\{x:f(x)=0\}.
+$$
+
+Using Riesz representation,
+
+$$
+f(x)=\langle x,a_f\rangle.
+$$
+
+Therefore,
+
+$$
+x\in\ker f \iff \langle x,a_f\rangle=0.
+$$
+
+Thus
+
+$$
+\boxed{ \ker f=\{x:x\perp a_f\}. }
+$$
+
+The Riesz representative $a_f$ is normal to the kernel hyperplane.
+
+The length $\|a_f\|$ describes the scale of the measurement.
+
+Indeed, by Cauchy–Schwarz,
+
+$$
+|f(x)| = |\langle x,a_f\rangle| \le\|x\|\|a_f\|.
+$$
+
+Equality is attained for a suitable nonzero multiple of $a_f$.
+
+Therefore,
+
+$$
+\boxed{ \sup_{\|x\|\le1}|f(x)|=\|a_f\|. }
+$$
+
+This is often written
+
+$$
+\boxed{\|f\|_{V^*}=\|a_f\|_V.}
+$$
+
+So Riesz representation preserves the natural norms of functionals and their representing vectors.
+
+It is not merely an algebraic isomorphism; in the real Hilbert-space setting, it is an isometric isomorphism.
+
+### Connection to dual bases {#sec-module-c-session-2-connection-to-dual-bases}
+
+Recall Module B.
+
+Let $\mathcal B=(v_1,\ldots,v_n)$ be a possibly nonorthonormal basis of $V$, with dual basis
+
+$$
+(\varepsilon^1,\ldots,\varepsilon^n).
+$$
+
+Each dual-basis functional has a Riesz representative $a_i\in V$:
+
+$$
+\varepsilon^i(x)=\langle x,a_i\rangle.
+$$
+
+In particular,
+
+$$
+\boxed{ \langle v_j,a_i\rangle=\delta_{ij}. }
+$$
+
+Thus the Riesz representatives of the dual basis form a basis **biorthogonal** to the original basis.
+
+If the original basis is orthonormal, then $a_i=v_i$.
+
+If it is not orthonormal, the Riesz representatives generally differ from the original basis vectors.
+
+This reveals an important structural relationship:
+
+The dual basis is an algebraic construction determined by coordinate extraction. Its Riesz representatives depend additionally on the inner product.
+
+### Riesz representation in a weighted inner product {#sec-module-c-session-2-riesz-representation-in-a-weighted-inner-product}
+
+Consider
+
+$$
+V=\mathbb R^n
+$$
+
+with inner product
+
+$$
+\langle x,y\rangle_G=x^TGy,
+$$
+
+where $G$ is SPD.
+
+Suppose the functional $f$ is represented in standard coordinates by
+
+$$
+f(x)=c^Tx.
+$$
+
+We want its Riesz representative $a_f$ relative to the $G$-inner product.
+
+By definition,
+
+$$
+f(x)=\langle x,a_f\rangle_G.
+$$
+
+Therefore,
+
+$$
+c^Tx=x^TGa_f \qquad\forall x.
+$$
+
+This implies
+
+$$
+Ga_f=c.
+$$
+
+Hence
+
+$$
+\boxed{ a_f=G^{-1}c. }
+$$
+
+The formula is simple but conceptually important.
+
+The same covector $f$ has different representing vectors under different inner products.
+
+#### Example {#module-c-session-2-riesz-representation-in-a-weighted-inner-product-example}
+
+Let
+
+$$
+f(x_1,x_2)=2x_1+x_2.
+$$
+
+Under the Euclidean inner product,
+
+$$
+a_f=\begin{pmatrix}
+  2\\
+  1
+\end{pmatrix}.
+$$
+
+Under
+
+$$
+G= \begin{pmatrix}
+  4&0\\
+  0&1
+\end{pmatrix},
+$$
+
+the representative becomes
+
+$$
+a_f = G^{-1}\begin{pmatrix}
+  2\\
+  1
+\end{pmatrix} = \boxed{ \begin{pmatrix}
+  1/2\\
+  1
+\end{pmatrix}. }
+$$
+
+The functional has not changed.
+
+What has changed is the geometry used to represent it.
+
+This is one of the most useful ways to understand the Riesz theorem: **it converts covectors into vectors, but the conversion depends on geometric structure.**
+
+### Gradients are Riesz representatives {#sec-module-c-session-2-gradients-are-riesz-representatives}
+
+This idea also clarifies the concept of a gradient.
+
+Let
+
+$$
+F:\mathbb R^n\to\mathbb R
+$$
+
+be differentiable.
+
+At a point $x$, the derivative is a linear functional
+
+$$
+DF(x):\mathbb R^n\to\mathbb R.
+$$
+
+It assigns to a direction $h$ the first-order change in $F$:
+
+$$
+F(x+h)=F(x)+DF(x)[h]+o(\|h\|).
+$$
+
+Under the Euclidean inner product, the gradient is defined by
+
+$$
+\boxed{ DF(x)[h]=\langle h,\nabla F(x)\rangle. }
+$$
+
+Thus $\nabla F(x)$ is the Riesz representative of the derivative functional.
+
+The derivative and the gradient are not fundamentally the same kind of object:
+
+$$
+DF(x)\in V^*, \qquad \nabla F(x)\in V.
+$$
+
+The inner product identifies them.
+
+#### Example {#module-c-session-2-gradients-are-riesz-representatives-example}
+
+Let
+
+$$
+F(x_1,x_2)=x_1^2+3x_2^2.
+$$
+
+Then
+
+$$
+DF(x)[h] = 2x_1h_1+6x_2h_2.
+$$
+
+The Euclidean gradient is
+
+$$
+\nabla F(x)= \begin{pmatrix}
+  2x_1\\
+  6x_2
+\end{pmatrix}.
+$$
+
+If we change the inner product to one defined by $G$, the gradient becomes
+
+$$
+\boxed{ \nabla_G F(x)=G^{-1}\nabla F(x). }
+$$
+
+This is not an arbitrary modification of the gradient.
+
+It follows directly from the Riesz representation theorem.
+
+#### Computational significance {#module-c-session-2-gradients-are-riesz-representatives-computational-significance}
+
+This relationship appears in optimization, preconditioned gradient methods, and numerical algorithms for variational problems.
+
+Changing the inner product changes which vector represents the same derivative functional.
+
+That can change the geometry of optimization steps and sometimes improve numerical behavior.
+
+### The infinite-dimensional Riesz theorem: a preview {#sec-module-c-session-2-the-infinite-dimensional-riesz-theorem-a-preview}
+
+The finite-dimensional theorem is a special case of a more general result.
+
+A **Hilbert space** is a complete inner-product space.
+
+For a real Hilbert space $H$, every continuous linear functional
+
+$$
+f:H\to\mathbb R
+$$
+
+has a unique representing vector $a_f\in H$ satisfying
+
+$$
+\boxed{ f(x)=\langle x,a_f\rangle_H \qquad\forall x\in H. }
+$$
+
+Moreover,
+
+$$
+\|f\|=\|a_f\|.
+$$
+
+The word *continuous* is essential in infinite dimensions.
+
+Unlike the finite-dimensional situation, not every algebraic linear functional on an infinite-dimensional normed space is necessarily continuous.
+
+#### Example in a function space {#module-c-session-2-the-infinite-dimensional-riesz-theorem-a-preview-example-in-a-function-space}
+
+Take
+
+$$
+H=L^2(0,1),
+$$
+
+with inner product
+
+$$
+\langle u,v\rangle = \int_0^1u(x)v(x)\,dx.
+$$
+
+Define
+
+$$
+F(u)=\int_0^1x\,u(x)\,dx.
+$$
+
+This is a continuous linear functional.
+
+Its Riesz representative is the function
+
+$$
+a_F(x)=x,
+$$
+
+because
+
+$$
+F(u)=\langle u,a_F\rangle.
+$$
+
+So a linear measurement of functions can itself be represented by a function belonging to the same Hilbert space.
+
+This is one of the foundational ideas of functional analysis.
+
+#### Why completeness matters {#module-c-session-2-the-infinite-dimensional-riesz-theorem-a-preview-why-completeness-matters}
+
+A deeper geometric proof of Riesz representation uses the orthogonal decomposition
+
+$$
+H=\ker f\oplus^\perp(\ker f)^\perp.
+$$
+
+Because a nonzero continuous functional has a closed kernel, Hilbert-space completeness ensures the existence of the required orthogonal projection.
+
+The orthogonal complement of the kernel is one-dimensional, so the functional measures precisely one distinguished direction, with a suitable scale factor.
+
+We will develop this geometry in Session 4.
+
+### Checkpoint 2 {#module-c-checkpoint-2 .unnumbered .unlisted}
+
+Explain why the same functional can have different Riesz representatives under different inner products.
+
+Then derive the formula
+
+$$
+a_f=G^{-1}c
+$$
+
+for a weighted inner product.
+
+Finally, explain why the derivative $DF(x)$ is intrinsically a functional, whereas its gradient depends on the chosen inner product.
+
+## Session 3 — Adjoint operators and the geometry of linear maps {#sec-module-c-session-3}
+
+We are now ready to answer the question that originally motivated our discussion of Riesz representation:
+
+**Why does every linear transformation between finite-dimensional inner-product spaces have an adjoint, and what does that adjoint mean?**
+
+### Defining the adjoint {#sec-module-c-session-3-defining-the-adjoint}
+
+Let $V,W$ be finite-dimensional real inner-product spaces, and let
+
+$$
+T:V\to W
+$$
+
+be linear.
+
+The **adjoint** of $T$ is the unique linear map
+
+$$
+T^*:W\to V
+$$
+
+such that
+
+$$
+\boxed{ \langle Tx,y\rangle_W = \langle x,T^*y\rangle_V }
+$$
+
+for every $x\in V$ and $y\in W$.
+
+Notice that the direction is reversed:
+
+$$
+T:V\to W, \qquad T^*:W\to V.
+$$
+
+But $T^*$ is not generally an inverse of $T$.
+
+Rather, it tells us how to transfer an inner-product measurement of an output back into the input space.
+
+### Deriving the adjoint from Riesz representation {#sec-module-c-session-3-deriving-the-adjoint-from-riesz-representation}
+
+Fix $y\in W$.
+
+Define
+
+$$
+f_y:V\to\mathbb R
+$$
+
+by
+
+$$
+f_y(x)=\langle Tx,y\rangle_W.
+$$
+
+This is a linear functional on $V$.
+
+By the Riesz representation theorem, there is a unique vector $z_y\in V$ such that
+
+$$
+f_y(x)=\langle x,z_y\rangle_V
+$$
+
+for every $x\in V$.
+
+Therefore,
+
+$$
+\langle Tx,y\rangle_W=\langle x,z_y\rangle_V.
+$$
+
+Define
+
+$$
+\boxed{T^*y=z_y.}
+$$
+
+We obtain
+
+$$
+\langle Tx,y\rangle_W = \langle x,T^*y\rangle_V.
+$$
+
+This proves existence.
+
+Uniqueness follows because the Riesz representative of each $f_y$ is unique.
+
+To prove that $T^*$ is linear, observe that for any $y_1,y_2\in W$,
+
+$$
+\begin{aligned}
+  \langle x,T^*(\alpha y_1+\beta y_2)\rangle &=\langle Tx,\alpha y_1+\beta y_2\rangle\\
+  &=\alpha\langle Tx,y_1\rangle+\beta\langle Tx,y_2\rangle\\
+  &=\langle x,\alpha T^*y_1+\beta T^*y_2\rangle.
+\end{aligned}
+$$
+
+Uniqueness of the representing vector implies
+
+$$
+T^*(\alpha y_1+\beta y_2) = \alpha T^*y_1+\beta T^*y_2.
+$$
+
+Thus $T^*$ is linear.
+
+**The adjoint is the result of applying Riesz representation to the functionals obtained by composing output measurements with $T$.**
+
+### The adjoint and the algebraic dual map {#sec-module-c-session-3-the-adjoint-and-the-algebraic-dual-map}
+
+Module B introduced
+
+$$
+T^\vee:W^*\to V^*, \qquad T^\vee(g)=g\circ T.
+$$
+
+Module C has introduced the Riesz identifications
+
+$$
+R_V:V\to V^*, \qquad R_W:W\to W^*.
+$$
+
+The adjoint is related to these maps by
+
+$$
+\boxed{ R_V\circ T^* = T^\vee\circ R_W. }
+$$
+
+Indeed, for $y\in W$,
+
+$$
+\begin{aligned}
+  (T^\vee(R_Wy))(x) &=(R_Wy)(Tx)\\
+  &=\langle Tx,y\rangle_W\\
+  &=\langle x,T^*y\rangle_V\\
+  &=(R_V(T^*y))(x).
+\end{aligned}
+$$
+
+Hence the two functionals agree.
+
+Equivalently,
+
+$$
+\boxed{ T^*=R_V^{-1}\circ T^\vee\circ R_W. }
+$$
+
+The two paths in @fig-module-c-riesz-adjoint express this identity.
+
+```{mermaid}
+%%| label: fig-module-c-riesz-adjoint
+%%| fig-cap: "Both routes turn an output vector into the same linear functional on the input space."
+%%| fig-alt: "From W to the dual of V, one path applies the adjoint and then the Riesz map on V. The other applies the Riesz map on W and then the algebraic dual of T."
+flowchart LR
+  W["W"] -->|"adjoint of T"| V["V"]
+  V -->|"Riesz map on V"| VD["V∗"]
+  W -->|"Riesz map on W"| WD["W∗"]
+  WD -->|"dual of T"| VD
+```
+
+The Riesz maps connect vector spaces to their duals. The adjoint represents the algebraic dual map using those identifications.
+
+In real finite-dimensional spaces, both Riesz maps are linear isomorphisms.
+
+In complex spaces, the Riesz identification is conjugate-linear under our convention, but the adjoint remains a complex-linear transformation.
+
+The main conceptual relationship is the same.
+
+### Matrix representation in orthonormal coordinates {#sec-module-c-session-3-matrix-representation-in-orthonormal-coordinates}
+
+Suppose
+
+$$
+T:\mathbb R^n\to\mathbb R^m
+$$
+
+is represented by $A$.
+
+With standard Euclidean inner products,
+
+$$
+\begin{aligned}
+  \langle Ax,y\rangle &=(Ax)^Ty\\
+  &=x^TA^Ty\\
+  &=\langle x,A^Ty\rangle.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{[T^*]=A^T.}
+$$
+
+For complex matrices,
+
+$$
+\boxed{[T^*]=A^H=\overline A^{\,T}.}
+$$
+
+The distinction between the algebraic dual and the adjoint now becomes explicit.
+
+| Construction                     | Underlying structure | Matrix in the appropriate standard coordinates                 |
+| -------------------------------- | -------------------- | -------------------------------------------------------------- |
+| Algebraic dual $T^\vee$      | Vector spaces        | $A^T$                                                      |
+| Inner-product adjoint $T^*$ | Inner-product spaces | $A^T$ over $\mathbb R$, $A^H$ over $\mathbb C$ |
+
+They coincide in real Euclidean coordinates, but not because they are conceptually identical.
+
+### Geometric meaning: pulling measurements backward {#sec-module-c-session-3-geometric-meaning-pulling-measurements-backward}
+
+Suppose $x\in V$ is an input, and $Tx\in W$ is its output.
+
+We want to measure the output in the direction $y\in W$.
+
+The measurement is
+
+$$
+\langle Tx,y\rangle_W.
+$$
+
+The adjoint identity tells us that the same scalar can be obtained before applying $T$:
+
+$$
+\boxed{ \underbrace{\langle Tx,y\rangle_W}_{\text{output measurement}} = \underbrace{\langle x,T^*y\rangle_V}_{\text{input measurement}}. }
+$$
+
+Thus $T^*y$ is the input-space direction representing the output measurement associated with $y$.
+
+Another interpretation involves hyperplanes.
+
+The output condition
+
+$$
+\langle w,y\rangle_W=0
+$$
+
+describes a hyperplane perpendicular to $y$.
+
+Its preimage under $T$ is characterized by
+
+$$
+\langle Tx,y\rangle_W=0.
+$$
+
+By the adjoint identity,
+
+$$
+\langle x,T^*y\rangle_V=0.
+$$
+
+Thus, when $T^*y\ne0$, the preimage is the input hyperplane perpendicular to $T^*y$. If $T^*y=0$, the preimage is all of $V$.
+
+**The adjoint pulls normal directions of output hyperplanes backward into the input space.**
+
+This geometric idea is useful in optimization, automatic differentiation, inverse problems, and sensitivity analysis.
+
+### Adjoints under nonstandard inner products {#sec-module-c-session-3-adjoints-under-nonstandard-inner-products}
+
+Suppose $V=\mathbb R^n$ and $W=\mathbb R^m$, with inner products
+
+$$
+\langle x,z\rangle_V=x^TG_Vz,
+$$
+
+$$
+\langle y,w\rangle_W=y^TG_Ww,
+$$
+
+where $G_V,G_W$ are SPD.
+
+Let $T$ be represented by $A\in\mathbb R^{m\times n}$.
+
+We seek the matrix $A^\dagger_G$ of its adjoint.
+
+The defining equation is
+
+$$
+\langle Ax,y\rangle_W = \langle x,A^\dagger_Gy\rangle_V.
+$$
+
+Expanding,
+
+$$
+x^TA^TG_Wy=x^TG_VA^\dagger_Gy.
+$$
+
+Because this holds for all $x,y$,
+
+$$
+A^TG_W=G_VA^\dagger_G.
+$$
+
+Therefore,
+
+$$
+\boxed{ A^\dagger_G=G_V^{-1}A^TG_W. }
+$$
+
+Here $A^\dagger_G$ denotes the weighted adjoint solely within this formula; many numerical linear algebra texts reserve $A^\dagger$ for the Moore–Penrose pseudoinverse. To avoid confusion, we will otherwise write $A^{*_{G_V,G_W}}$.
+
+Thus,
+
+$$
+\boxed{ A^{*_{G_V,G_W}} = G_V^{-1}A^TG_W. }
+$$
+
+For complex inner products with Hermitian positive definite Gram matrices, replace $A^T$ by $A^H$.
+
+This is a central formula for numerical methods using weighted inner products.
+
+#### Example {#module-c-session-3-adjoints-under-nonstandard-inner-products-example}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&2\\
+  0&1
+\end{pmatrix}
+$$
+
+and use the same weighted inner product in the domain and codomain:
+
+$$
+G= \begin{pmatrix}
+  4&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Then
+
+$$
+A^{*_{G}} = G^{-1}A^TG = \begin{pmatrix}
+  1&0\\
+  8&1
+\end{pmatrix}.
+$$
+
+The adjoint is not the ordinary transpose
+
+$$
+A^T= \begin{pmatrix}
+  1&0\\
+  2&1
+\end{pmatrix}.
+$$
+
+The reason is that the geometric identification between vectors and functionals is different.
+
+#### Structural lesson {#module-c-session-3-adjoints-under-nonstandard-inner-products-structural-lesson}
+
+**The algebraic dual map is determined by $T$. The adjoint depends on both $T$ and the inner products chosen on its domain and codomain.**
+
+This distinction is essential when analyzing finite-element mass matrices, generalized eigenvalue problems, and weighted optimization methods.
+
+### Algebraic properties of adjoints {#sec-module-c-session-3-algebraic-properties-of-adjoints}
+
+Let $T:V\to W$, $S:W\to Z$ be linear maps between finite-dimensional inner-product spaces.
+
+The adjoint satisfies
+
+$$
+\boxed{(S\circ T)^*=T^*\circ S^*.}
+$$
+
+#### Proof {#module-c-session-3-algebraic-properties-of-adjoints-proof}
+
+For $x\in V,z\in Z$,
+
+$$
+\begin{aligned}
+  \langle STx,z\rangle_Z &=\langle Tx,S^*z\rangle_W\\
+  &=\langle x,T^*S^*z\rangle_V.
+\end{aligned}
+$$
+
+By uniqueness of the adjoint,
+
+$$
+(ST)^*=T^*S^*.
+$$
+
+Other important identities include
+
+$$
+\boxed{(T^*)^*=T,}
+$$
+
+and, for real scalars,
+
+$$
+\boxed{(\alpha T+\beta S)^*=\alpha T^*+\beta S^*.}
+$$
+
+For complex scalars, conjugation appears:
+
+$$
+(\alpha T+\beta S)^* = \overline\alpha T^*+\overline\beta S^*.
+$$
+
+An invertible operator also satisfies
+
+$$
+\boxed{(T^{-1})^*=(T^*)^{-1}.}
+$$
+
+All these identities follow from the defining inner-product relationship.
+
+### Fundamental orthogonality relationships {#sec-module-c-session-3-fundamental-orthogonality-relationships}
+
+We now recover the geometric versions of the annihilator identities from Module B.
+
+**Theorem.** For a linear map $T:V\to W$ between finite-dimensional inner-product spaces,
+
+$$
+\boxed{ \begin{aligned}
+  \ker T&=(\operatorname{im}T^*)^\perp,\\
+  \ker T^*&=(\operatorname{im}T)^\perp.
+\end{aligned} }
+$$
+
+#### Proof of the first identity {#module-c-session-3-fundamental-orthogonality-relationships-proof-of-the-first-identity}
+
+Take $x\in V$.
+
+Then
+
+$$
+\begin{aligned}
+  x\in\ker T &\iff Tx=0\\
+  &\iff \langle Tx,y\rangle_W=0\quad\forall y\in W\\
+  &\iff \langle x,T^*y\rangle_V=0\quad\forall y\in W\\
+  &\iff x\perp\operatorname{im}T^*.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\ker T=(\operatorname{im}T^*)^\perp.
+$$
+
+Applying the same argument to $T^*$, using $(T^*)^*=T$, gives the second identity.
+
+Taking orthogonal complements and using finite dimensionality,
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^*&=(\ker T)^\perp,\\
+  \operatorname{im}T&=(\ker T^*)^\perp.
+\end{aligned} }
+$$
+
+These are the four fundamental orthogonality identities.
+
+They give the decompositions
+
+$$
+\boxed{ V=\ker T\oplus^\perp\operatorname{im}T^* }
+$$
+
+and
+
+$$
+\boxed{ W=\operatorname{im}T\oplus^\perp\ker T^*. }
+$$
+
+The superscript $\perp$ indicates an orthogonal direct sum.
+
+#### Comparison with Module B {#module-c-session-3-fundamental-orthogonality-relationships-comparison-with-module-b}
+
+Recall the algebraic identity
+
+$$
+\operatorname{im}T^\vee=(\ker T)^0.
+$$
+
+The Riesz representation theorem identifies the annihilator $(\ker T)^0$ with the orthogonal complement $(\ker T)^\perp$, and identifies $T^\vee$ with $T^*$.
+
+Thus,
+
+$$
+\boxed{ \text{Annihilator duality} \quad\xrightarrow{\text{Riesz}}\quad \text{Orthogonality duality}. }
+$$
+
+This is one of the central conceptual achievements of Module C.
+
+#### A finite-versus-infinite-dimensional qualification {#module-c-session-3-fundamental-orthogonality-relationships-a-finite-versus-infinite-dimensional-qualification}
+
+For a bounded operator between Hilbert spaces, we always have
+
+$$
+\ker T=(\operatorname{im}T^*)^\perp
+$$
+
+and
+
+$$
+\ker T^*=(\operatorname{im}T)^\perp.
+$$
+
+However, the images need not be closed in infinite dimensions.
+
+Therefore the corresponding statements are
+
+$$
+\boxed{ \begin{aligned}
+  (\ker T)^\perp&=\overline{\operatorname{im}T^*},\\
+  (\ker T^*)^\perp&=\overline{\operatorname{im}T}.
+\end{aligned} }
+$$
+
+The closure bars are essential.
+
+We will return to this distinction when studying functional analysis.
+
+### Checkpoint 3 {#module-c-checkpoint-3 .unnumbered .unlisted}
+
+Starting only from the definition of an adjoint, prove
+
+$$
+\ker T^*=(\operatorname{im}T)^\perp.
+$$
+
+Then explain why the identity
+
+$$
+\operatorname{im}T^*=(\ker T)^\perp
+$$
+
+is closely related to the annihilator theorem from Module B.
+
+Finally, derive the weighted-adjoint formula without memorizing it.
+
+## Session 4 — Orthogonal projections and closest-point approximation {#sec-module-c-session-4}
+
+In Module A, we studied direct-sum decompositions
+
+$$
+V=K\oplus U
+$$
+
+and the corresponding algebraic projections.
+
+These projections are generally not unique.
+
+Inner-product geometry gives us a distinguished choice: the projection along the orthogonal complement.
+
+More importantly, it explains why this choice solves an optimization problem.
+
+### Orthogonal complements {#sec-module-c-session-4-orthogonal-complements}
+
+Let $U\subseteq V$ be a subspace of an inner-product space.
+
+Its orthogonal complement is
+
+$$
+\boxed{ U^\perp= \{x\in V:\langle x,u\rangle=0\quad\forall u\in U\}. }
+$$
+
+It is a subspace.
+
+In finite-dimensional inner-product spaces, we have
+
+$$
+\boxed{ V=U\oplus^\perp U^\perp. }
+$$
+
+This means every vector $x\in V$ has a unique decomposition
+
+$$
+\boxed{x=u+r}
+$$
+
+with
+
+$$
+u\in U,\qquad r\in U^\perp.
+$$
+
+The vector $u$ is the orthogonal projection of $x$ onto $U$.
+
+### Constructing the orthogonal decomposition {#sec-module-c-session-4-constructing-the-orthogonal-decomposition}
+
+Choose an orthonormal basis
+
+$$
+(q_1,\ldots,q_k)
+$$
+
+of $U$.
+
+Define
+
+$$
+u=\sum_{i=1}^k\langle x,q_i\rangle q_i.
+$$
+
+This vector belongs to $U$.
+
+Let
+
+$$
+r=x-u.
+$$
+
+For every basis vector $q_j$,
+
+$$
+\begin{aligned}
+  \langle r,q_j\rangle &=\langle x,q_j\rangle -\sum_i\langle x,q_i\rangle\langle q_i,q_j\rangle\\
+  &=\langle x,q_j\rangle-\langle x,q_j\rangle\\
+  &=0.
+\end{aligned}
+$$
+
+Thus $r$ is orthogonal to every basis vector of $U$, hence to every vector of $U$.
+
+So
+
+$$
+x=u+r, \qquad u\in U,\quad r\in U^\perp.
+$$
+
+Uniqueness follows because
+
+$$
+U\cap U^\perp=\{0\}.
+$$
+
+This proves the orthogonal decomposition theorem in finite dimensions.
+
+### Why orthogonal projection gives the closest point {#sec-module-c-session-4-why-orthogonal-projection-gives-the-closest-point}
+
+Suppose
+
+$$
+x=u+r, \qquad u\in U,\quad r\perp U.
+$$
+
+Take any other $z\in U$.
+
+Then
+
+$$
+x-z=(u-z)+r.
+$$
+
+Since $u-z\in U$ and $r\perp U$,
+
+$$
+\langle u-z,r\rangle=0.
+$$
+
+By the Pythagorean theorem,
+
+$$
+\boxed{ \|x-z\|^2 = \|u-z\|^2+\|r\|^2. }
+$$
+
+The second term is fixed, while the first is nonnegative.
+
+The minimum occurs exactly when $z=u$.
+
+Therefore,
+
+$$
+\boxed{ u=\underset{z\in U}{\operatorname{argmin}}\|x-z\|. }
+$$
+
+Thus the orthogonal projection is the unique closest point to $x$ in $U$.
+
+This is one of the most important applications of inner-product geometry.
+
+```{dot}
+//| label: fig-module-c-projections
+//| fig-cap: "For x = (2, 0), the perpendicular to the diagonal U reaches (1, 1). Projecting along a vertical line reaches (2, 2). The two distances are √2 and 2."
+//| fig-alt: "A diagonal line U contains the points (1, 1) and (2, 2). A perpendicular segment joins (2, 0) to (1, 1), and a longer vertical segment joins it to (2, 2)."
+digraph projection {
+  graph [layout=neato, splines=line, outputorder=edgesfirst, pad=0.19, bgcolor="#ffffff", id="module-c-projection"]
+  node [shape=point, width=0, height=0, label="", id="c-proj-node-\N"]
+  edge [dir=none, penwidth=2, id="c-proj-edge-\T-\H"]
+  start [pos="-0.16,-0.16!"]; finish [pos="2.4,2.4!"]
+  x [pos="2,0!", width=0.075, color="#1e293b"]
+  p [pos="1,1!", width=0.075, color="#0f766e"]
+  q [pos="2,2!", width=0.075, color="#b45309"]
+  start -> finish [color="#526882"]
+  x -> p [color="#0f766e"]
+  x -> q [color="#b45309", style=dashed]
+  a [pos="1.12,1.12!"]; b [pos="1.24,1!"]; c [pos="1.12,0.88!"]
+  a -> b [color="#0f766e", penwidth=1]; b -> c [color="#0f766e", penwidth=1]
+  node [shape=plaintext, width=0, height=0, margin=0, fontsize=13, fontname="sans-serif", fontcolor="#273548"]
+  lx [pos="2,-0.18!", label="x = (2, 0)"]
+  lp [pos="0.49,1.11!", label="(1, 1)", fontcolor="#0f766e"]
+  lq [pos="2.40,1.99!", label="(2, 2)", fontcolor="#9a4309"]
+  lu [pos="2.58,2.42!", label="U"]
+}
+```
+
+In @fig-module-c-projections, both projections map $x$ into the same subspace $U$, but only the orthogonal projection $P_Ux$ minimizes the distance to $x$.
+
+### Matrix of an orthogonal projection {#sec-module-c-session-4-matrix-of-an-orthogonal-projection}
+
+Let $U\subseteq\mathbb R^n$ have an orthonormal basis consisting of columns of
+
+$$
+Q\in\mathbb R^{n\times k}.
+$$
+
+Then
+
+$$
+Q^TQ=I_k.
+$$
+
+The orthogonal projection onto $U$ is
+
+$$
+P_Ux = \sum_{i=1}^k(q_i^Tx)q_i.
+$$
+
+In matrix notation,
+
+$$
+\boxed{ P_U=QQ^T. }
+$$
+
+The matrix satisfies two fundamental properties:
+
+$$
+\boxed{P_U^2=P_U}
+$$
+
+and
+
+$$
+\boxed{P_U^T=P_U.}
+$$
+
+Indeed,
+
+$$
+P_U^2=QQ^TQQ^T=Q(Q^TQ)Q^T=QQ^T,
+$$
+
+and
+
+$$
+P_U^T=(QQ^T)^T=QQ^T.
+$$
+
+The first property says that $P_U$ is a projection.
+
+The second says that it is self-adjoint.
+
+#### Characterization theorem {#module-c-session-4-matrix-of-an-orthogonal-projection-characterization-theorem}
+
+A real matrix $P$ is an orthogonal projection if and only if
+
+$$
+\boxed{ P^2=P,\qquad P^T=P. }
+$$
+
+The forward implication follows from the construction above.
+
+For the converse, suppose $P^2=P=P^T$.
+
+Module A gave
+
+$$
+\mathbb R^n=\operatorname{im}P\oplus\ker P.
+$$
+
+Now let $u=Px\in\operatorname{im}P$ and $k\in\ker P$.
+
+Then
+
+$$
+\langle u,k\rangle = \langle Px,k\rangle = \langle x,Pk\rangle =0.
+$$
+
+Thus the image and kernel of $P$ are orthogonal.
+
+Therefore $P$ is the orthogonal projection onto its image.
+
+### Projection using a nonorthonormal basis {#sec-module-c-session-4-projection-using-a-nonorthonormal-basis}
+
+Suppose $U$ has basis columns collected in
+
+$$
+B\in\mathbb R^{n\times k},
+$$
+
+where $B$ has full column rank.
+
+We seek the closest vector $Bc\in U$ to $x$.
+
+The residual
+
+$$
+r=x-Bc
+$$
+
+must be orthogonal to $U$, so
+
+$$
+B^Tr=0.
+$$
+
+Therefore,
+
+$$
+B^T(x-Bc)=0,
+$$
+
+giving
+
+$$
+B^TBc=B^Tx.
+$$
+
+Because the columns of $B$ are independent, $B^TB$ is SPD and invertible.
+
+Thus
+
+$$
+c=(B^TB)^{-1}B^Tx.
+$$
+
+Substituting,
+
+$$
+\boxed{ P_U=B(B^TB)^{-1}B^T. }
+$$
+
+This generalizes $QQ^T$ to a nonorthonormal basis.
+
+Notice that the Gram matrix $B^TB$ appears naturally.
+
+It corrects for the fact that the basis columns are not orthonormal.
+
+For numerical computation, one generally uses a QR factorization rather than explicitly forming the inverse of $B^TB$.
+
+### Orthogonal projection onto the kernel of our running matrix {#sec-module-c-session-4-orthogonal-projection-onto-the-kernel-of-our-running-matrix}
+
+Recall
+
+$$
+A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix}
+$$
+
+and the kernel basis matrix
+
+$$
+K= \begin{pmatrix}
+  -2&-4\\
+  1&0\\
+  0&-1\\
+  0&1
+\end{pmatrix}.
+$$
+
+The Gram matrix is
+
+$$
+K^TK= \begin{pmatrix}
+  5&8\\
+  8&18
+\end{pmatrix}.
+$$
+
+Its determinant is
+
+$$
+5\cdot18-8^2=26>0.
+$$
+
+Therefore it is invertible, and
+
+$$
+(K^TK)^{-1} = \frac1{26} \begin{pmatrix}
+  18&-8\\
+  -8&5
+\end{pmatrix}.
+$$
+
+The orthogonal projection onto $\ker A$ is
+
+$$
+\boxed{ P_{\ker A} = K(K^TK)^{-1}K^T. }
+$$
+
+Compare this with the RREF-based projection from Module A:
+
+$$
+P_{\mathrm{RREF}}= \begin{pmatrix}
+  0&-2&0&-4\\
+  0&1&0&0\\
+  0&0&0&-1\\
+  0&0&0&1
+\end{pmatrix}.
+$$
+
+Both have image $\ker A$, and both satisfy
+
+$$
+P^2=P.
+$$
+
+But they use different complementary subspaces.
+
+For the RREF projection,
+
+$$
+\ker P_{\mathrm{RREF}} = \operatorname{span}\{e_1,e_3\}.
+$$
+
+For the orthogonal projection,
+
+$$
+\ker P_{\ker A} = (\ker A)^\perp = \operatorname{im}A^T.
+$$
+
+Thus the two projections are generally different.
+
+The RREF projection is an algebraically convenient coordinate choice.
+
+The orthogonal projection is the geometrically distinguished choice determined by the inner product.
+
+### Orthogonal decompositions and quotient spaces {#sec-module-c-session-4-orthogonal-decompositions-and-quotient-spaces}
+
+There is a particularly elegant connection back to Module A.
+
+For every subspace $S\subseteq V$ in a finite-dimensional inner-product space,
+
+$$
+V=S\oplus^\perp S^\perp.
+$$
+
+Therefore every coset in $V/S$ has a unique representative in $S^\perp$.
+
+We obtain an isomorphism
+
+$$
+\boxed{ V/S\cong S^\perp. }
+$$
+
+The quotient exists algebraically, without an inner product.
+
+But the inner product provides a distinguished complementary subspace $S^\perp$.
+
+Thus Riesz representation and orthogonal decomposition supply canonical representatives of quotient classes **relative to the chosen inner product**.
+
+The isomorphism is not canonical if we forget the inner product.
+
+### Checkpoint 4 {#module-c-checkpoint-4 .unnumbered .unlisted}
+
+Prove that an orthogonal projection is self-adjoint and idempotent.
+
+Then explain why the formula
+
+$$
+B(B^TB)^{-1}B^T
+$$
+
+requires the columns of $B$ to be linearly independent.
+
+Finally, explain how an inner product gives a distinguished realization of the quotient space $V/S$ using $S^\perp$.
+
+## Session 5 — Self-adjoint operators, positive definiteness, and spectral geometry {#sec-module-c-session-5}
+
+We now investigate why symmetric and Hermitian matrices are so important in linear algebra and numerical computation.
+
+The central reason is that self-adjointness connects the action of a linear operator with the geometry of the space.
+
+This imposes strong structural restrictions on its eigenvalues, eigenspaces, and invariant subspaces.
+
+### Self-adjoint operators {#sec-module-c-session-5-self-adjoint-operators}
+
+Let $T:V\to V$ be a linear operator on a finite-dimensional inner-product space.
+
+We call $T$ **self-adjoint** if
+
+$$
+\boxed{T=T^*.}
+$$
+
+Equivalently,
+
+$$
+\boxed{ \langle Tx,y\rangle=\langle x,Ty\rangle \qquad\forall x,y\in V. }
+$$
+
+The equation describes a symmetry between applying $T$ to the first argument and applying it to the second.
+
+In real orthonormal coordinates, self-adjointness means
+
+$$
+\boxed{A=A^T.}
+$$
+
+For complex matrices, it means
+
+$$
+\boxed{A=A^H.}
+$$
+
+Complex self-adjoint matrices are called **Hermitian**.
+
+#### A subtle point about coordinates {#module-c-session-5-self-adjoint-operators-a-subtle-point-about-coordinates}
+
+A self-adjoint operator need not have a symmetric matrix in an arbitrary nonorthonormal basis.
+
+Suppose the inner product has Gram matrix $G$.
+
+Then
+
+$$
+A^{*_{G}}=G^{-1}A^TG.
+$$
+
+Self-adjointness means
+
+$$
+A=G^{-1}A^TG.
+$$
+
+Equivalently,
+
+$$
+\boxed{A^TG=GA.}
+$$
+
+This is the correct matrix characterization of self-adjointness in a general basis.
+
+Thus **self-adjointness is a property of an operator relative to an inner product, not simply a property of its matrix entries**.
+
+### Example: a nonsymmetric matrix representing a self-adjoint operator {#sec-module-c-session-5-example-a-nonsymmetric-matrix-representing-a-self-adjoint-operator}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  2&1\\
+  2&3
+\end{pmatrix}, \qquad G= \begin{pmatrix}
+  2&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Clearly,
+
+$$
+A\ne A^T.
+$$
+
+But
+
+$$
+GA= \begin{pmatrix}
+  4&2\\
+  2&3
+\end{pmatrix}
+$$
+
+and
+
+$$
+A^TG= \begin{pmatrix}
+  4&2\\
+  2&3
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+A^TG=GA.
+$$
+
+So $A$ is self-adjoint with respect to the $G$-inner product, even though it is not symmetric in ordinary Euclidean coordinates.
+
+Its eigenvalues are $1$ and $4$, both real.
+
+This example is useful for generalized eigenvalue problems, where operators often become self-adjoint only after choosing a problem-dependent inner product.
+
+### Orthogonality of eigenvectors {#sec-module-c-session-5-orthogonality-of-eigenvectors}
+
+Suppose $T$ is self-adjoint and
+
+$$
+Tv=\lambda v,\qquad Tw=\mu w.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  \lambda\langle v,w\rangle &=\langle Tv,w\rangle\\
+  &=\langle v,Tw\rangle\\
+  &=\mu\langle v,w\rangle.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+(\lambda-\mu)\langle v,w\rangle=0.
+$$
+
+If $\lambda\ne\mu$, we obtain
+
+$$
+\boxed{\langle v,w\rangle=0.}
+$$
+
+Thus eigenvectors associated with distinct eigenvalues are orthogonal.
+
+This is an important part of the geometric structure of self-adjoint operators.
+
+For complex self-adjoint operators, the eigenvalues are real, and the same conclusion holds.
+
+### Why self-adjoint eigenvalues are real {#sec-module-c-session-5-why-self-adjoint-eigenvalues-are-real}
+
+Let $T$ be self-adjoint on a complex inner-product space, and suppose
+
+$$
+Tv=\lambda v,\qquad v\ne0.
+$$
+
+Then, using self-adjointness,
+
+$$
+\langle Tv,v\rangle=\langle v,Tv\rangle.
+$$
+
+Under our convention, the left side equals
+
+$$
+\lambda\|v\|^2,
+$$
+
+while the right side equals
+
+$$
+\overline\lambda\|v\|^2.
+$$
+
+Since $v\ne0$,
+
+$$
+\lambda=\overline\lambda.
+$$
+
+Therefore,
+
+$$
+\boxed{\lambda\in\mathbb R.}
+$$
+
+This is another major advantage of Hermitian eigenvalue problems: the spectrum is real.
+
+### Invariant subspaces and their orthogonal complements {#sec-module-c-session-5-invariant-subspaces-and-their-orthogonal-complements}
+
+Recall Module A.
+
+A subspace $U\subseteq V$ is invariant under $T$ when
+
+$$
+T(U)\subseteq U.
+$$
+
+For a general operator, an invariant subspace need not have an invariant orthogonal complement.
+
+For a self-adjoint operator, it does.
+
+**Theorem.** If $T=T^*$ and $U$ is invariant under $T$, then $U^\perp$ is invariant under $T$.
+
+#### Proof {#module-c-session-5-invariant-subspaces-and-their-orthogonal-complements-proof}
+
+Take $x\in U^\perp$.
+
+We want to show $Tx\in U^\perp$.
+
+For any $u\in U$,
+
+$$
+\langle Tx,u\rangle = \langle x,Tu\rangle.
+$$
+
+Because $U$ is invariant,
+
+$$
+Tu\in U.
+$$
+
+Since $x\in U^\perp$,
+
+$$
+\langle x,Tu\rangle=0.
+$$
+
+Therefore,
+
+$$
+\langle Tx,u\rangle=0 \qquad\forall u\in U.
+$$
+
+Thus
+
+$$
+Tx\in U^\perp.
+$$
+
+Hence
+
+$$
+\boxed{T(U^\perp)\subseteq U^\perp.}
+$$
+
+This leads to an orthogonal invariant decomposition
+
+$$
+V=U\oplus^\perp U^\perp.
+$$
+
+In a basis adapted to this decomposition, $T$ has block-diagonal form.
+
+This is the structural connection between self-adjointness, invariant subspaces, and spectral decomposition.
+
+### The spectral theorem {#sec-module-c-session-5-the-spectral-theorem}
+
+**Finite-dimensional spectral theorem.** Every self-adjoint operator $T$ on a finite-dimensional real or complex inner-product space admits an orthonormal basis of eigenvectors.
+
+For a real symmetric matrix,
+
+$$
+\boxed{ A=Q\Lambda Q^T, }
+$$
+
+where $Q$ is orthogonal and $\Lambda$ is real diagonal.
+
+For a complex Hermitian matrix,
+
+$$
+\boxed{ A=Q\Lambda Q^H, }
+$$
+
+where $Q$ is unitary.
+
+The matrix $\Lambda$ contains the eigenvalues, and the columns of $Q$ are orthonormal eigenvectors.
+
+#### Why is this theorem plausible? {#module-c-session-5-the-spectral-theorem-why-is-this-theorem-plausible}
+
+We have already established two important facts.
+
+First, distinct eigenspaces are orthogonal.
+
+Second, the orthogonal complement of an invariant subspace is invariant.
+
+Thus, once we find an eigenvector, we can separate its one-dimensional eigenspace from the rest of the space and continue studying the operator on the orthogonal complement.
+
+This suggests an inductive construction.
+
+#### Proof outline in the real case {#module-c-session-5-the-spectral-theorem-proof-outline-in-the-real-case}
+
+Consider the Rayleigh quotient
+
+$$
+\rho(x)=\frac{\langle Tx,x\rangle}{\langle x,x\rangle}, \qquad x\ne0.
+$$
+
+Restrict it to the unit sphere
+
+$$
+\{x:\|x\|=1\}.
+$$
+
+Since the sphere is compact in finite dimensions and $\rho$ is continuous, it attains a maximum at some unit vector $v$.
+
+For symmetric $T$, stationarity of the quadratic form on the unit sphere implies
+
+$$
+Tv=\lambda v
+$$
+
+for some real $\lambda$.
+
+Thus an eigenvector exists.
+
+The subspace $\operatorname{span}\{v\}$ is invariant.
+
+Because $T$ is self-adjoint, its orthogonal complement is also invariant.
+
+We can restrict $T$ to $v^\perp$, which has dimension one less, and repeat the argument.
+
+By induction, we obtain an orthonormal eigenbasis of $V$.
+
+The complex case follows similarly, using the real-valued Rayleigh quotient for Hermitian operators.
+
+This outline explains why self-adjointness is crucial: it permits the invariant orthogonal decomposition needed for the induction.
+
+### Positive definite operators {#sec-module-c-session-5-positive-definite-operators}
+
+A self-adjoint operator $T:V\to V$ is **positive definite** if
+
+$$
+\boxed{ \langle Tx,x\rangle>0 \qquad\forall x\ne0. }
+$$
+
+It is **positive semidefinite** if
+
+$$
+\boxed{ \langle Tx,x\rangle\ge0 \qquad\forall x. }
+$$
+
+In real Euclidean coordinates, these conditions become
+
+$$
+x^TAx>0
+$$
+
+or
+
+$$
+x^TAx\ge0.
+$$
+
+For symmetric matrices, positive definiteness has a precise spectral characterization.
+
+#### Theorem {#module-c-session-5-positive-definite-operators-theorem}
+
+Let $A=A^T\in\mathbb R^{n\times n}$.
+
+Then
+
+$$
+\boxed{ A\text{ is positive definite} \iff \lambda_i(A)>0\quad\forall i. }
+$$
+
+#### Proof {#module-c-session-5-positive-definite-operators-proof}
+
+By the spectral theorem,
+
+$$
+A=Q\Lambda Q^T.
+$$
+
+Write $x=Qc$. Since $Q$ is orthogonal,
+
+$$
+x^TAx=c^T\Lambda c.
+$$
+
+Therefore,
+
+$$
+\boxed{ x^TAx=\sum_{i=1}^n\lambda_i c_i^2. }
+$$
+
+If every $\lambda_i>0$, then this expression is positive whenever $c\ne0$, equivalently $x\ne0$.
+
+Conversely, if $A$ is positive definite, evaluate the quadratic form at any eigenvector $q_i$:
+
+$$
+q_i^TAq_i=\lambda_i\|q_i\|^2>0.
+$$
+
+Hence $\lambda_i>0$.
+
+The semidefinite analogue is
+
+$$
+\boxed{ A\succeq0 \iff \lambda_i(A)\ge0\quad\forall i. }
+$$
+
+Here $A\succeq0$ denotes a symmetric positive semidefinite matrix.
+
+### Geometry of positive definiteness {#sec-module-c-session-5-geometry-of-positive-definiteness}
+
+Suppose $A$ is SPD.
+
+The quadratic form
+
+$$
+E(x)=\frac12x^TAx
+$$
+
+can be interpreted as an energy.
+
+Because $A$ is positive definite,
+
+$$
+E(x)>0 \qquad\text{for }x\ne0.
+$$
+
+Its level sets
+
+$$
+x^TAx=c
+$$
+
+are ellipsoids for $c>0$.
+
+The eigenvectors determine their principal axes, while the eigenvalues determine how rapidly the energy increases along those directions.
+
+In an orthonormal eigenbasis,
+
+$$
+E(x)=\frac12\sum_i\lambda_i c_i^2.
+$$
+
+Thus large eigenvalues correspond to directions in which the energy increases rapidly.
+
+Small positive eigenvalues correspond to directions in which it increases slowly.
+
+This geometric picture is fundamental in optimization and numerical linear algebra.
+
+### The Rayleigh quotient and eigenvalue bounds {#sec-module-c-session-5-the-rayleigh-quotient-and-eigenvalue-bounds}
+
+For a real symmetric matrix $A$, define
+
+$$
+\boxed{ \rho_A(x)=\frac{x^TAx}{x^Tx}, \qquad x\ne0. }
+$$
+
+Write
+
+$$
+x=\sum_i c_iq_i
+$$
+
+in an orthonormal eigenbasis.
+
+Then
+
+$$
+\rho_A(x) = \frac{\sum_i\lambda_i c_i^2} {\sum_i c_i^2}.
+$$
+
+The Rayleigh quotient is therefore a weighted average of the eigenvalues.
+
+Consequently,
+
+$$
+\boxed{ \lambda_{\min}\le\rho_A(x)\le\lambda_{\max}. }
+$$
+
+In particular,
+
+$$
+\lambda_{\min} = \min_{x\ne0}\rho_A(x),
+$$
+
+$$
+\lambda_{\max} = \max_{x\ne0}\rho_A(x).
+$$
+
+This gives a variational characterization of the extreme eigenvalues.
+
+The Rayleigh quotient is central to eigenvalue approximation, Rayleigh–Ritz methods, and the mathematical analysis of iterative eigensolvers.
+
+### The special operators $T^*T$ and $TT^*$ {#sec-module-c-session-5-the-special-operators-and}
+
+Let
+
+$$
+T:V\to W.
+$$
+
+Consider
+
+$$
+T^*T:V\to V.
+$$
+
+This operator is self-adjoint:
+
+$$
+(T^*T)^*=T^*(T^*)^*=T^*T.
+$$
+
+Moreover,
+
+$$
+\begin{aligned}
+  \langle T^*Tx,x\rangle_V &=\langle Tx,Tx\rangle_W\\
+  &=\|Tx\|_W^2\\
+  &\ge0.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{T^*T\text{ is positive semidefinite}.}
+$$
+
+Similarly, $TT^*$ is positive semidefinite.
+
+We also have
+
+$$
+\boxed{\ker(T^*T)=\ker T.}
+$$
+
+To prove this, one inclusion is immediate: $Tx=0$ implies $T^*Tx=0$.
+
+Conversely, if $T^*Tx=0$, then
+
+$$
+0=\langle T^*Tx,x\rangle=\|Tx\|^2,
+$$
+
+so $Tx=0$.
+
+Thus $T^*T$ is positive definite precisely when $T$ is injective.
+
+#### Why this matters {#module-c-session-5-the-special-operators-and-why-this-matters}
+
+The matrix $A^TA$ plays a central role in least squares and the singular value decomposition.
+
+Its eigenvalues are the squares of the singular values of $A$.
+
+Consequently, the singular values describe how strongly $A$ stretches vectors in orthogonal input directions.
+
+The kernel of $A$ corresponds to the directions associated with zero singular values.
+
+This is a direct connection between Module A's kernel structure and Module C's positive semidefinite geometry.
+
+### Checkpoint 5 {#module-c-checkpoint-5 .unnumbered .unlisted}
+
+Prove that a real symmetric positive definite matrix is invertible.
+
+Then prove
+
+$$
+\ker(A^TA)=\ker A.
+$$
+
+Finally, explain why the quadratic form $x^TAx$ for SPD $A$ can be interpreted as a geometric energy, and how its eigenvalues describe different directional scales.
+
+## Session 6 — Least squares, pseudoinverses, and numerical stability {#sec-module-c-session-6}
+
+Least squares is perhaps the clearest example of how inner-product geometry becomes a computational algorithm.
+
+The problem is familiar:
+
+Given
+
+$$
+A\in\mathbb R^{m\times n}, \qquad b\in\mathbb R^m,
+$$
+
+we want to solve
+
+$$
+Ax=b.
+$$
+
+But what if the system is inconsistent?
+
+The geometry of orthogonal projection tells us what to do.
+
+### Formulating the least-squares problem {#sec-module-c-session-6-formulating-the-least-squares-problem}
+
+Instead of requiring exact equality, seek
+
+$$
+\boxed{ x_{\mathrm{LS}} \in \underset{x\in\mathbb R^n}{\operatorname{argmin}} \|Ax-b\|_2^2. }
+$$
+
+The vector $Ax$ always belongs to the column space
+
+$$
+U=\operatorname{im}A.
+$$
+
+Thus minimizing $\|Ax-b\|$ is equivalent to finding the point in $U$ closest to $b$.
+
+But we already know the solution to that geometric problem.
+
+The closest point is the orthogonal projection of $b$ onto $U$.
+
+Therefore, every least-squares minimizer satisfies
+
+$$
+\boxed{ Ax_{\mathrm{LS}}=P_{\operatorname{im}A}b. }
+$$
+
+### Deriving the normal equations geometrically {#sec-module-c-session-6-deriving-the-normal-equations-geometrically}
+
+Define the residual
+
+$$
+r=b-Ax_{\mathrm{LS}}.
+$$
+
+Because $Ax_{\mathrm{LS}}$ is the orthogonal projection of $b$ onto $\operatorname{im}A$,
+
+$$
+\boxed{ r\perp\operatorname{im}A. }
+$$
+
+In particular, $r$ is orthogonal to every column of $A$.
+
+This is equivalent to
+
+$$
+A^Tr=0.
+$$
+
+Substituting $r=b-Ax_{\mathrm{LS}}$,
+
+$$
+A^T(b-Ax_{\mathrm{LS}})=0.
+$$
+
+Hence
+
+$$
+\boxed{ A^TAx_{\mathrm{LS}}=A^Tb. }
+$$
+
+These are the **normal equations**.
+
+Notice how naturally the transpose appears.
+
+It arises because the residual must belong to the orthogonal complement of the image:
+
+$$
+r\in(\operatorname{im}A)^\perp = \ker A^T.
+$$
+
+This is exactly one of the fundamental orthogonality identities from Session 3.
+
+### Alternative derivation using optimization {#sec-module-c-session-6-alternative-derivation-using-optimization}
+
+Define
+
+$$
+F(x)=\frac12\|Ax-b\|_2^2.
+$$
+
+Expanding,
+
+$$
+F(x)=\frac12(Ax-b)^T(Ax-b).
+$$
+
+The derivative in a direction $h$ is
+
+$$
+DF(x)[h] = (Ax-b)^TAh.
+$$
+
+Using the adjoint identity,
+
+$$
+DF(x)[h] = h^TA^T(Ax-b).
+$$
+
+Therefore the Euclidean gradient is
+
+$$
+\boxed{\nabla F(x)=A^T(Ax-b).}
+$$
+
+A minimizer must satisfy
+
+$$
+\nabla F(x)=0,
+$$
+
+giving
+
+$$
+A^TAx=A^Tb.
+$$
+
+Thus the same equations can be derived in two ways:
+
+Geometrically, through orthogonal projection.
+
+Analytically, through the Riesz representative of the derivative functional.
+
+This is a particularly elegant meeting point of the ideas developed throughout the module.
+
+### Worked least-squares example {#sec-module-c-session-6-worked-least-squares-example}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&0\\
+  0&1\\
+  1&1
+\end{pmatrix}, \qquad b= \begin{pmatrix}
+  1\\
+  2\\
+  4
+\end{pmatrix}.
+$$
+
+The system
+
+$$
+Ax=b
+$$
+
+requires
+
+$$
+x_1=1,\qquad x_2=2,\qquad x_1+x_2=4.
+$$
+
+These equations are inconsistent because $1+2\ne4$.
+
+We therefore solve the least-squares problem.
+
+First,
+
+$$
+A^TA= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix}.
+$$
+
+Also,
+
+$$
+A^Tb= \begin{pmatrix}
+  5\\
+  6
+\end{pmatrix}.
+$$
+
+The normal equations become
+
+$$
+\begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix} \begin{pmatrix}
+  x_1\\
+  x_2
+\end{pmatrix} = \begin{pmatrix}
+  5\\
+  6
+\end{pmatrix}.
+$$
+
+The inverse is
+
+$$
+(A^TA)^{-1} = \frac13 \begin{pmatrix}
+  2&-1\\
+  -1&2
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\boxed{ x_{\mathrm{LS}} = \begin{pmatrix}
+  4/3\\
+  7/3
+\end{pmatrix}. }
+$$
+
+The corresponding output is
+
+$$
+Ax_{\mathrm{LS}} = \begin{pmatrix}
+  4/3\\
+  7/3\\
+  11/3
+\end{pmatrix}.
+$$
+
+The residual is
+
+$$
+r=b-Ax_{\mathrm{LS}} = \boxed{ \begin{pmatrix}
+  -1/3\\
+  -1/3\\
+  1/3
+\end{pmatrix}. }
+$$
+
+Verify:
+
+$$
+A^Tr = \begin{pmatrix}
+  1&0&1\\
+  0&1&1
+\end{pmatrix} \begin{pmatrix}
+  -1/3\\
+  -1/3\\
+  1/3
+\end{pmatrix} = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}.
+$$
+
+Thus the residual is orthogonal to the column space, as required.
+
+### When is the least-squares solution unique? {#sec-module-c-session-6-when-is-the-least-squares-solution-unique}
+
+The least-squares problem always has at least one minimizer in finite dimensions.
+
+Why?
+
+Because the orthogonal projection
+
+$$
+P_{\operatorname{im}A}b
+$$
+
+always exists and belongs to $\operatorname{im}A$.
+
+Therefore at least one $x$ satisfies
+
+$$
+Ax=P_{\operatorname{im}A}b.
+$$
+
+But the minimizer need not be unique.
+
+If $x_0$ is a minimizer and $k\in\ker A$, then
+
+$$
+A(x_0+k)=Ax_0.
+$$
+
+Therefore $x_0+k$ has the same residual and the same least-squares objective value.
+
+Thus all minimizers form an affine space:
+
+$$
+\boxed{ x_0+\ker A. }
+$$
+
+The minimizer is unique precisely when
+
+$$
+\boxed{\ker A=\{0\}.}
+$$
+
+Equivalently, $A$ must have full column rank.
+
+In that case, $A^TA$ is SPD, so the normal equations have the unique solution
+
+$$
+\boxed{ x_{\mathrm{LS}}=(A^TA)^{-1}A^Tb. }
+$$
+
+This formula is mathematically valid, but is not usually the preferred way to compute the solution numerically.
+
+### Minimum-norm solutions and the pseudoinverse {#sec-module-c-session-6-minimum-norm-solutions-and-the-pseudoinverse}
+
+Suppose $A$ has a nontrivial kernel.
+
+Then there are infinitely many least-squares minimizers.
+
+The inner product lets us select one distinguished minimizer: the one with smallest Euclidean norm.
+
+Let $x_0$ be any least-squares minimizer.
+
+Using the orthogonal decomposition
+
+$$
+\mathbb R^n = \ker A\oplus^\perp(\ker A)^\perp,
+$$
+
+write
+
+$$
+x_0=k+u,
+$$
+
+where
+
+$$
+k\in\ker A,\qquad u\in(\ker A)^\perp.
+$$
+
+Since $Ak=0$,
+
+$$
+Au=Ax_0.
+$$
+
+Thus $u$ is also a least-squares minimizer.
+
+Moreover,
+
+$$
+\|x_0\|^2=\|k\|^2+\|u\|^2.
+$$
+
+Therefore,
+
+$$
+\|u\|\le\|x_0\|,
+$$
+
+with equality only when $k=0$.
+
+So $u$ is the unique minimum-norm least-squares solution.
+
+We obtain the characterization:
+
+$$
+\boxed{ x_{\min}\in(\ker A)^\perp, \qquad Ax_{\min}=P_{\operatorname{im}A}b. }
+$$
+
+Recall that
+
+$$
+(\ker A)^\perp=\operatorname{im}A^T.
+$$
+
+Thus the minimum-norm solution lies in the row space.
+
+#### The Moore–Penrose pseudoinverse {#module-c-session-6-minimum-norm-solutions-and-the-pseudoinverse-the-moore-penrose-pseudoinverse}
+
+The map sending $b$ to this unique minimum-norm least-squares solution is represented by the **Moore–Penrose pseudoinverse**, denoted $A^+$:
+
+$$
+\boxed{x_{\min}=A^+b.}
+$$
+
+For a full-column-rank matrix,
+
+$$
+A^+=(A^TA)^{-1}A^T.
+$$
+
+For a general matrix, the pseudoinverse is most naturally understood using the singular value decomposition.
+
+If
+
+$$
+A=U\Sigma V^T
+$$
+
+is an SVD, then
+
+$$
+A^+=V\Sigma^+U^T,
+$$
+
+where $\Sigma^+$ replaces each positive singular value by its reciprocal and transposes the rectangular diagonal structure, leaving zero singular values at zero.
+
+This connects minimum-norm least squares to spectral structure.
+
+### Why numerical methods avoid forming normal equations unnecessarily {#sec-module-c-session-6-why-numerical-methods-avoid-forming-normal-equations-unnecessarily}
+
+There is an important numerical issue.
+
+Suppose $A$ has full column rank, with singular values
+
+$$
+\sigma_{\max},\qquad\sigma_{\min}>0.
+$$
+
+Its 2-norm condition number is
+
+$$
+\kappa_2(A)=\frac{\sigma_{\max}}{\sigma_{\min}}.
+$$
+
+The eigenvalues of $A^TA$ are the squares of the singular values of $A$.
+
+Therefore,
+
+$$
+\boxed{ \kappa_2(A^TA)=\kappa_2(A)^2. }
+$$
+
+If $A$ is already ill-conditioned, forming the normal equations can substantially worsen the conditioning of the linear system being solved.
+
+Moreover, computing $A^TA$ explicitly introduces additional rounding errors.
+
+For this reason, QR factorization and SVD-based methods are generally preferred for stable least-squares computation.
+
+#### Geometric versus numerical perspective {#module-c-session-6-why-numerical-methods-avoid-forming-normal-equations-unnecessarily-geometric-versus-numerical-perspective}
+
+The normal equations are an excellent way to understand the mathematical structure of least squares.
+
+But they are not always the best computational algorithm.
+
+This distinction illustrates an important principle of numerical analysis:
+
+**A mathematically correct characterization of a solution need not lead to a numerically stable way of computing it.**
+
+Understanding both the structure and its numerical realization is one of the overarching goals of our curriculum.
+
+### Weighted least squares {#sec-module-c-session-6-weighted-least-squares}
+
+Suppose the residual space has an SPD weight matrix $W$.
+
+Consider
+
+$$
+\min_x\|Ax-b\|_W^2,
+$$
+
+where
+
+$$
+\|r\|_W^2=r^TWr.
+$$
+
+The residual at the optimum must be orthogonal to $\operatorname{im}A$ in the weighted inner product.
+
+Thus
+
+$$
+\langle Ax-b,Ah\rangle_W=0 \qquad\forall h.
+$$
+
+Expanding,
+
+$$
+h^TA^TW(Ax-b)=0 \qquad\forall h.
+$$
+
+Therefore,
+
+$$
+\boxed{ A^TW(Ax-b)=0. }
+$$
+
+The weighted normal equations are
+
+$$
+\boxed{ A^TWAx=A^TWb. }
+$$
+
+This is the same geometric principle, but in a different inner product.
+
+Weighted least squares appears in statistical estimation, inverse problems, data assimilation, and numerical optimization.
+
+It provides another example of how SPD matrices define the geometry of a numerical problem.
+
+### Checkpoint 6 {#module-c-checkpoint-6 .unnumbered .unlisted}
+
+Derive the normal equations in two different ways: first from orthogonal projection, then by differentiating the least-squares objective.
+
+Prove that a least-squares minimizer is unique if and only if $\ker A=\{0\}$.
+
+Finally, explain why forming $A^TA$ may be undesirable in floating-point arithmetic even though the normal equations are mathematically correct.
+
+## Session 7 — Functional analysis, variational methods, and numerical PDEs {#sec-module-c-session-7}
+
+We have now developed the main finite-dimensional theory.
+
+But the same concepts become particularly powerful when the vectors are functions and the linear transformations are differential or integral operators.
+
+This is the setting of functional analysis and much of numerical PDE theory.
+
+Our main example will be the weak formulation of a boundary-value problem and its approximation using finite elements.
+
+### From finite-dimensional vectors to functions {#sec-module-c-session-7-from-finite-dimensional-vectors-to-functions}
+
+Consider the Hilbert space
+
+$$
+H=L^2(0,1)
+$$
+
+with inner product
+
+$$
+\boxed{ \langle u,v\rangle_{L^2} = \int_0^1u(x)v(x)\,dx. }
+$$
+
+The corresponding norm is
+
+$$
+\|u\|_{L^2} = \left(\int_0^1|u(x)|^2\,dx\right)^{1/2}.
+$$
+
+The elements are functions, or more precisely equivalence classes of functions equal almost everywhere.
+
+The notions of orthogonality and projection still make sense.
+
+For example, two functions are orthogonal when
+
+$$
+\int_0^1u(x)v(x)\,dx=0.
+$$
+
+The geometry is no longer visualized by arrows in ordinary Euclidean space, but the same inner-product identities apply.
+
+### Continuous dual spaces {#sec-module-c-session-7-continuous-dual-spaces}
+
+In finite-dimensional vector spaces, every linear functional is automatically continuous.
+
+In infinite-dimensional normed spaces, this is no longer true.
+
+Functional analysis therefore generally studies the **continuous dual**
+
+$$
+V'= \{f:V\to\mathbb R: f\text{ is linear and continuous}\}.
+$$
+
+A linear functional $f$ is continuous if and only if it is bounded, meaning there exists $C\ge0$ such that
+
+$$
+|f(v)|\le C\|v\| \qquad\forall v\in V.
+$$
+
+For a Hilbert space $H$, the Riesz representation theorem states that every element of its continuous dual has a unique representing vector.
+
+Thus
+
+$$
+\boxed{ H'\cong H }
+$$
+
+through the Riesz identification.
+
+This is one reason Hilbert spaces are particularly convenient for studying linear operator equations.
+
+### A boundary-value problem {#sec-module-c-session-7-a-boundary-value-problem}
+
+Consider the one-dimensional Poisson equation
+
+$$
+\boxed{ -u''(x)=f(x), \qquad 0<x<1, }
+$$
+
+with homogeneous Dirichlet boundary conditions
+
+$$
+u(0)=u(1)=0.
+$$
+
+We want to understand how this differential equation leads to a linear system involving an SPD matrix.
+
+#### Step 1: Multiply by a test function {#module-c-session-7-a-boundary-value-problem-step-1-multiply-by-a-test-function}
+
+Choose a sufficiently smooth function $v$ with
+
+$$
+v(0)=v(1)=0.
+$$
+
+Multiply the equation by $v$ and integrate:
+
+$$
+-\int_0^1u''(x)v(x)\,dx = \int_0^1f(x)v(x)\,dx.
+$$
+
+#### Step 2: Integrate by parts {#module-c-session-7-a-boundary-value-problem-step-2-integrate-by-parts}
+
+Integration by parts gives
+
+$$
+-\int_0^1u''v = -\left[u'v\right]_0^1 +\int_0^1u'v'.
+$$
+
+Because $v$ vanishes at both endpoints, the boundary term is zero.
+
+Therefore,
+
+$$
+\boxed{ \int_0^1u'(x)v'(x)\,dx = \int_0^1f(x)v(x)\,dx. }
+$$
+
+This is the **weak formulation** of the Poisson equation.
+
+It requires fewer derivatives of $u$ than the original differential equation.
+
+### The correct function-space setting {#sec-module-c-session-7-the-correct-function-space-setting}
+
+The natural space for this problem is
+
+$$
+V=H_0^1(0,1),
+$$
+
+the Sobolev space of functions with a weak first derivative in $L^2$ and zero boundary trace.
+
+Define
+
+$$
+a(u,v)=\int_0^1u'(x)v'(x)\,dx.
+$$
+
+Define the load functional
+
+$$
+F(v)=\int_0^1f(x)v(x)\,dx.
+$$
+
+The weak problem becomes:
+
+Find $u\in V$ such that
+
+$$
+\boxed{ a(u,v)=F(v) \qquad\forall v\in V. }
+$$
+
+Assume, for example, $f\in L^2(0,1)$.
+
+Then $F$ is a continuous linear functional on $V$.
+
+The bilinear form $a$ is symmetric:
+
+$$
+a(u,v)=a(v,u).
+$$
+
+Furthermore,
+
+$$
+a(u,u)=\int_0^1|u'(x)|^2\,dx.
+$$
+
+On $H_0^1(0,1)$, this expression is strictly positive for $u\ne0$, because a function with zero weak derivative is constant, and a constant with zero boundary values must be zero.
+
+Thus $a$ defines an inner product on $V$.
+
+Its norm,
+
+$$
+\|u\|_a=\sqrt{a(u,u)},
+$$
+
+is equivalent to the usual $H^1$ norm on $H_0^1(0,1)$, by the Poincaré inequality.
+
+### Riesz representation as a PDE solvability principle {#sec-module-c-session-7-riesz-representation-as-a-pde-solvability-principle}
+
+The weak problem asks for $u\in V$ such that
+
+$$
+a(u,v)=F(v) \qquad\forall v\in V.
+$$
+
+But $a$ is an inner product on the Hilbert space $V$, and $F$ is a continuous linear functional.
+
+Therefore the Riesz representation theorem guarantees a unique $u\in V$ satisfying
+
+$$
+\boxed{ F(v)=a(v,u) \qquad\forall v\in V. }
+$$
+
+Because $a$ is symmetric, this is exactly the weak formulation.
+
+So, in this particular problem, **Riesz representation provides an existence-and-uniqueness theorem for the weak solution**.
+
+This is a striking application: a theorem about representing linear measurements becomes a theorem about solving a differential equation.
+
+For more general continuous, coercive bilinear forms that need not be symmetric, the corresponding existence-and-uniqueness result is the **Lax–Milgram theorem**.
+
+That theorem is a major foundation of numerical PDE analysis.
+
+### The operator maps into the dual space {#sec-module-c-session-7-the-operator-maps-into-the-dual-space}
+
+Recall Module B's variational viewpoint.
+
+For each $u\in V$, define a functional
+
+$$
+\mathcal Au\in V'
+$$
+
+by
+
+$$
+(\mathcal Au)(v)=a(u,v).
+$$
+
+Thus
+
+$$
+\boxed{ \mathcal A:V\to V'. }
+$$
+
+The weak problem becomes
+
+$$
+\boxed{\mathcal Au=F.}
+$$
+
+The operator does not naturally map a function to another ordinary function in this formulation.
+
+It maps a function to a continuous linear functional.
+
+Riesz representation allows us to identify the dual with the original Hilbert space relative to an appropriate inner product.
+
+This is precisely the kind of connection between duality, adjoints, and PDEs that motivated our curriculum.
+
+### Finite-dimensional Galerkin approximation {#sec-module-c-session-7-finite-dimensional-galerkin-approximation}
+
+In numerical computation, we cannot generally work with every function in an infinite-dimensional space.
+
+Instead, choose a finite-dimensional subspace
+
+$$
+V_h\subseteq V.
+$$
+
+Let
+
+$$
+V_h=\operatorname{span}\{\phi_1,\ldots,\phi_n\}.
+$$
+
+We seek an approximation
+
+$$
+u_h=\sum_{j=1}^n c_j\phi_j
+$$
+
+satisfying
+
+$$
+\boxed{ a(u_h,v_h)=F(v_h) \qquad\forall v_h\in V_h. }
+$$
+
+It suffices to test against the basis functions:
+
+$$
+a(u_h,\phi_i)=F(\phi_i).
+$$
+
+Substituting the expansion,
+
+$$
+\sum_{j=1}^n c_j a(\phi_j,\phi_i) = F(\phi_i).
+$$
+
+Define the stiffness matrix
+
+$$
+\boxed{ K_{ij}=a(\phi_j,\phi_i) }
+$$
+
+and the load vector
+
+$$
+b_i=F(\phi_i).
+$$
+
+Then
+
+$$
+\boxed{Kc=b.}
+$$
+
+We have converted an infinite-dimensional operator equation into a finite-dimensional linear system.
+
+### Why the stiffness matrix is SPD {#sec-module-c-session-7-why-the-stiffness-matrix-is-spd}
+
+Let $c\in\mathbb R^n$, and define
+
+$$
+v_h=\sum_i c_i\phi_i.
+$$
+
+Then
+
+$$
+\begin{aligned}
+  c^TKc &=\sum_{i,j}c_ic_j a(\phi_j,\phi_i)\\
+  &=a(v_h,v_h).
+\end{aligned}
+$$
+
+Since $a$ is an inner product,
+
+$$
+a(v_h,v_h)>0
+$$
+
+whenever $v_h\ne0$.
+
+Because the basis functions are linearly independent, $c\ne0$ implies $v_h\ne0$.
+
+Therefore,
+
+$$
+\boxed{c^TKc>0\qquad\forall c\ne0.}
+$$
+
+The matrix is symmetric because $a$ is symmetric.
+
+Hence $K$ is SPD.
+
+This is the structural origin of positive definite stiffness matrices in finite-element methods.
+
+They inherit their geometry from the underlying variational problem.
+
+### A concrete finite-element example {#sec-module-c-session-7-a-concrete-finite-element-example}
+
+Consider
+
+$$
+-u''(x)=1,\qquad 0<x<1,
+$$
+
+with
+
+$$
+u(0)=u(1)=0.
+$$
+
+Divide the interval into three equal elements, each of length
+
+$$
+h=\frac13.
+$$
+
+Use continuous, piecewise-linear basis functions associated with the two interior nodes $x=1/3$ and $x=2/3$.
+
+There are two unknown coefficients:
+
+$$
+u_h=c_1\phi_1+c_2\phi_2.
+$$
+
+The stiffness matrix is
+
+$$
+K= \frac1h \begin{pmatrix}
+  2&-1\\
+  -1&2
+\end{pmatrix} = \boxed{ \begin{pmatrix}
+  6&-3\\
+  -3&6
+\end{pmatrix}. }
+$$
+
+For the constant forcing $f=1$, the load vector is
+
+$$
+b= \begin{pmatrix}
+  \int_0^1\phi_1(x)\,dx\\
+  \int_0^1\phi_2(x)\,dx
+\end{pmatrix} = \begin{pmatrix}
+  1/3\\
+  1/3
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+\begin{pmatrix}
+  6&-3\\
+  -3&6
+\end{pmatrix} \begin{pmatrix}
+  c_1\\
+  c_2
+\end{pmatrix} = \begin{pmatrix}
+  1/3\\
+  1/3
+\end{pmatrix}.
+$$
+
+Solving gives
+
+$$
+\boxed{ c_1=c_2=\frac19. }
+$$
+
+These are the approximate solution values at the two interior nodes.
+
+For comparison, the exact solution is
+
+$$
+u(x)=\frac12x(1-x).
+$$
+
+At $x=1/3$ and $x=2/3$,
+
+$$
+u(1/3)=u(2/3)=\frac19.
+$$
+
+In this simple one-dimensional example, the finite-element nodal values agree with the exact solution at the nodes.
+
+The finite-element function itself is still piecewise linear, while the exact solution is quadratic.
+
+### Galerkin orthogonality {#sec-module-c-session-7-galerkin-orthogonality}
+
+Let $u\in V$ be the exact weak solution and $u_h\in V_h$ the Galerkin approximation.
+
+We have
+
+$$
+a(u,v)=F(v) \qquad\forall v\in V,
+$$
+
+and
+
+$$
+a(u_h,v_h)=F(v_h) \qquad\forall v_h\in V_h.
+$$
+
+Subtracting gives
+
+$$
+\boxed{ a(u-u_h,v_h)=0 \qquad\forall v_h\in V_h. }
+$$
+
+This is called **Galerkin orthogonality**.
+
+Let
+
+$$
+e=u-u_h
+$$
+
+be the error.
+
+Then the error is orthogonal to the approximation space $V_h$ with respect to the energy inner product $a$.
+
+Consequently, $u_h$ is the orthogonal projection of $u$ onto $V_h$ in the energy geometry.
+
+It follows that
+
+$$
+\boxed{ \|u-u_h\|_a = \min_{v_h\in V_h}\|u-v_h\|_a. }
+$$
+
+#### Proof of the best-approximation property {#module-c-session-7-galerkin-orthogonality-proof-of-the-best-approximation-property}
+
+Take any $v_h\in V_h$.
+
+Write
+
+$$
+u-v_h=(u-u_h)+(u_h-v_h).
+$$
+
+The first term is the error $e$.
+
+The second belongs to $V_h$.
+
+By Galerkin orthogonality,
+
+$$
+a(e,u_h-v_h)=0.
+$$
+
+Thus the Pythagorean theorem in the $a$-inner product gives
+
+$$
+\|u-v_h\|_a^2 = \|u-u_h\|_a^2 + \|u_h-v_h\|_a^2.
+$$
+
+Therefore,
+
+$$
+\|u-v_h\|_a^2 \ge \|u-u_h\|_a^2.
+$$
+
+Equality occurs at $v_h=u_h$.
+
+This proves the best-approximation property.
+
+#### Why this is important {#module-c-session-7-galerkin-orthogonality-why-this-is-important}
+
+We have connected an infinite-dimensional PDE problem to the same geometric principle used in ordinary least squares.
+
+| Least squares                                                          | Galerkin approximation                                       |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Approximate a vector $b$ by an element of $\operatorname{im}A$ | Approximate a function $u$ by an element of $V_h$    |
+| Residual is orthogonal to the column space                             | Error is orthogonal to $V_h$ in the energy inner product |
+| Normal equations arise                                                 | Stiffness matrix equations arise                             |
+| Best approximation in Euclidean norm                                   | Best approximation in energy norm                            |
+
+This is a particularly clear example of mathematical transfer: the same projection geometry reappears in a much more advanced setting.
+
+### When the variational form is only semidefinite {#sec-module-c-session-7-when-the-variational-form-is-only-semidefinite}
+
+A useful contrast is the Poisson problem with homogeneous Neumann conditions:
+
+$$
+-u''=f,\qquad u'(0)=u'(1)=0.
+$$
+
+Its weak form uses the same bilinear form
+
+$$
+a(u,v)=\int_0^1u'v'.
+$$
+
+But now the function space does not require $u$ to vanish at the endpoints.
+
+Every constant function satisfies
+
+$$
+a(c,v)=0 \qquad\forall v.
+$$
+
+Thus the bilinear form is positive semidefinite, not positive definite, on the full space.
+
+The solution is determined only up to an additive constant, and a compatibility condition is necessary:
+
+$$
+\boxed{\int_0^1f(x)\,dx=0.}
+$$
+
+This follows by testing the weak equation with the constant function $v=1$.
+
+The quotient by constant functions removes the nonuniqueness.
+
+This returns us to Module A's quotient-space construction, now in a PDE setting.
+
+It also illustrates why numerical discretizations of Neumann problems produce singular positive semidefinite matrices.
+
+### Checkpoint 7 {#module-c-checkpoint-7 .unnumbered .unlisted}
+
+Explain why the finite-element stiffness matrix is SPD for the homogeneous Dirichlet Poisson problem.
+
+Derive Galerkin orthogonality and use it to prove best approximation in the energy norm.
+
+Then explain why replacing Dirichlet boundary conditions with Neumann conditions introduces a constant-function kernel and a compatibility condition.
+
+## Session 8 — Generalized eigenvalue problems and numerical spectral methods {#sec-module-c-session-8}
+
+The final session connects inner-product geometry directly to the Numerical Linear Algebra and HASC topics that motivated the curriculum.
+
+Our main ideas are generalized self-adjointness, spectral projections, Rayleigh–Ritz approximation, and polynomial filtering.
+
+### Why generalized eigenvalue problems arise {#sec-module-c-session-8-why-generalized-eigenvalue-problems-arise}
+
+In elementary linear algebra, an eigenvalue problem has the form
+
+$$
+Ax=\lambda x.
+$$
+
+But numerical methods for PDEs often produce a generalized eigenvalue problem
+
+$$
+\boxed{ Kx=\lambda Mx, }
+$$
+
+where $K$ and $M$ are matrices arising from bilinear forms.
+
+For example, in a finite-element discretization of
+
+$$
+-u''=\lambda u
+$$
+
+with homogeneous Dirichlet conditions, one obtains
+
+$$
+K_{ij}=\int_0^1\phi_j'(x)\phi_i'(x)\,dx,
+$$
+
+and
+
+$$
+M_{ij}=\int_0^1\phi_j(x)\phi_i(x)\,dx.
+$$
+
+Here $K$ is a stiffness matrix and $M$ is a mass matrix.
+
+Both are symmetric, and in the standard conforming Dirichlet setting they are SPD.
+
+The matrix $M$ is the Gram matrix of the basis with respect to the $L^2$ inner product.
+
+Thus generalized eigenvalue problems arise naturally when different bilinear forms describe different aspects of the underlying function-space geometry.
+
+### Transforming the generalized problem {#sec-module-c-session-8-transforming-the-generalized-problem}
+
+Assume $M$ is SPD.
+
+We can rewrite
+
+$$
+Kx=\lambda Mx
+$$
+
+as
+
+$$
+\boxed{ M^{-1}Kx=\lambda x. }
+$$
+
+Define
+
+$$
+T=M^{-1}K.
+$$
+
+The matrix $T$ need not be symmetric in ordinary Euclidean coordinates.
+
+However, it is self-adjoint with respect to the $M$-inner product.
+
+Let's prove this.
+
+For $x,y\in\mathbb R^n$,
+
+$$
+\begin{aligned}
+  \langle Tx,y\rangle_M &=(M^{-1}Kx)^TMy\\
+  &=x^TK^Ty\\
+  &=x^TKy,
+\end{aligned}
+$$
+
+since $K=K^T$.
+
+On the other hand,
+
+$$
+\begin{aligned}
+  \langle x,Ty\rangle_M &=x^TM(M^{-1}Ky)\\
+  &=x^TKy.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{ \langle Tx,y\rangle_M = \langle x,Ty\rangle_M. }
+$$
+
+Thus $T$ is self-adjoint in the $M$-geometry.
+
+This explains why generalized symmetric eigenvalue problems retain the favorable spectral properties of ordinary symmetric problems.
+
+### Orthogonality of generalized eigenvectors {#sec-module-c-session-8-orthogonality-of-generalized-eigenvectors}
+
+Suppose
+
+$$
+Kv_i=\lambda_iMv_i,
+$$
+
+$$
+Kv_j=\lambda_jMv_j.
+$$
+
+Multiply the first equation by $v_j^T$:
+
+$$
+v_j^TKv_i = \lambda_i v_j^TMv_i.
+$$
+
+Similarly,
+
+$$
+v_i^TKv_j = \lambda_j v_i^TMv_j.
+$$
+
+Because $K$ and $M$ are symmetric, the left-hand sides agree, and so do the $M$-inner products.
+
+Thus
+
+$$
+(\lambda_i-\lambda_j)v_i^TMv_j=0.
+$$
+
+If $\lambda_i\ne\lambda_j$,
+
+$$
+\boxed{ v_i^TMv_j=0. }
+$$
+
+Therefore generalized eigenvectors associated with distinct eigenvalues are orthogonal in the $M$-inner product.
+
+They need not be orthogonal in the ordinary Euclidean inner product.
+
+This is exactly the distinction between intrinsic geometric structure and coordinate representation developed earlier in the module.
+
+### The generalized Rayleigh quotient {#sec-module-c-session-8-the-generalized-rayleigh-quotient}
+
+For a nonzero vector $x$, define
+
+$$
+\boxed{ \rho_{K,M}(x) = \frac{x^TKx}{x^TMx}. }
+$$
+
+Because $M$ is SPD,
+
+$$
+x^TMx>0.
+$$
+
+If $x$ is a generalized eigenvector,
+
+$$
+Kx=\lambda Mx,
+$$
+
+then
+
+$$
+\rho_{K,M}(x)=\lambda.
+$$
+
+More generally, the quotient plays the same role as the ordinary Rayleigh quotient, but in the geometry defined by $M$.
+
+If $K$ is symmetric and $M$ is SPD, the generalized eigenvalues are real, and the extreme values satisfy variational characterizations analogous to the ordinary symmetric case.
+
+This is particularly important in finite-element eigenvalue problems.
+
+### Rayleigh–Ritz approximation {#sec-module-c-session-8-rayleigh-ritz-approximation}
+
+Suppose $A=A^T\in\mathbb R^{n\times n}$.
+
+Let $U\subseteq\mathbb R^n$ be a $k$-dimensional trial subspace with orthonormal basis columns
+
+$$
+Q\in\mathbb R^{n\times k}, \qquad Q^TQ=I.
+$$
+
+We seek an approximate eigenvector $v\in U$.
+
+Write
+
+$$
+v=Qy.
+$$
+
+The Rayleigh–Ritz method constructs the smaller matrix
+
+$$
+\boxed{H=Q^TAQ.}
+$$
+
+We then solve
+
+$$
+Hy=\theta y.
+$$
+
+The scalar $\theta$ is a **Ritz value**, and
+
+$$
+v=Qy
+$$
+
+is a **Ritz vector**.
+
+#### Where does this reduced eigenproblem come from? {#module-c-session-8-rayleigh-ritz-approximation-where-does-this-reduced-eigenproblem-come-from}
+
+We would like the residual
+
+$$
+r=Av-\theta v
+$$
+
+to vanish.
+
+But because $v$ is restricted to the trial subspace, we generally cannot achieve $r=0$.
+
+Instead, impose the condition
+
+$$
+\boxed{r\perp U.}
+$$
+
+Since the columns of $Q$ span $U$, this is equivalent to
+
+$$
+Q^Tr=0.
+$$
+
+Substituting $v=Qy$,
+
+$$
+Q^T(AQy-\theta Qy)=0.
+$$
+
+Therefore,
+
+$$
+Q^TAQy=\theta Q^TQy.
+$$
+
+Since $Q^TQ=I$,
+
+$$
+\boxed{ Q^TAQy=\theta y. }
+$$
+
+This is exactly the projected eigenvalue problem.
+
+**Rayleigh–Ritz approximation arises by requiring the eigenpair residual to be orthogonal to the trial subspace.**
+
+This is closely related to Galerkin orthogonality for PDE approximation.
+
+Both methods project an infinite- or high-dimensional problem onto a smaller trial space and impose an orthogonality condition on the residual.
+
+### Generalized Rayleigh–Ritz approximation {#sec-module-c-session-8-generalized-rayleigh-ritz-approximation}
+
+For
+
+$$
+Kx=\lambda Mx,
+$$
+
+choose a trial subspace with basis columns $Q$.
+
+Seek
+
+$$
+v=Qy.
+$$
+
+The generalized residual is
+
+$$
+r=KQy-\theta MQy.
+$$
+
+Impose
+
+$$
+Q^Tr=0.
+$$
+
+Then
+
+$$
+\boxed{ Q^TKQy=\theta Q^TMQy. }
+$$
+
+Thus Rayleigh–Ritz produces a smaller generalized eigenvalue problem.
+
+If the columns of $Q$ are $M$-orthonormal, so that
+
+$$
+Q^TMQ=I,
+$$
+
+the equation simplifies to
+
+$$
+\boxed{ Q^TKQy=\theta y. }
+$$
+
+The requirement $Q^Tr=0$ means that the residual vector represents the zero functional on the trial subspace under the ordinary coordinate pairing. Equivalently, the operator residual
+
+$$
+M^{-1}r
+$$
+
+is $M$-orthogonal to the trial subspace.
+
+This is a direct application of the weighted inner-product theory.
+
+### Polynomial filtering and self-adjoint spectral theory {#sec-module-c-session-8-polynomial-filtering-and-self-adjoint-spectral-theory}
+
+Suppose $A$ is Hermitian.
+
+The spectral theorem gives
+
+$$
+A=Q\Lambda Q^H.
+$$
+
+For a polynomial $p$,
+
+$$
+\boxed{ p(A)=Qp(\Lambda)Q^H. }
+$$
+
+To understand this, note that
+
+$$
+A^k=Q\Lambda^kQ^H.
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
+  p(A) &=\sum_{j=0}^d a_jA^j\\
+  &=Q\left(\sum_{j=0}^d a_j\Lambda^j\right)Q^H\\
+  &=Qp(\Lambda)Q^H.
+\end{aligned}
+$$
+
+Thus, for an eigenvector $q_i$,
+
+$$
+p(A)q_i=p(\lambda_i)q_i.
+$$
+
+A polynomial of the operator preserves the eigendirections and changes the scaling associated with each eigenvalue.
+
+This is the fundamental mechanism of polynomial spectral filtering.
+
+### Why Chebyshev polynomials are useful {#sec-module-c-session-8-why-chebyshev-polynomials-are-useful}
+
+Chebyshev polynomials have controlled behavior on $[-1,1]$.
+
+The first-kind Chebyshev polynomials satisfy
+
+$$
+T_0(t)=1,\qquad T_1(t)=t,
+$$
+
+and the recurrence
+
+$$
+\boxed{ T_{k+1}(t)=2tT_k(t)-T_{k-1}(t). }
+$$
+
+For $t\in[-1,1]$,
+
+$$
+|T_k(t)|\le1.
+$$
+
+Outside that interval, their magnitude can grow rapidly with $k$.
+
+Suppose the unwanted eigenvalues of a Hermitian matrix lie in an interval $[a,b]$.
+
+Map that interval to $[-1,1]$ using
+
+$$
+s(t)=\frac{2t-(a+b)}{b-a}.
+$$
+
+Then a filter of the form
+
+$$
+p_k(t)=T_k(s(t))
+$$
+
+is bounded in magnitude by $1$ on the unwanted interval, while it can grow substantially at desired eigenvalues outside that interval.
+
+After suitable scaling or normalization, this can create strong relative amplification of desired spectral components.
+
+The operator filter is
+
+$$
+p_k(A)=T_k\left(\frac{2A-(a+b)I}{b-a}\right).
+$$
+
+In practice, we generally do not form this matrix polynomial explicitly.
+
+Instead, we apply the Chebyshev recurrence to vectors or blocks of vectors.
+
+This allows high-degree polynomial filtering using repeated matrix-vector or matrix-block products.
+
+### Connection to HASC and hardware-aware computing {#sec-module-c-session-8-connection-to-hasc-and-hardware-aware-computing}
+
+The underlying mathematical structure explains why Chebyshev-filtered subspace iteration is effective.
+
+A Hermitian matrix has an orthonormal eigenbasis.
+
+Polynomial functions of that matrix act diagonally on its spectral components.
+
+Orthogonalization keeps the evolving trial basis well-conditioned.
+
+Rayleigh–Ritz extracts approximate eigenpairs from the trial subspace.
+
+Residuals measure how far the approximate eigenpairs are from satisfying the original eigenproblem.
+
+From a numerical perspective, however, we must distinguish exact arithmetic from finite-precision computation.
+
+In floating-point arithmetic, matrix-vector products, polynomial recurrences, and orthogonalization steps introduce errors.
+
+These errors may alter convergence behavior, especially when the desired spectral components are weak, eigenvalues are clustered, or a polynomial recurrence strongly amplifies some directions.
+
+This creates the mathematical setting for questions in hardware-aware scientific computing: how should one balance arithmetic precision, communication costs, memory bandwidth, numerical stability, and the accuracy required for convergence?
+
+The tools developed in Module C provide the geometric language needed to analyze those questions.
+
+| Mathematical concept                  | Role in an eigenvalue algorithm                     |
+| ------------------------------------- | --------------------------------------------------- |
+| Self-adjointness                      | Real spectrum and orthogonal spectral decomposition |
+| Orthogonal projection                 | Approximation within trial subspaces                |
+| Rayleigh quotient                     | Eigenvalue estimates                                |
+| Rayleigh–Ritz                         | Extraction of approximate eigenpairs                |
+| Adjoint identities                    | Residual orthogonality and projected equations      |
+| Positive definiteness                 | Weighted geometry and generalized eigenproblems     |
+| Spectral theorem                      | Justification of polynomial filtering               |
+| Condition numbers and singular values | Sensitivity and finite-precision behavior           |
+
+The detailed convergence and stability analysis belongs to Modules D and E.
+
+### Checkpoint 8 {#module-c-checkpoint-8 .unnumbered .unlisted}
+
+Prove that $M^{-1}K$ is self-adjoint in the $M$-inner product when $K$ is symmetric and $M$ is SPD.
+
+Then derive the Rayleigh–Ritz residual orthogonality condition and the associated projected eigenvalue problem.
+
+Finally, explain why polynomial filtering is especially transparent for Hermitian matrices.
+
+## Exercises — Module C {#sec-module-c-exercises-module-c}
+
+These exercises are designed to test the six forms of understanding established in the curriculum: rigorous reasoning, geometric intuition, computation, structural connections, abstraction, and applications.
+
+Attempt each exercise independently before consulting the solutions.
+
+### Exercise 1 — Inner products and Gram matrices {#module-c-exercise-1}
+
+Let
+
+$$
+G= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix}.
+$$
+
+Define
+
+$$
+\langle x,y\rangle_G=x^TGy.
+$$
+
+Prove that this is an inner product on $\mathbb R^2$.
+
+Find all vectors $y$ that are $G$-orthogonal to
+
+$$
+x=(1,0)^T.
+$$
+
+Explain why the resulting orthogonal complement differs from the Euclidean orthogonal complement of $x$.
+
+### Exercise 2 — Riesz representation in a weighted geometry {#module-c-exercise-2}
+
+Let
+
+$$
+G= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix}
+$$
+
+and define the functional
+
+$$
+f(x_1,x_2)=3x_1.
+$$
+
+Find its Riesz representative $a_f$ with respect to the $G$-inner product.
+
+Verify explicitly that
+
+$$
+f(x)=\langle x,a_f\rangle_G.
+$$
+
+Calculate the norm of the functional and verify
+
+$$
+\|f\|_{V^*}=\|a_f\|_G.
+$$
+
+### Exercise 3 — A weighted adjoint {#module-c-exercise-3}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&2\\
+  0&1
+\end{pmatrix}.
+$$
+
+Equip the domain and codomain with inner products represented by
+
+$$
+G_V= \begin{pmatrix}
+  2&0\\
+  0&1
+\end{pmatrix}, \qquad G_W= \begin{pmatrix}
+  1&0\\
+  0&3
+\end{pmatrix}.
+$$
+
+Calculate the adjoint $A^{*_{G_V,G_W}}$.
+
+Verify the defining identity for
+
+$$
+x=(1,2)^T,\qquad y=(3,1)^T.
+$$
+
+Then explain why the ordinary transpose would give the wrong answer in this geometry.
+
+### Exercise 4 — Orthogonal and oblique projections {#module-c-exercise-4}
+
+Let
+
+$$
+U=\operatorname{span}\{(1,1)^T\} \subseteq\mathbb R^2.
+$$
+
+Find the matrix of the Euclidean orthogonal projection onto $U$.
+
+Project
+
+$$
+x=(2,0)^T.
+$$
+
+Now construct the projection onto $U$ along
+
+$$
+W=\operatorname{span}\{(0,1)^T\}.
+$$
+
+Compare the two projected vectors and their distances from $x$.
+
+Verify that both matrices are idempotent but only one is symmetric.
+
+### Exercise 5 — Self-adjointness and positive definiteness {#module-c-exercise-5}
+
+Consider
+
+$$
+A= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix}.
+$$
+
+Calculate its eigenvalues and orthonormal eigenvectors.
+
+Prove that $A$ is SPD.
+
+Find the minimum and maximum possible values of its Rayleigh quotient.
+
+Calculate the Rayleigh quotient of $x=(1,0)^T$.
+
+### Exercise 6 — Rank-deficient least squares {#module-c-exercise-6}
+
+Let
+
+$$
+A= \begin{pmatrix}
+  1&1\\
+  2&2
+\end{pmatrix}, \qquad b= \begin{pmatrix}
+  1\\
+  0
+\end{pmatrix}.
+$$
+
+Find the orthogonal projection of $b$ onto $\operatorname{im}A$.
+
+Describe all least-squares minimizers.
+
+Then find the unique minimizer with smallest Euclidean norm.
+
+Explain how the kernel and its orthogonal complement determine the answer.
+
+### Exercise 7 — A finite-element stiffness matrix {#module-c-exercise-7}
+
+Consider the weak problem
+
+$$
+\int_0^1u'v'=\int_0^1v
+$$
+
+for all $v\in H_0^1(0,1)$.
+
+Use a mesh with nodes
+
+$$
+0,\frac13,\frac23,1
+$$
+
+and continuous piecewise-linear basis functions $\phi_1,\phi_2$ corresponding to the two interior nodes.
+
+Show that the stiffness matrix and load vector are
+
+$$
+K= \begin{pmatrix}
+  6&-3\\
+  -3&6
+\end{pmatrix}, \qquad b= \begin{pmatrix}
+  1/3\\
+  1/3
+\end{pmatrix}.
+$$
+
+Solve $Kc=b$.
+
+Prove that $K$ is SPD without relying solely on its eigenvalues.
+
+### Exercise 8 — Generalized eigenvalue geometry {#module-c-exercise-8}
+
+Let
+
+$$
+K= \begin{pmatrix}
+  2&0\\
+  0&6
+\end{pmatrix}, \qquad M= \begin{pmatrix}
+  2&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Find the generalized eigenvalues of
+
+$$
+Kx=\lambda Mx.
+$$
+
+Show that
+
+$$
+T=M^{-1}K
+$$
+
+is self-adjoint in the $M$-inner product.
+
+Find an $M$-orthonormal eigenbasis and express the generalized Rayleigh quotient in that basis.
+
+### Exercise 9 — Infinite-dimensional orthogonality {#module-c-exercise-9}
+
+Consider the Hilbert space
+
+$$
+H=\ell^2
+$$
+
+of square-summable real sequences.
+
+Define
+
+$$
+T:\ell^2\to\ell^2, \qquad T(x_1,x_2,\ldots) = \left(x_1,\frac{x_2}{2},\frac{x_3}{3},\ldots\right).
+$$
+
+Show that $T$ is bounded, injective, and self-adjoint.
+
+Show that the image of $T$ is dense but not closed.
+
+Explain why
+
+$$
+\operatorname{im}T\ne(\ker T)^\perp
+$$
+
+even though
+
+$$
+\overline{\operatorname{im}T}=(\ker T)^\perp.
+$$
+
+### Exercise 10 — Structural synthesis {#module-c-exercise-10}
+
+Starting from
+
+$$
+T:V\to W,
+$$
+
+explain the logical relationship among the following ideas:
+
+$$
+\operatorname{im}T^\vee=(\ker T)^0,
+$$
+
+$$
+\operatorname{im}T^*=(\ker T)^\perp,
+$$
+
+$$
+V=\ker T\oplus^\perp\operatorname{im}T^*,
+$$
+
+and
+
+$$
+V/\ker T\cong\operatorname{im}T.
+$$
+
+Explain which results are purely algebraic and which depend on an inner product.
+
+Finally, explain why the restriction
+
+$$
+T|_{(\ker T)^\perp}: (\ker T)^\perp\to\operatorname{im}T
+$$
+
+is an isomorphism in finite dimensions, and whether it must be an isometry.
+
+## Worked solutions {#sec-module-c-worked-solutions}
+
+### Solution 1 — Weighted geometry {#module-c-solution-1}
+
+The matrix $G$ is symmetric.
+
+Its eigenvalues are $3$ and $1$, both positive.
+
+Therefore $G$ is SPD, and
+
+$$
+\langle x,y\rangle_G=x^TGy
+$$
+
+is an inner product.
+
+Now let $x=(1,0)^T$ and $y=(y_1,y_2)^T$.
+
+Then
+
+$$
+\begin{aligned}
+  \langle x,y\rangle_G &= \begin{pmatrix}
+  1&0
+\end{pmatrix} \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix} \begin{pmatrix}
+  y_1\\
+  y_2
+\end{pmatrix}\\
+&=2y_1+y_2.
+\end{aligned}
+$$
+
+Thus $x\perp_G y$ if and only if
+
+$$
+2y_1+y_2=0.
+$$
+
+Therefore,
+
+$$
+\boxed{ x^{\perp_G} = \operatorname{span}\{(1,-2)^T\}. }
+$$
+
+By contrast, the Euclidean orthogonal complement of $x$ is
+
+$$
+x^\perp=\operatorname{span}\{(0,1)^T\}.
+$$
+
+The difference occurs because orthogonality depends on the chosen inner product.
+
+### Solution 2 — Weighted Riesz representative {#module-c-solution-2}
+
+The functional has coefficient column
+
+$$
+c=\begin{pmatrix}
+  3\\
+  0
+\end{pmatrix}.
+$$
+
+Its Riesz representative satisfies
+
+$$
+Ga_f=c.
+$$
+
+Since
+
+$$
+G^{-1} = \frac13 \begin{pmatrix}
+  2&-1\\
+  -1&2
+\end{pmatrix},
+$$
+
+we obtain
+
+$$
+a_f = G^{-1}c = \boxed{ \begin{pmatrix}
+  2\\
+  -1
+\end{pmatrix}. }
+$$
+
+Verification:
+
+$$
+Ga_f= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix} \begin{pmatrix}
+  2\\
+  -1
+\end{pmatrix} = \begin{pmatrix}
+  3\\
+  0
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\langle x,a_f\rangle_G =x^TGa_f =3x_1=f(x).
+$$
+
+The norm of the representative is
+
+$$
+\begin{aligned}
+  \|a_f\|_G^2 &=a_f^TGa_f\\
+  &= \begin{pmatrix}
+  2&-1
+\end{pmatrix} \begin{pmatrix}
+  3\\
+  0
+\end{pmatrix}\\
+&=6.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{ \|a_f\|_G=\sqrt6. }
+$$
+
+By the Riesz isometry theorem,
+
+$$
+\boxed{\|f\|_{V^*}=\sqrt6.}
+$$
+
+### Solution 3 — Weighted adjoint {#module-c-solution-3}
+
+We use
+
+$$
+A^{*_{G_V,G_W}} = G_V^{-1}A^TG_W.
+$$
+
+First,
+
+$$
+A^TG_W = \begin{pmatrix}
+  1&0\\
+  2&1
+\end{pmatrix} \begin{pmatrix}
+  1&0\\
+  0&3
+\end{pmatrix} = \begin{pmatrix}
+  1&0\\
+  2&3
+\end{pmatrix}.
+$$
+
+Also,
+
+$$
+G_V^{-1} = \begin{pmatrix}
+  1/2&0\\
+  0&1
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\boxed{ A^{*_{G_V,G_W}} = \begin{pmatrix}
+  1/2&0\\
+  2&3
+\end{pmatrix}. }
+$$
+
+Now take $x=(1,2)^T$, $y=(3,1)^T$.
+
+We have
+
+$$
+Ax=(5,2)^T.
+$$
+
+Thus
+
+$$
+\langle Ax,y\rangle_{G_W} = \begin{pmatrix}
+  5&2
+\end{pmatrix} \begin{pmatrix}
+  1&0\\
+  0&3
+\end{pmatrix} \begin{pmatrix}
+  3\\
+  1
+\end{pmatrix} =21.
+$$
+
+On the other side,
+
+$$
+A^{*_{G_V,G_W}}y = \begin{pmatrix}
+  3/2\\
+  9
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\langle x,A^{*_{G_V,G_W}}y\rangle_{G_V} = \begin{pmatrix}
+  1&2
+\end{pmatrix} \begin{pmatrix}
+  2&0\\
+  0&1
+\end{pmatrix} \begin{pmatrix}
+  3/2\\
+  9
+\end{pmatrix} =21.
+$$
+
+The defining identity holds.
+
+The ordinary transpose is not the correct adjoint because the inner products are not Euclidean.
+
+### Solution 4 — Orthogonal versus oblique projections {#module-c-solution-4}
+
+The subspace $U$ has basis vector
+
+$$
+u=(1,1)^T.
+$$
+
+The Euclidean orthogonal projection is
+
+$$
+P_U=\frac{uu^T}{u^Tu} = \boxed{ \frac12 \begin{pmatrix}
+  1&1\\
+  1&1
+\end{pmatrix}. }
+$$
+
+For $x=(2,0)^T$,
+
+$$
+P_Ux=(1,1)^T.
+$$
+
+Its distance from $x$ is
+
+$$
+\|x-P_Ux\| = \|(1,-1)\| = \sqrt2.
+$$
+
+Now project onto $U$ along
+
+$$
+W=\operatorname{span}\{(0,1)^T\}.
+$$
+
+Every vector decomposes as
+
+$$
+(x_1,x_2) = (x_1,x_1)+(0,x_2-x_1).
+$$
+
+Therefore the oblique projection is
+
+$$
+Q(x_1,x_2)=(x_1,x_1),
+$$
+
+with matrix
+
+$$
+\boxed{ Q= \begin{pmatrix}
+  1&0\\
+  1&0
+\end{pmatrix}. }
+$$
+
+Then
+
+$$
+Qx=(2,2)^T.
+$$
+
+Its distance from $x$ is
+
+$$
+\|x-Qx\|=2.
+$$
+
+Thus
+
+$$
+\sqrt2<2,
+$$
+
+confirming that the orthogonal projection is closer.
+
+Both satisfy
+
+$$
+P_U^2=P_U,\qquad Q^2=Q.
+$$
+
+But
+
+$$
+P_U^T=P_U,
+$$
+
+while
+
+$$
+Q^T\ne Q.
+$$
+
+### Solution 5 — SPD matrix and Rayleigh quotient {#module-c-solution-5}
+
+For
+
+$$
+A= \begin{pmatrix}
+  2&1\\
+  1&2
+\end{pmatrix},
+$$
+
+the characteristic polynomial is
+
+$$
+\det(A-\lambda I) =(2-\lambda)^2-1.
+$$
+
+Its roots are
+
+$$
+\boxed{\lambda_1=1,\qquad\lambda_2=3.}
+$$
+
+Corresponding orthonormal eigenvectors are
+
+$$
+q_1=\frac1{\sqrt2}(1,-1)^T,
+$$
+
+$$
+q_2=\frac1{\sqrt2}(1,1)^T.
+$$
+
+Since $A$ is symmetric and both eigenvalues are positive, it is SPD.
+
+The Rayleigh quotient satisfies
+
+$$
+\boxed{ 1\le\rho_A(x)\le3. }
+$$
+
+The minimum and maximum are attained at $q_1$ and $q_2$, respectively.
+
+For $x=(1,0)^T$,
+
+$$
+\rho_A(x) = \frac{x^TAx}{x^Tx} = \boxed{2}.
+$$
+
+### Solution 6 — Rank-deficient least squares {#module-c-solution-6}
+
+The columns of $A$ are identical:
+
+$$
+a_1=a_2=(1,2)^T.
+$$
+
+Thus
+
+$$
+\operatorname{im}A=\operatorname{span}\{(1,2)^T\}.
+$$
+
+The orthogonal projection of $b=(1,0)^T$ onto this line is
+
+$$
+P_{\operatorname{im}A}b = \frac{(1,2)^Tb}{(1,2)^T(1,2)}(1,2)^T.
+$$
+
+Since
+
+$$
+(1,2)^Tb=1,\qquad (1,2)^T(1,2)=5,
+$$
+
+we obtain
+
+$$
+\boxed{ P_{\operatorname{im}A}b = \begin{pmatrix}
+  1/5\\
+  2/5
+\end{pmatrix}. }
+$$
+
+But
+
+$$
+Ax=(x_1+x_2)(1,2)^T.
+$$
+
+Therefore every least-squares minimizer satisfies
+
+$$
+x_1+x_2=\frac15.
+$$
+
+The full solution family is
+
+$$
+\boxed{ x= \begin{pmatrix}
+  1/10\\
+  1/10
+\end{pmatrix} +t\begin{pmatrix}
+  1\\
+  -1
+\end{pmatrix}. }
+$$
+
+The kernel is
+
+$$
+\ker A=\operatorname{span}\{(1,-1)^T\}.
+$$
+
+Its orthogonal complement is
+
+$$
+(\ker A)^\perp = \operatorname{span}\{(1,1)^T\}.
+$$
+
+The minimum-norm solution must lie in this orthogonal complement.
+
+Therefore its two coordinates must be equal.
+
+Together with $x_1+x_2=1/5$, this gives
+
+$$
+\boxed{ x_{\min}= \begin{pmatrix}
+  1/10\\
+  1/10
+\end{pmatrix}. }
+$$
+
+### Solution 7 — Finite-element stiffness matrix {#module-c-solution-7}
+
+For continuous piecewise-linear hat functions on a uniform mesh with spacing $h=1/3$, each interior basis function has derivative magnitude $1/h=3$ on its two adjacent elements.
+
+Therefore,
+
+$$
+a(\phi_i,\phi_i) = 2h\left(\frac1h\right)^2 = \frac2h=6.
+$$
+
+The two neighboring basis functions overlap on one element, where their derivatives have opposite signs.
+
+Thus
+
+$$
+a(\phi_1,\phi_2) = -h\left(\frac1h\right)^2 = -\frac1h=-3.
+$$
+
+Hence
+
+$$
+\boxed{ K= \begin{pmatrix}
+  6&-3\\
+  -3&6
+\end{pmatrix}. }
+$$
+
+Each hat function has area $h=1/3$, so for forcing $f=1$,
+
+$$
+\boxed{ b=\begin{pmatrix}
+  1/3\\
+  1/3
+\end{pmatrix}. }
+$$
+
+Solving gives
+
+$$
+\boxed{ c=\begin{pmatrix}
+  1/9\\
+  1/9
+\end{pmatrix}. }
+$$
+
+To prove that $K$ is SPD structurally, let
+
+$$
+v_h=c_1\phi_1+c_2\phi_2.
+$$
+
+Then
+
+$$
+c^TKc=\int_0^1|v_h'(x)|^2\,dx.
+$$
+
+This is nonnegative.
+
+If it equals zero, $v_h'=0$ almost everywhere, so $v_h$ is constant.
+
+Because $v_h$ vanishes at both endpoints, it must be identically zero.
+
+Independence of the basis functions implies $c=0$.
+
+Therefore $c^TKc>0$ for every nonzero $c$, proving positive definiteness.
+
+### Solution 8 — Generalized eigenvalues {#module-c-solution-8}
+
+The generalized eigenvalue equation is
+
+$$
+\begin{pmatrix}
+  2&0\\
+  0&6
+\end{pmatrix} \begin{pmatrix}
+  x_1\\
+  x_2
+\end{pmatrix} = \lambda \begin{pmatrix}
+  2&0\\
+  0&1
+\end{pmatrix} \begin{pmatrix}
+  x_1\\
+  x_2
+\end{pmatrix}.
+$$
+
+The two equations are
+
+$$
+2x_1=2\lambda x_1,
+$$
+
+$$
+6x_2=\lambda x_2.
+$$
+
+Therefore,
+
+$$
+\boxed{\lambda_1=1,\qquad\lambda_2=6.}
+$$
+
+We have
+
+$$
+T=M^{-1}K = \begin{pmatrix}
+  1&0\\
+  0&6
+\end{pmatrix}.
+$$
+
+It is self-adjoint in the $M$-inner product because
+
+$$
+T^TM=MT=K.
+$$
+
+An $M$-orthonormal eigenbasis is
+
+$$
+q_1=\frac1{\sqrt2}(1,0)^T, \qquad q_2=(0,1)^T.
+$$
+
+Indeed,
+
+$$
+q_i^TMq_j=\delta_{ij}.
+$$
+
+For $x=c_1q_1+c_2q_2$,
+
+$$
+x^TMx=c_1^2+c_2^2,
+$$
+
+and
+
+$$
+x^TKx=c_1^2+6c_2^2.
+$$
+
+Thus
+
+$$
+\boxed{ \rho_{K,M}(x) = \frac{c_1^2+6c_2^2}{c_1^2+c_2^2}. }
+$$
+
+This is a weighted average of the generalized eigenvalues.
+
+### Solution 9 — Dense but nonclosed range {#module-c-solution-9}
+
+For $x\in\ell^2$,
+
+$$
+\|Tx\|_{\ell^2}^2 = \sum_{n=1}^\infty\frac{|x_n|^2}{n^2} \le \sum_{n=1}^\infty|x_n|^2 = \|x\|_{\ell^2}^2.
+$$
+
+Thus $T$ is bounded, with $\|T\|\le1$.
+
+It is injective because
+
+$$
+Tx=0\implies x_n/n=0\quad\forall n,
+$$
+
+so $x=0$.
+
+It is self-adjoint because
+
+$$
+\langle Tx,y\rangle = \sum_{n=1}^\infty\frac{x_ny_n}{n} = \langle x,Ty\rangle.
+$$
+
+Every finitely supported sequence belongs to the image: if $y$ has only finitely many nonzero entries, choose $x_n=ny_n$.
+
+Since finitely supported sequences are dense in $\ell^2$, the image is dense.
+
+However, consider
+
+$$
+y=\left(1,\frac12,\frac13,\ldots\right).
+$$
+
+We have
+
+$$
+\sum_{n=1}^\infty\frac1{n^2}<\infty,
+$$
+
+so $y\in\ell^2$.
+
+If $Tx=y$, then
+
+$$
+x_n=ny_n=1
+$$
+
+for every $n$.
+
+But $(1,1,\ldots)\notin\ell^2$.
+
+Therefore $y\notin\operatorname{im}T$.
+
+Its finite truncations do belong to the image and converge to $y$, so the image is not closed.
+
+Since $\ker T=\{0\}$,
+
+$$
+(\ker T)^\perp=\ell^2.
+$$
+
+But
+
+$$
+\operatorname{im}T\ne\ell^2.
+$$
+
+Hence
+
+$$
+\boxed{ \operatorname{im}T\ne(\ker T)^\perp, \qquad \overline{\operatorname{im}T}=(\ker T)^\perp. }
+$$
+
+This demonstrates why closures matter in infinite-dimensional operator theory.
+
+### Solution 10 — Structural synthesis {#module-c-solution-10}
+
+The identity
+
+$$
+\operatorname{im}T^\vee=(\ker T)^0
+$$
+
+is purely algebraic.
+
+It concerns the algebraic dual map and annihilator, neither of which requires an inner product.
+
+Once inner products are chosen, the Riesz representation theorem identifies the dual spaces with the original spaces.
+
+Under these identifications,
+
+$$
+T^\vee
+$$
+
+corresponds to the adjoint $T^*$, and
+
+$$
+(\ker T)^0
+$$
+
+corresponds to
+
+$$
+(\ker T)^\perp.
+$$
+
+Thus
+
+$$
+\boxed{ \operatorname{im}T^*=(\ker T)^\perp }
+$$
+
+in finite dimensions.
+
+The orthogonal decomposition theorem gives
+
+$$
+\boxed{ V=\ker T\oplus^\perp(\ker T)^\perp = \ker T\oplus^\perp\operatorname{im}T^*. }
+$$
+
+Independently, the first isomorphism theorem gives
+
+$$
+\boxed{ V/\ker T\cong\operatorname{im}T. }
+$$
+
+The inner product allows us to identify the quotient with the orthogonal complement of the kernel:
+
+$$
+V/\ker T\cong(\ker T)^\perp.
+$$
+
+Therefore,
+
+$$
+\boxed{ T|_{(\ker T)^\perp}: (\ker T)^\perp\to\operatorname{im}T }
+$$
+
+is an isomorphism.
+
+It is injective because its kernel is
+
+$$
+(\ker T)^\perp\cap\ker T=\{0\}.
+$$
+
+It is surjective because every $v\in V$ decomposes as
+
+$$
+v=k+u, \qquad k\in\ker T,\quad u\in(\ker T)^\perp,
+$$
+
+and
+
+$$
+Tv=Tu.
+$$
+
+However, the restriction need not be an isometry.
+
+It preserves vector-space structure but may change lengths.
+
+For example, multiplication by $2$ on $\mathbb R$ is an isomorphism whose kernel is zero, but
+
+$$
+\|2x\|=2\|x\|.
+$$
+
+Thus the structural isomorphism theorem does not imply preservation of geometric distances.
+
+## Computational laboratory — MATLAB {#sec-module-c-computational-laboratory-matlab}
+
+This laboratory is designed to make the mathematical relationships concrete.
+
+Each experiment corresponds to one or more sessions. The calculations use small matrices for which the theoretical results can also be verified by hand.
+
+The code is intended to run as a MATLAB script.
+
+```matlab
+%% Module C — Inner-Product Geometry
+clear; clc;
+
+%% 1. Riesz representation in a weighted inner product
+G = [2 1;
+     1 2];
+
+% Functional f(x) = 3*x1
+c = [3; 0];
+
+% Riesz representative: G*a = c
+a = G \ c;
+
+x = [1; 2];
+
+fprintf('Riesz representative:\n');
+disp(a);
+
+fprintf('Functional value: %.8f\n', c.'*x);
+fprintf('Inner-product value: %.8f\n', x.'*G*a);
+
+fprintf('Functional norm: %.8f\n', ...
+    sqrt(c.'*(G\c)));
+
+fprintf('Representative norm: %.8f\n', ...
+    sqrt(a.'*G*a));
+
+
+%% 2. Adjoint with weighted inner products
+A = [1 2;
+     0 1];
+
+Gv = diag([2, 1]);
+Gw = diag([1, 3]);
+
+% Adjoint matrix: Gv^{-1} * A^T * Gw
+A_adj = Gv \ (A.'*Gw);
+
+x = [1; 2];
+y = [3; 1];
+
+left  = (A*x).'*Gw*y;
+right = x.'*Gv*(A_adj*y);
+
+fprintf('Weighted adjoint error: %.3e\n', ...
+    abs(left-right));
+
+
+%% 3. Orthogonal and oblique projections
+u = [1; 1];
+
+P_orth = (u*u.')/(u.'*u);
+
+% Projection onto span(u) along span(e2)
+P_oblique = [1 0;
+             1 0];
+
+x = [2; 0];
+
+fprintf('Orthogonal projection:\n');
+disp(P_orth*x);
+
+fprintf('Oblique projection:\n');
+disp(P_oblique*x);
+
+fprintf('Orthogonal distance: %.8f\n', ...
+    norm(x-P_orth*x));
+
+fprintf('Oblique distance: %.8f\n', ...
+    norm(x-P_oblique*x));
+
+fprintf('||P_orth^2-P_orth|| = %.3e\n', ...
+    norm(P_orth^2-P_orth));
+
+fprintf('||P_orth^T-P_orth|| = %.3e\n', ...
+    norm(P_orth.'-P_orth));
+
+
+%% 4. Orthogonal projection onto a null space
+A = [1 2 -1 3;
+     2 4  1 9;
+     3 6  0 12];
+
+K = [-2 -4;
+      1  0;
+      0 -1;
+      0  1];
+
+% Orthogonal projector onto ker(A)
+P_kernel = K * ((K.'*K)\K.');
+
+fprintf('||P_kernel^2-P_kernel|| = %.3e\n', ...
+    norm(P_kernel^2-P_kernel));
+
+fprintf('||P_kernel^T-P_kernel|| = %.3e\n', ...
+    norm(P_kernel.'-P_kernel));
+
+fprintf('||A*P_kernel|| = %.3e\n', ...
+    norm(A*P_kernel));
+
+
+%% 5. SPD matrices and spectral decomposition
+Aspd = [2 1;
+        1 2];
+
+[Q,Lambda] = eig(Aspd);
+
+fprintf('Eigenvalues of SPD matrix:\n');
+disp(diag(Lambda));
+
+fprintf('||A-Q*Lambda*Q^T|| = %.3e\n', ...
+    norm(Aspd-Q*Lambda*Q.'));
+
+x = [1; 0];
+
+rho = (x.'*Aspd*x)/(x.'*x);
+fprintf('Rayleigh quotient: %.8f\n', rho);
+
+% Cholesky factorization (upper triangular R)
+R = chol(Aspd);
+
+fprintf('||A-R^T*R|| = %.3e\n', ...
+    norm(Aspd-R.'*R));
+
+
+%% 6. Least squares and normal equations
+Als = [1 0;
+       0 1;
+       1 1];
+
+b = [1; 2; 4];
+
+% MATLAB backslash uses a suitable numerical solver
+xls = Als \ b;
+
+r = b-Als*xls;
+
+fprintf('Least-squares solution:\n');
+disp(xls);
+
+fprintf('Residual:\n');
+disp(r);
+
+fprintf('||A^T*r|| = %.3e\n', ...
+    norm(Als.'*r));
+
+% Compare against the normal-equation solution
+x_normal = (Als.'*Als)\(Als.'*b);
+
+fprintf('||x_ls-x_normal|| = %.3e\n', ...
+    norm(xls-x_normal));
+
+
+%% 7. Rank-deficient minimum-norm least squares
+Arank = [1 1;
+         2 2];
+
+brank = [1; 0];
+
+x_min = pinv(Arank)*brank;
+
+fprintf('Minimum-norm solution:\n');
+disp(x_min);
+
+fprintf('Kernel orthogonality: %.3e\n', ...
+    abs([1 -1]*x_min));
+
+
+%% 8. Finite-element stiffness matrix
+Kfe = [6 -3;
+      -3  6];
+
+bfe = [1/3; 1/3];
+
+cfe = Kfe\bfe;
+
+fprintf('FE nodal values:\n');
+disp(cfe);
+
+fprintf('Smallest stiffness eigenvalue: %.8f\n', ...
+    min(eig(Kfe)));
+
+
+%% 9. Generalized eigenproblem
+Kgen = diag([2, 6]);
+Mgen = diag([2, 1]);
+
+[V,D] = eig(Kgen,Mgen);
+
+fprintf('Generalized eigenvalues:\n');
+disp(diag(D));
+
+T = Mgen\Kgen;
+
+fprintf('M-self-adjointness residual: %.3e\n', ...
+    norm(T.'*Mgen-Mgen*T));
+
+
+%% 10. Rayleigh-Ritz in a one-dimensional subspace
+q = [1; 1]/sqrt(3);  % M-normalized for M=diag(2,1)
+
+theta = q.'*Kgen*q;
+
+r = Kgen*q-theta*Mgen*q;
+
+fprintf('Ritz value: %.8f\n', theta);
+fprintf('Galerkin residual orthogonality: %.3e\n', ...
+    abs(q.'*r));
+```
+
+### Interpretation of the laboratory {#sec-module-c-computational-laboratory-matlab-interpretation-of-the-laboratory}
+
+The most important observations are not the individual numerical answers, but the relationships they verify.
+
+| Experiment               | Mathematical structure to recognize                                         |
+| ------------------------ | --------------------------------------------------------------------------- |
+| Riesz representation     | $f(x)=\langle x,a_f\rangle_G$, with $a_f=G^{-1}c$                   |
+| Weighted adjoint         | $\langle Ax,y\rangle_{G_W}=\langle x,A^{*_{G_V,G_W}}y\rangle_{G_V}$ |
+| Orthogonal projection    | Idempotence, self-adjointness, and best approximation                       |
+| Kernel projection        | $\operatorname{im}P=\ker A$, with $P^2=P=P^T$                       |
+| SPD matrix               | Positive eigenvalues, Cholesky factorization, and spectral decomposition    |
+| Least squares            | The residual belongs to $\ker A^T$                                      |
+| Minimum-norm solution    | The selected solution belongs to $(\ker A)^\perp$                       |
+| Finite elements          | A coercive energy form leads to an SPD stiffness matrix                     |
+| Generalized eigenproblem | Self-adjointness in a weighted inner product                                |
+| Rayleigh–Ritz            | The approximate eigenpair residual annihilates the trial subspace           |
+
+For larger numerical experiments, avoid using explicit matrix inverses merely because they appear in mathematical formulas.
+
+For example, solve
+
+$$
+Ga=c
+$$
+
+using a suitable factorization instead of forming $G^{-1}$.
+
+Similarly, solve least-squares problems using QR or SVD-based methods rather than explicitly forming normal equations when conditioning is a concern.
+
+This distinction between **the mathematical characterization of a solution** and **a stable computational implementation** is a recurring theme of numerical linear algebra.
+
+## Final synthesis — What Module C establishes {#sec-module-c-final-synthesis-what-module-c-establishes}
+
+Module C has added geometric structure to the algebraic framework developed in Modules A and B.
+
+The central relationship is
+
+$$
+\boxed{ \begin{gathered}
+  \text{Algebraic dual space }V^*\\
+  \updownarrow\quad\text{Riesz representation}\\
+  \text{Inner-product space }V
+\end{gathered} }
+$$
+
+Through this identification, the dual map becomes the adjoint, and annihilators correspond to orthogonal complements.
+
+This leads to orthogonal decompositions and the numerical algorithms that exploit them.
+
+### The conceptual chain {#sec-module-c-final-synthesis-what-module-c-establishes-the-conceptual-chain}
+
+**Inner products**
+
+$\langle x,y\rangle$ — Lengths, angles, orthogonality
+
+**Riesz representation and adjoints**
+
+$f(x)=\langle x,a_f\rangle$ — Covectors represented by vectors
+
+**Orthogonal decompositions and projections**
+
+$V=U\oplus^\perp U^\perp$ — Best approximation and least squares
+
+**Self-adjointness and positive definiteness**
+
+$T=T^*,\qquad\langle Tx,x\rangle>0$ — Real spectrum, orthogonal eigenspaces, and energy geometry
+
+**Spectral and variational numerical methods**
+
+Least squares · Galerkin approximation · Rayleigh–Ritz · Chebyshev filtering
+
+### Important relationships to retain {#sec-module-c-final-synthesis-what-module-c-establishes-important-relationships-to-retain}
+
+| Concept                  | Main result                                      | Interpretation                          |
+| ------------------------ | ------------------------------------------------ | --------------------------------------- |
+| Inner product            | $\langle x,y\rangle_G=x^TGy$                 | Defines geometry                        |
+| Gram matrix              | $G_{ij}=\langle v_i,v_j\rangle$             | Coordinate representation of geometry   |
+| Riesz theorem            | $f(x)=\langle x,a_f\rangle$                  | Represents functionals by vectors       |
+| Adjoint                  | $\langle Tx,y\rangle=\langle x,T^*y\rangle$ | Pulls output measurements backward      |
+| Weighted adjoint         | $A^{*_{G_V,G_W}}=G_V^{-1}A^TG_W$           | Adjoint in non-Euclidean geometry       |
+| Fundamental subspaces    | $\operatorname{im}T^*=(\ker T)^\perp$       | Algebraic duality becomes orthogonality |
+| Orthogonal projection    | $P^2=P=P^*$                                 | Closest-point approximation             |
+| Self-adjointness         | $T=T^*$                                     | Symmetry relative to the inner product  |
+| Positive definiteness    | $\langle Tx,x\rangle>0$                      | Strictly positive quadratic energy      |
+| Normal equations         | $A^T(Ax-b)=0$                                | Least-squares residual orthogonality    |
+| Galerkin orthogonality   | $a(u-u_h,v_h)=0$                             | Best approximation in an energy norm    |
+| Generalized eigenproblem | $Kx=\lambda Mx$                              | Spectral theory in a weighted geometry  |
+| Rayleigh–Ritz            | $Q^TAQy=\theta y$                            | Projected eigenvalue approximation      |
+
+### Final mastery checklist {#sec-module-c-final-synthesis-what-module-c-establishes-final-mastery-checklist}
+
+Before beginning Module D, aim to be able to reconstruct the principal results independently and explain how they connect.
+
+- [ ] Prove Cauchy–Schwarz and explain how an inner product induces norm and distance.
+- [ ] Construct Gram matrices and explain why SPD matrices define inner products.
+- [ ] Prove finite-dimensional Riesz representation and calculate weighted Riesz representatives.
+- [ ] Derive adjoints from Riesz representation and compute weighted adjoints.
+- [ ] Prove the fundamental orthogonality identities involving kernels, images, and adjoints.
+- [ ] Construct orthogonal projectors, prove their best-approximation property, and distinguish them from oblique projections.
+- [ ] Explain self-adjointness, the spectral theorem, positive definiteness, and the Rayleigh quotient.
+- [ ] Derive least-squares normal equations and the minimum-norm solution characterization.
+- [ ] Explain the role of Riesz representation, energy norms, and Galerkin orthogonality in a PDE approximation.
+- [ ] Derive the Rayleigh–Ritz equations and explain the connection to generalized eigenproblems and polynomial filtering.
+
+## Transition to Module D — Spectral theory {#sec-module-c-transition-to-module-d-spectral-theory}
+
+Module C has introduced the essential geometry of self-adjoint operators and the spectral theorem.
+
+Module D will build on these results to study spectral theory systematically.
+
+In particular, we will investigate invariant subspaces, spectral decomposition, the Rayleigh quotient, Rayleigh–Ritz approximation, singular value decomposition, spectral projections, and the behavior of eigenvalues and eigenspaces under perturbations.
+
+The central transition is from understanding the geometry of an operator to understanding how its spectrum organizes the entire space.
+
+For a Hermitian matrix,
+
+$$
+A=Q\Lambda Q^H.
+$$
+
+This decomposition means that the action of $A$ can be understood through independent orthogonal spectral directions.
+
+That leads directly to methods for identifying selected eigenvalues and eigenspaces.
+
+In particular, a polynomial filter satisfies
+
+$$
+p(A)=Qp(\Lambda)Q^H.
+$$
+
+Thus the same spectral decomposition that explains the geometry of a self-adjoint operator also explains the mechanism of Chebyshev-filtered subspace iteration.
+
+The subsequent numerical questions concern how accurately the desired invariant subspaces can be approximated, how residuals and spectral gaps control approximation quality, and how finite-precision operations affect convergence.
+
+**The main achievement of Module C is to understand that orthogonality, adjoints, projections, positive definiteness, and spectral geometry are not isolated constructions. They arise when the algebraic theory of linear maps and duality is enriched by an inner product.**
+
+That is the foundation for the spectral and numerical methods developed in Modules D and E.

@@ -16,9 +16,29 @@ book:
     # - intro.qmd
     # - summary.qmd
     - references.qmd
-    - part: "Review"
+    - part: "Review I"
       chapters: 
       - review/01_vector_spaces.qmd
+      - review/02_inner_products_orthogonality.qmd
+      - review/03_orthogonal_projections.qmd
+    - part: "Review II"
+      chapters:
+        # - review_2/a.qmd
+        - review_2/a02.qmd
+        - review_2/b.qmd
+        - review_2/c.qmd
+        - review_2/d.qmd
+        - review_2/e.qmd
+    - part: "Review III"
+      chapters:
+        - review_3/a03.qmd
+        - review_3/b03.qmd
+        - review_3/c03.qmd
+        - review_3/d03.qmd
+        - review_3/e03.qmd
+        - review_2/f1.qmd
+        - review_2/f2.qmd
+      
 
   downloads: pdf
 

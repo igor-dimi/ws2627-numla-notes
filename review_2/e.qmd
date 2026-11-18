@@ -1,0 +1,597 @@
+# Module E — Numerical Eigenvalue Methods, Conditioning, and Stability {#sec-module-e}
+
+## From a spectral decomposition to a numerical claim
+
+Suppose a program returns a unit vector $x$ and a number $\theta$. You can multiply by $A$, but you do not know any of its eigenvectors. What calculation would justify the statement “this is an accurate approximation to the second eigenvector”? Computing $\|Ax-\theta x\|$ is a first step. You still need to identify the eigenvalue, establish separation from competing directions, and know how accurately you evaluated the residual itself. Each of the eight sessions develops one part of that argument.
+
+**Starting point in Review II.** Module A (§4.11) supplied invariant subspaces and direct sums. Module B (§5.7) explained how a functional pulls back through a map. Module C (§§6.7, 6.11) supplied orthogonal projections and the mass-matrix inner product. Module D (§§7.5–7.10) established the spectral theorem, principal angles, Rayleigh–Ritz, and polynomial filtering. Its §7.18 asks what accuracy and cost survive implementation. Here a spectral theorem becomes both a way to design an algorithm and a way to audit its output.
+
+**Running example and conventions.** Work over a finite-dimensional real or complex inner-product space, using orthonormal coordinates unless specified. A star denotes conjugate transpose. Write $\|\cdot\|$ for the Euclidean or induced spectral norm, $\|\cdot\|_F$ for the Frobenius norm. The Rayleigh quotient is $\rho_A(x)=x^*Ax/(x^*x)$. Reuse the matrix from §7.5.5,
+
+$$
+A_0=\begin{pmatrix}2&1&0\\1&2&0\\0&0&9\end{pmatrix},
+\quad q_1=(1,-1,0)^T/\sqrt2,\quad q_2=(1,1,0)^T/\sqrt2,\quad q_3=e_3 .
+$$
+
+The corresponding eigenvalues are $1,3,9$. These subscripts stay attached to these vectors. For general results we state the ordering separately, since largest magnitude, largest algebraic value and closest to a shift are three different targets.
+
+| Session | Question to reconstruct at the board |
+|---|---|
+| 1. Arithmetic | Which nearby problem explains a computed answer? |
+| 2. Perturbations | What can a small residual certify? |
+| 3. Vector iteration | Which component survives repeated application? |
+| 4. Block iteration | What contracts when individual columns can rotate? |
+| 5. Krylov projection | What do we gain by keeping earlier powers? |
+| 6. Polynomial filters | How do spectral separation and recurrence errors interact? |
+| 7. Mixed precision | Which operation limits the verified accuracy? |
+| 8. Case study | Do the measured histories agree with the prediction? |
+
+Read Sessions 1–2 together, derive Sessions 3–4 first for $A_0$, and work through Session 6 once with scalars before interpreting a matrix experiment. The laboratory is a single MATLAB script collected after the exercises.
+
+## Session 1 — Floating-point arithmetic, conditioning, and stability
+
+### What one rounding step changes
+
+In binary precision $p$ a normalized positive number has form $(1.b_2\ldots b_p)_2 2^e$ with a bounded exponent. Adjacent numbers in $[1,2)$ are $2^{1-p}$ apart. Rounding to nearest therefore gives unit roundoff $u=2^{-p}$. In binary32, $p=24$; in binary64, $p=53$. MATLAB's spacing at one is $2u$. The exponent controls range independently of the precision. For a correctly rounded real operation with exact result in the normal range and no overflow,
+
+$$
+\operatorname{fl}(a\mathbin{\circ}b)=(a\mathbin{\circ}b)(1+\delta),\quad |\delta|\le u .
+$$
+
+Indeed half an ulp in the binade starting at $2^e$ is $2^eu$, while the result has magnitude at least $2^e$. Zero is exact. Near underflow one needs an absolute-error term. A fused multiply-add rounds the combined expression once. Complex arithmetic implemented with real operations has different operation counts.
+
+**Hand experiment.** With $p=3$ and ties to even, $1+1/8$ rounds to $1$. Thus $(1+1/8)-1$ evaluates to zero while $(1-1)+1/8$ evaluates exactly. The final subtraction in the first expression is itself exact. It exposes the loss in the preceding sum. This is the same difficulty that arises when subtracting two large nearly equal terms in an eigenpair residual.
+
+### From dot products to a matrix product
+
+For $ku<1$ write $\gamma_k=ku/(1-ku)$. A product of at most $k$ factors $1+\delta_j$ differs from one by at most $\gamma_k$: its upper bound is $(1+u)^k\le 1/(1-ku)$ by binomial expansion and the geometric series, and its lower bound is at least $1-ku$. Unroll a sequential real dot product. Each exact summand $a_jx_j$ is multiplied by the rounding factor from its product and factors from subsequent additions, at most $n$ in total when the first product initializes the sum. Thus
+
+$$
+|\operatorname{fl}(a^Tx)-a^Tx|\le\gamma_n\sum_j|a_jx_j|,
+\qquad |\operatorname{fl}(Ax)-Ax|\le\gamma_n|A|\,|x|.
+$$
+
+Absolute values and the second inequality are entrywise. Equivalently, for this multiply there exists $\Delta A$ with $|\Delta A|\le\gamma_n|A|$ giving the computed result exactly as $(A+\Delta A)x$. The perturbation can change with the input and with each multiply. For sparse rows one can replace $n$ by their maximum number of summed products under the same arithmetic model. Cancellation can make the *relative output error* large even when the componentwise backward error is small.
+
+### Problem sensitivity versus the error of a method
+
+For differentiable $f$ the local absolute condition number in specified norms is $\|Df(d)\|$. For $d,f(d)\ne0$, the relative one is $\|Df(d)\|\|d\|/\|f(d)\|$. This follows by maximizing the first-order change $Df(d)h$ over a ball of input perturbations. Specifying which data may change is part of defining the problem.
+
+A forward error measures distance from the exact output. A backward error is the least size of a permitted perturbation for which the computed output is exact. Backward stability means this size is small on the scale of arithmetic error under stated hypotheses. For $Ax=b$ with nonsingular $A$, fixed $A$, and $r=b-A\hat x$, the exact perturbed right side is $b-r$. Hence
+
+$$
+x-\hat x=A^{-1}r,\qquad
+\frac{\|x-\hat x\|}{\|x\|}\le\kappa_2(A)\frac{\|r\|}{\|b\|},
+\quad \kappa_2(A)=\|A\|\|A^{-1}\|=\sigma_{\max}/\sigma_{\min}.
+$$
+
+Here $\|b\|\le\|A\|\|x\|$ supplies the last factor. For $A=\operatorname{diag}(1,\varepsilon)$, $b=e_1$ and $\hat x=(1,1)^T$, the relative residual is $\varepsilon$ and the relative forward error is one. The SVD from Module D explains this amplification by the long axis of the inverse image ellipsoid. In iterative refinement a more accurate residual helps recover the correction. The eigenvalue analogue requires spectral separation, developed next.
+
+**Checkpoint.** For $a=(1,-1)$, $x=(1,1+\varepsilon)^T$, explain why the dot-product bound divided by $|a^Tx|$ grows like $2\gamma_2/|\varepsilon|$. Which two terms cancel?
+
+## Session 2 — Eigenpair residuals and perturbations
+
+### A residual as the price of exactness
+
+For a unit vector $x$, set $r=Ax-\theta x$. A matrix $E$ makes $(\theta,x)$ exact for $A+E$ precisely when $Ex=-r$. Consequently $\|E\|\ge\|r\|$, with equality for $E=-rx^*$. This is an exact, normwise, absolute backward error allowing arbitrary matrix perturbations. For a nonzero unnormalized vector divide the residual norm by $\|x\|$. Normalizing further by $\|A\|$ gives a relative perturbation in $A$ when $\|A\|>0$.
+
+If $A=A^*$ and $\theta=\rho_A(x)$, then $x^*r=0$. Now $E=-rx^*-xr^*$ is Hermitian and has the same optimal norm. On the orthonormal pair $x,r/\|r\|$ its matrix has zero diagonal and off-diagonals $-\|r\|$, and it vanishes on their orthogonal complement. The case $r=0$ takes $E=0$. This construction preserves self-adjointness. Additional requirements such as a fixed sparsity pattern change the backward-error problem.
+
+### Locating an eigenvalue and locating a direction
+
+Let $A=A^*=U\Lambda U^*$, $x=\sum_i c_i u_i$, $\|x\|=1$. Pythagoras gives the identity
+
+$$
+\|r\|^2=\sum_i|\lambda_i-\theta|^2|c_i|^2 .
+$$
+
+Since $\sum_i|c_i|^2=1$, some eigenvalue lies within $\|r\|$ of $\theta$. To identify a target set $I$, let $P_I=\sum_{i\in I}u_i u_i^*$ and $\delta=\min_{i\notin I}|\lambda_i-\theta|>0$. Discarding the target terms gives
+
+$$
+\sin\angle(x,\operatorname{ran}P_I)=\|(I-P_I)x\|\le\|r\|/\delta .
+$$
+
+Knowing which eigenvalues are excluded is substantive information. An exact eigenvector of the wrong eigenvalue has zero residual. Eigenvectors inside a multiple eigenspace are interchangeable, so a particular basis there cannot be certified from the equation.
+
+For a simple target $\lambda_j$, expansion of the Rayleigh quotient gives
+$\rho_A(x)-\lambda_j=\sum_{i\ne j}(\lambda_i-\lambda_j)|c_i|^2$. Its absolute value is bounded by $\max_i|\lambda_i-\lambda_j|\sin^2\angle(x,u_j)$. Thus the value can settle to many digits while its direction still moves appreciably. For $x=\cos t\,q_2+\sin t\,q_3$, the value is $3+6\sin^2 t$ and the residual norm is $6|\sin t\cos t|$.
+
+### Weyl and subspace separation
+
+For two Hermitian matrices $A$ and $A+E$, their eigenvalues in increasing order satisfy $|\lambda_i(A+E)-\lambda_i(A)|\le\|E\|$. **Proof.** For every unit vector the Rayleigh quotients differ by at most $\|E\|$. Taking the maximum over vectors in an $i$-dimensional subspace and then the minimum over such subspaces preserves both inequalities. Apply Module D's min–max theorem. This is an absolute bound. Relative sensitivity may be large near zero.
+
+Here is a residual version of the subspace separation argument behind Davis–Kahan. Let $X^*X=I$, $H=X^*AX$, and $R=AX-XH$. Rotate $X$ by a unitary matrix to diagonalize $H=\operatorname{diag}(\theta_j)$ in its new basis. If $U_2$ spans the exact unwanted eigenvectors with diagonal matrix $\Lambda_2$, then $S=U_2^*X$ satisfies
+
+$$
+\Lambda_2 S-SH=U_2^*R .
+$$
+
+If every $|\lambda_i(\Lambda_2)-\theta_j|\ge\delta>0$, division entry by entry and summation of squares gives $\|S\|_F\le\|R\|_F/\delta$. The singular values of $S$ are the sines of the principal angles when the target and trial dimensions agree. This proves a Frobenius sin-theta bound and therefore also bounds the largest sine. Entrywise division alone does not prove the same constant for a spectral-norm right side. For a perturbed invariant subspace of $A+E$, $R=-(I-XX^*)EX$; the denominator must still separate the perturbed Ritz spectrum from the unwanted spectrum of $A$.
+
+**Small-gap example.** For $\operatorname{diag}(1,1+g)$ add a real symmetric off-diagonal $\varepsilon$. The diagonalizing rotation has $|\tan(2t)|=2|\varepsilon|/g$. Taking $\varepsilon=g/2$ rotates the axes by $\pi/8$ even as $g\to0$. Appending a third eigenvalue $9$ leaves the first two coordinates as an exact invariant plane. A well-determined plane may contain poorly determined individual directions.
+
+### Why nonnormality changes the certificate
+
+If $A=V\Lambda V^{-1}$ and $\mu$ is an eigenvalue of $A+E$, then $\min_i|\mu-\lambda_i|\le\kappa_2(V)\|E\|$ (Bauer–Fike). For $\mu$ outside the spectrum, apply $(\mu I-A)^{-1}$ to $Ex$ for a unit perturbed eigenvector $x$. The resolvent has norm at most $\kappa_2(V)/\min_i|\mu-\lambda_i|$, giving the claim. A normal matrix admits unitary $V$. For a simple eigenvalue, differentiating $Ax=\lambda x$ and testing with a left eigenvector $y^*$ gives $\dot\lambda=y^*\dot A x/(y^*x)$. This is Module B's dual measurement in action. Nearly orthogonal left and right eigenvectors amplify perturbations.
+
+For the Jordan block $J=\left(\begin{smallmatrix}0&1\\0&0\end{smallmatrix}\right)$, adding $\varepsilon$ in position $(2,1)$ produces eigenvalues $\pm\sqrt{\varepsilon}$. Even the order of the displacement changes at a defective eigenvalue. More generally the $\varepsilon$-pseudospectrum consists of the possible eigenvalues under $\|E\|\le\varepsilon$. The rank-one construction identifies it exactly with those $\theta$ admitting a unit vector of residual at most $\varepsilon$.
+
+**Checkpoint.** If a normalized Hermitian Ritz vector has residual $10^{-8}$ and every unwanted eigenvalue is at least $10^{-3}$ away from its Ritz value, what is certified? Some eigenvalue is within $10^{-8}$ and the sine to the identified target space is at most $10^{-5}$.
+
+## Session 3 — Vector iterations as spectral transformations
+
+### Power iteration and its rate
+
+Given a unit $x_0$, form $y=Ax_k$, $x_{k+1}=y/\|y\|$ whenever $y\ne0$. Normalization controls the scale and preserves the line generated by $A^{k+1}x_0$. For Hermitian $A$, order $|\lambda_1|>|\lambda_2|\ge\cdots$ and write $x_0=\sum c_i u_i$ with $c_1\ne0$. Divide the squared norm of the unwanted components by that of the desired component:
+
+$$
+\tan^2\angle(x_k,u_1)=
+\sum_{i>1}\left|\frac{c_i}{c_1}\right|^2
+             \left|\frac{\lambda_i}{\lambda_1}\right|^{2k}.
+$$
+
+Consequently the tangent decreases at least as fast as the bound $(|\lambda_2/\lambda_1|)^k\tan\angle(x_0,u_1)$. Equality holds if all active unwanted components have modulus $|\lambda_2|$. The Rayleigh quotient error is quadratic in the sine by Session 2. A negative dominant eigenvalue reverses sign each iteration. Monitor the line or its residual. A zero starting coefficient stays zero in exact arithmetic. Equal dominant moduli can prevent convergence to a line, as $\operatorname{diag}(1,-1)$ shows.
+
+For $A_0$, start at $(q_2+q_3)/\sqrt2$. After two multiplications the tangent to $q_3$ is $1/9$, and the Rayleigh quotient is $(3+9\cdot81)/82$. Compare the error $6/82$ with the angle $\arctan(1/9)$. In an optimization interpretation, $\rho_A$ on the unit sphere has tangential gradient $2(Ax-\rho_A(x)x)$ in real coordinates. A stationary point is an eigenvector. Power iteration selects by modulus, so on an indefinite matrix it need not maximize the quotient.
+
+### Inverse iteration and Rayleigh quotient iteration
+
+Choose a real shift $\sigma$ outside the spectrum. Solve $(A-\sigma I)y=x_k$ and normalize $y$. In the eigenbasis the component multiplier is $1/(\lambda_i-\sigma)$. For a unique closest eigenvalue $\lambda_t$, nonzero starting overlap, and second-closest distance $d_2$, the tangent bound contracts per step by $|\lambda_t-\sigma|/d_2$. A fixed shift permits reuse of a factorization. For $A_0$, $\sigma=2.8$ gives distances $1.8,0.2,6.2$. The target is $q_2$ and the worst-case factor is $1/9$. Near-singularity is the source of selectivity. It also calls for stable shifted solves and residual checks on the original eigenproblem. A solve residual $s=x_k-(A-\sigma I)\hat y$ changes the inverse application by $-(A-\sigma I)^{-1}s$.
+
+Rayleigh quotient iteration (RQI) recomputes $\sigma=\rho_A(x_k)$ each time. Assume $A$ Hermitian, $\lambda_t$ simple, gap $g>0$, and $x_k$ close enough that $|\rho_A(x_k)-\lambda_t|<g/2$. Put $t=\angle(x_k,u_t)$ and $D=\max_i|\lambda_i-\lambda_t|$. When the shifted solve exists, the same component calculation gives
+
+$$
+\tan t_{\mathrm{new}}\le
+\frac{|\lambda_t-\rho_A(x_k)|}{\min_{i\ne t}|\lambda_i-\rho_A(x_k)|}\tan t
+\le (2D/g)\sin^2 t\,\tan t .
+$$
+
+This proves local cubic convergence of the direction. Each changing shift can require a new factorization. Check convergence before solving: at an eigenvector the shifted matrix is singular. At an interior eigenvalue cancellation can also give a singular shift away from an eigenvector. For $\operatorname{diag}(-1,0,1)$, the equal mixture of the outer directions has quotient zero. A practical safeguard detects a failed solve and selects a perturbed shift. The cubic estimate makes no global claim about which eigenpair a distant start selects.
+
+**Checkpoint.** Explain why a smaller shift distance helps inverse iteration in exact arithmetic and simultaneously increases the potential amplification of a linear-solve residual.
+
+## Session 4 — Block iteration, principal angles, and extraction
+
+### Why a basis needs attention
+
+To find a $p$-dimensional invariant space, start with $X_0^*X_0=I_p$, form $Y=AX_k$, and take $X_{k+1}$ as the thin $Q$ in $Y=QR$. Provided $Y$ has full column rank, $R$ is invertible and the range is unchanged by this operation. Independent power iterations tend to align all columns with the strongest direction. A QR step restores a basis with which the weaker directions can still be represented. A unitary change of basis $X\mapsto XW$ leaves the orthogonal projector $XX^*$ unchanged.
+
+Write $A=[U_1,U_2]\operatorname{diag}(\Lambda_1,\Lambda_2)[U_1,U_2]^*$ for Hermitian $A$, with $p$ target columns in $U_1$. Put $C=U_1^*X_0$, $D=U_2^*X_0$. Assume $C$ invertible and every target eigenvalue nonzero. In eigen-coordinates a basis of the iterated space can be written
+$$
+\begin{pmatrix}\Lambda_1^k C\\\Lambda_2^k D\end{pmatrix}
+(\Lambda_1^k C)^{-1}=\begin{pmatrix}I\\Z_k\end{pmatrix},
+\qquad Z_k=\Lambda_2^k DC^{-1}\Lambda_1^{-k}.
+$$
+This is the graph of a map from the target to its orthogonal complement. A vector on it has tangent $\|Z_k v\|/\|v\|$ to the target. Maximization therefore gives $\tan\theta_{\max}=\|Z_k\|$. In particular
+$$
+\tan\theta_{\max,k}\le
+\left(\frac{\max_{\mathrm{out}}|\lambda|}{\min_{\mathrm{in}}|\lambda|}\right)^k\|DC^{-1}\| .
+$$
+Separation is needed across the boundary of the target. Multiplicities wholly inside it cause no difficulty. Taking a block larger than the requested number can move that boundary beyond a cluster; then interpret the bound for the enlarged space and extract the requested Ritz pairs.
+
+### Rayleigh–Ritz and finite precision
+
+With orthonormal $X$, compress to $H=X^*AX$. Solve $Hw_j=\theta_jw_j$ with orthonormal $w_j$, form $v_j=Xw_j$. Then $r_j=Av_j-\theta_j v_j$ satisfies $X^*r_j=0$ by substitution. Conversely this orthogonality for $v=Xw$ is precisely the projected eigenproblem. Thus the defect annihilates every trial-space test direction (Module B), or equivalently has zero orthogonal projection there (Module C). For nonorthonormal full-rank $Y$ the corresponding problem is $Y^*AYw=\theta Y^*Yw$. An ill-conditioned Gram matrix squares the basis condition number. Orthogonalize first.
+
+For $A_0$, use $X=[q_2,(q_1+q_3)/\sqrt2]$. The compression is $\operatorname{diag}(3,5)$, yet $5$ is not an eigenvalue of $A_0$. Its residual is $4(q_3-q_1)/\sqrt2$, perpendicular to both columns. One exact Ritz pair can coexist with a poor second pair. Sorted Ritz values alone do not verify a block.
+
+Householder QR uses unitary reflections $I-2vv^*/(v^*v)$ to zero entries below a pivot without changing exact lengths. In floating point it is a standard stable choice for a dense block. Gram–Schmidt subtracts projections onto earlier columns. If this leaves a tiny vector, errors made in subtracting large components are magnified upon normalization. A second orthogonalization pass often repairs the defect. If the input block has lost numerical rank, reorthogonalization cannot recover information already lost. Monitor $\|I-X^*X\|$, the size and conditioning of the small triangular factor, and the direct residual. Computing small angles through $\arccos(\sigma_{\min}(U_1^*X))$ loses digits near one. Prefer $\|(I-U_1U_1^*)X\|$ or $\|U_2^*X\|$ for the largest sine.
+
+**Checkpoint.** For trial columns $q_3,(q_2+q_1)/\sqrt2$ and target $\operatorname{span}(q_3,q_2)$, calculate the tangent after one power step. It is $1/3$, even though the first column is already exact.
+
+## Session 5 — Krylov spaces and projected eigenproblems
+
+### Keeping the history
+
+For $v\ne0$, $\mathcal K_m(A,v)=\operatorname{span}(v,Av,\ldots,A^{m-1}v)=\{p(A)v:\deg p<m\}$. Power iteration keeps one polynomial. Krylov projection searches the span of all these candidates. If $A^m v$ lies in the earlier span then applying $A$ to any spanning vector stays inside and the space is invariant. Algebraically, $p\mapsto p(A)v$ maps the polynomial ring onto the cyclic space generated by $v$. Its kernel is the ideal generated by the least-degree monic polynomial annihilating $v$. Polynomial division shows that its degree equals the eventual Krylov dimension. This is the first isomorphism theorem of Module A in the language of Module F2.
+
+### Arnoldi, Lanczos, and the residual shortcut
+
+Normalize $v_1=v/\|v\|$. Given $V_j=[v_1,\ldots,v_j]$, project $Av_j$ onto the basis, subtract that projection and normalize the remainder:
+$$
+h_{ij}=v_i^*Av_j,\quad w=Av_j-\sum_{i=1}^j h_{ij}v_i,\quad
+h_{j+1,j}=\|w\|,\quad v_{j+1}=w/h_{j+1,j}.
+$$
+A zero norm gives an invariant space in exact arithmetic. Stacking the identities gives
+$$
+AV_m=V_m H_m+h_{m+1,m}v_{m+1}e_m^*,\qquad H_m=V_m^*AV_m .
+$$
+$H_m$ is upper Hessenberg because $Av_j$ lies in the first $j+1$ basis vectors. For a unit eigenvector $H_m y=\theta y$, its lifted residual has norm $|h_{m+1,m}|\,|e_m^*y|$. Only the last coefficient and the last subdiagonal enter.
+
+For Hermitian $A$, Hermitian symmetry of $H_m$ forces all entries above its first superdiagonal to vanish as well. Writing its real diagonal as $\alpha_j$ and nonnegative subdiagonal as $\beta_j$ gives the Lanczos recurrence
+$$
+\beta_jv_{j+1}=Av_j-\alpha_jv_j-\beta_{j-1}v_{j-1},
+\quad \beta_0=0 .
+$$
+In exact arithmetic earlier projections vanish by the Hessenberg identity and symmetry. In finite precision tiny components along converged Ritz directions can grow back, causing duplicate approximate eigenvalues. Full or selective reorthogonalization trades additional work and communication for control of this effect. The direct residual checks both the recurrence shortcut and the projected solve.
+
+**Two steps by hand.** Start $A_0$ at $e_1$. Then $Ae_1=2e_1+e_2$, so $\alpha_1=2$, $\beta_1=1$, $v_2=e_2$. Next $Ae_2=e_1+2e_2$, yielding $\alpha_2=2$, $\beta_2=0$. The projected problem has eigenvalues $1,3$. The missing $9$ cannot be recovered from this start because every polynomial in $A$ preserves this coordinate plane.
+
+A sparse Arnoldi step needs one matrix application and projections against earlier vectors. For $m$ steps, storing the full basis costs order $nm$ and orthogonalization costs order $nm^2$. Short-recurrence Lanczos can generate coefficients with a few vectors, but recovering Ritz vectors later requires stored or regenerated basis information. Restarting bounds storage by retaining selected approximate spectral information before building a new space. Discarding too much can erase progress near a cluster. Block iteration has fixed width and can exploit matrix–block products. A degree-$d$ filtered block also belongs to a block Krylov space, but evaluates a prescribed polynomial without storing every power.
+
+**Checkpoint.** What evidence distinguishes exact invariance from numerical breakdown? A tiny computed $\beta_j$ is a clue. Directly test $\|AV_j-V_jH_j\|$ and $\|V_j^*V_j-I\|$ at the accuracy required by the application.
+
+## Session 6 — Designing and evaluating a Chebyshev filter
+
+### The design problem
+
+Suppose the unwanted eigenvalues of a Hermitian operator lie in $[a,b]$ and all desired eigenvalues lie above $b$. Let $c=(a+b)/2$, $h=(b-a)/2>0$, and $B=(A-cI)/h$. The unwanted interval maps to $[-1,1]$. A filter should be bounded there and large at every target. The same map works for a target below $a$ using the parity of the polynomial. An interior band generally needs a different filter design: two exterior tails cannot both be mapped to this single unwanted interval by one affine map without also including the interior target.
+
+Define $T_j(\cos t)=\cos(jt)$. The addition formula gives $T_0=1$, $T_1=z$, $T_{j+1}=2zT_j-T_{j-1}$. Thus $|T_j|\le1$ on $[-1,1]$, and $T_j(-z)=(-1)^jT_j(z)$. For $z>1$ substitute $z=\cosh s$ into the same recurrence to obtain $T_j(z)=\cosh(js)$, $s=\operatorname{arcosh}z$. Growth is exponential for fixed exterior $z$. It slows as the target approaches the cutoff. Taking higher powers $z^j$ also amplifies exterior components, but misses the extremal property below.
+
+**Normalized minimax theorem.** Fix $z_*>1$, $d\ge1$. Among real polynomials $p$ of degree at most $d$ satisfying $p(z_*)=1$, the least possible maximum of $|p|$ on $[-1,1]$ is $1/T_d(z_*)$. The candidate is $p=T_d/T_d(z_*)$. To prove optimality, suppose a competitor has strictly smaller maximum. The difference $T_d-T_d(z_*)p$ alternates in sign at $\cos(j\pi/d)$ for $j=0,\ldots,d$. It has $d$ distinct interior zeros and another zero at $z_*$. A nonzero polynomial of degree at most $d$ cannot have $d+1$ roots. This optimality concerns uniform suppression of an interval with a specified exterior normalization. It does not optimize wall time or rounding errors.
+
+### Subspace convergence and degree choice
+
+The spectral theorem gives $T_d(B)u_i=T_d((\lambda_i-c)/h)u_i$. Apply the graph proof from Session 4 with each eigenvalue replaced by its filter value. For full initial target overlap,
+$$
+\tan\theta_{\max,k}\le \rho_d^k\tan\theta_{\max,0},\qquad
+\rho_d=\frac{\max_{\mathrm{out}}|T_d((\lambda-c)/h)|}
+{\min_{\mathrm{in}}|T_d((\lambda-c)/h)|}.
+$$
+If the nearest target maps to $z_*>1$ and all unwanted eigenvalues lie in the design interval, $\rho_d\le\operatorname{sech}(d\,\operatorname{arcosh}z_*)$. For a desired one-block contraction $\tau<1$ choose
+$d\ge\operatorname{arcosh}(1/\tau)/\operatorname{arcosh}z_*$. Round upward. This counts polynomial degree, hence block products, per application. It is a sufficient interval estimate. The finite set of actual unwanted eigenvalues can give a smaller ratio.
+
+**Running matrix.** Seek $q_3$ of $A_0$. For $[1,3]$, $B=A_0-2I$ has eigenvalues $-1,1,7$. A degree-two filter has values $1,1,97$. Starting at $(q_2+q_3)/\sqrt2$, two ordinary power steps leave tangent $1/9$. One degree-two filter also takes two products and leaves tangent $1/97$. Both calculations start with the same angle and cost the same number of applications. Differences in QR, memory access and coefficient operations enter an actual timing comparison.
+
+### Evaluating a polynomial without forming powers
+
+Use $Y_0=X$, $Y_1=BX$, $Y_{j+1}=2BY_j-Y_{j-1}$. Induction gives $Y_j=T_j(B)X$. Only successive blocks are needed. The product $BY=(AY-cY)/h$ can be implemented as an operator action. Forming $B$ once can change cancellation, rounding and memory requirements. An exact-arithmetic scalar normalization common to the entire block leaves the resulting space unchanged.
+
+To control range, choose an exterior reference $z_s>1$, typically near the largest mapped target, and set $W_j=Y_j/T_j(z_s)$. Define $s_j=T_{j-1}(z_s)/T_j(z_s)$. Then
+$$
+s_1=1/z_s,\quad s_{j+1}=1/(2z_s-s_j),\quad
+W_0=X,\quad W_1=s_1BX,\quad
+W_{j+1}=2s_{j+1}BW_j-s_js_{j+1}W_{j-1}.
+$$
+This follows by dividing the recurrence by $T_{j+1}(z_s)$. It avoids computing the huge normalization factor explicitly. Common scaling controls overflow but leaves the ratio between the strongest and weakest wanted components intact. Large degree can make the filtered block nearly rank deficient before QR. Compare singular values of the small $R$ factor, shorten the polynomial or orthogonalize between complete shorter filters. Inserting arbitrary independent normalizations into an unmodified three-term recurrence changes the polynomial.
+
+### What a local error becomes
+
+For the unscaled recurrence define a local additive defect $F_j$ in each computed step, incorporating whatever product and update errors occurred:
+$$
+\widehat Y_0=X,\quad \widehat Y_1=BX+F_1,\quad
+\widehat Y_j=2B\widehat Y_{j-1}-\widehat Y_{j-2}+F_j,\quad j\ge2 .
+$$
+Let $U_0(z)=1$, $U_1(z)=2z$, $U_{k+1}=2zU_k-U_{k-1}$ be the Chebyshev polynomials of the second kind (here $U_k$ is a polynomial). Subtract the exact recurrence. Induction, using $U_0=1$ for the newest defect, gives the exact error representation
+$$
+\widehat Y_d-Y_d=\sum_{j=1}^d U_{d-j}(B)F_j .
+$$
+This identity assumes a fixed exact $B$ and exact initial block. Errors in storing or applying $B$ can be included in $F_j$. It does not presume independent random signs. Projection onto any eigendirection reduces the propagation to scalar weights. For $z=\cos t$, $U_k(z)=\sin((k+1)t)/\sin t$, bounded by $k+1$ including the limiting endpoints (expand the sine quotient as a sum of unit complex exponentials). Consequently for the unwanted spectral projector $P_2$,
+$$
+\|P_2(\widehat Y_d-Y_d)\|\le
+\sum_{j=1}^d(d-j+1)\|P_2 F_j\|.
+$$
+For $z=\cosh s>1$, the corresponding weight is $\sinh((k+1)s)/\sinh s$. An early error in a desired component can grow very large in absolute norm. Whether it rotates the range is a separate question. For instance, at $d=3$ a defect in the first product contributes $(4B^2-I)F_1$, while a defect in the last update contributes $F_3$ directly.
+
+### Turning application error into angle error
+
+In the target/complement coordinates write the input block as $\binom{C}{D}$, and write one computed filter output as $\binom{P_1 C+G_1}{P_2' D+G_2}$, where $P_1,P_2'$ are diagonal target and unwanted filter values, and $G_i$ are the total filter errors in those coordinates. Put $\alpha=\min|\operatorname{diag}P_1|$, $\beta=\max|\operatorname{diag}P_2'|$. Right-multiplying by $C^{-1}$ shows that the graph of the output has tangent bounded by
+$$
+t_{\mathrm{new}}\le
+\frac{\beta t+\|G_2 C^{-1}\|}{\alpha-\|G_1 C^{-1}\|},
+\qquad t=\|DC^{-1}\|.
+$$
+Indeed the smallest singular value of the top block after multiplication is at least the denominator, which must be positive. The unwanted numerator is bounded by the triangle inequality. This inequality explains why a global absolute error bound alone is a poor predictor of angle accuracy. Unwanted leakage adds a new direction and poor target overlap can amplify it.
+
+If the resulting step bounds yield **uniform** constants $t_{k+1}\le q t_k+\eta$ with $0\le q<1$, summing a geometric progression gives $t_k\le q^kt_0+\eta(1-q^k)/(1-q)$. The second term predicts a possible stagnation scale. It is an upper envelope, never a proof that every run stagnates there. Errors can cancel or decrease as the residual shrinks. A verified residual and a gap estimate are needed to diagnose a real run.
+
+### Bounds that miss part of the spectrum
+
+If an unwanted eigenvalue falls just outside the designed interval, its multiplier becomes $\cosh(d\,\operatorname{arcosh}|z|)$ in magnitude. Recompute the *actual* ratio $\rho_d$: convergence can slow and an unwanted direction can even dominate. Conversely an overly wide interval can bring the nearest target closer to $1$, requiring higher degree. Obtain bounds from analysis of the operator, enclosing intervals such as Gershgorin bounds, or preliminary iterations with explicit margins. An interior Ritz estimate of an extreme eigenvalue alone is generally not an outer enclosure, as min–max already shows.
+
+**Checkpoint.** With $[a,b]=[1,5]$ and target $8$, $z_*=2.5$. Show $T_3(2.5)=55$. If an unwanted $6$ was missed, its mapped value is $1.5$, giving $T_3(1.5)=9$. The ratio estimate changes from $1/55$ to $9/55$ when this is the only missed eigenvalue.
+
+## Session 7 — Mixed precision and hardware-aware computation
+
+### An error budget by operation
+
+| Operation | Where accuracy enters | Measurement or design choice |
+|---|---|---|
+| Store and apply $A$ | Quantization perturbs the operator before accumulation begins | Retain a reference action for verification |
+| Evaluate the filter | Every recurrence defect is propagated by a different polynomial | Select degree, scaling, product and update precisions separately |
+| QR | Small singular directions of the input may be obscured | Check orthogonality and inspect the triangular factor |
+| Rayleigh–Ritz | Projection errors perturb a small Hermitian problem | Form and solve the compression accurately, check its symmetry |
+| Stop and report | Cancellation in $AX-X\Theta$ may hide the true residual | Reapply the original operator in a specified verification precision |
+
+If storage gives $\widetilde A=A+E_s$ and arithmetic returns $\widetilde A X+F$, the product error relative to the original data is $E_s X+F$. Higher-precision accumulation can reduce $F$ but does not remove $E_sX$. If $X$ itself is quantized, expand $(A+E_s)(X+E_x)$ to see the additional terms $AE_x+E_sE_x$. In a distributed computation rounding communicated entries contributes to $E_x$, possibly only on boundary data. A uniform normwise model may overestimate that effect. Floating-point format, product precision, accumulation precision and communication format must be specified separately.
+
+**Verification bound.** If the computed verification residual is $\hat r=r+e$ with $\|e\|\le\epsilon_v$, then $\|r\|\le\|\hat r\|+\epsilon_v$. A matvec bound from Session 1 plus bounds for the scale and subtraction can supply $\epsilon_v$ under a known arithmetic model. A double-precision direct residual is a practical independent diagnostic when the filter ran in single. Calling it a rigorous enclosure additionally requires controlling its own evaluation and norm rounding. Increasing the verification precision can reveal an existing error without changing the iterate.
+
+**A scalar identity behind residual-based methods.** For a polynomial $p$ and approximate eigenpair $(x,\theta)$, the factor theorem gives $p(z)-p(\theta)=(z-\theta)s_\theta(z)$. Therefore
+$$
+p(A)x=p(\theta)x+s_\theta(A)r,\qquad r=Ax-\theta x .
+$$
+For $p(z)=2z^2-1$, $s_\theta(z)=2(z+\theta)$. Near convergence the argument of the operator in the correction is small. If a product error is proportional to the norm of its input, the error in applying an operator to a small residual may shrink with convergence. An accurately evaluated residual and a controlled correction recurrence are essential. When the input residual is already corrupted at the scale of $u\|A\|$, the argument loses force. This identity provides a way into the seminar paper's residual-based recurrence. The ordinary recurrence in the lab is its comparison case. For the actual algorithm and its numerical evidence see [Kodali, Ramakrishnan and Motamarri, *Residual-based Chebyshev filtered subspace iteration*](https://arxiv.org/abs/2503.22652).
+
+### Cost of reaching an accuracy target
+
+A dense matrix–block product with an $n\times p$ real block costs approximately $2n^2p$ scalar floating-point operations. A sparse product costs approximately $2\,\mathrm{nnz}(A)p$. A thin dense QR costs order $np^2$ and the compressed eigensolve costs order $p^3$. A degree-$d$ filter takes $d$ matrix–block products before extraction. These counts give no sustained bandwidth, occupancy or collective latency. For an illustrative machine model with peak rate $F$ and bandwidth $B_w$, moving $S$ bytes and doing $W$ operations requires at least $\max(W/F,S/B_w)$ time for the modeled resources. Sparse indices, cache reuse, conversions, synchronization and contention affect actual time. A block may reuse matrix entries across columns. Distributed inner products require reductions, whereas stencil products often require neighbor exchanges.
+
+For a fair comparison specify a target cluster, a common residual tolerance on the original operator, an orthogonality threshold, starting block and stopping rule. Time setup, transfers, filtering, QR, extraction and verification; include all repetitions needed to reach tolerance. Record failures to meet tolerance. A low-precision run with faster individual products can take longer to deliver an acceptable subspace, or never meet the criterion. Timing the dense teaching example says little about a sparse device implementation.
+
+**Checkpoint.** A single-precision filter and double-precision QR produce $\|I-X^*X\|\approx10^{-15}$ but a verified residual of $10^{-6}$. These diagnostics can coexist: one measures internal geometry of the basis, the other tests its relation to $A$.
+
+## Session 8 — A controlled experiment from prediction to verification
+
+### Construct a problem with known answers
+
+Take $n=32$ and the orthonormal discrete cosine basis $U$. Its zeroth column is constant $1/\sqrt n$, and for row $i=0,\ldots,n-1$ and column $j=1,\ldots,n-1$ its entry is $\sqrt{2/n}\cos(\pi(i+1/2)j/n)$. Set $A=U\Lambda U^T$ with 29 equally spaced unwanted eigenvalues from $1$ to $5$ and targets $8,9,10$. The dense rotation is deliberate: rounding a diagonal example can preserve exact zeros and hide leakage between directions. The exact mathematical construction and its stored floating-point realization differ slightly.
+
+For each target eigenvector take its equal mixture with a different unwanted eigenvector. Pair $8$ with $5$, $9$ with $1$, and $10$ with the second-smallest eigenvalue. These three vectors are orthonormal. Each angle is initially $\pi/4$. For the pair determining the worst angle the power multiplier ratio is $5/8$ and the degree-three Chebyshev ratio is $1/55$. All other ratios are smaller. The graph estimate is attained, so the predicted largest tangents are **exactly** $(5/8)^k$ and $55^{-k}$ in mathematical arithmetic. Convert a tangent $t$ to a sine by $t/\sqrt{1+t^2}$ before comparing with the lab's sine diagnostic.
+
+Each outer step applies the chosen operator, orthogonalizes, solves the projected eigenproblem, and checks the residuals in the original coordinates. The lab retains the QR basis for the next step; rotating it to the Ritz basis gives the same next range in exact arithmetic. It records the largest column residual, largest sine, maximum sorted Ritz-value error and orthogonality defect. Only the synthetic example supplies the exact target basis and exact target values. In applications, identification and separation must come from other information.
+
+### A measured history
+
+The numbers below were obtained by independently executing the real-valued case study in NumPy with the same cosine construction, polynomial and precision split used in the MATLAB script. Both variants use binary64 QR, extraction and verification. The binary32 variant stores the mapped matrix in single and performs the filter recurrence in single. Last digits and stagnation levels depend on implementation.
+
+| Outer steps | Predicted tangent | Largest sine, double filter | Largest sine, single filter | Max residual, double filter | Max residual, single filter |
+|---:|---:|---:|---:|---:|---:|
+| 1 | $1.82\,10^{-2}$ | $1.82\,10^{-2}$ | $1.82\,10^{-2}$ | $8.08\,10^{-2}$ | $8.08\,10^{-2}$ |
+| 4 | $1.09\,10^{-7}$ | $1.09\,10^{-7}$ | $1.23\,10^{-7}$ | $3.28\,10^{-7}$ | $4.36\,10^{-7}$ |
+| 8 | $1.19\,10^{-14}$ | $1.58\,10^{-14}$ | $5.56\,10^{-8}$ | $3.61\,10^{-14}$ | $3.75\,10^{-7}$ |
+| 10 | $3.95\,10^{-18}$ | $9.38\,10^{-15}$ | $6.90\,10^{-8}$ | $4.61\,10^{-15}$ | $4.02\,10^{-7}$ |
+
+At step one the largest angle belongs to the $8,5$ pair, while the largest residual can belong to a different pair: a residual weights the angle by the local eigenvalue separation. At step eight the double run meets an absolute residual tolerance of $10^{-12}$; the displayed single run does not. The experiment combines storage and arithmetic errors. To isolate storage, round $B$ to binary32 once and convert it back to binary64 for all products. To probe communication errors separately, an experiment needs an explicit communication pattern and quantization model.
+
+### Transfer to a variational PDE problem
+
+In §6.11, $Kx=\lambda Mx$ came from testing $-u''=\lambda u$ with finite-element basis functions. Assume $K=K^*$, $M=M^*>0$ and $M=LL^*$. Set $y=L^*x$ and $C=L^{-1}KL^{-*}$. Then $Cy=\lambda y$ is Hermitian, $\|y\|^2=x^*Mx$, and
+$$
+Cy-\theta y=L^{-1}(Kx-\theta Mx).
+$$
+For an $M$-normalized approximate eigenvector, $\|Kx-\theta Mx\|_{M^{-1}}$ is precisely the Euclidean residual norm of the transformed problem. Solve triangular systems to apply the transformations. An $M$-orthonormal trial basis $X$ gives the small matrix $X^*KX$ and the Ritz residual satisfies $X^*(KX-MXH)=0$. These are the Galerkin test equations again. A verified algebraic residual certifies the *discrete* eigenproblem. Errors due to the mesh and the choice of trial functions require an additional approximation argument.
+
+**Checkpoint.** Why can a change of finite-element basis alter the Euclidean norm of a residual without changing the mathematical approximation? The residual represents a functional; its coordinates and the mass Gram matrix transform together. The dual norm accounts for both changes.
+
+## Exercises and worked solutions
+
+Try each problem before reading its solution. Problems 4, 6, 8 and 11 form a short proof-reconstruction route into the seminar.
+
+### 1. Which data are allowed to move?
+
+For $A=\operatorname{diag}(1,10^{-6})$, $b=e_1$ and $\hat x=(1,1)^T$, find the minimum absolute normwise perturbations when (i) only $b$ may move, (ii) only $A$ may move. Compare with the relative forward error.
+
+**Solution.** The residual is $(0,-10^{-6})^T$. The new right side is forced to be $A\hat x$, so its distance is $10^{-6}$. For a matrix change $E\hat x=r$, the lower bound is $\|r\|/\|\hat x\|=10^{-6}/\sqrt2$. It is attained by $E=r\hat x^*/\|\hat x\|^2$. The exact $x=e_1$ gives relative forward error $1$. Backward error has meaning only after specifying the allowed data and norm.
+
+### 2. A Rayleigh quotient can conceal an inaccurate vector
+
+For $A_0$ take $x=(q_2+0.01q_3)/\sqrt{1.0001}$. Compute the quotient error relative to $3$ in absolute units, the residual norm and the sine to $q_2$.
+
+**Solution.** With $t=0.01$, $\rho=(3+9t^2)/(1+t^2)$, so the absolute error is $6t^2/(1+t^2)\approx 0.000600$. The two residual coordinates in the eigenbasis are $(3-\rho)/\sqrt{1+t^2}$ and $(9-\rho)t/\sqrt{1+t^2}$. Squaring and adding gives $6t/(1+t^2)\approx0.059994$ for the norm. The sine is $t/\sqrt{1+t^2}\approx0.0099995$. To call the quotient error relative, one would divide it by $3$.
+
+### 3. A backward error with symmetry
+
+For $A=\operatorname{diag}(1,3)$, $x=(1,1)^T/\sqrt2$, find an optimal Hermitian perturbation for its Rayleigh quotient.
+
+**Solution.** $\theta=2$, $r=(-1,1)^T/\sqrt2$, $\|r\|=1$. Expanding $-rx^*-xr^*$ gives $\operatorname{diag}(1,-1)$. The corrected matrix is $2I$, so $(2,x)$ is exact. Any admissible $E$ has $\|E\|\ge\|Ex\|=1$, proving optimality. The perturbation merges two simple eigenvalues; the backward-error condition imposes no constraint on multiplicities.
+
+### 4. Fixed versus adaptive inverse iteration
+
+In a two-dimensional Hermitian eigenspace mixture take $x=(u_1+t u_2)/\sqrt{1+t^2}$, real $t\ne0$, and distinct eigenvalues. Derive exactly the new signed coefficient ratio under RQI.
+
+**Solution.** $\rho=(\lambda_1+t^2\lambda_2)/(1+t^2)$. The new ratio equals $t(\lambda_1-\rho)/(\lambda_2-\rho)=-t^3$. Thus the tangent cubes even with the sign change. A fixed shift produces $t(\lambda_1-\sigma)/(\lambda_2-\sigma)$ instead. Starting at $t=1$ gives a two-cycle in the line for RQI, illustrating the locality of the convergence statement.
+
+### 5. A block that cannot recover its target
+
+For $A_0$ target $\operatorname{span}(q_2,q_3)$ and start with $[q_1,q_3]$. Predict the residuals and the sine of the largest target angle after any number of power steps.
+
+**Solution.** Multiplication and QR preserve the starting invariant plane. Both Ritz residuals are zero, whereas $q_1$ is orthogonal to the target plane and the largest sine is one. In target coordinates the overlap matrix has rank one. The invertibility hypothesis in the graph argument fails. This is why stopping on residuals requires an eigenvalue selection or cluster identification rule as well.
+
+### 6. From an approximate Arnoldi relation to a trustworthy residual
+
+Suppose $AV=VH+hve_m^*+F$, $\|v\|=1$, and $Hy=\theta y+s$ with $\|y\|=1$. Bound the lifted residual and explain the role of $\|Vy\|$.
+
+**Solution.** Substitution gives $(A-\theta I)Vy=hve_m^*y+Vs+Fy$. By the reverse triangle inequality its norm differs from $|h|\,|e_m^*y|$ by at most $\|V\|\|s\|+\|F\|$. To report the residual for a unit vector divide by $\|Vy\|$. If $\|V^*V-I\|\le\epsilon<1$ then $\sqrt{1-\epsilon}\le\|Vy\|\le\sqrt{1+\epsilon}$. A shortcut reporting zero can coexist with a nonzero direct residual when the recurrence has a defect.
+
+### 7. Designing a degree
+
+For an unwanted interval $[1,5]$, a nearest target at $8$, and a desired one-step angle contraction $10^{-3}$, find the smallest degree certified by the interval bound.
+
+**Solution.** $z_*=(8-3)/2=2.5$. Successive values $T_j(2.5)$ are $1,2.5,11.5,55,263.5,1262.5$ by the recurrence. Since the requirement is $T_d(2.5)\ge1000$, the first sufficient degree is five. Degrees lower than five might meet the goal on a particular starting block if the most weakly amplified target component carries no error, but the interval certificate is uniform.
+
+### 8. Endpoint accumulation
+
+Consider the scalar recurrence with $B=1$, exact initial value, and the same additive defect $f$ at every computed step starting with step one. Find the exact error after $d$ steps. Compare it with a single defect only at step one.
+
+**Solution.** $U_k(1)=k+1$ by induction. Summation gives $f\sum_{j=1}^d(d-j+1)=fd(d+1)/2$. A single first defect gives $df$. The polynomial endpoint satisfies $|T_d(1)|=1$, yet perturbations in recurrence evaluation can accumulate quadratically with degree. Using a uniform bound $\|F_j\|\le |f|$ attains equality in this example.
+
+### 9. Verification with a mass matrix
+
+Let $M=\operatorname{diag}(4,1)$, $K=\operatorname{diag}(4,3)$, $x=(1/2,1)^T/\sqrt2$. Determine the generalized Rayleigh quotient and the dual residual norm.
+
+**Solution.** $x^*Mx=1$, $x^*Kx=2$. Thus $r=Kx-2Mx=(-2,1)^T/\sqrt2$. The Euclidean norm is $\sqrt{5/2}$, whereas $r^*M^{-1}r=(1+1)/2=1$. Under $L=\operatorname{diag}(2,1)$ the transformed matrix is $\operatorname{diag}(1,3)$, $y=(1,1)^T/\sqrt2$, and its Euclidean residual norm is exactly one.
+
+### 10. Distinguishing a measured floor from a theorem
+
+Suppose $t_{k+1}\le0.1t_k+10^{-7}$. Can one prove that $t_k$ can never fall below $10^{-7}$? For $t_0=1$ bound $t_8$.
+
+**Solution.** The zero sequence after step zero obeys the inequality, so it supplies no lower bound. Repeated substitution gives $t_8\le10^{-8}+10^{-7}(1-10^{-8})/0.9\approx1.21\,10^{-7}$. A measured history that levels off there is consistent with this model. A smaller measured value is equally consistent.
+
+### 11. A filter written in terms of its residual
+
+With $p(z)=4z^3-3z$, derive a correction formula involving $r=Ax-\theta x$. Which products would you evaluate accurately if the requested tolerance is much smaller than the filter's working unit roundoff?
+
+**Solution.** Polynomial division gives $s_\theta(z)=4(z^2+\theta z+\theta^2)-3$, hence $p(A)x=p(\theta)x+[4(A^2+\theta A+\theta^2 I)-3I]r$. Compute the initial residual using the original operator in verification precision and accumulate the correction accurately. Products on the correction may tolerate lower precision since their absolute errors can scale with $\|r\|$. This conclusion requires bounds on the correction operator, conversion errors and dynamic range. A small $\|r\|$ does not authorize treating its *relative* error as small automatically.
+
+### 12. Design an equal-work comparison
+
+For the case study, compare one degree-three application with three ordinary power steps from the same start. Which conclusion follows before any timing experiment?
+
+**Solution.** Both use three matrix–block products. The respective largest tangents are $1/55\approx0.01818$ and $(5/8)^3=125/512\approx0.24414$. The filter gives the smaller angle for this spectrum, block and work metric. Three ordinary outer steps may perform more QR and extraction operations. Timing must specify their frequency, data movement, precision, matrix layout and verification tolerance. Neither theoretical ratio determines the faster implementation on a given machine.
+
+## Computational laboratory — MATLAB
+
+Copy the complete block into a script named **module_e_lab.m** and run it. It uses base MATLAB with local functions at the end of a script. It produces two convergence plots, histories for the three block variants and a direct check of the Arnoldi residual formula. All reported residuals are absolute norms for unit vectors. The fixed iteration count deliberately continues past practical stopping points to expose finite-precision behavior.
+
+~~~matlab
+%% Experiment 1: an exact two-mode prediction from Review II
+A0 = [2 1 0; 1 2 0; 0 0 9];
+q2 = [1;1;0]/sqrt(2);
+q3 = [0;0;1];
+x = (q2+q3)/sqrt(2);
+fprintf('Power iteration: k, tangent, predicted tangent, residual\n');
+for k = 0:8
+    theta = x'*(A0*x);
+    tangent = abs(q2'*x)/abs(q3'*x);
+    fprintf('%2d  %.4e  %.4e  %.4e\n',k,tangent,3^(-k), ...
+            norm(A0*x-theta*x));
+    x = A0*x;
+    x = x/norm(x);
+end
+
+%% Experiment 2: a known cluster and explicit orthogonal complement
+n = 32;
+row = (0:n-1)';
+freq = 0:n-1;
+U = sqrt(2/n)*cos((pi/n)*(row+0.5)*freq);
+U(:,1) = U(:,1)/sqrt(2);
+lambda = [linspace(1,5,n-3),8,9,10]';
+A = U*diag(lambda)*U';
+A = (A+A')/2;
+target = U(:,end-2:end);
+outside = U(:,1:end-3);
+X0 = (target+U(:,[n-3,1,2]))/sqrt(2);
+B = (A-3*eye(n))/2;
+steps = 10;
+% Each row of a history stores [max residual, largest sine,
+% max Ritz-value error, orthogonality defect].
+powerHist = blockHistory(A,A,X0,outside,lambda(end-2:end),steps,1);
+doubleHist = blockHistory(A,B,X0,outside,lambda(end-2:end),steps,3);
+singleHist = blockHistory(A,single(B),X0,outside,lambda(end-2:end),steps,3);
+
+k = (0:steps)';
+tPower = (5/8).^k;
+tCheb = (1/55).^k;
+disp(table(k,doubleHist(:,1),singleHist(:,1),doubleHist(:,2), ...
+    singleHist(:,2),doubleHist(:,3),singleHist(:,3), ...
+    'VariableNames',{'k','res64','res32','sin64','sin32','val64','val32'}));
+fprintf('Maximum orthogonality defects (power, double, mixed):\n');
+disp(max([powerHist(:,4),doubleHist(:,4),singleHist(:,4)],[],1));
+figure;
+subplot(1,2,1);
+semilogy(k,powerHist(:,2),'o-',k,doubleHist(:,2),'s-', ...
+    k,singleHist(:,2),'^-',k,tPower./hypot(1,tPower),'k--', ...
+    k,tCheb./hypot(1,tCheb),'k:');
+xlabel('Outer steps'); ylabel('Largest sine'); grid on;
+legend('Power','Cheb double','Cheb mixed','Power theory','Cheb theory');
+subplot(1,2,2);
+% Use product count to expose differences in cost per outer step.
+semilogy(k,powerHist(:,1),'o-',3*k,doubleHist(:,1),'s-', ...
+    3*k,singleHist(:,1),'^-');
+xlabel('Filter or power products (extraction excluded)');
+ylabel('Maximum verified Ritz residual'); grid on;
+legend('Power','Cheb double','Cheb mixed');
+
+%% Experiment 3: Arnoldi applied to a symmetric problem
+% Two passes of modified Gram-Schmidt control loss of orthogonality.
+% Hermitian symmetry should make the Hessenberg projection tridiagonal.
+start = U*ones(n,1);
+[V,H,tail] = arnoldiProjection(A,start,12);
+[S,D] = eig(H);
+ritz = diag(D);
+[~,j] = max(real(ritz));
+y = S(:,j)/norm(S(:,j));
+v = V*y;
+shortcut = tail*abs(y(end));
+direct = norm(A*v-ritz(j)*v);
+fprintf('Arnoldi shortcut %.6e, direct %.6e, basis defect %.3e\n', ...
+    shortcut,direct,norm(V'*V-eye(size(H))));
+fprintf('Entries above first superdiagonal, Frobenius norm %.3e\n', ...
+    norm(triu(H,2),'fro'));
+
+function hist = blockHistory(A,op,X,outside,wanted,steps,degree)
+    [X,~] = qr(X,0);
+    p = size(X,2);
+    hist = zeros(steps+1,4);
+    for k = 0:steps
+        H = X'*(A*X);
+        [W,D] = eig((H+H')/2);
+        [theta,order] = sort(diag(D));
+        Z = X*W(:,order);
+        residual = A*Z-Z*diag(theta);
+        hist(k+1,:) = [max(vecnorm(residual)),norm(outside'*Z), ...
+                       max(abs(theta-wanted)),norm(Z'*Z-eye(p))];
+        if k == steps
+            break
+        end
+        previous = cast(X,'like',op);
+        current = op*previous;
+        for j = 2:degree
+            following = 2*(op*current)-previous;
+            previous = current;
+            current = following;
+        end
+        [X,~] = qr(double(current),0);
+    end
+end
+
+function [V,H,tail] = arnoldiProjection(A,start,m)
+    n = size(A,1);
+    V = zeros(n,m+1);
+    H = zeros(m+1,m);
+    V(:,1) = start/norm(start);
+    % A small tail signals possible numerical invariance. Keep its actual
+    % norm in the reported estimate, even when no new vector is formed.
+    tol = 10*eps*norm(A,'fro');
+    for j = 1:m
+        w = A*V(:,j);
+        for pass = 1:2
+            for i = 1:j
+                coeff = V(:,i)'*w;
+                H(i,j) = H(i,j)+coeff;
+                w = w-coeff*V(:,i);
+            end
+        end
+        tail = norm(w);
+        H(j+1,j) = tail;
+        if tail <= tol || j == m
+            break
+        end
+        V(:,j+1) = w/tail;
+    end
+    H = H(1:j,1:j);
+    V = V(:,1:j);
+end
+~~~
+
+**Read the output.** In the left plot compare the early measured sines with their respective exact curves. In the right plot compare methods at equal product counts. Examine value error and residual separately once the value reaches its rounding scale. For Arnoldi inspect the difference between the shortcut and direct residual, and compare the off-tridiagonal entries with $\|A\|$. The Arnoldi experiment uses full reorthogonalization on a symmetric matrix to reveal the Lanczos structure; a short-recurrence implementation has different storage and orthogonality behavior.
+
+**Two changes to try.** First replace the input to the mixed run with double-precision products on a once-rounded matrix by passing **double(single(B))**. This isolates the effect of storing the mapped operator. Second, change the interval upper bound from $5$ to $4$, recompute both $c$ and $h$, and replace $1/55$ in the prediction with the largest actual unwanted multiplier divided by the smallest actual target multiplier. Check which part of the earlier estimate depended on enclosing the entire unwanted spectrum.
+
+## Synthesis — What makes the computation reliable?
+
+Module A's direct sum provides the coordinates $\binom{C}{D}$ in which algorithmic convergence becomes a graph contraction. Module B explains both why left eigenvectors measure perturbations and why Ritz tests annihilate the trial-space residual. Module C makes these tests computable through inner products and makes “close” precise through orthogonal projection. Module D diagonalizes a polynomial of a Hermitian operator. Module E uses all four results twice: first to choose the algorithm, then to decide what its output warrants. The hypotheses in the middle column below are as important as the formulas.
+
+| Quantity or result | Hypotheses | Interpretation |
+|---|---|---|
+| $\gamma_n\lvert A\rvert\lvert x\rvert$ | Sequential real matvec, $nu<1$, normal-range model | Componentwise absolute error envelope |
+| $\min\|E\|=\|r\|$ | Unit $x$, unrestricted matrix perturbation | Price of making the approximate pair exact |
+| $\operatorname{dist}(\theta,\sigma(A))\le\|r\|$ | Hermitian or normal $A$, unit vector | Existence of a nearby eigenvalue |
+| $\|(I-P)x\|\le\|r\|/\delta$ | Hermitian $A$, unwanted spectrum separated from $\theta$ | Target-space angle certificate |
+| $\tan t_k\le\rho^k\tan t_0$ | Self-adjoint filter, full overlap, $\rho=\beta/\alpha<1$ | Block convergence across a cluster boundary |
+| $X^*(AX-XH)=0$ | $X^*X=I$, $H=X^*AX$ | Galerkin orthogonality |
+| $\|r_{\mathrm{Ritz}}\|=h_{m+1,m}\lvert e_m^*y\rvert$ | Exact Arnoldi relation, normalized projected eigenpair | Cheap residual estimate |
+| $\sum_{j=1}^d U_{d-j}(B)F_j$ | Unscaled recurrence, fixed $B$, exact initialization | Total error from local filter defects |
+| $\|L^{-1}(Kx-\theta Mx)\|$ | $M=LL^*>0$, $x^*Mx=1$ | Residual in the correct variational geometry |
+
+### Mastery questions
+
+1. Given a computed eigenpair, can you construct the optimal perturbation and specify exactly which structure it preserves?
+2. Given a cluster, can you explain why an orthonormal basis may change substantially even when the projector barely moves?
+3. Starting from a spectral decomposition, can you derive the tangent contraction for power, shifted inverse and filtered block iteration with their respective hypotheses?
+4. Can you derive an Arnoldi residual using only the last subdiagonal, then identify the two numerical defects that compromise it?
+5. Given spectral bounds and a requested contraction, can you map the interval, choose a degree and diagnose a missed unwanted eigenvalue?
+6. Can you propagate a single early recurrence defect, then explain why an absolute filter error need not equal an angle error?
+7. Can you design a mixed-precision comparison that separates storage error, arithmetic error, verification error and time to tolerance?
+
+### Where to go next
+
+**For HASC.** Read the seminar recurrence with three quantities on paper: the object being multiplied at each step, the norm in which its product error is bounded, and the factor that transfers this error into the unwanted space. Compare an error proportional to the norm of a full iterate with one proportional to a residual correction. Track which steps require access to the higher-precision operator. In an experiment, maintain a separate column for measured time and another for the verified final residual. This lets you judge a performance claim at a stated mathematical accuracy.
+
+**For functional analysis.** Orthogonal projections, Rayleigh quotients and bounded polynomials of a bounded self-adjoint operator extend to Hilbert space. A compact self-adjoint operator has an eigen-expansion with possible accumulation at zero, so a uniform positive gap cannot be assumed along its whole spectrum. Differential operators can be unbounded and require domains and boundary conditions. A useful next step is to prove spectral convergence of finite-element approximations using compact solution operators, distinguishing discretization error from iteration error.
+
+**For structural algebra.** The polynomial action $p\mapsto p(A)$ and the cyclic quotient by an annihilating ideal explain exact Krylov termination independently of the coordinate basis. An inner product, an error norm and a rounding model add information that an algebraic quotient does not encode. Under a badly conditioned nonunitary change of coordinates the abstract operator is isomorphic while measured sensitivity can change substantially.
+
+**Foundation established in principle.** After reconstructing the proofs and reproducing the experiment, you have the tools to justify selection, contraction, extraction and verification for finite-dimensional Hermitian problems. **Further study** includes sharper clustered-subspace bounds, implicit restarting and locking, interior filter design, communication-avoiding QR, sparse generalized eigensolvers with inexact solves, and precision-dependent convergence proofs for a specific residual-based recurrence. Each needs assumptions beyond the elementary graph and residual estimates proved here.

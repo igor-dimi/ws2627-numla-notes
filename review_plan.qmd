@@ -553,3 +553,45 @@ Determine $p(A)$. Explain how repeated application of $p(A)$ affects each eigens
 
 The first four checkpoints test prerequisites. The last one connects directly to the polynomial-filtering example in NLA §3.3.
 
+## Structural Linear Algebra Review
+
+Reviewing linear algebra from a higher, structural level:
+
+* **Module A - Structure of linear maps**: Vector spaces, bases, kernels, images, rank-nullity, direct sums, quotients,
+  isomorphism theorems
+* **Module B - Duality and linear measurements**: Dual bases, dual maps, anhiliators, transpose, quotient duality, exact sequences
+* **Module C - Inner-product Geometry**: Riesz representation, adjoints, orthogonal projections, SPD matrices, Gram matrices,
+  least squares
+* **Module D - Spectral theory**: Invariant subspaces, spectral theorem, Rayleigh quotients, Rayleigh-Ritz, singular values,
+  spectral projections
+* **Module E - Numerical Methods**: Power iterations, subspace iteration, Chebyshev filtering ,residulas, conditioning, numerical stability
+* **Module F1 - Functional Analysis**: normed and hilbert spaces, bounded operators, infinite dimensional spectral theory
+* **Module F2 - Structural Algebra**: Universal properties, exact sequences, functors, categorical duality
+
+### What mastery should mean
+For each major concept, I would require five kinds of understanding.
+Level	Question you should be able to answer
+Definition	What is the object, precisely?
+Structure and proof	Why does it have the stated properties?
+Concrete computation	How do I construct or calculate it for an example?
+Geometry and intuition	What does it mean, and what does it preserve or forget?
+Application	Where does this structure actually appear in an algorithm or mathematical model?
+
+Take the adjoint as an example.
+
+At the definitional level, you know that
+$$
+\langle Tx,y\rangle=\langle x,T^*y\rangle.
+$$
+
+At the structural level, you derive its existence from Riesz representation.
+
+At the computational level, you calculate $A^T$ or, under weighted inner products, $G_V^{-1}A^TG_W$.
+
+At the geometric level, you understand that the adjoint pulls output measurements backward.
+
+At the application level, you understand why $A^*$ appears in the normal equations, matrix-free eigenvalue algorithms, and variational problems.
+
+I would consider a concept well understood only when you can move between these perspectives without relying exclusively on a memorized formula.
+
+This approach is especially appropriate for the kind of questions you've been asking.

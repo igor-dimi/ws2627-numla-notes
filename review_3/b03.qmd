@@ -1,0 +1,695 @@
+---
+jupyter: python3
+---
+
+# Module B — Duality and Linear Measurements: From Covectors to Universal Structure {#sec-module-b}
+
+A sensor array reports $Ax$ for an unknown input $x$. An engineer asks for just **one number**, $f(x)$. Can the array provide that number even when it cannot recover $x$? If two different formulas in the readings both give the answer, can we explain their difference? These two questions lead respectively to the image and the kernel of the dual map. We will solve them for the rectangular matrix from Module A and then recognize the same construction in graph flows, weak equations and spectral coefficients.
+
+**Conventions.** Work over a field $F$, with finite-dimensional spaces unless indicated. $V^\vee=\operatorname{Hom}_F(V,F)$ denotes the algebraic dual, $T^\vee$ the algebraic dual map and $S^0$ an annihilator. A column $c$ of functional coefficients acts by $x\mapsto c^Tx$, including over $\mathbb C$. Superscript $H$ denotes conjugate transpose. Reserve $T^*$ for the inner-product adjoint. Inner products here are linear in the first variable. We use $F^n$ for coordinate columns and write $\operatorname{span}$ for all finite linear combinations.
+
+## Session 1 — How much of a vector does a measurement describe?
+
+A potential field may be stored as a function, a stress as a matrix, a displacement as a column. In each case one may ask for a scalar observation. Evaluation $p\mapsto p(1)$ on polynomials, trace $M\mapsto\sum_i M_{ii}$ on square matrices, and $f(x,y,z)=2x-y+3z$ on $\mathbb R^3$ all obey
+$$
+f(av+bw)=af(v)+bf(w).
+$$
+Such a map is a **linear functional**, also called a **covector**. The rule applies to the objects before choosing coordinates. Evaluation at $1$, for instance, gives the same reading whether a polynomial is written in monomials or in powers of $t-1$.
+
+Two sensors can be combined: $(af+bg)(v)=af(v)+bg(v)$. The new rule is linear in $v$ by distributivity. The zero functional, additive inverses and vector-space identities follow pointwise from the field operations. Thus measurements themselves form a vector space $V^\vee$. The common operation linking the two spaces is the **evaluation pairing**
+$$
+\langle f,v\rangle_{\mathrm{eval}}=f(v),\qquad V^\vee\times V\to F.
+$$
+It is linear in each argument separately, also over $\mathbb C$. Its arguments have different types. An inner product, introduced in Module C, takes two vectors from the same space and over $\mathbb C$ conjugates scalars in one argument.
+
+### The geometry a single reading gives you
+
+For a nonzero $f$ choose $u$ with $f(u)=1$ by rescaling a vector on which $f$ is nonzero. Write
+$$
+v=f(v)u+\big(v-f(v)u\big).
+$$
+The parenthesized term lies in $\ker f$ and $Fu\cap\ker f=\{0\}$. Consequently $V=\ker f\oplus Fu$, the kernel is a hyperplane (codimension one), and $f^{-1}(c)=cu+\ker f$. In the real plane these are parallel lines, with the scalar labels recording both scale and sign. In three dimensions the level sets of $2x-y+3z$ are parallel planes. A nonzero covector determines a kernel, but the kernel alone cannot calibrate the instrument: $f$ and $2f$ on a real space give different readings on the same family of planes.
+
+For a family $f_1,\ldots,f_m$, equal readings on $x,y$ mean $x-y\in\bigcap_i\ker f_i$. The family **separates points** exactly when this intersection is zero. On $\mathcal P_2(\mathbb R)$, readings at $0,1$ miss the direction $t(t-1)$. A third reading at $2$ detects it. The three readings together distinguish every quadratic because a polynomial of degree at most two with three distinct roots is zero. The example distinguishes independence of instruments from sufficiency to recover an input.
+
+### Can all linear measurements distinguish two different vectors?
+
+If $v\ne0$, extend $v$ to a basis of $V$ and define a functional taking $v$ to $1$ and the other basis vectors to zero. Such assignments extend linearly and uniquely because basis expansions are unique. Conversely a nonzero functional takes a nonzero value somewhere, by definition. These two statements express **nondegeneracy** of evaluation on both sides. In finite dimension the extension step follows by adding independent vectors until they span. The infinite-dimensional algebraic version uses basis extension with choice.
+
+Choose a basis $b_1,\ldots,b_n$. Sending a functional to its list of readings $(f(b_1),\ldots,f(b_n))$ is a linear bijection $V^\vee\to F^n$: any prescribed list extends uniquely. Hence $\dim V^\vee=n$. The proof identifies the dual with a coordinate space **after choosing the basis**. It does not yet give an intrinsic way to turn a vector into a functional. In Session 6 a change of scale will expose the missing choice.
+
+**Checkpoint.** Does knowledge of the *labelled* level sets recover a functional? Yes: read off the label of the unique set containing $v$. Knowledge of the zero set alone identifies a nonzero functional on a real space only up to a nonzero scalar. To see this, expand $v$ along the common kernel and one transverse vector.
+
+## Session 2 — How does an oblique grid measure coordinates?
+
+In an ordered basis $B=(b_1,\ldots,b_n)$ each vector has a unique expansion $v=\sum_j x_j b_j$. What instrument would read $x_i$ without reporting the other coordinates?
+
+::: {#thm-dual-basis-b}
+**Dual basis theorem.** There is a unique family $(\varepsilon^1,\ldots,\varepsilon^n)$ satisfying $\varepsilon^i(b_j)=\delta^i_j$. It is a basis of $V^\vee$, and
+$$
+v=\sum_i\varepsilon^i(v)b_i,\qquad f=\sum_i f(b_i)\varepsilon^i .
+$$
+:::
+
+::: {.proof}
+Define $\varepsilon^i(v)=x_i$. Uniqueness of expansion makes it well-defined, and adding or scaling expansions proves linearity. Its values on the basis are precisely the prescribed deltas, which also force uniqueness. Evaluating the proposed expansion of $f$ at each $b_j$ gives $f(b_j)$; agreement on a basis gives equality everywhere. A zero combination $\sum_i a_i\varepsilon^i=0$ evaluated at $b_j$ gives $a_j=0$, proving independence. The first displayed expansion is the construction of the coordinate functions itself.
+:::
+
+Write $B$ also for the matrix of basis columns expressed in standard coordinates. Stacking the dual basis as **rows** yields a matrix $D$ with $DB=I$. Hence $D=B^{-1}$. If each covector is stored as a coefficient **column**, the matrix of dual basis columns is $B^{-T}$. The transpose here changes storage convention.
+
+### A grid whose axes meet at an oblique angle
+
+Take $b_1=(1,0)^T$, $b_2=(1,1)^T$. Then
+$$
+B=\begin{pmatrix}1&1\\0&1\end{pmatrix},\quad
+B^{-1}=\begin{pmatrix}1&-1\\0&1\end{pmatrix},\qquad
+\varepsilon^1(x,y)=x-y,\quad\varepsilon^2(x,y)=y.
+$$
+At $v=(3,2)^T$, the readings are $1,2$, giving $v=b_1+2b_2$. The first coordinate is constant when moving along $b_2$ because $\varepsilon^1(b_2)=0$. A Euclidean dot product with $b_1$ would give $3$, the wrong coordinate. In @fig-dual-grid the two labelled lines through the marked point are its two coordinate readings. Their intersection determines $v$. The arrows are basis **vectors**; the level sets represent **covectors** without selecting normal arrows.
+
+```{python}
+#| label: fig-dual-grid
+#| fig-cap: "Dual coordinate readings on an oblique grid. The blue family measures x − y and the orange family measures y."
+#| echo: false
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
+xs = np.linspace(-1.2, 4.5, 120)
+for k in range(-2, 5):
+    ax.plot(xs, xs-k, color="#255d83", alpha=1 if k == 1 else .22,
+            label="x − y = 1" if k == 1 else None)
+    ax.axhline(k, color="#ac561c", alpha=1 if k == 2 else .22,
+               label="y = 2" if k == 2 else None)
+for end, label in [((1, 0), "b₁"), ((1, 1), "b₂")]:
+    ax.annotate("", end, (0, 0), arrowprops=dict(arrowstyle="->", lw=2))
+    ax.text(end[0]+.05, end[1]-.17, label)
+ax.scatter([3], [2], color="black", zorder=4)
+ax.text(3.08, 2.12, "v")
+ax.set(xlim=(-1.2, 4.5), ylim=(-.8, 3.4), aspect="equal", xlabel="x", ylabel="y")
+ax.legend(loc="upper left")
+plt.show()
+```
+
+### Which quantities change oppositely?
+
+Let $B'=BP$. The columns of $P$ express the new basis in the old coordinates. From $Bx=B'x'$ obtain $x'=P^{-1}x$. Write $c_i=f(b_i)$ and $c'_j=f(b'_j)$. Because $b'_j=\sum_i b_iP_{ij}$, we have $c'_j=\sum_i P_{ij}c_i$, hence
+$$
+x'=P^{-1}x,\quad c'=P^Tc,\qquad
+(c')^Tx'=c^TPP^{-1}x=c^Tx.
+$$
+For $f(x,y)=2x-y$ in the oblique example, $c_{\mathrm{old}}=(2,-1)^T$ in standard coordinates and $c_{\mathrm{new}}=(2,1)^T$ in the dual grid. Both read $4$ on $(3,2)^T$ because the vector's new coordinates are $(1,2)^T$.
+
+In the customary terminology, the vector's **components** transform contravariantly to the basis change and the functional's components transform covariantly. The **dual basis itself** changes inversely to the primal basis: as rows, $(BP)^{-1}=P^{-1}B^{-1}$. A separate use of *contravariant* refers to dualization reversing the direction of maps. Keeping the basis, its components, and the direction of a map distinct resolves the apparent clash of terminology.
+
+**Checkpoint.** Double just $b_1$. The first component of a fixed vector halves, the first component of a fixed covector doubles, and the first dual basis element halves. Check all three directly by evaluation.
+
+## Session 3 — How does an output instrument become an input instrument?
+
+Given $T:V\to W$ and $g:W\to F$, an instrument that first applies $T$ and then measures by $g$ reports the scalar $g(Tv)$. Viewed from the input, it is a single linear functional. Define the **pullback**
+$$
+T^\vee:W^\vee\to V^\vee,\qquad T^\vee g=g\circ T.
+$$
+Linearity in $v$ follows by composing linear maps; linearity in $g$ follows because $(ag+bh)(Tv)=ag(Tv)+bh(Tv)$. Its defining identity is
+$$
+\langle T^\vee g,v\rangle_{\mathrm{eval}}=\langle g,Tv\rangle_{\mathrm{eval}}.
+$$
+This determines $T^\vee g$ at every $v$. The reversal of direction expresses where the instrument can now be used. It requires neither an inverse for $T$ nor an inner product.
+
+```{mermaid}
+flowchart LR
+  V["Input space V"] -->|T| W["Output space W"]
+  W -->|measurement g| F["Scalar field"]
+  V -->|pulled back measurement| F
+```
+
+For $V\xrightarrow{T}W\xrightarrow{S}Z$ take $h\in Z^\vee$. At $v$, both $((ST)^\vee h)(v)$ and $(T^\vee S^\vee h)(v)$ equal $h(S(Tv))$. Thus $(ST)^\vee=T^\vee S^\vee$ and $\mathrm{id}_V^\vee=\mathrm{id}_{V^\vee}$. If $T$ is invertible these identities applied to $T^{-1}T$ and $TT^{-1}$ give $(T^\vee)^{-1}=(T^{-1})^\vee$. If $i:S\hookrightarrow V$ is inclusion, $i^\vee f$ is $f$ restricted to $S$. For $q:V\to V/S$, $q^\vee g$ measures $v$ by measuring its class $[v]$.
+
+### Deriving the transpose
+
+Let $A=[T]_{C\leftarrow B}$, so $Tb_j=\sum_i A_{ij}d_i$ in the target basis $C=(d_i)$. With $g$ represented by $c_i=g(d_i)$, the $j$th coefficient of its pullback in $B^\vee$ is
+$$
+(T^\vee g)(b_j)=\sum_i A_{ij}c_i=(A^Tc)_j.
+$$
+Hence $[T^\vee]_{B^\vee\leftarrow C^\vee}=A^T$. It has shape $n\times m$ for an $m\times n$ primal matrix. For every coordinate column $x$, $(A^Tc)^Tx=c^TAx$. A quick consistency check: if $A'=Q^{-1}AP$, then $(A')^T=P^TA^TQ^{-T}$, exactly the change of coordinates for the two dual spaces.
+
+Return to Module A's real sensor matrix
+$$
+A=\begin{pmatrix}1&2&-1&3\\2&4&1&9\\3&6&0&12\end{pmatrix}.
+$$
+Suppose the instrument reports $g(b)=b_2-2b_1$. Its pulled-back row is row 2 minus twice row 1, namely $(0,0,3,3)$. Thus $x_3+x_4$ is recoverable by dividing the reported scalar by three, even if neither setting is recoverable individually. Conversely $n=(-1,-1,1)^T$ represents an output functional whose pullback vanishes: row 3 is the sum of the first two. Adding any multiple of $n$ to an output formula gives the same input reading. Session 4 will show that this accounts for **every** ambiguity in such a formula.
+
+Over $\mathbb C$, take $Tz=iz$ and $g(z)=z$. Then $(T^\vee g)(z)=iz$, while the Euclidean Hermitian adjoint acts by $-i$. Replacing the transpose by conjugate transpose in the algebraic pullback would give a wrong value already at $z=1$. Session 9 will derive the adjoint by specifying the additional map that represents functionals as vectors.
+
+**Checkpoint.** Which source and target belong to the transpose of a $3\times4$ sensing matrix? An input to the transpose consists of three **weights on readings**; its four outputs are coefficients of a measurement on the settings.
+
+## Session 4 — Which questions about an unknown input can the data answer?
+
+For a subspace $S\subseteq V$, define its **annihilator**
+$$
+S^0=\{f\in V^\vee:f(s)=0\text{ for every }s\in S\}.
+$$
+If $f\in S^0$, moving the input by any $s\in S$ leaves the reading unchanged. Conversely constancy along every such direction implies $f(s)=f(0)=0$. Since linear combinations of measurements vanishing on $S$ also vanish there, $S^0$ is a subspace of the **dual**. It suffices to test a spanning list. If its vectors form the columns of $D$, the coefficient columns of $S^0$ solve $D^Tc=0$.
+
+**Dimension and order.** Extend a basis $s_1,\ldots,s_k$ of $S$ to $s_1,\ldots,s_n$ of $V$. In the dual expansion of $f$, the first $k$ coefficients $f(s_i)$ vanish precisely for $f\in S^0$. The remaining $n-k$ dual basis vectors give a basis of $S^0$, proving $\dim S^0=n-k$. For $S\subseteq U$, every functional zero on $U$ is zero on $S$, so $U^0\subseteq S^0$. Larger invisible subspaces impose more constraints on possible instruments.
+
+::: {#thm-measure-recovery}
+**Recovery and redundancy.** For a linear $T:V\to W$ between finite-dimensional spaces,
+$$
+\ker T^\vee=(\operatorname{im}T)^0,\qquad
+\operatorname{im}T^\vee=(\ker T)^0.
+$$
+:::
+
+::: {.proof}
+A functional $g$ on $W$ has zero pullback exactly when $g(Tv)=0$ for every $v$, that is, when it vanishes on the image. This equality holds in any dimension.
+
+If $f=T^\vee g$, then $f(k)=g(0)=0$ for $k\in\ker T$. For the converse, suppose $f$ kills $\ker T$. Prescribe a measurement on the attainable outputs by $g_0(Tv)=f(v)$. This rule is well-defined because two inputs yielding the same output differ by a kernel vector. Adding and scaling preimages proves linearity on $\operatorname{im}T$. To obtain an instrument on all of $W$, extend an image basis to a basis of $W$, keep the values of $g_0$ on the image basis, and assign zero to the added vectors. The resulting linear $g$ satisfies $T^\vee g=f$. All possible extensions agree on the image; their differences form exactly $(\operatorname{im}T)^0$.
+:::
+
+The second proof has two distinct steps. **Recovery on actual data is unique.** Extrapolation to unattainable data can involve a choice. Over an arbitrary algebraic vector space basis extension gives the same result under the usual choice assumption. For continuous measurements, boundedness of the recovered rule is a further question.
+
+### Computing all four spaces in the sensor problem
+
+Solving $Ax=0$ gives $x_3=-x_4$, $x_1=-2x_2-4x_4$. Write $K=\ker A$, $I=\operatorname{im} A$. Let $r=(1,2,0,4)$ and $s=(0,0,1,1)$ be measurement rows. In ordinary coordinates we have the exact factorization
+$$
+A=\begin{pmatrix}1&-1\\2&1\\3&0\end{pmatrix}
+\begin{pmatrix}r\\s\end{pmatrix}.
+$$
+The first matrix has independent columns; the second hits both coordinate axes. Hence the rank is two. A recipe for measuring $r x$ is $b_3/3$, and for $s x$ it is $(b_2-2b_1)/3$.
+
+| Space | Ambient space | Basis given in standard coordinates |
+|---|---|---|
+| $K$ | inputs $\mathbb R^4$ | $(-2,1,0,0)^T$, $(-4,0,-1,1)^T$ |
+| $I$ | outputs $\mathbb R^3$ | $(1,2,3)^T$, $(-1,1,0)^T$ |
+| $\ker A^\vee=I^0$ | output dual | the row $(-1,-1,1)$ |
+| $\operatorname{im}A^\vee=K^0$ | input dual | the rows $r,s$ |
+
+To check the last line without a dimension argument, write an input measurement as $(a,b,c,d)$. Vanishing on both kernel generators gives $b=2a$ and $d=4a+c$. Thus its row is precisely $ar+cs$. To check the third line, impose zero readings on the two image columns. The equations $g_1+2g_2+3g_3=0$ and $-g_1+g_2=0$ give exactly the span shown. This is the algebraic meaning of row space and left null space. In general $\operatorname{rank}T^\vee=\dim V-\dim\ker T=\operatorname{rank}T$. It follows that $T$ is injective iff $T^\vee$ is surjective, and $T$ is surjective iff $T^\vee$ is injective.
+
+### A compatibility test that is also sufficient
+
+If $Tx=b$ is solvable then $g(b)=0$ for every $g\in(\operatorname{im}T)^0$. Conversely, if $b$ lies outside the image, append $b$ to an image basis and extend to a basis of $W$. Assign $1$ to $b$ and $0$ to every other basis element. This constructs a witness $g$ killing the image but detecting $b$. Consequently
+$$
+Ax=b\ \text{solvable}\quad\Longleftrightarrow\quad
+c^Tb=0\quad\text{for every }c\in\ker A^T .
+$$
+The formula uses linear functional coefficients over any field. For the sensors take $b=(2,1,3)^T$. The witness $n$ gives zero; the recovered coordinates are $rx=1$, $sx=-1$. One solution is $(1,0,-1,0)^T$, and adding any member of $K$ gives all others. Changing $b_3$ to $4$ yields $n^Tb=1$, a certificate of impossibility.
+
+**Checkpoint.** Can you recover $x_3$ by designing a more complicated, possibly nonlinear, function of $Ax$? The inputs $0$ and $(-4,0,-1,1)^T$ give identical data and different answers. Even a nonlinear rule cannot distinguish them. Linearity of a *recoverable linear quantity* ensures there is a linear rule on the image.
+
+## Session 5 — Which instruments survive identification, and which survive restriction?
+
+Let $S\subseteq V$. A quotient vector $[v]=v+S$ represents a whole family of inputs; $[v]=[w]$ iff $v-w\in S$. Its linear operations are inherited from representatives. One may lose access to $v$ by storing only $[v]$. Alternatively one may retain ordinary inputs but perform experiments only on $S$. These procedures pose different measurement problems.
+
+::: {#thm-dual-quotients-b}
+**Descent and restriction.** The quotient map $q:V\to V/S$ induces a canonical isomorphism $(V/S)^\vee\cong S^0$ via pullback. For finite-dimensional $V$, the inclusion $i:S\hookrightarrow V$ induces a canonical isomorphism $V^\vee/S^0\cong S^\vee$ via restriction.
+:::
+
+::: {.proof}
+$g\mapsto gq$ takes quotient measurements into $S^0$ and is injective since $q$ is onto. For $f\in S^0$ define $g([v])=f(v)$. If $w=v+s$, then $f(w)=f(v)$, so this is well-defined. Linearity follows from quotient operations. These recipes are mutual inverses and use no lift or complement.
+
+Restriction $i^\vee f=f|_S$ has kernel $S^0$ by definition. Extend any functional on $S$ by prescribing its values on an extended basis of $V$. Thus restriction is onto. Two extensions have the same restriction precisely when they differ in $S^0$. The first isomorphism theorem now gives the second canonical isomorphism $[f]\mapsto f|_S$. The class of extensions is forced even though a particular extension may vary.
+:::
+
+### See both statements in the same three coordinates
+
+Let $S=\operatorname{span}(1,1,0)$ and $Q(x,y,z)=(x-y,z)$. The map $Q$ is onto, with kernel $S$, so it supplies coordinates $(u,w)$ on $V/S$. Pulling back $\alpha u+\beta w$ gives the row $(\alpha,-\alpha,\beta)$ on $V$. This lists all measurements that survive forgetting displacement along $S$. For the second problem restrict $(a,b,c)$ to $(t,t,0)$ and obtain $(a+b)t$. The rows with prescribed $a+b$ form an entire coset of $S^0$. For example $(2,0,0)$ and $(1,1,3)$ both restrict to $2t$. Neither of those two rows descends to $V/S$.
+
+### What happens to a short exact sequence?
+
+Exactness at the middle of a pair of consecutive arrows means that the incoming image equals the outgoing kernel. In
+$$
+0\longrightarrow S\xrightarrow{i}V\xrightarrow{q}V/S\longrightarrow0
+$$
+the endpoints express injectivity and surjectivity. The two parts of @thm-dual-quotients-b jointly prove exactness of the sequence with reversed arrows:
+$$
+0\longrightarrow(V/S)^\vee\xrightarrow{q^\vee}V^\vee
+\xrightarrow{i^\vee} S^\vee\longrightarrow0.
+$$
+At the first dual space $q^\vee$ is injective; at $V^\vee$ its image is $S^0$, exactly the kernel of restriction; at $S^\vee$ extension gives surjectivity. Any short exact sequence of vector spaces reduces to this one by identifying the first space with its image and the last with the quotient. Returning to the sensors, dualizing $V/K\cong I$ identifies $I^\vee$ with the recoverable measurements $K^0$. Passing from $I^\vee$ to formulas on the full measurement apparatus $W$ amounts to extending a functional.
+
+**Analytic boundary.** In a normed space write $V'$ for the continuous dual, consisting of those linear $f$ with $|f(v)|\le C\|v\|$ for some $C$. In finite dimension all linear functionals are continuous: in coordinates the bound follows from a finite sum and equivalence of norms. For a closed subspace $S$ of a normed space the quotient norm is $\|[v]\|=\inf_{s\in S}\|v+s\|$. A bounded $f$ killing $S$ satisfies $|f(v)|=|f(v+s)|\le\|f\|\|v+s\|$. Taking the infimum proves continuity of the descended functional, even preservation of its norm since $q$ is contractive. A nonclosed $S$ would give only a seminorm. Extending a **bounded** scalar functional from $S$ with its norm preserved is the Hahn–Banach theorem, a stronger assertion than algebraic basis extension. A continuous functional vanishing on a set vanishes on its closure. Session 8 gives a concrete range for which this matters.
+
+**Checkpoint.** Which arrow gives a unique object on going backwards? A functional killing $S$ gives one functional on $V/S$. A functional on $S$ gives one **class** in $V^\vee/S^0$, usually containing many extensions.
+
+## Session 6 — Can a vector be recovered from all its possible readings?
+
+Treat $v$ itself as an instrument on instruments:
+$$
+\iota_V:V\to V^{\vee\vee},\qquad \iota_V(v)(f)=f(v).
+$$
+For fixed $v$ this is linear in $f$ by pointwise operations. For variable $v$ it defines a linear map because every $f$ is linear. If $\iota_V(v)=0$, every functional vanishes on $v$, so nondegeneracy gives $v=0$.
+
+::: {#thm-dual-natural-b}
+**Double dual and naturality.** In finite dimension $\iota_V$ is an isomorphism. For any linear $T:V\to W$, one has $T^{\vee\vee}\iota_V=\iota_W T$.
+:::
+
+::: {.proof}
+An injective map between spaces of the same finite dimension is onto, and the dual basis theorem twice gives $\dim V^{\vee\vee}=\dim V$. For a constructive inverse, given $\Phi\in V^{\vee\vee}$ take $v=\sum_i\Phi(\varepsilon^i)b_i$. Expanding $f$ in the dual basis gives $f(v)=\sum_i f(b_i)\Phi(\varepsilon^i)=\Phi(f)$. Uniqueness of the representing vector shows its value is independent of the basis used to find it.
+
+For naturality test both paths on an arbitrary $g\in W^\vee$. The first gives $(T^{\vee\vee}\iota_V(v))(g)=\iota_V(v)(T^\vee g)=g(Tv)$. The second gives $\iota_W(Tv)(g)=g(Tv)$. Agreement on every $g$ proves the identity. This part has no dimension hypothesis.
+:::
+
+```{mermaid}
+flowchart TD
+  V["V"] -->|T| W["W"]
+  V -->|evaluate| VV["Double dual of V"]
+  W -->|evaluate| WW["Double dual of W"]
+  VV -->|double pullback| WW
+```
+
+Here *natural* means that evaluating vectors on instruments commutes with **every** linear map between spaces, as the square asserts. Since one pullback reverses composition and preserves identities, dualization is called a **contravariant functor**. Two pullbacks restore the original direction. The family of evaluation maps is a **natural transformation** from the identity functor to the double-dual functor and a natural isomorphism in finite dimension. These terms in Module F2 encode the identities just proved.
+
+What goes wrong one dual earlier? A basis $B$ does define $J_B:V\to V^\vee$ by $b_i\mapsto\varepsilon^i$, extended linearly. In a real line with basis $e$, $J_e(e)(e)=1$. Use $2e$ as basis instead. Its dual basis functional takes $e$ to $1/2$, hence $J_{2e}(e)(e)=1/4$. More intrinsically, a basis-free identification compatible with all changes of basis would give a nondegenerate bilinear form invariant under every automorphism. In particular over $\mathbb R$ invariance under $v\mapsto2v$ would force $h(v,w)=h(2v,2w)=4h(v,w)$, hence $h=0$. This illustrates why equal dimension alone supplies no preferred identification. A specified inner product supplies extra structure and changes which symmetries must be respected.
+
+### Can invisible directions be recovered from invisible measurements?
+
+For $S\subseteq V$, $S^{00}$ is first a subspace of **$V^{\vee\vee}$**. For $s\in S$ and $f\in S^0$, $\iota_V(s)(f)=0$, so $\iota_V(S)\subseteq S^{00}$. In finite dimension the annihilator dimension formula gives $\dim S^{00}=n-(n-\dim S)=\dim S$, proving equality. In the original $V$, the vectors killed by every member of $S^0$ are precisely $S$: a vector outside $S$ can be separated by extending a basis, as in the compatibility proof. This latter separation statement does not assert that every bidual element is evaluation in infinite dimension.
+
+For subspaces $U,H\subseteq V$, a functional kills $U+H$ iff it kills each separately. Thus $(U+H)^0=U^0\cap H^0$. Also $U^0+H^0\subseteq(U\cap H)^0$. To prove equality in finite dimension, put $n=\dim V$. The dimension of the left side is
+$$
+(n-\dim U)+(n-\dim H)-\big(n-\dim(U+H)\big)
+=n-\dim(U\cap H),
+$$
+using the sum dimension formula twice. The containing space has the same dimension. For the coordinate axes in $\mathbb R^2$, the two annihilators are the complementary coordinate measurements. Killing both axes forces the zero measurement, while killing only their intersection imposes no constraint.
+
+**Checkpoint.** In the double-dual square, what are the inputs of $T^{\vee\vee}$, $\iota_V(v)$ and $T^\vee g$? They are respectively a functional on $V^\vee$, a functional on $V$, and a vector of $V$. Type-checking the evaluation proof catches an attempted reversal of either arrow.
+
+## Session 7 — Who reads the coefficient of an eigenvector?
+
+If a subspace is preserved by evolution, what happens to the instruments that ignore it? Suppose $T:V\to V$ and $T(U)\subseteq U$. For $f\in U^0$ and $u\in U$ we have $(T^\vee f)(u)=f(Tu)=0$. Thus **$U^0$ is invariant under $T^\vee$**. In finite dimension the converse holds: if every $f\in U^0$ kills $Tu$ for each $u\in U$, then $Tu\in U$ by separation.
+
+There are two smaller evolutions. Restriction gives $T_U:U\to U$. The quotient operator $\widehat T[v]=[Tv]$ on $V/U$ is well-defined because a change of representative by $u$ changes the output by $Tu\in U$. From $qT=\widehat Tq$, dualizing gives $T^\vee q^\vee=q^\vee\widehat T^\vee$. Since $q^\vee$ identifies the quotient dual with $U^0$, the dual quotient evolution is exactly $T^\vee|_{U^0}$ under this identification. Similarly $Ti=iT_U$ yields $i^\vee T^\vee=T_U^\vee i^\vee$: restricting a pulled-back instrument is the same as pulling back its restriction. In an adapted primal basis $T$ has blocks $\left(\begin{smallmatrix}A&B\\0&C\end{smallmatrix}\right)$. The dual coordinates killing $U$ have first block zero, and transposition acts on their last block by $C^T$. This shows the quotient evolution directly in coordinates.
+
+### A basis of modes brings its own instruments
+
+Assume now that $T$ has an eigenbasis $v_i$ over $F$ with $Tv_i=\lambda_i v_i$. Let $\ell_i$ be its dual basis. Then
+$$
+x=\sum_i\ell_i(x)v_i,\qquad (T^\vee\ell_i)(v_j)=\lambda_j\delta_{ij}=\lambda_i\ell_i(v_j).
+$$
+Agreement on all basis vectors proves $T^\vee\ell_i=\lambda_i\ell_i$. These are **left eigenfunctionals**. Define $P_ix=v_i\ell_i(x)$. Biorthogonality gives
+$$
+P_iP_jx=v_i\ell_i(v_j)\ell_j(x)=\delta_{ij}P_ix,\quad
+\sum_i P_i=I,\quad T=\sum_i\lambda_iP_i .
+$$
+The last two identities follow by expanding $x$ and $Tx$. If $X=(v_1\ \cdots\ v_n)$ in fixed coordinates, the rows of $X^{-1}$ are the $\ell_i$. Thus $A=X\Lambda X^{-1}$ means **measure the components, scale each, then reconstruct**. Scaling an eigenvector inversely scales its dual functional, leaving $P_i$ fixed. Within a repeated eigenspace a change of basis can alter its individual rank-one projectors. Their sum, the projector onto the entire eigenspace along all the other eigenspaces, is intrinsic to a diagonalizable operator.
+
+For a polynomial $p$, repeated multiplication gives $p(T)=\sum_i p(\lambda_i)P_i$. The same measurement coefficients appear in a polynomial filter. Hermitian operators have an orthonormal eigenbasis, so the rows can then be written $v_i^H$ and the projectors are orthogonal. An arbitrary diagonalizable matrix need not have that geometry. A matrix without a full eigenbasis does not admit the displayed rank-one eigenbasis expansion.
+
+### Two eigenlines close together
+
+Take $v_1=(1,0)^T$, $v_2=(1,1)^T$, with eigenvalues $1,3$. Then
+$$
+A=X\begin{pmatrix}1&0\\0&3\end{pmatrix}X^{-1}
+=\begin{pmatrix}1&2\\0&3\end{pmatrix},
+\quad P_1=\begin{pmatrix}1&-1\\0&0\end{pmatrix},
+\quad P_2=\begin{pmatrix}0&1\\0&1\end{pmatrix}.
+$$
+The first coordinate in this eigenbasis is $x-y$, from Session 2. Hence $P_1(3,2)^T=(1,0)^T$. The displacement from the input to the projected point is parallel to the second eigenline. Orthogonal projection onto the first line gives $(3,0)^T$ instead. Neither $P_i$ is symmetric. Computing the $(1,1)$ entries of $AA^T$ and $A^TA$ gives $5$ and $1$, respectively, so $A$ is nonnormal.
+
+Replace the second eigenvector by $(1,\delta)^T$ with $\delta>0$. Now
+$$
+X_\delta^{-1}=\begin{pmatrix}1&-1/\delta\\0&1/\delta\end{pmatrix},
+\qquad \ell_1(x,y)=x-y/\delta,\quad \ell_2(x,y)=y/\delta.
+$$
+A vertical input error $\eta$ changes the two spectral coefficients by $-\eta/\delta$ and $+\eta/\delta$. The exact scalar responses can be large and cancel on reconstruction. This is sensitivity of the mathematical measurements themselves; roundoff can add further loss. Module E's bounds on polynomial filtering must account for the conditioning of a nonorthogonal eigenbasis. Module D's orthonormal Hermitian case has unitary $X$, which preserves Euclidean lengths.
+
+**Checkpoint.** For $\delta=1$ find a polynomial producing $P_1$ exactly. The degree-one polynomial $p(t)=(3-t)/2$ takes $1$ to $1$ and $3$ to $0$. Applying $p(A)$ reproduces the same oblique projector.
+
+## Session 8 — Where does a transpose arise without a dot product?
+
+### A graph trades edge instruments for vertex instruments
+
+Orient the path $1\to2\to3$. Its incidence matrix with edges as rows is the discrete gradient $D_0$; add the edge $3\to1$ to obtain $D$:
+$$
+D_0=\begin{pmatrix}-1&1&0\\0&-1&1\end{pmatrix},\qquad
+D=\begin{pmatrix}-1&1&0\\0&-1&1\\1&0&-1\end{pmatrix}.
+$$
+Vertex potentials $p$ produce edge differences $Dp$. Adding a constant to all potentials changes none. Conversely, zero differences force equality along edges, hence constancy on each connected component. Edge weights $h=(a,b,c)^T$ define the functional $d\mapsto h^Td$. Evaluate:
+$$
+a(p_2-p_1)+b(p_3-p_2)+c(p_1-p_3)
+=(c-a)p_1+(a-b)p_2+(b-c)p_3.
+$$
+The collected coefficients are $D^Th$. They measure **inflow minus outflow** at each vertex for the oriented flow $h$. If divergence is defined as outflow minus inflow, it is $-D^Th$ in these coordinates. The transpose arose by composition alone. A weighted inner-product adjoint would additionally depend on vertex and edge weights.
+
+The circulation $(1,1,1)^T$ pulls back to zero and spans $\ker D^T$. Hence edge differences must sum to zero around the triangle. Conversely any zero-sum $d$ arises: choose $p_1=0$, $p_2=d_1$, $p_3=d_1+d_2$, and the closing difference is $d_3$. On the path there is no cycle constraint. On the triangle each vertex measurement pulled back from edges has weights summing to zero, exactly the measurements insensitive to constant potential shifts. For example $p_3-p_1$ is the sum of the first two readings or the negative of the third. The two edge recipes differ by a circulation. This is the recovery theorem in graph coordinates. In the language of Module F2 an edge has a signed boundary at its endpoints; the boundary of a cycle is zero. Pairing an edge chain with a potential difference yields exactly the pairing of its boundary with the potential.
+
+### A weak equation produces a functional before it produces a vector
+
+Suppose $a:U\times V\to\mathbb R$ is bilinear and the desired $u$ must satisfy $a(u,v)=L(v)$ for every test $v$. Fixing $u$ leaves a linear rule on tests. Thus the appropriate operator is $\mathcal A:U\to V^\vee$ with $(\mathcal Au)(v)=a(u,v)$; linearity in the first slot makes $\mathcal A$ linear. For trial basis $\phi_j$ and test basis $\psi_i$, expansion $u=\sum_j u_j\phi_j$ gives
+$$
+K_{ij}=a(\phi_j,\psi_i),\quad b_i=L(\psi_i),\quad Ku=b.
+$$
+The row index specifies the **test**. The result $Ku$ lists readings of a functional on test basis vectors. Under trial basis change $P$ and test basis change $Q$, this gives $K'=Q^TKP$, $u'=P^{-1}u$, $b'=Q^Tb$. For a symmetric form and equal bases this is congruence $P^TKP$. A map from vectors to vectors would use a different target coordinate change.
+
+For a concrete finite element calculation take $-u''=1$ on $[0,1]$ with $u(0)=u(1)=0$. Multiplying by an endpoint-zero test and integrating by parts gives $\int u'v'=\int v$. Choose one trial and test hat $\phi$ with value $1$ at $1/2$, zero at the endpoints, and constant slopes $2,-2$ on the half intervals. Its stiffness is $\int(\phi')^2=4$ and the load is $\int\phi=1/2$. The discrete equation is $4c=1/2$, so $u_h=\phi/8$. The residual functional $r(v)=\int v-\int u_h'v'$ vanishes on the chosen test span. On $v=t(1-t)$ it has value $1/6-1/8=1/24$, since $\int\phi'v'=1$. Vanishing on finitely many tests has not solved the equation on all tests. Halving or doubling the hat changes load and coefficients by the coordinate rules above, while $u_h$ stays fixed.
+
+For the infinite test space the relevant target is a **continuous dual**. For example Cauchy–Schwarz gives $|\int u'v'|\le\|u'\|_2\|v'\|_2$, so fixing $u$ yields a bounded functional in a norm controlling $\|v'\|_2$. Completing suitable endpoint-zero functions gives the energy space used in Module F1. The finite matrix came from restricting both trial and test spaces. Stability and convergence as those spaces change require additional analysis.
+
+### A derivative is a measurement of a perturbation
+
+Let $J(y_1,y_2)=y_1^2+y_1y_2$. Expanding $J(y+h)$ gives the linear part $dJ_y(h)=(2y_1+y_2)h_1+y_1h_2$ and a quadratic remainder $h_1^2+h_1h_2$. At $(1,2)$ the differential has row $(4,1)$. If $y=Lx$ with $L=\left(\begin{smallmatrix}1&2&0\\0&1&1\end{smallmatrix}\right)$, then $d(J\circ L)_x=dJ_{Lx}\circ L$. At a point mapping to $(1,2)$ the input sensitivity has row $(4,9,1)$. This is the chain rule as a pullback. Reverse-mode differentiation composes such pullbacks starting at a scalar output. A gradient **vector** appears only after representing the differential with a chosen inner product.
+
+A related numerical identity applies when $Au=b$ and a computed $\tilde u$ has residual $r=b-A\tilde u$. If the quantity of interest has coefficient column $c$ and $A^Tz=c$, then $c^T(u-\tilde u)=z^Tr$. This converts the residual into an exact output error for that scalar. Existence of such a $z$ is precisely $c\in(\ker A)^0$, the same recovery condition encountered with the sensors.
+
+### Where the finite-dimensional argument stops
+
+Consider $T:\ell^2(\mathbb R)\to\ell^2(\mathbb R)$, $(Tx)_n=x_n/n$, on square-summable real sequences. This is bounded and injective. Its range contains all finitely supported sequences, so is dense by truncation, but misses $(1/n)$, whose only possible preimage is the nonsummable constant sequence. Every **continuous** measurement annihilating the range therefore vanishes everywhere and cannot certify that this particular datum is unattainable.
+
+In fact $f(x)=\sum_n x_n/n$ is a bounded input functional by Cauchy–Schwarz, killing the zero kernel. If $f=g\circ T$ for a bounded $g$, testing on the unit sequence $e_n$ forces $g(e_n)=1$ for all $n$. On $y_N=\sum_{n=1}^N e_n/\sqrt N$, we would have $\|y_N\|=1$ and $g(y_N)=\sqrt N$. Impossible. The recovered rule on the dense image is algebraically well-defined but unbounded. For Hilbert-space bounded operators the adjoint identity involves a closure, $\overline{\operatorname{im}T^*}=(\ker T)^\perp$. Equality without the closure needs closed range. This is one reason Module F1 distinguishes exact solvability from approximation.
+
+**Checkpoint.** In the graph, finite element and sensitivity examples identify what the rows index. They index edges, tests and output components respectively. In each case a linear combination of rows describes what one can measure on the inputs.
+
+## Computational laboratory — Seven experiments in measuring and reconstructing
+
+Use Python 3 with SymPy, NumPy and Matplotlib in the Jupyter environment used by Quarto. Run cells in document order. Algebraic certificates use exact arithmetic. The floating-point experiment at the end measures sensitivity in Euclidean coordinates.
+
+### A. Calibrate three instruments on a nonorthogonal basis
+
+```{python}
+import sympy as sp
+
+B = sp.Matrix([[1, 1, 0], [0, 1, 1], [0, 0, 1]])
+dual_rows = B.inv()
+print("Dual instruments by rows:", dual_rows.tolist())
+print("Readings on the three basis vectors:", (dual_rows*B).tolist())
+assert dual_rows*B == sp.eye(3)
+```
+
+The first row measures $x-y+z$, the second $y-z$, the third $z$. A zero off the diagonal means that moving along the corresponding other basis direction changes no reading of that instrument.
+
+### B. Change coordinates while preserving every evaluation
+
+```{python}
+v = sp.Matrix(sp.symbols("x y z"))
+c = sp.Matrix(sp.symbols("a b c"))
+v_grid, c_grid = B.inv()*v, B.T*c
+assert sp.expand(c_grid.dot(v_grid) - c.dot(v)) == 0
+v_num, c_num = sp.Matrix([4, 2, 1]), sp.Matrix([2, -1, 3])
+print("New vector coordinates:", list(B.inv()*v_num))
+print("New covector coefficients:", list(B.T*c_num))
+print("Old and new readings:", c_num.dot(v_num),
+      (B.T*c_num).dot(B.inv()*v_num))
+```
+
+The printed values $9,9$ check one case; the symbolic identity covers all vectors and instruments for this basis. Dot here denotes multiplication and summation of coefficient entries over the reals. The invariant is evaluation, independent of the basis.
+
+### C. Pull a three-channel instrument back to four settings
+
+```{python}
+A = sp.Matrix([[1, 2, -1, 3], [2, 4, 1, 9], [3, 6, 0, 12]])
+g = sp.Matrix([-2, 1, 0])
+x = sp.Matrix(sp.symbols("x1:5"))
+pullback = A.T*g
+print("Coefficients on input settings:", list(pullback))
+assert sp.expand(g.dot(A*x) - pullback.dot(x)) == 0
+```
+
+Three output weights become four input weights. The identity checks that the two instruments agree on every settings vector, even when distinct settings give identical data.
+
+### D. Test both annihilator equalities as equalities of spaces
+
+```{python}
+def basis_matrix(columns):
+    return sp.Matrix.hstack(*columns)
+
+K = basis_matrix(A.nullspace())
+I = basis_matrix(A.columnspace())
+left_kernel = basis_matrix(A.T.nullspace())
+pullback_image = basis_matrix(A.T.columnspace())
+image_ann = basis_matrix(I.T.nullspace())
+kernel_ann = basis_matrix(K.T.nullspace())
+
+def same_span(B1, B2):
+    return B1.rank() == B2.rank() == B1.row_join(B2).rank()
+
+assert same_span(image_ann, left_kernel)
+assert same_span(kernel_ann, pullback_image)
+assert left_kernel.T*I == sp.zeros(left_kernel.cols, I.cols)
+assert pullback_image.T*K == sp.zeros(pullback_image.cols, K.cols)
+print("Output obstructions:", image_ann.T.tolist())
+print("Recoverable input instruments:", kernel_ann.T.tolist())
+```
+
+Zero products check containment. Checking ranks of both bases and their concatenation proves equality even when the returned bases differ. This is stronger than testing one candidate functional.
+
+### E. Calibrate a quotient instrument and change the representative
+
+```{python}
+Q = sp.Matrix([[1, -1, 0], [0, 0, 1]])
+direction = sp.Matrix([1, 1, 0])
+alpha, beta, t = sp.symbols("alpha beta t")
+weights = sp.Matrix([alpha, beta])
+lifted = Q.T*weights
+assert Q.rank() == 2 and Q.nullspace() == [direction]
+assert lifted.dot(direction) == 0
+assert sp.expand(lifted.dot(v+t*direction) - weights.dot(Q*v)) == 0
+candidate = sp.Matrix(sp.symbols("d1:4"))
+print("Pulled-back row:", list(lifted))
+print("Necessary and sufficient vanishing condition:",
+      sp.Eq(candidate.dot(direction), 0))
+```
+
+Every row $(d_1,d_2,d_3)$ satisfying the printed condition arises uniquely by taking $\alpha=d_1$, $\beta=d_3$. Thus the parameterization is exhaustive, and every parameter choice gives a functional independent of the coset representative.
+
+### F. Detect a circulation and reconstruct a vertex measurement
+
+```{python}
+D = sp.Matrix([[-1, 1, 0], [0, -1, 1], [1, 0, -1]])
+h = sp.Matrix([2, 3, -1])
+p = sp.Matrix([1, 4, 2])
+ones = sp.ones(3, 1)
+assert D*ones == sp.zeros(3, 1) and D.T*ones == sp.zeros(3, 1)
+assert D.rank() == 2
+assert h.dot(D*p) == (D.T*h).dot(p)
+assert D.T*(h+t*ones) == D.T*h
+print("Edge differences:", list(D*p))
+print("Vertex weights:", list(D.T*h), "sum:", sum(D.T*h))
+print("Scalar reading by either route:", h.dot(D*p))
+```
+
+Zero total vertex weight makes the instrument insensitive to a constant shift. Adding a unit circulation to the edge weights changes the instrument on arbitrary edge data but agrees on every gradient. The equalities distinguish primal ambiguity from dual redundancy.
+
+### G. Compare an exact projector with sensitive spectral coordinates
+
+```{python}
+H = sp.Matrix([[1, 2], [0, 3]])
+values = [1, 3]
+modes = [(H-lam*sp.eye(2)).nullspace()[0] for lam in values]
+X = basis_matrix(modes)
+L = X.inv()
+projectors = [X[:, i]*L[i, :] for i in range(2)]
+assert L*H == sp.diag(*values)*L
+assert all(P*P == P for P in projectors)
+P1, P2 = projectors
+assert P1*P2 == P2*P1 == sp.zeros(2)
+assert P1+P2 == sp.eye(2) and P1+3*P2 == H
+assert P1.T != P1 and H.T*H != H*H.T
+print("Right modes by columns:", X.tolist())
+print("Dual left instruments by rows:", L.tolist())
+print("Projectors:", [P.tolist() for P in projectors])
+```
+
+Now use floating-point arithmetic on the family $X_\delta$. A fixed vertical perturbation tests how distinguishable the two modes are as their lines approach. The final column reports the measured *change in coefficients*, a sensitivity which would be present in exact arithmetic too.
+
+```{python}
+eta = 1e-8
+print("delta       cond_2(X)    change in first coefficient")
+for delta in [1., 1e-2, 1e-4, 1e-6]:
+    basis = np.array([[1., 1.], [0., delta]])
+    before = np.linalg.solve(basis, [1., 0.])
+    after = np.linalg.solve(basis, [1., eta])
+    print(f"{delta:8.1e} {np.linalg.cond(basis):12.4g} {after[0]-before[0]:22.4g}")
+```
+
+The predicted change is $-\eta/\delta$. A discrepancy in its last computed digits is a floating-point effect. The factor $1/\delta$ is predicted by the exact inverse and reflects intrinsic sensitivity for these modes and this perturbation.
+
+```{python}
+#| label: fig-dual-oblique
+#| fig-cap: "Two projections onto the same eigenline for two choices of the discarded eigenline. Dashed segments run parallel to the discarded mode."
+#| echo: false
+fig, axes = plt.subplots(1, 2, figsize=(8, 3), sharex=True, sharey=True,
+                         constrained_layout=True)
+for ax, delta in zip(axes, [1., .25]):
+    x0, y0 = 1., .5
+    x_projected = x0-y0/delta
+    xx = np.array([-1.6, 1.6])
+    ax.axhline(0, color="#245b83", lw=2)
+    ax.plot(xx, delta*xx, color="#a14f24", lw=2)
+    ax.plot([x0, x_projected], [y0, 0], "k--")
+    ax.scatter([x0, x_projected], [y0, 0], color="#232323", zorder=5)
+    ax.annotate("input", (x0, y0), xytext=(4, 4), textcoords="offset points")
+    ax.annotate("P₁x", (x_projected, 0), xytext=(3, -16), textcoords="offset points")
+    ax.set(xlim=(-1.6, 1.65), ylim=(-.8, 1.25), aspect="equal",
+           xlabel="x", title=f"δ = {delta:g}")
+axes[0].set_ylabel("y")
+plt.show()
+```
+
+In @fig-dual-oblique the input is fixed. Changing the discarded eigenline changes $\ell_1$ and moves $P_1x$ from $1/2$ to $-1$ on the horizontal axis. The visible horizontal range is the same for both panels, so the displacement directly illustrates the coefficient formula.
+
+## Exercises — Measurements, obstructions and representations
+
+Try first to specify the source and target of every map. Then choose coordinates if they simplify the argument.
+
+### Construct and transport instruments
+
+1. **Sampling a polynomial.** On $\mathcal P_2(\mathbb R)$ take $f_1(p)=p(0)$, $f_2(p)=p'(0)$ and $f_3(p)=p(1)$. Find a polynomial basis dual to these instruments. Express $p(2)$ as a combination of the readings and explain why the recipe is unique.
+2. **Reconstruct the dual basis proof.** Start with any finite basis and a list of target scalars. Construct the unique functional with these readings. Derive both the dimension of the dual and a test for whether a given family spans it. Apply the test to trace and determinant on real $2\times2$ matrices.
+3. **A coordinate error.** For $B=\left(\begin{smallmatrix}1&2\\1&1\end{smallmatrix}\right)$ find its dual rows. For $v=(4,3)^T$ and $f(x,y)=3x-y$, compute both coordinate columns in the new basis. Show the failure if you transform both by $B^{-1}$.
+4. **Pullback and complex scalars.** For $A=\left(\begin{smallmatrix}1&i&0\\0&1&2\end{smallmatrix}\right)$, $g(y)=iy_1+y_2$, compute $gA$ using composition. Then apply $S(y)=y_1-y_2$ after $A$ and compare $(SA)^\vee$ with $A^\vee S^\vee$ on an arbitrary scalar weight.
+
+### Reconstruct the structural proofs
+
+5. **Build an obstruction.** Let $U=\operatorname{span}((1,1,0),(0,1,1))$. Construct $U^0$, test $b=(1,0,1)$ for membership in $U$, and prove the general codimension count using an adapted dual basis.
+6. **Reconstruct a missing sensor.** For Module A's matrix determine whether $2x_1+4x_2-x_3+7x_4$ is recoverable. If it is, give all recipes. Prove from scratch why the kernel test is necessary and sufficient for any linear map between finite-dimensional spaces.
+7. **Two quotient experiments.** For $S=\operatorname{span}((1,0,1))$ in $\mathbb R^3$, give coordinates on $V/S$. Write down both arrows in the dual short exact sequence as matrices and check exactness at all three nonzero spaces.
+8. **Double dual and symmetry.** Given an arbitrary functional $\Phi$ on $V^\vee$, reconstruct $v$ with $\iota_V(v)=\Phi$ in finite dimension. Show the reconstruction commutes with $T:V\to W$. Explain why the analogous assignment of a functional to each vector by copying its coordinates changes under rescaling.
+9. **Annihilators as a calculus.** Prove $(U+H)^0=U^0\cap H^0$. Use the bidual identification and double annihilation to deduce the intersection formula without a second dimension computation.
+10. **Invariant annihilators.** Let $T(x,y)=(x+2y,3y)$ and $U=\operatorname{span}(e_1)$. Compute $T|_U$, the quotient operator and the action of $T^\vee$ on $U^0$. Is the complementary coordinate line invariant? Explain what information restriction and quotient omit.
+
+### Use measurements in an unfamiliar problem
+
+11. **A graph with a free branch.** Add an edge $3\to4$ to the oriented triangle. Which edge measurements can be prescribed as gradients? Find all edge-weight recipes for measuring $p_4-p_1$. Justify completeness.
+12. **A nonnormal spectral decomposition.** For $H=\left(\begin{smallmatrix}2&4\\0&4\end{smallmatrix}\right)$ find right modes, dual left modes and both projectors. Evaluate $p(H)$ for $p(t)=(4-t)/2$ and explain its range and kernel.
+13. **Dual coordinates of a load.** In the one-hat problem use trial $\phi'=3\phi$ and test $\psi'=2\phi$ (the primes here label new basis functions). Recompute the stiffness entry, load and solution coefficient. Explain why the two factors in the stiffness change differ from the transformation for an endomorphism.
+14. **An algebraic instrument with no norm bound.** On $c_{00}$, the finitely supported sequences with the $\ell^2$ norm, let $f(x)=\sum_n x_n$. Show it is an algebraic functional, prove it is unbounded, and decide whether a continuous extension to $\ell^2$ exists.
+15. **Metric-dependent sensitivity.** A real differential has row $(2,-1)$. Find its representing vector in the usual inner product, and in $\langle x,y\rangle=y^TMx$ with $M=\operatorname{diag}(4,1)$. Does the directional derivative along $(1,2)$ change?
+
+## Worked solutions
+
+**1.** The kernel of the first two readings consists of $ct^2$; the third detects $c$. Solve the three interpolation problems with readings $e_j$. The polynomials are $1-t^2$, $t-t^2$, $t^2$, respectively. Direct substitution gives the identity reading matrix. Every quadratic with readings $a,b,c$ therefore equals $a(1-t^2)+b(t-t^2)+ct^2$; the difference has all three readings zero. At $2$ the result is $-3a-2b+4c$. Uniqueness follows by testing any candidate recipe on these three polynomials.
+
+**2.** Define $f(\sum_j x_j b_j)=\sum_j c_jx_j$. Expansion is unique and respects the vector operations; all values are forced by linearity. The list of readings is therefore a coordinate isomorphism $V^\vee\to F^n$. A finite family spans the dual iff its reading rows on the basis span $F^{1\times n}$, equivalently the measurement matrix has rank $n$. Trace is linear with row $(1,0,0,1)$ on the ordered matrix units $(E_{11},E_{12},E_{21},E_{22})$. Its span has dimension one out of four. Determinant fails even additivity: the two diagonal matrix units have determinant zero and their sum has determinant one. It cannot be included as a member of the dual.
+
+**3.** The inverse has rows $(-1,2),(1,-1)$. The new vector column is $(2,1)^T$, the new covector column $B^T(3,-1)^T=(2,5)^T$. Their evaluation is $9$, agreeing with $3\cdot4-3$. Applying $B^{-1}$ incorrectly to the covector yields $(-5,4)^T$, which reports $-6$. Operationally, covector components are readings on the new basis vectors, where multiplication by $B^T$ comes from putting each of those vectors into the instrument.
+
+**4.** $g(Ax)=i(x_1+ix_2)+x_2+2x_3=ix_1+2x_3$. Multiplying the coefficient column $(i,1)^T$ by $A^T$ yields $(i,0,2)^T$. A conjugation of the entry $i$ in $A$ would incorrectly leave a coefficient $2$ on $x_2$. Next $SA=(1,i-1,-2)$. A scalar weight $c$ pulls back by $S$ to $(c,-c)^T$, then by $A$ to $(c,(i-1)c,-2c)^T$, the transpose of the composite times $c$. In general this calculation is evaluation of the same composed function in two groupings.
+
+**5.** Annihilation imposes $a+b=0$ and $b+c=0$. The row $(1,-1,1)$ spans the solutions and takes value $2$ on the proposed $b$, proving $b\notin U$. Generally extend a $k$-element subspace basis to an $n$-element basis. In the resulting dual basis any annihilator member has its first $k$ coefficients zero and every remaining coefficient is free. Thus the annihilator has dimension $n-k$.
+
+**6.** The requested row is $2r-s$ in Session 4. Its recipe can be $2b_3/3-(b_2-2b_1)/3$, with row $(2,-1,2)/3$. Every other recipe adds a multiple of $(-1,-1,1)$. In general if $f=gT$, then $f$ vanishes on $\ker T$. Conversely set $h(Tv)=f(v)$: two possible preimages differ by a kernel vector, so the rule gives one value. It is linear by choosing sums and scalar multiples of preimages. Extend $h$ linearly to a basis of the codomain completed from an image basis. All extensions pull back to $f$, and two recipes agree on inputs precisely when their difference annihilates the image. This proves both fundamental identities.
+
+**7.** Use $Q(x,y,z)=(x-z,y)$. It is onto and its kernel is $S$. Choose $t$ as coordinate of $(t,0,t)$ in $S$. The dual arrows have matrices
+$$
+Q^T=\begin{pmatrix}1&0\\0&1\\-1&0\end{pmatrix},
+\qquad i^T=\begin{pmatrix}1&0&1\end{pmatrix}.
+$$
+The first has independent columns. The kernel of the second consists of $(a,b,-a)^T$, precisely the first image. The last arrow is onto since $(c,0,0)^T$ maps to $c$. In particular zero composite alone would not have proved middle exactness; the displayed parameterization does.
+
+**8.** Set $v=\sum_i\Phi(\varepsilon^i)b_i$. For any $f$, expand in the dual basis and apply $\Phi$ to get $\Phi(f)=\sum_i f(b_i)\Phi(\varepsilon^i)=f(v)$. Uniqueness follows since coordinate instruments distinguish vectors. For any $g\in W^\vee$, $(T^{\vee\vee}\Phi)(g)=\Phi(T^\vee g)=(T^\vee g)(v)=g(Tv)$, so its reconstructed vector is $Tv$. By contrast in a real line changing $e$ to $2e$ changes the copied coefficient of $e$ from $1$ to $1/2$ and also halves its dual basis instrument. The resulting functional evaluates on $e$ as $1/4$ instead of $1$.
+
+**9.** A functional killing $U$ and $H$ kills every $u+h$, and each subspace belongs to the sum, proving the first formula. Apply it in $V^\vee$ to $U^0$ and $H^0$. It gives $(U^0+H^0)^0=U^{00}\cap H^{00}=\iota_V(U\cap H)$. Take annihilators again. In finite dimension double annihilation recovers $U^0+H^0$ in the triple dual. Under the evaluation identification for $V^\vee$, the annihilator of $\iota_V(U\cap H)$ consists exactly of the $f$ with $f(u)=0$ on $U\cap H$. This yields the intersection formula with all spaces accounted for.
+
+**10.** On $U$, $T$ acts as identity. Modulo $U$ only $y$ is observed, and it becomes $3y$. Thus the quotient acts by $3$. The annihilator is spanned by the row $(0,1)$ and its pullback is $(0,3)$, the same scalar. The complementary $y$-axis is not invariant since $Te_2=(2,3)^T$. The off-diagonal $2$ records a transfer from a chosen lift of a quotient direction into $U$. Neither smaller operator sees it.
+
+**11.** Label edges in order $12,23,31,34$. A gradient must satisfy $d_{12}+d_{23}+d_{31}=0$ and $d_{34}$ is unrestricted. Sufficiency follows by integrating along the tree $12,23,34$ with $p_1=0$, then checking the closing edge. Summing on that same tree path gives weights $(1,1,0,1)^T$ for $p_4-p_1$. All recipes add $c(1,1,1,0)^T$. To see completeness, at vertex 4 a difference of recipes with zero pullback must have zero weight on edge $34$, then balance at the triangle vertices forces the three other weights equal.
+
+**12.** Right modes $(1,0)^T,(2,1)^T$ have eigenvalues $2,4$. The inverse basis matrix has rows $(1,-2),(0,1)$, the left instruments. Multiplying each column by its dual row gives $P_1=\left(\begin{smallmatrix}1&-2\\0&0\end{smallmatrix}\right)$ and $P_2=\left(\begin{smallmatrix}0&2\\0&1\end{smallmatrix}\right)$. The deltas ensure each kills the other's range and fixes its own. Since $p(2)=1$ and $p(4)=0$, $p(H)=P_1$. Its range is the first eigenline, its kernel the sloping second line. The projector is oblique in the usual Euclidean geometry.
+
+**13.** Bilinearity gives $K'=2\cdot4\cdot3=24$, and the load on the new test is $2(1/2)=1$. Thus the trial coefficient is $1/24$, representing $(1/24)(3\phi)=\phi/8$. Trial basis vectors enter the first slot of the form, and test vectors the second. Evaluating on a rescaled test multiplies the load by the same scale. An endomorphism's output consists of vector coordinates in a target basis, which instead transform with the inverse basis matrix.
+
+**14.** Finite support makes the formula a finite sum for every input, and distributivity proves linearity. The vector with first $N$ entries $1/\sqrt N$ and all others zero has norm one but reading $\sqrt N$. Hence no uniform norm bound holds. Restriction of any continuous extension would be bounded, so no continuous extension exists. Algebraic and continuous duals already differ on this simple normed space.
+
+**15.** Writing $f(x)=y^TMx$ requires $My=(2,-1)^T$. The representing vector is $(2,-1)^T$ in Euclidean geometry and $(1/2,-1)^T$ for the specified $M$. Along $(1,2)^T$ both give $0$. A direction's measured change is independent of which metric represents the measurement.
+
+## Session 9 — What can three curvature readings tell us about a cubic?
+
+### Integrated mastery problem
+
+In the final problem of Module A the device $T:\mathcal P_3(\mathbb R)\to\mathbb R^3$ reported $Tp=(p''(0),p''(1),p''(2))$. Suppose the stored readings are the only surviving experimental data. A colleague asks for $p'(1)-p'(0)$; another asks for $p(1)-p(0)$. Decide which answer can be reconstructed. Find **all** output formulas for the recoverable quantity, characterize every possible input quantity that can be answered, and explain the exact sequence and naturality identity in this particular experiment.
+
+### Worked reconstruction
+
+Write $p=a+bt+ct^2+dt^3$. Its second derivative is affine, so a reading $(u,v,w)$ obeys $w=2v-u$. Conversely $c=u/2$ and $d=(v-u)/6$ reconstruct a cubic giving that reading. Thus $K=\ker T=\mathcal P_1$ and $I=\operatorname{im}T=\{u-2v+w=0\}$. This supplies the primal answer $V/K\cong I$.
+
+For output weights $(\alpha,\beta,\gamma)$ expand the reading:
+$$
+(T^\vee g)(p)=2(\alpha+\beta+\gamma)c+6(\beta+2\gamma)d.
+$$
+The coefficients on $a,b$ vanish. Every pair of coefficients on $c,d$ can be obtained by choosing $\gamma=0$ and solving for $\alpha,\beta$. Hence the image of $T^\vee$ is **all** of $K^0$. Its kernel is the span of the output measurement $(1,-2,1)$, exactly $I^0$. The first question asks for $2c+3d=(u+v)/2$, so all output recipes are
+$$
+(1/2,1/2,0)+s(1,-2,1),\qquad s\in\mathbb R .
+$$
+Integration gives another derivation: the integral of the affine function $p''$ on $[0,1]$ is the average of its endpoint values. The second question asks for $b+c+d$. Adding $t$ changes that answer by $1$ and changes none of the readings. No recipe exists.
+
+The unique instrument on the quotient is $[p]\mapsto 2c+3d$; adding an affine polynomial changes neither coefficient. The dual exact sequence $0\to I^\vee\to V^\vee\to K^\vee\to0$ first embeds instruments on attainable data by composition with $T$ restricted in codomain. The second arrow tests an instrument on affine polynomials. Being zero on both $1$ and $t$ is therefore exactly the criterion for recovery. Every instrument on $K$ extends because its values on $t^2,t^3$ may be freely prescribed. The other exact sequence $0\to I^0\to W^\vee\to I^\vee\to0$ explains the freedom $s$ in the formula.
+
+Finally test naturality on the output instrument $g(u,v,w)=v$. Sending the vector $p$ to $Tp$ and evaluating at $g$ gives $p''(1)=2c+6d$. Evaluating $p$ on the pulled-back instrument $T^\vee g$ gives the same number. Replacing $g$ by any output instrument repeats exactly the argument, so the equality is one of bidual elements, not just agreement on a selected sensor.
+
+### Conceptual map
+
+```{mermaid}
+flowchart TD
+  B["Input basis"] -->|coordinate extraction| D["Dual basis"]
+  T["Linear map"] -->|precomposition| P["Pullback of measurements"]
+  D -->|coordinates| M["Transpose matrix"]
+  P -->|represented by| M
+  P --> K["Kernel: redundant output measurements"]
+  P --> I["Image: recoverable input measurements"]
+  I -->|descent| Q["Measurements on input classes"]
+```
+
+The diagram records two ways to reach the transpose: specify how to measure on a basis, or compose measurements and then express the result in dual coordinates. At the bottom, restriction and descent explain the two exact sequences in the cubic problem. They separate the ambiguity of an input representative from the ambiguity of an output formula.
+
+| Result | Content | Assumptions that matter |
+|---|---|---|
+| Evaluation | $(f,v)\mapsto f(v)$ separates both arguments | Algebraic basis extension for separation in arbitrary dimension |
+| Dual basis | $\varepsilon^i(b_j)=\delta^i_j$, $\dim V^\vee=\dim V$ | Finite basis for the finite expansion of every functional |
+| Dual map | $g\mapsto gT$, $(ST)^\vee=T^\vee S^\vee$ | Linear structure alone |
+| Transpose | $[T^\vee]=[T]^T$ | Corresponding dual bases; linear coefficient convention |
+| Output obstruction | $\ker T^\vee=(\operatorname{im}T)^0$ | Algebraic, any dimension |
+| Input recovery | $\operatorname{im}T^\vee=(\ker T)^0$ | Algebraic extension; automatic in finite dimension |
+| Quotient dual | $(V/S)^\vee\cong S^0$ | Canonical descent, any algebraic dimension |
+| Dual exactness | $\ker i^\vee=\operatorname{im}q^\vee$, $i^\vee$ onto | Restriction and extension over a field |
+| Bidual | $T^{\vee\vee}\iota_V=\iota_WT$ | Any dimension for naturality; finite dimension suffices for bijectivity |
+| Lattice of subspaces | Sums and intersections interchange under annihilation | Finite dimension suffices; $S^{00}$ lives in the bidual |
+| Spectral coordinates | $P_ix=v_i\ell_i(x)$, $p(T)=\sum_i p(\lambda_i)P_i$ | An eigenbasis over the chosen field |
+| Continuous recovery | A rule on the image must be bounded to extend continuously | Norms, topology of the range, and bounded extension |
+
+**Canonical or chosen?** Evaluation, pullback, restriction, annihilators, descent and the bidual map require only their stated spaces and maps. A dual basis is forced *given* a primal basis. A particular extension off a subspace generally requires a choice, while its class modulo the annihilator is determined. The projector onto a full eigenspace along the other eigenspaces of a diagonalizable operator is determined by the operator. Individual eigenvector scalings and a basis within a repeated eigenspace are choices.
+
+### What geometry adds to duality
+
+| Object | Source and target | Coordinate description |
+|---|---|---|
+| Vector $v$ | Element of $V$; evaluates instruments through $\iota_V(v)$ | Column $x$ in a chosen basis |
+| Covector $f$ | Linear map $V\to F$ | Coefficient column $c$ acting by $c^Tx$ |
+| Algebraic dual map $T^\vee$ | $W^\vee\to V^\vee$ | $A^T$ in corresponding dual bases |
+| Inner-product adjoint $T^*$ | $W\to V$ | $A^H$ in orthonormal coordinates, with metric factors in general |
+
+Where do the metric factors come from? In finite dimension choose inner products and set $R_V(y)(x)=\langle x,y\rangle_V$. This is a linear functional of $x$. Over $\mathbb C$, $R_V$ is **conjugate-linear in $y$**. It is injective by positivity: $R_V(y)=0$ implies $\langle y,y\rangle=0$. In an orthonormal basis a functional with coefficient column $c$ is represented by the vector $\overline c$, proving surjectivity. Equivalently, with Hermitian positive definite Gram matrix $G_V$ the pairing is $y^HG_Vx$. One solves $G_Vy=\overline c$ for the unique representative. The real case drops conjugation.
+
+Consequently the map $T^*=R_V^{-1}T^\vee R_W$ is linear (two conjugate-linear factors over $\mathbb C$). Its defining identity is
+$$
+\langle Tx,y\rangle_W=\langle x,T^*y\rangle_V,\qquad
+[T^*]=G_V^{-1}A^H G_W.
+$$
+Indeed $y^HG_WAx=(T^*y)^HG_Vx$ for every $x$, which yields the matrix formula. In orthonormal coordinates both Grams are identities. Further, $R_V^{-1}(S^0)=S^\perp$ because vanishing on $s$ becomes $\langle s,y\rangle_V=0$. Here is the precise transition to Module C: specify a geometry and the same instruments acquire representing vectors, lengths and perpendicular directions. In infinite-dimensional Hilbert spaces the Riesz theorem represents the **continuous** dual.
+
+### Common wrong turns
+
+| Tempting step | A way to diagnose it |
+|---|---|
+| Copy the vector's change-of-basis rule for the instrument | Evaluate both transformed objects. A scalar reading must remain unchanged. |
+| Conjugate entries when forming an algebraic complex pullback | Test multiplication by $i$ on the identity functional. |
+| Treat $S^0$ and $S^\perp$ as subspaces of the same space | Write their ambient spaces first, then specify a Riesz map. |
+| Assume the recovery recipe is unique on the whole codomain | Add an image-annihilating functional and test only attainable readings. |
+| Replace a left eigenfunctional by a transposed right eigenvector | Test on every other right eigenvector. The required values are zero. |
+| Certify exact solvability from continuous annihilators of a dense image | Check whether the image is closed; compare the diagonal sequence example. |
+
+### Mastery checklist
+
+- [ ] Construct the evaluation pairing and prove both nondegeneracy statements.
+- [ ] Construct a dual basis, derive both coordinate-change rules and explain why a reading is invariant.
+- [ ] Derive composition reversal and the transpose rule from the values of a functional.
+- [ ] Compute an annihilator and prove the two kernel–image identities, including the extension step.
+- [ ] Decide whether data determine a requested quantity and give every linear output recipe.
+- [ ] Distinguish a quotient measurement from a class of extensions; prove exactness at each term of the reversed sequence.
+- [ ] Construct the bidual identification, verify naturality and recover a subspace by double annihilation.
+- [ ] Construct left eigenfunctionals and oblique projectors, and identify what changes inside repeated eigenspaces.
+- [ ] Interpret a transpose on a graph, a finite element load and an output-error functional.
+- [ ] Derive the adjoint through the Riesz maps, track complex conjugation and identify the topology needed for continuous duality.
+
+**Opening question for Module C.** A computation reports a residual functional $r$. To say that $r$ is *small* we need to specify the size of a unit test vector. What inner product on the test space should determine that size, and which vector represents $r$ in that geometry?

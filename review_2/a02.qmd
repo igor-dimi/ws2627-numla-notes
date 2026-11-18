@@ -1,0 +1,3919 @@
+---
+title: "Module A — Structural Linear Algebra"
+---
+
+Linear maps, kernels, images, direct sums, quotients, isomorphism theorems, and their applications
+
+*Advanced undergraduate · 8 study sessions · Approximately 14–18 hours*
+
+## Introduction: The central idea
+
+The purpose of this module is to develop a structural understanding of linear algebra.
+
+In an introductory course, we learn how to solve linear systems, calculate ranks, compute null spaces, and manipulate matrices.
+
+Here, we will ask a deeper question:
+
+**What do these computations reveal about the mathematical structure of a linear transformation?**
+
+Given a linear map
+
+$$
+T:V\longrightarrow W,
+$$
+
+we want to understand what information it preserves, what information it loses, how it organizes the domain and codomain into subspaces, and why these constructions generalize far beyond matrices.
+
+One of the most important results we will establish is
+
+$$
+\boxed{V/\ker T\cong\operatorname{im}T.}
+$$
+
+This equation connects several concepts:
+
+- The kernel describes which distinctions between inputs disappear under $T$.
+- The quotient identifies inputs that $T$ cannot distinguish.
+- The image describes all outputs that $T$ can produce.
+- The isomorphism tells us that, after identifying indistinguishable inputs, the transformation becomes bijective onto its image.
+
+We will derive this result rigorously, interpret it geometrically, compute it in concrete examples, and investigate its manifestations in numerical linear algebra, differential equations, and scientific computing.
+
+## The six perspectives
+
+Every major concept will be developed through the following perspectives.
+
+| Perspective                 | What we want to understand                                                               |
+| --------------------------- | ---------------------------------------------------------------------------------------- |
+| **Rigorous**                | Definitions, assumptions, statements, and proofs                                         |
+| **Intuitive and geometric** | What the construction represents and why it is natural                                   |
+| **Computational**           | How to construct, calculate, or implement it                                             |
+| **Structural**              | How it relates to other concepts and theorems                                            |
+| **Universal**               | How it generalizes to abstract algebra and category theory                               |
+| **Applied**                 | How it appears in numerical methods, functional analysis, PDEs, and scientific computing |
+
+These perspectives will not always receive equal emphasis. We will introduce abstraction when it illuminates the concrete mathematics, rather than making every calculation unnecessarily abstract.
+
+## Roadmap
+
+**I. Understand linear maps**
+
+Kernels · Images · Rank–nullity · RREF
+
+**II. Decompose and identify**
+
+Subspace sums · Direct sums · Complements · Quotients
+
+**III. Discover the common structure**
+
+First isomorphism theorem · Universal properties · Exact sequences · Projections
+
+**IV. Transfer to applications**
+
+Singular systems · Graph Laplacians · Differential operators · Invariant subspaces
+
+### Sessions
+
+| Session | Main topic                                                            |
+| ------- | --------------------------------------------------------------------- |
+| 1 | [Linear maps, kernels, images, and rank–nullity](#sec-module-a-session-1) |
+| 2 | [RREF, matrix representations, and parameterization of kernels](#sec-module-a-session-2) |
+| 3 | [Subspace sums, direct sums, and complements](#sec-module-a-session-3) |
+| 4 | [Quotient spaces and equivalence classes](#sec-module-a-session-4) |
+| 5 | [The first isomorphism theorem](#sec-module-a-session-5) |
+| 6 | [Universal properties, exact sequences, and projections](#sec-module-a-session-6) |
+| 7 | [Applications to numerical systems, graphs, and differential equations](#sec-module-a-session-7) |
+| 8 | [Invariant subspaces, spectral connections, and synthesis](#sec-module-a-session-8) |
+
+Each session includes a checkpoint. A set of exercises, solutions, and a computational laboratory follows the theoretical material.
+
+## Session 1 — The structure of a linear transformation {#sec-module-a-session-1}
+
+### From matrices to linear maps
+
+Let $V,W$ be vector spaces over a field $\mathbb F$, usually $\mathbb R$ or $\mathbb C$.
+
+A transformation
+
+$$
+T:V\to W
+$$
+
+is linear if
+
+$$
+T(\alpha v+\beta w)=\alpha T(v)+\beta T(w)
+$$
+
+for every $v,w\in V$ and $\alpha,\beta\in\mathbb F$.
+
+The property implies
+
+$$
+T\left(\sum_{i=1}^k a_iv_i\right) =\sum_{i=1}^k a_iT(v_i).
+$$
+
+In particular, if $(v_1,\ldots,v_n)$ is a basis of $V$, knowing the images $T(v_1),\ldots,T(v_n)$ determines the transformation completely.
+
+Indeed, every $v\in V$ has a unique expansion
+
+$$
+v=\sum_{i=1}^n a_iv_i,
+$$
+
+and therefore
+
+$$
+T(v)=\sum_{i=1}^n a_iT(v_i).
+$$
+
+This is the fundamental reason we can represent linear maps using matrices.
+
+**A matrix is a coordinate representation of a linear map, not the linear map itself.** Once bases are chosen in the domain and codomain, the columns of the matrix record the coordinates of the images of the domain basis vectors.
+
+This distinction becomes important when studying changes of basis, eigenvalues, and numerical algorithms.
+
+### The kernel: indistinguishable inputs
+
+The **kernel** of a linear map is
+
+$$
+\boxed{\ker T=\{v\in V:T(v)=0\}.}
+$$
+
+It is a subspace of $V$.
+
+The most illuminating property of the kernel is
+
+$$
+\boxed{ T(v)=T(w)\iff v-w\in\ker T. }
+$$
+
+#### Proof {#module-a-session-1-the-kernel-indistinguishable-inputs-proof}
+
+By linearity,
+
+$$
+\begin{aligned}
+  T(v)=T(w) &\iff T(v)-T(w)=0\\
+  &\iff T(v-w)=0\\
+  &\iff v-w\in\ker T.
+\end{aligned}
+$$
+
+This tells us exactly what information a linear map loses.
+
+Two inputs produce the same output if and only if they differ by an element of the kernel.
+
+#### Example {#module-a-session-1-the-kernel-indistinguishable-inputs-example}
+
+Consider
+
+$$
+T:\mathbb R^3\to\mathbb R^2, \qquad T(x,y,z)=(x+y,z).
+$$
+
+To find the kernel, solve
+
+$$
+(x+y,z)=(0,0).
+$$
+
+Thus
+
+$$
+x=-y,\qquad z=0.
+$$
+
+Therefore,
+
+$$
+\boxed{ \ker T=\operatorname{span}\{(1,-1,0)\}. }
+$$
+
+The transformation observes the sum $x+y$, but cannot distinguish different pairs with the same sum.
+
+For example,
+
+$$
+T(2,3,4)=T(5,0,4)=(5,4).
+$$
+
+Their difference is
+
+$$
+(-3,3,0)\in\ker T.
+$$
+
+The kernel contains precisely the directions invisible to the transformation.
+
+#### Injectivity {#module-a-session-1-the-kernel-indistinguishable-inputs-injectivity}
+
+A linear map is injective if and only if its kernel is trivial:
+
+$$
+\boxed{ T\text{ injective}\iff\ker T=\{0\}. }
+$$
+
+To prove the forward direction, observe that $T(v)=0=T(0)$ implies $v=0$ when $T$ is injective.
+
+For the converse, if $T(v)=T(w)$, then $v-w\in\ker T$. A trivial kernel therefore implies $v=w$.
+
+### The image: attainable outputs
+
+The **image** of $T$ is
+
+$$
+\boxed{\operatorname{im}T=\{T(v):v\in V\}.}
+$$
+
+It is a subspace of $W$.
+
+The kernel tells us what the transformation loses; the image tells us what it can produce.
+
+For our example,
+
+$$
+T(x,y,z)=(x+y,z),
+$$
+
+we have
+
+$$
+\operatorname{im}T=\mathbb R^2,
+$$
+
+because every $(a,b)\in\mathbb R^2$ is obtained as
+
+$$
+T(a,0,b)=(a,b).
+$$
+
+Thus $T$ is surjective, although not injective.
+
+Notice the distinction between the **codomain** $W$ and the **image** $\operatorname{im}T$. The codomain is part of the specification of $T$, whereas the image consists of its actually attainable outputs.
+
+### Rank–nullity
+
+Assume $V$ is finite-dimensional.
+
+Define
+
+$$
+\operatorname{nullity}(T)=\dim\ker T,
+$$
+
+$$
+\operatorname{rank}(T)=\dim\operatorname{im}T.
+$$
+
+The **rank–nullity theorem** states that
+
+$$
+\boxed{ \dim V = \operatorname{nullity}(T)+\operatorname{rank}(T). }
+$$
+
+#### Proof by extending a kernel basis {#module-a-session-1-rank-nullity-proof-by-extending-a-kernel-basis}
+
+Let
+
+$$
+(k_1,\ldots,k_s)
+$$
+
+be a basis of $\ker T$.
+
+Extend it to a basis of $V$:
+
+$$
+(k_1,\ldots,k_s,u_1,\ldots,u_r).
+$$
+
+We claim that
+
+$$
+(Tu_1,\ldots,Tu_r)
+$$
+
+is a basis of $\operatorname{im}T$.
+
+**Spanning.** Every $v\in V$ can be written as
+
+$$
+v=\sum_{i=1}^s a_ik_i+\sum_{j=1}^r b_ju_j.
+$$
+
+Applying $T$,
+
+$$
+T(v)=\sum_{j=1}^r b_jT(u_j),
+$$
+
+because $T(k_i)=0$.
+
+Hence these images span $\operatorname{im}T$.
+
+**Independence.** Suppose
+
+$$
+\sum_{j=1}^r b_jT(u_j)=0.
+$$
+
+Then
+
+$$
+T\left(\sum_{j=1}^r b_ju_j\right)=0,
+$$
+
+which means
+
+$$
+\sum_{j=1}^r b_ju_j\in\ker T.
+$$
+
+It can therefore be expressed as a linear combination of the $k_i$. But the extended basis is linearly independent, so all $b_j=0$.
+
+Thus the $T(u_j)$ form a basis of the image.
+
+Consequently,
+
+$$
+\dim\operatorname{im}T=r,\qquad \dim\ker T=s,
+$$
+
+and since the basis of $V$ contains $s+r$ vectors,
+
+$$
+\dim V=s+r.
+$$
+
+#### What the proof reveals {#module-a-session-1-rank-nullity-what-the-proof-reveals}
+
+The proof does more than count dimensions.
+
+It demonstrates that we can choose a basis of $V$ consisting of two groups:
+
+- Vectors annihilated by $T$.
+- Additional vectors whose images form a basis of the image.
+
+This is the beginning of a direct-sum decomposition.
+
+### Checkpoint 1 {#module-a-checkpoint-1 .unnumbered .unlisted}
+
+Prove that if $\dim V>\dim W$, then every linear map $T:V\to W$ has a nontrivial kernel.
+
+Then explain why no linear map $\mathbb R^4\to\mathbb R^3$ can be injective.
+
+## Session 2 — RREF as a method for discovering structure {#sec-module-a-session-2}
+
+Gaussian elimination is often introduced as a procedure for solving linear equations.
+
+We will interpret it instead as a method for exposing the structure of a linear transformation.
+
+### Running example
+
+Consider
+
+$$
+\boxed{ A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix} :\mathbb R^4\to\mathbb R^3. }
+$$
+
+The third row is the sum of the first two, so we already expect some redundancy in the equations.
+
+Gaussian elimination gives
+
+$$
+A\sim \begin{pmatrix}
+  1&2&-1&3\\
+  0&0&3&3\\
+  0&0&0&0
+\end{pmatrix} \sim \underbrace{ \begin{pmatrix}
+  1&2&0&4\\
+  0&0&1&1\\
+  0&0&0&0
+\end{pmatrix}}_{R=\operatorname{rref}(A)}.
+$$
+
+The pivot columns are columns 1 and 3, so
+
+$$
+\operatorname{rank}(A)=2.
+$$
+
+### Why row reduction preserves the null space
+
+Every elementary row operation is equivalent to multiplying the matrix on the left by an invertible matrix.
+
+Thus
+
+$$
+R=EA
+$$
+
+for some invertible $E\in\mathbb R^{3\times3}$.
+
+Therefore,
+
+$$
+\begin{aligned}
+  Rx=0 &\iff EAx=0\\
+  &\iff Ax=0.
+\end{aligned}
+$$
+
+So
+
+$$
+\boxed{\ker R=\ker A.}
+$$
+
+The transformation $EA$ is obtained by applying an invertible transformation to the outputs of $A$.
+
+Since an invertible transformation sends only zero to zero, the inputs annihilated by $A$ are unchanged.
+
+This explains conceptually why row reduction preserves the homogeneous solution space.
+
+### Constructing a null-space basis
+
+The equations $Rx=0$ are
+
+$$
+\begin{aligned}
+  x_1+2x_2+4x_4&=0,\\
+  x_3+x_4&=0.
+\end{aligned}
+$$
+
+The pivot variables are $x_1,x_3$, while $x_2,x_4$ are free.
+
+Let
+
+$$
+x_2=s,\qquad x_4=t.
+$$
+
+Then
+
+$$
+x_1=-2s-4t,\qquad x_3=-t.
+$$
+
+Every solution has the form
+
+$$
+x= \begin{pmatrix}
+  -2s-4t\\
+  s\\
+  -t\\
+  t
+\end{pmatrix} = s\begin{pmatrix}
+  -2\\
+  1\\
+  0\\
+  0
+\end{pmatrix} + t\begin{pmatrix}
+  -4\\
+  0\\
+  -1\\
+  1
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+\boxed{ \ker A= \operatorname{span} \left\{ \begin{pmatrix}
+  -2\\
+  1\\
+  0\\
+  0
+\end{pmatrix}, \begin{pmatrix}
+  -4\\
+  0\\
+  -1\\
+  1
+\end{pmatrix} \right\}. }
+$$
+
+Why are these vectors not merely generators, but a basis?
+
+### The free-variable parameterization is an isomorphism
+
+Define
+
+$$
+\Phi:\mathbb R^2\to\ker A
+$$
+
+by
+
+$$
+\boxed{ \Phi(s,t)= \begin{pmatrix}
+  -2s-4t\\
+  s\\
+  -t\\
+  t
+\end{pmatrix}. }
+$$
+
+This map is linear.
+
+It is injective because if
+
+$$
+\Phi(s_1,t_1)=\Phi(s_2,t_2),
+$$
+
+then comparing the second and fourth coordinates gives
+
+$$
+s_1=s_2,\qquad t_1=t_2.
+$$
+
+It is surjective because we have shown that every element of $\ker A$ can be expressed in this form.
+
+Therefore,
+
+$$
+\boxed{\mathbb R^2\cong\ker A.}
+$$
+
+Now consider the standard basis of $\mathbb R^2$:
+
+$$
+e_1=(1,0),\qquad e_2=(0,1).
+$$
+
+Since an isomorphism maps a basis to a basis,
+
+$$
+\Phi(e_1),\quad\Phi(e_2)
+$$
+
+form a basis of $\ker A$.
+
+That is precisely the familiar procedure of setting one free variable equal to $1$ and the other free variables equal to $0$.
+
+**The computational rule is an application of a general theorem: a linear isomorphism transports bases between vector spaces.**
+
+### The general RREF structure
+
+Suppose $A\in\mathbb F^{m\times n}$ has rank $r$.
+
+After identifying and conceptually reordering pivot and free coordinates, its RREF has the block form
+
+$$
+R= \begin{pmatrix}
+  I_r&C\\
+  0&0
+\end{pmatrix}.
+$$
+
+Write
+
+$$
+x=\begin{pmatrix}
+  x_P\\
+  x_F
+\end{pmatrix},
+$$
+
+where $x_P\in\mathbb F^r$ and $x_F\in\mathbb F^{n-r}$.
+
+Then
+
+$$
+Rx=0 \iff x_P+Cx_F=0.
+$$
+
+Thus
+
+$$
+\boxed{ x= \begin{pmatrix}
+  -Cx_F\\
+  x_F
+\end{pmatrix}. }
+$$
+
+The map
+
+$$
+\Phi(x_F)= \begin{pmatrix}
+  -Cx_F\\
+  x_F
+\end{pmatrix}
+$$
+
+is an isomorphism from $\mathbb F^{n-r}$ onto $\ker A$.
+
+Its matrix is
+
+$$
+N= \begin{pmatrix}
+  -C\\
+  I_{n-r}
+\end{pmatrix}.
+$$
+
+The columns of $N$, restored to the original coordinate ordering, form a null-space basis.
+
+This gives
+
+$$
+\dim\ker A=n-r,
+$$
+
+which is exactly rank–nullity.
+
+### Column dependencies and the image
+
+Write
+
+$$
+A=(a_1\ a_2\ a_3\ a_4).
+$$
+
+Then
+
+$$
+Ax=x_1a_1+x_2a_2+x_3a_3+x_4a_4.
+$$
+
+Therefore,
+
+$$
+Ax=0
+$$
+
+means that the coefficients $x_1,\ldots,x_4$ describe a linear-dependence relation among the columns.
+
+For our matrix,
+
+$$
+a_2=2a_1,\qquad a_4=4a_1+a_3.
+$$
+
+The corresponding dependence relations are
+
+$$
+-2a_1+a_2=0
+$$
+
+and
+
+$$
+-4a_1-a_3+a_4=0.
+$$
+
+These are exactly the two kernel basis vectors obtained above.
+
+The pivot columns of the original matrix are
+
+$$
+a_1=\begin{pmatrix}
+  1\\
+  2\\
+  3
+\end{pmatrix}, \qquad a_3=\begin{pmatrix}
+  -1\\
+  1\\
+  0
+\end{pmatrix}.
+$$
+
+Thus
+
+$$
+\boxed{ \operatorname{im}A= \operatorname{span} \left\{ \begin{pmatrix}
+  1\\
+  2\\
+  3
+\end{pmatrix}, \begin{pmatrix}
+  -1\\
+  1\\
+  0
+\end{pmatrix} \right\}. }
+$$
+
+Remember that row reduction preserves column-dependence relations, but generally changes the column space as a subspace of the codomain. That is why the pivot indices are found using RREF, while the actual column-space basis vectors are taken from the original matrix.
+
+### Checkpoint 2 {#module-a-checkpoint-2 .unnumbered .unlisted}
+
+Explain why the columns of
+
+$$
+N= \begin{pmatrix}
+  -2&-4\\
+  1&0\\
+  0&-1\\
+  0&1
+\end{pmatrix}
+$$
+
+are linearly independent without computing an RREF of $N$.
+
+Then explain why the identity $AN=0$ alone would not be sufficient to guarantee that they form a basis of $\ker A$.
+
+## Session 3 — Subspace sums, direct sums, and complements {#sec-module-a-session-3}
+
+One of the most important themes in linear algebra is the decomposition of a vector space into simpler components.
+
+A good decomposition allows us to analyze a transformation by studying how it acts on the individual components.
+
+### The sum of two subspaces
+
+Let $U,W\subseteq V$ be subspaces.
+
+Their sum is defined by
+
+$$
+\boxed{ U+W=\{u+w:u\in U,\ w\in W\}. }
+$$
+
+The sum is itself a subspace.
+
+It is also the **smallest subspace** containing both $U$ and $W$.
+
+Indeed, every subspace containing $U$ and $W$ must contain all sums $u+w$, so it must contain $U+W$.
+
+This is why the sum is called the *join* of $U$ and $W$ in the lattice of subspaces of $V$.
+
+#### Example {#module-a-session-3-the-sum-of-two-subspaces-example}
+
+Let
+
+$$
+U=\operatorname{span}\{(1,0)\}, \qquad W=\operatorname{span}\{(0,1)\}.
+$$
+
+Then
+
+$$
+U+W=\mathbb R^2.
+$$
+
+But
+
+$$
+U\cup W
+$$
+
+is just the union of the two coordinate axes.
+
+The union is not closed under addition, whereas the sum is.
+
+### When is a sum direct?
+
+The sum $U+W$ is called a **direct sum** when
+
+$$
+\boxed{U\cap W=\{0\}.}
+$$
+
+We write $U\oplus W$.
+
+The key result is the equivalence
+
+$$
+\boxed{ U\cap W=\{0\} \iff \text{every vector in }U+W \text{ has a unique decomposition }u+w. }
+$$
+
+#### Proof {#module-a-session-3-when-is-a-sum-direct-proof}
+
+Suppose
+
+$$
+u_1+w_1=u_2+w_2.
+$$
+
+Then
+
+$$
+u_1-u_2=w_2-w_1.
+$$
+
+The left-hand side belongs to $U$, while the right-hand side belongs to $W$.
+
+If their intersection is trivial, both sides must be zero.
+
+Therefore,
+
+$$
+u_1=u_2,\qquad w_1=w_2.
+$$
+
+Conversely, suppose $0\ne z\in U\cap W$.
+
+Then
+
+$$
+0=0+0=z+(-z)
+$$
+
+gives two different decompositions, so uniqueness fails.
+
+Thus directness means **independent contributions without ambiguity**.
+
+### Internal and external direct sums
+
+There is an important distinction.
+
+An internal direct sum describes subspaces already sitting inside a common vector space:
+
+$$
+V=U\oplus W.
+$$
+
+An external direct sum constructs a new vector space from two possibly unrelated spaces:
+
+$$
+U\oplus W=\{(u,w):u\in U,\ w\in W\},
+$$
+
+with componentwise operations.
+
+The external sum always exists.
+
+When $U,W\subseteq V$, the addition map
+
+$$
+F:U\oplus W\to U+W, \qquad F(u,w)=u+w
+$$
+
+connects the two constructions.
+
+It is always surjective. It is injective precisely when $U\cap W=\{0\}$.
+
+Therefore, when the internal sum is direct, this addition map is an isomorphism.
+
+This also suggests a deeper reason for the dimension formula.
+
+### The dimension formula for subspace sums
+
+For finite-dimensional subspaces $U,W$,
+
+$$
+\boxed{ \dim(U+W) = \dim U+\dim W-\dim(U\cap W). }
+$$
+
+Let's derive this using the addition map.
+
+We have
+
+$$
+F:U\oplus W\to U+W, \qquad F(u,w)=u+w.
+$$
+
+Its kernel is
+
+$$
+\begin{aligned}
+  \ker F &=\{(u,w):u+w=0\}\\
+  &=\{(z,-z):z\in U\cap W\}.
+\end{aligned}
+$$
+
+The map
+
+$$
+z\longmapsto(z,-z)
+$$
+
+is an isomorphism from $U\cap W$ onto $\ker F$.
+
+Therefore,
+
+$$
+\dim\ker F=\dim(U\cap W).
+$$
+
+Applying rank–nullity to $F$,
+
+$$
+\dim(U\oplus W) = \dim\ker F+\dim(U+W).
+$$
+
+Since the external direct sum has dimension $\dim U+\dim W$, rearranging gives the formula.
+
+#### A structural insight {#module-a-session-3-the-dimension-formula-for-subspace-sums-a-structural-insight}
+
+The intersection measures the redundancy in the addition map.
+
+If $U\cap W\ne\{0\}$, different pairs $(u,w)$ can produce the same vector $u+w$.
+
+If $U\cap W=\{0\}$, this redundancy disappears.
+
+This is the same kernel-versus-identification phenomenon we encountered in Session 1.
+
+### Complements
+
+A subspace $U\subseteq V$ is a **complement** of $K\subseteq V$ if
+
+$$
+\boxed{V=K\oplus U.}
+$$
+
+Every subspace of a finite-dimensional vector space has at least one complement.
+
+To prove this, take a basis of $K$, extend it to a basis of $V$, and let $U$ be the span of the additional basis vectors.
+
+Complements are generally not unique.
+
+For example, if
+
+$$
+K=\operatorname{span}\{(1,0)\}\subseteq\mathbb R^2,
+$$
+
+both
+
+$$
+U_1=\operatorname{span}\{(0,1)\}
+$$
+
+and
+
+$$
+U_2=\operatorname{span}\{(1,1)\}
+$$
+
+are complements of $K$.
+
+### A complement of the kernel
+
+Let $T:V\to W$ be linear, with finite-dimensional $V$.
+
+Choose any complement $U$ of $\ker T$:
+
+$$
+\boxed{V=\ker T\oplus U.}
+$$
+
+The restriction
+
+$$
+T|_U:U\to\operatorname{im}T
+$$
+
+is an isomorphism.
+
+#### Proof {#module-a-session-3-a-complement-of-the-kernel-proof}
+
+If $u\in U$ and $Tu=0$, then
+
+$$
+u\in U\cap\ker T=\{0\}.
+$$
+
+So $T|_U$ is injective.
+
+For surjectivity, take any $y\in\operatorname{im}T$, so $y=Tv$ for some $v\in V$.
+
+Write
+
+$$
+v=k+u,\qquad k\in\ker T,\quad u\in U.
+$$
+
+Then
+
+$$
+y=Tv=T(k+u)=Tu.
+$$
+
+Thus $T|_U$ is surjective onto the image.
+
+We obtain
+
+$$
+\boxed{U\cong\operatorname{im}T.}
+$$
+
+This is a stronger structural version of rank–nullity: not only do the dimensions match, but we can identify a subspace of the domain on which $T$ becomes an isomorphism onto its image.
+
+### Our running matrix: an explicit decomposition
+
+For
+
+$$
+A:\mathbb R^4\to\mathbb R^3,
+$$
+
+we found
+
+$$
+K=\ker A= \operatorname{span}\{(-2,1,0,0),(-4,0,-1,1)\}.
+$$
+
+Because the pivot coordinates are 1 and 3, choose
+
+$$
+U=\operatorname{span}\{e_1,e_3\}.
+$$
+
+Then
+
+$$
+\boxed{\mathbb R^4=K\oplus U.}
+$$
+
+For any $x=(x_1,x_2,x_3,x_4)^T$, the decomposition is
+
+$$
+\boxed{ x= \underbrace{ \begin{pmatrix}
+  -2x_2-4x_4\\
+  x_2\\
+  -x_4\\
+  x_4
+\end{pmatrix}}_{\in K} + \underbrace{ \begin{pmatrix}
+  x_1+2x_2+4x_4\\
+  0\\
+  x_3+x_4\\
+  0
+\end{pmatrix}}_{\in U}. }
+$$
+
+The first component uses the same free coordinates as $x$, but adjusts the pivot coordinates to satisfy $Ax=0$.
+
+The second component corrects the remaining difference and has zero free coordinates.
+
+#### Geometric interpretation {#module-a-session-3-our-running-matrix-an-explicit-decomposition-geometric-interpretation}
+
+The same decomposition can be seen in two dimensions. Take $K=\operatorname{span}\{(1,0)\}$ and $U=\operatorname{span}\{(1,1)\}$. The lines are oblique, and they intersect only at the origin. In @fig-module-a-direct-sum, the two sides of the parallelogram determine the unique components of $x$.
+
+```{dot}
+//| label: fig-module-a-direct-sum
+//| fig-cap: "The vector x = (3, 1) decomposes uniquely into k = (2, 0) on K and u = (1, 1) on U."
+//| fig-alt: "Three arrows from the origin show k along the horizontal line K, u along the diagonal line U, and their sum x. Dashed lines complete the parallelogram."
+digraph direct_sum {
+  graph [id="module-a-direct-sum-graph", layout=neato, splines=line, outputorder=edgesfirst, bgcolor="#f8fafc", pad=0.20]
+  node [shape=point, width=0, height=0, label="", id="module-a-\G-node-\N"]
+  edge [arrowsize=0.72, penwidth=1.5, id="module-a-\G-edge-\T-\H"]
+
+  k_left [pos="-0.85,0!"]
+  k_right [pos="3.85,0!"]
+  u_lower [pos="-0.65,-0.65!"]
+  u_upper [pos="1.9,1.9!"]
+  origin [pos="0,0!"]
+  k [pos="2,0!"]
+  u [pos="1,1!"]
+  x [pos="3,1!"]
+
+  k_left -> k_right [dir=none, color="#8eb3e8"]
+  u_lower -> u_upper [dir=none, color="#77bcb0"]
+  k -> x [dir=none, style=dashed, color="#6b7280"]
+  u -> x [dir=none, style=dashed, color="#6b7280"]
+  origin -> k [color="#1d4ed8", penwidth=2.6]
+  origin -> u [color="#0f766e", penwidth=2.6]
+  origin -> x [color="#172033", penwidth=2.6]
+
+  node [shape=plaintext, margin=0, fontname="sans-serif", fontsize=15, fontcolor="#172033"]
+  label_k_line [pos="3.68,0.20!", label="K", fontcolor="#1d4ed8"]
+  label_u_line [pos="1.75,1.92!", label="U", fontcolor="#0f766e"]
+  label_origin [pos="-0.16,0.16!", label="0"]
+  label_k [pos="2,-0.20!", label="k", fontcolor="#1d4ed8"]
+  label_u [pos="0.96,1.19!", label="u", fontcolor="#0f766e"]
+  label_x [pos="3.17,1.13!", label="x"]
+}
+```
+
+### Checkpoint 3 {#module-a-checkpoint-3 .unnumbered .unlisted}
+
+Prove that if $V=\ker T\oplus U$, then
+
+$$
+\dim U=\operatorname{rank}T.
+$$
+
+Then explain why $U$ generally cannot be identified with $\operatorname{im}T$ as literally the same subset, even though they are isomorphic.
+
+## Session 4 — Quotient spaces: identifying vectors modulo a subspace {#sec-module-a-session-4}
+
+In Session 1, we learned that a linear map cannot distinguish inputs differing by a kernel vector.
+
+In Session 3, we learned to separate a vector space into complementary components.
+
+Now we introduce a third way to understand the same structure: instead of choosing a complement, we can identify all vectors differing by elements of a chosen subspace.
+
+This is the idea behind quotient spaces.
+
+### Defining the equivalence relation
+
+Let $S\subseteq V$ be a subspace.
+
+Define
+
+$$
+\boxed{ v\sim w\iff v-w\in S. }
+$$
+
+This is an equivalence relation.
+
+Reflexivity follows because $v-v=0\in S$.
+
+Symmetry follows because if $v-w\in S$, then $w-v=-(v-w)\in S$.
+
+Transitivity follows because if $v-w\in S$ and $w-u\in S$, then
+
+$$
+v-u=(v-w)+(w-u)\in S.
+$$
+
+The equivalence class of $v$ is
+
+$$
+[v]=v+S=\{v+s:s\in S\}.
+$$
+
+It is called a **coset** of $S$.
+
+The quotient set is
+
+$$
+\boxed{V/S=\{v+S:v\in V\}.}
+$$
+
+The elements of $V/S$ are cosets, not individual vectors of $V$.
+
+### Geometric example
+
+Let
+
+$$
+V=\mathbb R^2,\qquad S=\operatorname{span}\{(1,0)\}.
+$$
+
+Then
+
+$$
+(x_1,y_1)\sim(x_2,y_2)
+$$
+
+precisely when $y_1=y_2$.
+
+Therefore each equivalence class is a horizontal line.
+
+Every horizontal line becomes one element of the quotient. All points with the same vertical coordinate are identified.
+
+The quotient is isomorphic to $\mathbb R$, since one scalar (the vertical coordinate) completely describes each equivalence class.
+
+But $V/S$ is not literally the vertical axis. Its elements are horizontal lines.
+
+The vertical axis provides one representative for each equivalence class, as shown in @fig-module-a-quotient-cosets.
+
+```{dot}
+//| label: fig-module-a-quotient-cosets
+//| fig-cap: "Three horizontal cosets of S. The vertical complement U meets each coset at its unique representative."
+//| fig-alt: "Three horizontal lines at heights minus one, zero, and one. The line at height zero is S. The vertical line U meets the top coset at (0, 1), on the same horizontal line as (1, 1)."
+graph quotient_cosets {
+  graph [id="module-a-quotient-cosets-graph", layout=neato, splines=line, outputorder=edgesfirst, bgcolor="#f8fafc", pad=0.20]
+  node [shape=point, width=0, height=0, label="", id="module-a-\G-node-\N"]
+  edge [color="#94a3b8", penwidth=1.4, id="module-a-\G-edge-\T-\H"]
+
+  minus_left [pos="-1.7,-1!"]
+  minus_right [pos="1.7,-1!"]
+  zero_left [pos="-1.7,0!"]
+  zero_right [pos="1.7,0!"]
+  plus_left [pos="-1.7,1!"]
+  plus_right [pos="1.7,1!"]
+  u_lower [pos="0,-1.22!"]
+  u_upper [pos="0,1.38!"]
+
+  minus_left -- minus_right
+  zero_left -- zero_right [color="#64748b"]
+  plus_left -- plus_right [color="#1d4ed8", penwidth=2.2]
+  u_lower -- u_upper [color="#0f766e", penwidth=2.0]
+
+  node [width=0.082, height=0.082]
+  plus_rep [pos="0,1!", color="#0f766e"]
+  zero_rep [pos="0,0!", color="#0f766e"]
+  minus_rep [pos="0,-1!", color="#0f766e"]
+  plus_point [pos="1,1!", color="#1d4ed8"]
+
+  node [shape=plaintext, width=0, height=0, margin=0, fontname="sans-serif", fontsize=14, fontcolor="#172033"]
+  label_u [pos="-0.16,1.30!", label="U", fontcolor="#0f766e"]
+  label_rep [pos="0.35,1.24!", label="(0, 1)", fontcolor="#0f766e"]
+  label_point [pos="1,0.77!", label="(1, 1)", fontcolor="#1d4ed8"]
+  label_plus [pos="2.30,1!", label="(0, 1) + S", fontcolor="#1d4ed8"]
+  label_zero [pos="2.30,0!", label="S"]
+  label_minus [pos="2.30,-1!", label="(0, −1) + S"]
+}
+```
+
+### Making the quotient into a vector space
+
+Define addition and scalar multiplication by
+
+$$
+(v+S)+(w+S)=(v+w)+S
+$$
+
+and
+
+$$
+\alpha(v+S)=\alpha v+S.
+$$
+
+Before accepting these definitions, we must show they are **well-defined**.
+
+Suppose $v'=v+s_1$ and $w'=w+s_2$, with $s_1,s_2\in S$.
+
+Then
+
+$$
+v'+w'=(v+w)+(s_1+s_2).
+$$
+
+Because $S$ is a subspace,
+
+$$
+s_1+s_2\in S.
+$$
+
+Thus
+
+$$
+(v'+w')+S=(v+w)+S.
+$$
+
+Similarly,
+
+$$
+\alpha v'-\alpha v=\alpha s_1\in S,
+$$
+
+so scalar multiplication is independent of the representative.
+
+The vector-space axioms then follow from those of $V$.
+
+The zero vector of $V/S$ is the coset $S=0+S$.
+
+### The canonical quotient map
+
+Define
+
+$$
+\boxed{ q:V\to V/S,\qquad q(v)=v+S. }
+$$
+
+This map is linear and surjective.
+
+Its kernel is
+
+$$
+\begin{aligned}
+  \ker q &=\{v:q(v)=S\}\\
+  &=\{v:v+S=S\}\\
+  &=S.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{\ker q=S.}
+$$
+
+This is a revealing fact: the quotient map is a linear transformation that collapses precisely the subspace $S$.
+
+It is universal among linear maps that do so, as we will prove in Session 6.
+
+### Dimension of a quotient space
+
+Suppose
+
+$$
+\dim V=n,\qquad \dim S=k.
+$$
+
+Then
+
+$$
+\boxed{\dim(V/S)=n-k.}
+$$
+
+#### Proof {#module-a-session-4-dimension-of-a-quotient-space-proof}
+
+Choose a basis $(s_1,\ldots,s_k)$ of $S$, and extend it to a basis of $V$:
+
+$$
+(s_1,\ldots,s_k,u_1,\ldots,u_{n-k}).
+$$
+
+We claim that the cosets
+
+$$
+u_1+S,\ldots,u_{n-k}+S
+$$
+
+form a basis of $V/S$.
+
+**Spanning:** Every $v\in V$ can be expressed as
+
+$$
+v=\sum_i a_is_i+\sum_j b_ju_j.
+$$
+
+Since the $s_i$ vanish in the quotient,
+
+$$
+v+S=\sum_j b_j(u_j+S).
+$$
+
+**Independence:** Suppose
+
+$$
+\sum_j b_j(u_j+S)=S.
+$$
+
+Then
+
+$$
+\sum_j b_ju_j\in S.
+$$
+
+Therefore it can also be written as a linear combination of the $s_i$.
+
+Independence of the extended basis forces all $b_j=0$.
+
+Thus the quotient has a basis containing $n-k$ cosets.
+
+### Quotients and complements
+
+Suppose
+
+$$
+V=S\oplus U.
+$$
+
+Every $v\in V$ can be written uniquely as
+
+$$
+v=s+u.
+$$
+
+Because $s\in S$,
+
+$$
+v+S=u+S.
+$$
+
+Thus every coset contains exactly one vector from $U$.
+
+Define
+
+$$
+\Psi:U\to V/S,\qquad \Psi(u)=u+S.
+$$
+
+This is a linear isomorphism.
+
+Hence
+
+$$
+\boxed{V/S\cong U.}
+$$
+
+There is an important distinction between the two objects.
+
+The quotient $V/S$ is determined by $V$ and $S$.
+
+A complementary subspace $U$ is generally not unique.
+
+Therefore, the quotient exists independently of any choice of complement, even though a complement provides a convenient concrete model for it.
+
+### Checkpoint 4 {#module-a-checkpoint-4 .unnumbered .unlisted}
+
+Explain why the quotient $V/S$ should be thought of as a space of equivalence classes rather than as a particular complementary subspace.
+
+Then prove that if $V=S\oplus U$, the restriction of the quotient map $q$ to $U$ is an isomorphism $U\to V/S$.
+
+## Session 5 — The first isomorphism theorem {#sec-module-a-session-5}
+
+We have now developed enough theory to prove the central theorem of the module.
+
+### Motivation: turning a noninjective map into an isomorphism
+
+Let
+
+$$
+T:V\to W
+$$
+
+be linear.
+
+Suppose $T$ is not injective.
+
+Then there are distinct vectors $v,w\in V$ such that
+
+$$
+T(v)=T(w).
+$$
+
+We know that this happens precisely when
+
+$$
+v-w\in\ker T.
+$$
+
+Therefore, if we identify vectors differing by elements of $\ker T$, the ambiguity should disappear.
+
+That is exactly what the quotient
+
+$$
+V/\ker T
+$$
+
+does.
+
+The first isomorphism theorem makes this intuition rigorous.
+
+### Statement
+
+For every linear map $T:V\to W$,
+
+$$
+\boxed{ V/\ker T\cong\operatorname{im}T. }
+$$
+
+More precisely, define
+
+$$
+\widetilde T:V/\ker T\to\operatorname{im}T
+$$
+
+by
+
+$$
+\boxed{ \widetilde T(v+\ker T)=T(v). }
+$$
+
+The theorem states that $\widetilde T$ is a linear isomorphism.
+
+### Proof
+
+We must establish four properties.
+
+#### Well-definedness {#module-a-session-5-proof-well-definedness}
+
+Suppose two representatives describe the same coset:
+
+$$
+v+\ker T=w+\ker T.
+$$
+
+Then
+
+$$
+v-w\in\ker T.
+$$
+
+Consequently,
+
+$$
+T(v-w)=0,
+$$
+
+which implies
+
+$$
+T(v)=T(w).
+$$
+
+Thus $\widetilde T$ does not depend on the representative used.
+
+#### Linearity {#module-a-session-5-proof-linearity}
+
+For $v,w\in V$,
+
+$$
+\begin{aligned}
+  \widetilde T\bigl(\alpha(v+\ker T)+\beta(w+\ker T)\bigr) &=\widetilde T((\alpha v+\beta w)+\ker T)\\
+  &=T(\alpha v+\beta w)\\
+  &=\alpha T(v)+\beta T(w).
+\end{aligned}
+$$
+
+Therefore $\widetilde T$ is linear.
+
+#### Injectivity {#module-a-session-5-proof-injectivity}
+
+Suppose
+
+$$
+\widetilde T(v+\ker T)=0.
+$$
+
+Then $T(v)=0$, so $v\in\ker T$.
+
+Hence
+
+$$
+v+\ker T=\ker T,
+$$
+
+the zero element of the quotient.
+
+Therefore,
+
+$$
+\ker\widetilde T=\{0\},
+$$
+
+and $\widetilde T$ is injective.
+
+#### Surjectivity {#module-a-session-5-proof-surjectivity}
+
+Take any $y\in\operatorname{im}T$.
+
+By definition, $y=T(v)$ for some $v\in V$.
+
+Thus
+
+$$
+y=\widetilde T(v+\ker T).
+$$
+
+So $\widetilde T$ is surjective.
+
+We have proved that $\widetilde T$ is an isomorphism.
+
+### The canonical factorization of a linear map
+
+The theorem gives the factorization
+
+$$
+\boxed{
+  V \xrightarrow{q} V/\ker T
+  \xrightarrow[\cong]{\widetilde T} \operatorname{im}T
+  \overset{\iota}{\hookrightarrow} W.
+}
+$$
+
+Here $q$ is the quotient map and $\iota$ is the inclusion.
+
+The original transformation is their composition:
+
+$$
+\boxed{T=\iota\circ\widetilde T\circ q.}
+$$
+
+This separates the behavior of any linear map into three parts.
+
+The quotient map removes the ambiguity caused by the kernel.
+
+The induced map $\widetilde T$ establishes a one-to-one correspondence with the image.
+
+The inclusion regards that image as a subspace of the entire codomain.
+
+**A noninvertible linear map contains an invertible transformation once the kernel and image have been properly accounted for.**
+
+This is the essential structural content of the theorem.
+
+### Rank–nullity follows from the isomorphism theorem
+
+We already proved that
+
+$$
+\dim(V/S)=\dim V-\dim S.
+$$
+
+Setting $S=\ker T$ gives
+
+$$
+\dim(V/\ker T) = \dim V-\dim\ker T.
+$$
+
+But isomorphic finite-dimensional spaces have equal dimensions, so
+
+$$
+\dim(V/\ker T)=\dim\operatorname{im}T.
+$$
+
+Therefore,
+
+$$
+\dim V-\dim\ker T=\dim\operatorname{im}T.
+$$
+
+Rearranging,
+
+$$
+\boxed{ \dim V=\dim\ker T+\dim\operatorname{im}T. }
+$$
+
+We have derived rank–nullity a second way.
+
+The two proofs emphasize different ideas:
+
+The basis-extension proof counts independent directions.
+
+The quotient-space proof identifies indistinguishable inputs and shows that the remaining information is in bijection with the image.
+
+### The theorem applied to our running matrix
+
+For our matrix $A:\mathbb R^4\to\mathbb R^3$,
+
+$$
+K=\ker A = \operatorname{span}\{(-2,1,0,0),(-4,0,-1,1)\}.
+$$
+
+We constructed the complement
+
+$$
+U=\operatorname{span}\{e_1,e_3\}.
+$$
+
+Thus
+
+$$
+\mathbb R^4=K\oplus U.
+$$
+
+Every coset in $\mathbb R^4/K$ has exactly one representative in $U$.
+
+A basis of the quotient is therefore
+
+$$
+(e_1+K,\ e_3+K).
+$$
+
+The induced isomorphism maps these basis elements to
+
+$$
+\widetilde A(e_1+K)=Ae_1 =\begin{pmatrix}
+  1\\
+  2\\
+  3
+\end{pmatrix}
+$$
+
+and
+
+$$
+\widetilde A(e_3+K)=Ae_3 =\begin{pmatrix}
+  -1\\
+  1\\
+  0
+\end{pmatrix}.
+$$
+
+These are exactly the basis vectors of $\operatorname{im}A$.
+
+Thus we have the explicit identifications
+
+$$
+\boxed{ \mathbb R^4/K\cong U\cong\operatorname{im}A. }
+$$
+
+The map from the quotient to the image is canonical: it is determined by $A$.
+
+The identification of the quotient with $U$ depends on the complement we selected.
+
+### Connection to nonuniqueness of linear systems
+
+Consider the equation
+
+$$
+Ax=b.
+$$
+
+Suppose it is consistent, and $x_0$ is one solution.
+
+Then every solution has the form
+
+$$
+\boxed{x=x_0+k,\qquad k\in\ker A.}
+$$
+
+#### Proof {#module-a-session-5-connection-to-nonuniqueness-of-linear-systems-proof}
+
+If $Ax=b=Ax_0$, then
+
+$$
+A(x-x_0)=0,
+$$
+
+so $x-x_0\in\ker A$.
+
+Conversely, if $k\in\ker A$, then
+
+$$
+A(x_0+k)=Ax_0+Ak=b.
+$$
+
+Hence the full solution set is the affine subspace
+
+$$
+x_0+\ker A.
+$$
+
+This is not usually a vector subspace because it need not contain zero.
+
+However, it is precisely one coset of $\ker A$.
+
+Thus the quotient $V/\ker A$ can be interpreted as the space of equivalence classes of solutions that share the same output.
+
+The first isomorphism theorem then says that each such equivalence class corresponds to exactly one attainable right-hand side $b$.
+
+### Checkpoint 5 {#module-a-checkpoint-5 .unnumbered .unlisted}
+
+Prove that if $Ax=b$ is consistent, all its solutions form a single coset of $\ker A$.
+
+Then explain why the first isomorphism theorem is stronger than simply stating that the number of free variables equals the nullity.
+
+## Session 6 — Universal properties, exact sequences, and projections {#sec-module-a-session-6}
+
+We now examine the constructions from the previous sessions at a higher level of abstraction.
+
+The objective is not to begin a full category theory course, but to recognize how the same ideas can be characterized by their relationships with maps.
+
+### What is a universal property?
+
+A universal property describes a mathematical object by how maps into or out of that object behave.
+
+Rather than specifying only its elements, we specify a mapping problem for which the object provides a unique solution.
+
+This often reveals why a construction generalizes to other algebraic structures.
+
+### The universal property of the quotient
+
+Let $S\subseteq V$, with quotient map
+
+$$
+q:V\to V/S.
+$$
+
+Suppose
+
+$$
+L:V\to Z
+$$
+
+is linear and $S\subseteq\ker L$.
+
+Then there exists a unique linear map
+
+$$
+\overline L:V/S\to Z
+$$
+
+such that
+
+$$
+\boxed{L=\overline L\circ q.}
+$$
+
+The map is necessarily defined by
+
+$$
+\overline L(v+S)=L(v).
+$$
+
+Why is this well-defined?
+
+If $v+S=w+S$, then $v-w\in S\subseteq\ker L$, so
+
+$$
+L(v)=L(w).
+$$
+
+Linearity follows immediately.
+
+Uniqueness follows because every coset equals $q(v)$ for some $v$, so the identity
+
+$$
+\overline L(q(v))=L(v)
+$$
+
+determines $\overline L$ everywhere.
+
+The maps form the commuting triangle in @fig-module-a-quotient-property.
+
+```{mermaid}
+%%| label: fig-module-a-quotient-property
+%%| fig-cap: "The dashed arrow is the unique induced map from V / S to Z."
+%%| fig-alt: "A triangle with the direct arrow L from V to Z and the path from V through V slash S to Z. The first leg is q and the second leg is L bar."
+flowchart LR
+  domain["V"] -->|L| target["Z"]
+  domain -->|q| quotient["V / S"]
+  quotient -.->|"L̄"| target
+```
+
+Both paths from $V$ to $Z$ give the same result.
+
+#### Interpretation {#module-a-session-6-the-universal-property-of-the-quotient-interpretation}
+
+The quotient is the universal construction that forces all vectors in $S$ to become zero.
+
+Any linear map already annihilating $S$ automatically factors through the quotient.
+
+This gives a conceptual explanation of why quotient spaces arise throughout algebra.
+
+### Direct sums as universal constructions
+
+The external direct sum $V\oplus W$ has canonical inclusions
+
+$$
+i_V(v)=(v,0),\qquad i_W(w)=(0,w).
+$$
+
+Suppose we have linear maps
+
+$$
+f:V\to Z,\qquad g:W\to Z.
+$$
+
+There exists a unique linear map
+
+$$
+h:V\oplus W\to Z
+$$
+
+such that
+
+$$
+h\circ i_V=f,\qquad h\circ i_W=g.
+$$
+
+The map must be
+
+$$
+\boxed{h(v,w)=f(v)+g(w).}
+$$
+
+This is the **coproduct universal property**.
+
+There is also a product universal property.
+
+Let $\pi_V,\pi_W$ be the coordinate projections from $V\oplus W$.
+
+Given linear maps
+
+$$
+f:Z\to V,\qquad g:Z\to W,
+$$
+
+there is a unique map
+
+$$
+h:Z\to V\oplus W
+$$
+
+defined by
+
+$$
+h(z)=(f(z),g(z))
+$$
+
+such that
+
+$$
+\pi_V\circ h=f,\qquad\pi_W\circ h=g.
+$$
+
+Thus finite direct sums of vector spaces serve simultaneously as products and coproducts.
+
+This is an example of a categorical structure called a *biproduct*.
+
+It illustrates how ordinary linear algebraic operations can be understood through universal mapping properties.
+
+### Exact sequences
+
+Consider a sequence of linear maps
+
+$$
+\cdots\longrightarrow V_{i-1} \xrightarrow{T_{i-1}}V_i \xrightarrow{T_i}V_{i+1} \longrightarrow\cdots.
+$$
+
+The sequence is **exact at** $V_i$ if
+
+$$
+\boxed{\operatorname{im}T_{i-1}=\ker T_i.}
+$$
+
+In particular, exactness implies
+
+$$
+T_i\circ T_{i-1}=0.
+$$
+
+Every vector coming from the preceding map is annihilated by the next, and every vector annihilated by the next comes from the preceding map.
+
+#### Short exact sequences {#module-a-session-6-exact-sequences-short-exact-sequences}
+
+A particularly important form is
+
+$$
+\boxed{ 0\longrightarrow K \xrightarrow{\ i\ }V \xrightarrow{\ p\ }I \longrightarrow0. }
+$$
+
+Exactness means that
+
+$$
+i\text{ is injective}, \qquad p\text{ is surjective}, \qquad \operatorname{im}i=\ker p.
+$$
+
+For any linear map $T:V\to W$, we obtain the canonical short exact sequence
+
+$$
+\boxed{ 0\longrightarrow\ker T \longrightarrow V \xrightarrow{\ T\ }\operatorname{im}T \longrightarrow0. }
+$$
+
+Here, the arrow labeled $T$ is regarded as a map onto its image.
+
+This sequence packages the essential information about kernels and images into one expression.
+
+#### Rank–nullity from exactness {#module-a-session-6-exact-sequences-rank-nullity-from-exactness}
+
+For finite-dimensional spaces, a short exact sequence
+
+$$
+0\to K\to V\to I\to0
+$$
+
+implies
+
+$$
+\boxed{\dim V=\dim K+\dim I.}
+$$
+
+Thus rank–nullity can be seen as a dimension consequence of exactness.
+
+### Why exact sequences matter beyond vector spaces
+
+For vector spaces over a field, every short exact sequence splits.
+
+Informally, this means that a sequence
+
+$$
+0\to K\to V\to I\to0
+$$
+
+allows us to find an isomorphism
+
+$$
+\boxed{V\cong K\oplus I.}
+$$
+
+The reason is that every subspace has a complement.
+
+However, the splitting generally requires a choice and is not canonical.
+
+In other algebraic structures, such as modules over arbitrary rings, short exact sequences need not split.
+
+This is why exact sequences carry information beyond dimension counting in abstract algebra.
+
+They describe how objects fit together, including whether one can be decomposed into independent components.
+
+### Projections correspond to direct-sum decompositions
+
+Suppose
+
+$$
+V=K\oplus U.
+$$
+
+Every $v\in V$ has a unique decomposition
+
+$$
+v=k+u.
+$$
+
+Define
+
+$$
+P:V\to V,\qquad P(k+u)=k.
+$$
+
+This map is a projection onto $K$ along $U$.
+
+By construction,
+
+$$
+\boxed{ \operatorname{im}P=K,\qquad \ker P=U. }
+$$
+
+Moreover,
+
+$$
+P^2=P.
+$$
+
+Indeed,
+
+$$
+P(P(v))=P(k)=k=P(v).
+$$
+
+A linear operator satisfying
+
+$$
+\boxed{P^2=P}
+$$
+
+is called **idempotent**.
+
+#### Converse: every idempotent operator gives a direct sum {#module-a-session-6-projections-correspond-to-direct-sum-decompositions-converse-every-idempotent-operator-gives-a-direct-sum}
+
+Suppose $P:V\to V$ is linear and $P^2=P$.
+
+For every $v\in V$,
+
+$$
+v=P(v)+(v-P(v)).
+$$
+
+The first term belongs to $\operatorname{im}P$.
+
+The second belongs to $\ker P$, because
+
+$$
+P(v-P(v)) =P(v)-P^2(v) =0.
+$$
+
+Thus
+
+$$
+V=\operatorname{im}P+\ker P.
+$$
+
+The intersection is trivial.
+
+If $w\in\operatorname{im}P\cap\ker P$, then $w=P(v)$ for some $v$ and $P(w)=0$. Hence
+
+$$
+w=P(v)=P^2(v)=P(w)=0.
+$$
+
+Therefore,
+
+$$
+\boxed{ V=\operatorname{im}P\oplus\ker P. }
+$$
+
+This is a general algebraic characterization of projections.
+
+### Our running example: constructing a projection
+
+Recall the decomposition
+
+$$
+\mathbb R^4=\ker A\oplus U, \qquad U=\operatorname{span}\{e_1,e_3\}.
+$$
+
+The projection onto $\ker A$ along $U$ is
+
+$$
+P(x_1,x_2,x_3,x_4) = (-2x_2-4x_4,\ x_2,\ -x_4,\ x_4).
+$$
+
+In matrix form,
+
+$$
+\boxed{ P= \begin{pmatrix}
+  0&-2&0&-4\\
+  0&1&0&0\\
+  0&0&0&-1\\
+  0&0&0&1
+\end{pmatrix}. }
+$$
+
+You can verify that
+
+$$
+P^2=P,\qquad AP=0.
+$$
+
+The second identity follows because every output of $P$ lies in $\ker A$.
+
+But $P$ is not symmetric.
+
+So this projection is generally oblique, not orthogonal.
+
+The distinction will become central in Module C, when we introduce inner products and adjoints.
+
+### Checkpoint 6 {#module-a-checkpoint-6 .unnumbered .unlisted}
+
+Prove that an idempotent operator is the identity on its image.
+
+Then explain why the identity $P^2=P$ does not imply $P=P^T$.
+
+Finally, explain why the existence of algebraic projections requires no inner product.
+
+## Session 7 — Applications: when the abstract structure becomes useful {#sec-module-a-session-7}
+
+We now apply the ideas developed in Sessions 1–6.
+
+The goal is not merely to identify a kernel or quotient in a familiar setting. We want to see how the structure answers a concrete question that would otherwise be difficult to formulate or solve.
+
+We will examine three examples: rank-deficient linear systems, graph Laplacians, and differential operators.
+
+### Application I: rank-deficient linear systems
+
+Consider again
+
+$$
+A= \begin{pmatrix}
+  1&2&-1&3\\
+  2&4&1&9\\
+  3&6&0&12
+\end{pmatrix}.
+$$
+
+We know that
+
+$$
+\operatorname{rank}A=2,\qquad\dim\ker A=2.
+$$
+
+Now consider the linear system
+
+$$
+Ax=b.
+$$
+
+There are two different questions to investigate:
+
+1. Does a solution exist?
+2. If it exists, is it unique?
+
+The image and kernel answer these questions separately.
+
+#### Existence {#module-a-session-7-application-i-rank-deficient-linear-systems-existence}
+
+A solution exists precisely when
+
+$$
+\boxed{b\in\operatorname{im}A.}
+$$
+
+Every column of our matrix has its third entry equal to the sum of its first two entries.
+
+Therefore every vector in the image satisfies
+
+$$
+b_3=b_1+b_2.
+$$
+
+Conversely, the image has dimension $2$, and the set of vectors satisfying this equation is a two-dimensional subspace of $\mathbb R^3$.
+
+Hence
+
+$$
+\boxed{ \operatorname{im}A = \{b\in\mathbb R^3:b_3=b_1+b_2\}. }
+$$
+
+Consequently, $Ax=b$ is consistent if and only if
+
+$$
+\boxed{b_3=b_1+b_2.}
+$$
+
+For example,
+
+$$
+b=(1,2,3)^T
+$$
+
+is attainable, whereas
+
+$$
+b=(1,0,0)^T
+$$
+
+is not.
+
+#### Uniqueness {#module-a-session-7-application-i-rank-deficient-linear-systems-uniqueness}
+
+Suppose $x_0$ is one solution.
+
+Then all solutions are
+
+$$
+\boxed{x=x_0+k,\qquad k\in\ker A.}
+$$
+
+For $b=(1,2,3)^T$, we can take
+
+$$
+x_0=e_1=(1,0,0,0)^T.
+$$
+
+The full solution family is
+
+$$
+x= \begin{pmatrix}
+  1\\
+  0\\
+  0\\
+  0
+\end{pmatrix} +s\begin{pmatrix}
+  -2\\
+  1\\
+  0\\
+  0
+\end{pmatrix} +t\begin{pmatrix}
+  -4\\
+  0\\
+  -1\\
+  1
+\end{pmatrix}.
+$$
+
+Thus there are infinitely many solutions, indexed by two parameters.
+
+#### Why this matters numerically {#module-a-session-7-application-i-rank-deficient-linear-systems-why-this-matters-numerically}
+
+For a rank-deficient matrix, the nonuniqueness is not a numerical accident. It is part of the mathematical structure of the problem.
+
+A numerical algorithm must determine which solution to return.
+
+For example, one might choose the unique solution belonging to a selected complement of $\ker A$.
+
+With Euclidean geometry, an especially natural choice is the solution orthogonal to the kernel. This is the minimum-Euclidean-norm solution, which is computed using the Moore–Penrose pseudoinverse.
+
+Those ideas will be developed further in Module C.
+
+#### The numerical complication: near rank deficiency {#module-a-session-7-application-i-rank-deficient-linear-systems-the-numerical-complication-near-rank-deficiency}
+
+Suppose a matrix is not exactly rank deficient, but has a very small singular value.
+
+Then small changes in the right-hand side or rounding errors may produce large changes in the solution.
+
+This is a conditioning issue.
+
+Thus the mathematical distinction between a trivial and a nontrivial kernel leads naturally to numerical questions involving singular values, condition numbers, regularization, and stable algorithms.
+
+A further question is whether the rank is exact or only *numerically* small relative to a chosen tolerance.
+
+That is why robust numerical linear algebra generally uses singular values or rank-revealing factorizations rather than treating an RREF computed in floating-point arithmetic as an exact algebraic answer.
+
+### Application II: graphs, flows, and discrete differential operators
+
+Consider the path graph in @fig-module-a-path-graph.
+
+```{mermaid}
+%%| label: fig-module-a-path-graph
+%%| fig-cap: "The two arrows fix the sign convention for the incidence matrix of the path graph."
+%%| fig-alt: "Three vertices with potentials p one, p two, and p three. The edge from the first to the second measures p two minus p one, and the edge from the second to the third measures p three minus p two."
+flowchart LR
+  v1(("p₁")) -->|"p₂ − p₁"| v2(("p₂"))
+  v2 -->|"p₃ − p₂"| v3(("p₃"))
+```
+
+Assign a scalar potential $p_i$ to each vertex.
+
+For example, $p_i$ might represent electrical potential, temperature, or a scalar state variable.
+
+Collect the potentials in
+
+$$
+p=\begin{pmatrix}
+  p_1\\
+  p_2\\
+  p_3
+\end{pmatrix}.
+$$
+
+We want to measure differences across the edges:
+
+$$
+p_2-p_1,\qquad p_3-p_2.
+$$
+
+Define
+
+$$
+\boxed{ D= \begin{pmatrix}
+  -1&1&0\\
+  0&-1&1
+\end{pmatrix}. }
+$$
+
+Then
+
+$$
+Dp= \begin{pmatrix}
+  p_2-p_1\\
+  p_3-p_2
+\end{pmatrix}.
+$$
+
+The matrix $D$ is a discrete gradient operator, represented by an oriented graph incidence matrix.
+
+#### What is its kernel? {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-what-is-its-kernel}
+
+Solve
+
+$$
+Dp=0.
+$$
+
+This gives
+
+$$
+p_2=p_1,\qquad p_3=p_2.
+$$
+
+Thus every potential must have the same value:
+
+$$
+p=c\begin{pmatrix}
+  1\\
+  1\\
+  1
+\end{pmatrix}.
+$$
+
+Therefore,
+
+$$
+\boxed{ \ker D=\operatorname{span}\{\mathbf1\}, \qquad \mathbf1=(1,1,1)^T. }
+$$
+
+What does this mean?
+
+Adding the same constant to every potential does not change any potential difference:
+
+$$
+D(p+c\mathbf1)=Dp.
+$$
+
+The discrete gradient cannot detect absolute potential levels. It detects only relative differences.
+
+This is an example of a **gauge freedom**.
+
+#### The natural quotient {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-the-natural-quotient}
+
+Because constant shifts are invisible, the essential input space is
+
+$$
+\mathbb R^3/\operatorname{span}\{\mathbf1\}.
+$$
+
+Our graph is connected, and $D$ has rank $2$. Since its codomain is $\mathbb R^2$,
+
+$$
+\operatorname{im}D=\mathbb R^2.
+$$
+
+The first isomorphism theorem gives
+
+$$
+\boxed{ \mathbb R^3/\operatorname{span}\{\mathbf1\} \cong\mathbb R^2. }
+$$
+
+This has a concrete interpretation:
+
+Two independent edge differences contain exactly the same information as three vertex potentials, provided we ignore a common additive constant.
+
+#### Choosing a representative {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-choosing-a-representative}
+
+We can remove the ambiguity by fixing one potential, for example
+
+$$
+p_1=0.
+$$
+
+Then, given edge differences $d_1,d_2$,
+
+$$
+p_2=d_1,\qquad p_3=d_1+d_2.
+$$
+
+Thus we obtain the unique representative
+
+$$
+p=\begin{pmatrix}
+  0\\
+  d_1\\
+  d_1+d_2
+\end{pmatrix}.
+$$
+
+This is another example of choosing a complement of the kernel.
+
+The quotient is intrinsic; setting $p_1=0$ is a convenient choice of coordinates.
+
+#### Constructing the graph Laplacian {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-constructing-the-graph-laplacian}
+
+Now define
+
+$$
+L=D^TD.
+$$
+
+Calculating,
+
+$$
+\boxed{ L= \begin{pmatrix}
+  1&-1&0\\
+  -1&2&-1\\
+  0&-1&1
+\end{pmatrix}. }
+$$
+
+This is the graph Laplacian for our path graph.
+
+Notice that
+
+$$
+L\mathbf1=0.
+$$
+
+In fact,
+
+$$
+\ker L=\ker D.
+$$
+
+To see this, suppose $Lp=0$. Then
+
+$$
+0=p^TLp =p^TD^TDp =\|Dp\|_2^2.
+$$
+
+Therefore $Dp=0$.
+
+Conversely, $Dp=0$ clearly implies $Lp=0$.
+
+Hence
+
+$$
+\boxed{\ker L=\operatorname{span}\{\mathbf1\}.}
+$$
+
+The Laplacian is singular because absolute potential levels are undetermined.
+
+#### Compatibility conditions {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-compatibility-conditions}
+
+Consider the system
+
+$$
+Lp=b.
+$$
+
+Because $L\mathbf1=0$ and $L$ is symmetric, every vector in its image is orthogonal to $\mathbf1$:
+
+$$
+\mathbf1^T(Lp)=(L\mathbf1)^Tp=0.
+$$
+
+Thus a necessary condition for solvability is
+
+$$
+\boxed{b_1+b_2+b_3=0.}
+$$
+
+It is also sufficient because $\operatorname{rank}L=2$, and the vectors satisfying this condition form a two-dimensional subspace.
+
+Therefore,
+
+$$
+Lp=b
+$$
+
+is solvable precisely when the entries of $b$ sum to zero.
+
+This is exactly the same kernel-image structure we studied abstractly.
+
+#### Why this is important {#module-a-session-7-application-ii-graphs-flows-and-discrete-differential-operators-why-this-is-important}
+
+Graph Laplacians appear in electrical networks, diffusion, numerical PDEs, graph algorithms, machine learning, and scientific computing.
+
+Their constant-vector null space is not an incidental numerical defect. It reflects a fundamental invariance: only differences of potential matter.
+
+For more general connected graphs, the same principle applies. The discrete gradient has constant vectors in its kernel, while the transpose of the incidence matrix describes a discrete divergence of edge flows.
+
+This creates a natural bridge toward discrete differential operators and the algebraic structure of conservation laws.
+
+### Application III: differential operators and function spaces
+
+The preceding examples used finite-dimensional vectors.
+
+But the definitions of kernel, image, quotient, and linear map do not require finite-dimensional spaces.
+
+Let's investigate an infinite-dimensional example.
+
+Consider the vector spaces
+
+$$
+V=C^1([0,1]), \qquad W=C([0,1]).
+$$
+
+Here $C^1([0,1])$ consists of continuously differentiable real-valued functions, while $C([0,1])$ consists of continuous functions.
+
+Define the differentiation operator
+
+$$
+\boxed{ D:V\to W,\qquad D(f)=f'. }
+$$
+
+This is linear because
+
+$$
+(\alpha f+\beta g)'=\alpha f'+\beta g'.
+$$
+
+#### What is its kernel? {#module-a-session-7-application-iii-differential-operators-and-function-spaces-what-is-its-kernel}
+
+We have
+
+$$
+Df=0 \iff f'=0.
+$$
+
+On a connected interval, a continuously differentiable function with zero derivative is constant.
+
+Therefore,
+
+$$
+\boxed{ \ker D=\{f:f(x)=c,\ c\in\mathbb R\}. }
+$$
+
+The kernel is a one-dimensional vector space of constant functions.
+
+#### What is its image? {#module-a-session-7-application-iii-differential-operators-and-function-spaces-what-is-its-image}
+
+Let $g\in C([0,1])$.
+
+Define
+
+$$
+f(x)=\int_0^x g(t)\,dt.
+$$
+
+By the fundamental theorem of calculus,
+
+$$
+f'(x)=g(x).
+$$
+
+Thus $Df=g$.
+
+Since $g$ was arbitrary,
+
+$$
+\boxed{\operatorname{im}D=C([0,1]).}
+$$
+
+So differentiation is surjective from $C^1([0,1])$ onto $C([0,1])$, but not injective.
+
+#### The quotient interpretation {#module-a-session-7-application-iii-differential-operators-and-function-spaces-the-quotient-interpretation}
+
+The first isomorphism theorem gives
+
+$$
+\boxed{ C^1([0,1])/\{\text{constant functions}\} \cong C([0,1]). }
+$$
+
+This is a genuinely infinite-dimensional example of the same theorem.
+
+It says that differentiation determines a continuously differentiable function uniquely up to an additive constant.
+
+The integral
+
+$$
+f(x)=\int_0^x g(t)\,dt
+$$
+
+chooses the unique representative satisfying
+
+$$
+f(0)=0.
+$$
+
+Other representatives differ by a constant:
+
+$$
+f_c(x)=\int_0^x g(t)\,dt+c.
+$$
+
+#### Relation to initial conditions {#module-a-session-7-application-iii-differential-operators-and-function-spaces-relation-to-initial-conditions}
+
+This example gives a structural interpretation of why one initial condition determines a unique solution to
+
+$$
+f'(x)=g(x).
+$$
+
+The differential equation determines the solution only up to an element of $\ker D$, which has dimension one.
+
+One scalar condition, such as
+
+$$
+f(0)=a,
+$$
+
+fixes the remaining freedom.
+
+The same idea extends to higher-order differential operators.
+
+For instance,
+
+$$
+L:C^2([0,1])\to C([0,1]), \qquad L(f)=f''
+$$
+
+has kernel
+
+$$
+\ker L=\operatorname{span}\{1,x\}.
+$$
+
+Thus solutions to $f''=g$ differ by an affine function $a+bx$, and two independent initial conditions select a unique solution.
+
+#### Why this matters for functional analysis and PDEs {#module-a-session-7-application-iii-differential-operators-and-function-spaces-why-this-matters-for-functional-analysis-and-pdes}
+
+This is the beginning of operator theory.
+
+Instead of studying matrices acting on coordinate vectors, we study linear operators acting on functions.
+
+The same algebraic structures reappear:
+
+$$
+\ker L,\qquad \operatorname{im}L,\qquad V/\ker L.
+$$
+
+But in functional analysis, additional questions become important.
+
+For example, are the relevant spaces complete? Is the operator continuous or bounded? Is its image closed? Does a closed complementary subspace exist?
+
+In infinite-dimensional normed spaces, these questions cannot be answered using algebra alone.
+
+In particular, a subspace may have an algebraic complement without having a closed topological complement.
+
+This is one of the major reasons functional analysis is more subtle than finite-dimensional linear algebra.
+
+The algebraic foundations, however, are exactly the structures developed in this module.
+
+### Checkpoint 7 {#module-a-checkpoint-7 .unnumbered .unlisted}
+
+For the operator
+
+$$
+L(f)=f''
+$$
+
+on $C^2([0,1])$, prove that
+
+$$
+\ker L=\operatorname{span}\{1,x\}.
+$$
+
+Then explain why prescribing $f(0)$ and $f'(0)$ selects a unique solution of $f''=g$ for every continuous $g$.
+
+Finally, interpret this as choosing a unique representative from a coset of $\ker L$.
+
+## Session 8 — Invariant subspaces and the bridge to numerical eigenvalue methods {#sec-module-a-session-8}
+
+The applications in Session 7 showed how kernels, images, and quotient spaces arise in different mathematical settings.
+
+We now connect Module A to the spectral theory that underlies your Numerical Linear Algebra course and HASC seminar.
+
+The main new idea is the **invariant subspace**.
+
+### Eigenspaces and invariant subspaces
+
+Let
+
+$$
+T:V\to V
+$$
+
+be a linear operator.
+
+An eigenvector is a nonzero vector $v$ satisfying
+
+$$
+Tv=\lambda v.
+$$
+
+The corresponding eigenspace is
+
+$$
+\boxed{E_\lambda=\ker(T-\lambda I).}
+$$
+
+This is already a direct connection to Module A.
+
+An eigenspace is not a completely new type of object. It is the kernel of a shifted linear operator.
+
+Now generalize the idea.
+
+A subspace $U\subseteq V$ is **invariant under** $T$ if
+
+$$
+\boxed{T(U)\subseteq U.}
+$$
+
+Thus, whenever a vector belongs to $U$, applying $T$ keeps it inside $U$.
+
+Every eigenspace is invariant because
+
+$$
+T(v)=\lambda v\in E_\lambda
+$$
+
+whenever $v\in E_\lambda$.
+
+But the converse is not generally true: an invariant subspace need not have a basis of eigenvectors.
+
+For example, the real plane $\mathbb R^2$ is invariant under a rotation through $90^\circ$, although that rotation has no real eigenvectors.
+
+### Invariant subspaces and block matrices
+
+Suppose
+
+$$
+V=U\oplus W
+$$
+
+and both $U,W$ are invariant under $T$.
+
+Choose a basis of $U$ and a basis of $W$, then combine them to obtain a basis of $V$.
+
+In this adapted basis, $T$ has a block-diagonal matrix:
+
+$$
+\boxed{ [T]= \begin{pmatrix}
+  T_U&0\\
+  0&T_W
+\end{pmatrix}. }
+$$
+
+This follows because $T(U)\subseteq U$ and $T(W)\subseteq W$, so the transformation does not mix the two components.
+
+This is a fundamental connection between direct-sum decompositions and spectral methods.
+
+A suitable invariant-subspace decomposition can turn one large problem into smaller independent problems.
+
+If only $U$ is invariant and its chosen complement $W$ is not, the matrix is generally block upper triangular rather than block diagonal:
+
+$$
+[T]= \begin{pmatrix}
+  T_U&B\\
+  0&C
+\end{pmatrix}.
+$$
+
+This distinction is important.
+
+A direct sum alone does not imply block diagonality; invariance of both summands does.
+
+### A symmetric matrix example
+
+Consider
+
+$$
+\boxed{ B= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix}. }
+$$
+
+The eigenvalues are
+
+$$
+\lambda_1=1,\qquad \lambda_2=3,\qquad \lambda_3=9.
+$$
+
+Corresponding eigenvectors are
+
+$$
+v_1=\begin{pmatrix}
+  1\\
+  -1\\
+  0
+\end{pmatrix}, \qquad v_2=\begin{pmatrix}
+  1\\
+  1\\
+  0
+\end{pmatrix}, \qquad v_3=\begin{pmatrix}
+  0\\
+  0\\
+  1
+\end{pmatrix}.
+$$
+
+Observe that
+
+$$
+Bv_1=v_1,\qquad Bv_2=3v_2,\qquad Bv_3=9v_3.
+$$
+
+Define
+
+$$
+U=\operatorname{span}\{v_1,v_2\}, \qquad W=\operatorname{span}\{v_3\}.
+$$
+
+Then
+
+$$
+\mathbb R^3=U\oplus W.
+$$
+
+Both subspaces are invariant, so $B$ has a block-diagonal representation in a basis adapted to this decomposition.
+
+In fact, after normalizing the eigenvectors, the matrix is diagonal in that eigenbasis.
+
+This illustrates how spectral theory refines the general direct-sum constructions from Module A.
+
+### The spectral theorem: a preview
+
+The matrix $B$ is symmetric:
+
+$$
+B=B^T.
+$$
+
+The spectral theorem states that every real symmetric matrix admits an orthonormal eigenbasis.
+
+Thus
+
+$$
+\boxed{B=Q\Lambda Q^T}
+$$
+
+for some orthogonal $Q$ and real diagonal $\Lambda$.
+
+We will study the full theorem in Module D.
+
+For now, notice one important consequence of symmetry.
+
+Suppose
+
+$$
+Bv=\lambda v,\qquad Bw=\mu w.
+$$
+
+Because $B=B^T$,
+
+$$
+\begin{aligned}
+  \lambda\langle v,w\rangle &=\langle Bv,w\rangle\\
+  &=\langle v,Bw\rangle\\
+  &=\mu\langle v,w\rangle.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+(\lambda-\mu)\langle v,w\rangle=0.
+$$
+
+If $\lambda\ne\mu$,
+
+$$
+\boxed{\langle v,w\rangle=0.}
+$$
+
+Distinct eigenspaces of a real symmetric matrix are orthogonal.
+
+This explains why symmetric eigenvalue problems have such particularly useful geometric structure.
+
+### Polynomial functions of matrices
+
+Let
+
+$$
+p(t)=a_0+a_1t+\cdots+a_dt^d.
+$$
+
+Define
+
+$$
+p(B)=a_0I+a_1B+\cdots+a_dB^d.
+$$
+
+If $Bv_i=\lambda_i v_i$, then
+
+$$
+B^kv_i=\lambda_i^k v_i.
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
+  p(B)v_i &=\sum_{k=0}^d a_k B^kv_i\\
+  &=\sum_{k=0}^d a_k\lambda_i^k v_i\\
+  &=p(\lambda_i)v_i.
+\end{aligned}
+$$
+
+Thus
+
+$$
+\boxed{p(B)v_i=p(\lambda_i)v_i.}
+$$
+
+A polynomial of a matrix preserves its eigendirections, while changing the scaling factors associated with them.
+
+#### An elementary spectral filter {#module-a-session-8-polynomial-functions-of-matrices-an-elementary-spectral-filter}
+
+For our example, take
+
+$$
+p(t)=\frac{9-t}{8}.
+$$
+
+Then
+
+$$
+p(1)=1,\qquad p(3)=\frac34,\qquad p(9)=0.
+$$
+
+If
+
+$$
+x=c_1v_1+c_2v_2+c_3v_3,
+$$
+
+then
+
+$$
+p(B)x=c_1v_1+\frac34c_2v_2.
+$$
+
+The component along $v_3$ disappears entirely.
+
+Repeated application attenuates the component along $v_2$ relative to $v_1$.
+
+This is a simple example of polynomial spectral filtering.
+
+Chebyshev filtering uses carefully chosen higher-degree polynomials to create more effective separation between desired and unwanted spectral regions.
+
+The mathematical mechanism is the same: an appropriately chosen polynomial changes the relative magnitudes of spectral components.
+
+### Connection to subspace iteration
+
+Power iteration repeatedly applies a matrix to a vector, typically with normalization:
+
+$$
+x_{k+1}=\frac{Bx_k}{\|Bx_k\|}.
+$$
+
+Under suitable spectral assumptions, the vector becomes increasingly aligned with an eigendirection corresponding to an eigenvalue of largest magnitude.
+
+Subspace iteration generalizes this idea by evolving an entire subspace.
+
+If $X_k\in\mathbb R^{n\times s}$ has linearly independent columns spanning a trial subspace, a basic iteration computes
+
+$$
+Y_{k+1}=BX_k
+$$
+
+When $Y_{k+1}$ has $s$ independent columns, orthonormalizing them gives $X_{k+1}$.
+
+A filtered variant replaces $B$ by $p(B)$:
+
+$$
+Y_{k+1}=p(B)X_k.
+$$
+
+The polynomial is designed so that desired spectral components are amplified relative to unwanted ones. The filtered block must retain $s$ independent columns for this step to preserve the trial subspace dimension.
+
+This gives a direct connection to the structures we've studied:
+
+- Eigenvectors belong to kernels of $B-\lambda I$.
+- Eigenspaces and their sums are invariant subspaces.
+- Direct sums describe decompositions into spectral components.
+- Polynomial filters act on each eigenspace through scalar multiplication.
+- Orthogonalization and projection exploit additional inner-product geometry.
+
+### The Rayleigh–Ritz connection
+
+Suppose $B$ is symmetric and $Q\in\mathbb R^{n\times s}$ has orthonormal columns spanning a trial subspace $U$.
+
+The Rayleigh–Ritz procedure forms
+
+$$
+H=Q^TBQ.
+$$
+
+If
+
+$$
+Hy=\theta y,
+$$
+
+then
+
+$$
+v=Qy
+$$
+
+is a Ritz vector, and $\theta$ is its Ritz value.
+
+The residual is
+
+$$
+r=Bv-\theta v.
+$$
+
+Now observe:
+
+$$
+\begin{aligned}
+  Q^Tr &=Q^T(BQy-\theta Qy)\\
+  &=Q^TBQy-\theta Q^TQy\\
+  &=Hy-\theta y\\
+  &=0.
+\end{aligned}
+$$
+
+Therefore,
+
+$$
+\boxed{r\perp U.}
+$$
+
+This is an example of how a numerical approximation is characterized by a subspace and an orthogonality condition.
+
+We will derive Rayleigh–Ritz more systematically in Modules C–E.
+
+For your HASC seminar, the key structural insight is that the algorithm seeks a spectral subspace and uses polynomial filtering, orthogonalization, and projected eigenvalue problems to approximate it.
+
+Finite-precision computation introduces a further challenge: the algebraic invariance and orthogonality properties may no longer hold exactly after rounding or inexact operations.
+
+That is where residuals, perturbation theory, conditioning, and numerical stability become essential.
+
+### Checkpoint 8 {#module-a-checkpoint-8 .unnumbered .unlisted}
+
+Explain why $p(B)$ preserves every eigenspace of $B$.
+
+Then prove that if $U$ is invariant under $B$, it is also invariant under $p(B)$.
+
+Finally, explain why a decomposition into invariant subspaces can simplify a numerical eigenvalue problem.
+
+## The conceptual synthesis of Module A {#sec-module-a-the-conceptual-synthesis-of-module-a}
+
+We can now connect the main results.
+
+Start with a linear map $T:V\to W$. The kernel $\ker T$ gives its invisible directions, and the image $\operatorname{im}T$ gives its attainable outputs.
+
+- **Choose a complement.** Write $V=\ker T\oplus U$ to obtain an explicit decomposition.
+- **Form the quotient.** Use $V/\ker T$ to identify all inputs with the same output.
+
+Both constructions recover the effective domain of $T$.
+
+$$
+\boxed{U\cong V/\ker T\cong\operatorname{im}T.}
+$$
+
+The quotient-to-image isomorphism is canonical. The identification with a particular complement $U$ depends on the chosen decomposition.
+
+The ideas developed in this module therefore fit together as follows.
+
+| Construction              | Main meaning                            | Central result                                    |
+| ------------------------- | --------------------------------------- | ------------------------------------------------- |
+| Kernel                    | Inputs annihilated by a map             | $T$ injective iff $\ker T=\{0\}$        |
+| Image                     | Outputs reachable by a map              | $T$ surjective iff $\operatorname{im}T=W$ |
+| Direct sum                | Independent decomposition               | $V=K\oplus U$                                 |
+| Quotient                  | Identification modulo a subspace        | $\dim(V/S)=\dim V-\dim S$                     |
+| First isomorphism theorem | Essential bijection underlying a map    | $V/\ker T\cong\operatorname{im}T$             |
+| Exact sequence            | Relationship between kernels and images | $\operatorname{im}f=\ker g$                   |
+| Projection                | Extracts one direct-sum component       | $P^2=P$                                       |
+| Invariant subspace        | A subspace preserved by an operator     | $T(U)\subseteq U$                             |
+
+The same constructions recur in the applications we explored:
+
+- Singular linear systems have solution families that are cosets of the kernel.
+- Graph Laplacians have null spaces reflecting constant-shift freedoms.
+- Differential operators have kernels describing the nonuniqueness of solutions.
+- Spectral algorithms exploit invariant subspaces and decompositions of the domain.
+
+The significance of Module A is therefore not just that these concepts can be calculated. It is that they provide a common language for understanding many different mathematical problems.
+
+## Exercises — Test your understanding {#sec-module-a-exercises-test-your-understanding}
+
+The following exercises are designed to test more than mechanical computation.
+
+Some ask for explicit calculations, while others require you to explain why a construction works or to recognize the same structure in another setting.
+
+Try completing each exercise before consulting the solutions.
+
+### Part I — Linear algebraic foundations
+
+#### Exercise 1 — Kernel, image, and rank {#module-a-exercise-1}
+
+Let
+
+$$
+M= \begin{pmatrix}
+  1&2&1\\
+  0&0&1
+\end{pmatrix}.
+$$
+
+Find a basis of $\ker M$ and a basis of $\operatorname{im}M$.
+
+Verify rank–nullity and explain the relationship between the nonpivot column and the kernel basis.
+
+#### Exercise 2 — Direct-sum decomposition {#module-a-exercise-2}
+
+For the matrix $M$ in Exercise 1, let
+
+$$
+U=\operatorname{span}\{e_1,e_3\}.
+$$
+
+Prove that
+
+$$
+\mathbb R^3=\ker M\oplus U.
+$$
+
+Find the unique decomposition
+
+$$
+x=k+u, \qquad k\in\ker M,\quad u\in U,
+$$
+
+for
+
+$$
+x=(3,4,5)^T.
+$$
+
+#### Exercise 3 — Dimensions of subspace sums {#module-a-exercise-3}
+
+In $\mathbb R^3$, consider
+
+$$
+U=\operatorname{span}\{e_1,e_2\}, \qquad W=\operatorname{span}\{e_1,e_3\}.
+$$
+
+Find bases of $U\cap W$ and $U+W$.
+
+Verify the subspace dimension formula.
+
+Explain why this sum is not direct.
+
+### Part II — Quotients and structural theorems
+
+#### Exercise 4 — Quotient-space coordinates {#module-a-exercise-4}
+
+Let
+
+$$
+S=\operatorname{span}\{(1,1,1)\}\subseteq\mathbb R^3.
+$$
+
+Show that the cosets $e_1+S$ and $e_2+S$ form a basis of $\mathbb R^3/S$.
+
+Express
+
+$$
+(2,-1,4)+S
+$$
+
+in this quotient basis.
+
+#### Exercise 5 — First isomorphism theorem {#module-a-exercise-5}
+
+Consider
+
+$$
+T:\mathbb R^3\to\mathbb R^2, \qquad T(x,y,z)=(x+y,z).
+$$
+
+Compute its kernel and image.
+
+Construct the induced map
+
+$$
+\widetilde T:\mathbb R^3/\ker T\to\operatorname{im}T.
+$$
+
+Prove directly that this map is an isomorphism.
+
+#### Exercise 6 — Universal property of a quotient {#module-a-exercise-6}
+
+Let
+
+$$
+S=\operatorname{span}\{(1,1,0)\}\subseteq\mathbb R^3
+$$
+
+and define
+
+$$
+L:\mathbb R^3\to\mathbb R, \qquad L(x_1,x_2,x_3)=x_1-x_2+2x_3.
+$$
+
+Show that $L$ factors through $\mathbb R^3/S$.
+
+Construct the induced functional on the quotient and explain why it is well-defined.
+
+#### Exercise 7 — Projections {#module-a-exercise-7}
+
+Consider
+
+$$
+P= \begin{pmatrix}
+  1&2\\
+  0&0
+\end{pmatrix}.
+$$
+
+Show that $P^2=P$.
+
+Determine $\ker P$, $\operatorname{im}P$, and the resulting direct-sum decomposition of $\mathbb R^2$.
+
+Is this an orthogonal projection with respect to the standard Euclidean inner product?
+
+### Part III — Applications
+
+#### Exercise 8 — Graph Laplacian {#module-a-exercise-8}
+
+Let
+
+$$
+L= \begin{pmatrix}
+  1&-1&0\\
+  -1&2&-1\\
+  0&-1&1
+\end{pmatrix}.
+$$
+
+Find its kernel.
+
+Show that the equation $Lp=b$ is solvable if and only if
+
+$$
+b_1+b_2+b_3=0.
+$$
+
+Solve
+
+$$
+Lp=\begin{pmatrix}
+  1\\
+  -2\\
+  1
+\end{pmatrix}
+$$
+
+and describe every solution.
+
+Find the unique solution whose entries sum to zero.
+
+#### Exercise 9 — A differential operator {#module-a-exercise-9}
+
+Consider
+
+$$
+D^2:C^2([0,1])\to C([0,1]), \qquad D^2f=f''.
+$$
+
+Find its kernel and explain why the operator is surjective.
+
+Describe the quotient-space interpretation of the equation
+
+$$
+f''(x)=2.
+$$
+
+Then impose
+
+$$
+f(0)=1,\qquad f'(0)=3
+$$
+
+and determine the unique solution.
+
+#### Exercise 10 — Invariant subspaces and spectral filtering {#module-a-exercise-10}
+
+Let
+
+$$
+B= \begin{pmatrix}
+  2&1&0\\
+  1&2&0\\
+  0&0&9
+\end{pmatrix}.
+$$
+
+Define
+
+$$
+U=\operatorname{span}\{(1,-1,0),(1,1,0)\}.
+$$
+
+Prove that $U$ is invariant under $B$.
+
+Show that it remains invariant under any polynomial $p(B)$.
+
+For
+
+$$
+p(t)=\frac{9-t}{8},
+$$
+
+determine the effect of $p(B)$ on each of the three eigendirections.
+
+Explain why this illustrates the principle behind polynomial spectral filtering.
+
+## Worked solutions {#sec-module-a-worked-solutions}
+
+### Solution 1
+
+Solving $Mx=0$ gives
+
+$$
+x_3=0,\qquad x_1=-2x_2.
+$$
+
+Therefore,
+
+$$
+\boxed{\ker M=\operatorname{span}\{(-2,1,0)\}.}
+$$
+
+Columns 1 and 3 are independent and span $\mathbb R^2$, so
+
+$$
+\boxed{\operatorname{im}M=\mathbb R^2.}
+$$
+
+Thus
+
+$$
+\operatorname{rank}M=2,\qquad \operatorname{nullity}M=1,
+$$
+
+and $2+1=3$.
+
+Column 2 equals twice column 1, giving the relation
+
+$$
+-2a_1+a_2=0,
+$$
+
+which is encoded by the kernel vector $(-2,1,0)$.
+
+### Solution 2
+
+We know
+
+$$
+\ker M=\operatorname{span}\{(-2,1,0)\}.
+$$
+
+Every nonzero vector in this kernel has a nonzero second coordinate, while every vector in $U$ has second coordinate zero.
+
+Thus
+
+$$
+\ker M\cap U=\{0\}.
+$$
+
+Since their dimensions add to $3$,
+
+$$
+\mathbb R^3=\ker M\oplus U.
+$$
+
+For $x=(3,4,5)$, the kernel component must have second coordinate $4$, giving
+
+$$
+k=(-8,4,0).
+$$
+
+Then
+
+$$
+u=x-k=(11,0,5).
+$$
+
+Therefore,
+
+$$
+\boxed{ (3,4,5)=(-8,4,0)+(11,0,5). }
+$$
+
+### Solution 3
+
+The intersection consists of vectors that belong to both coordinate planes:
+
+$$
+\boxed{U\cap W=\operatorname{span}\{e_1\}.}
+$$
+
+Their sum contains $e_1,e_2,e_3$, so
+
+$$
+\boxed{U+W=\mathbb R^3.}
+$$
+
+The dimension formula gives
+
+$$
+3=2+2-1.
+$$
+
+The sum is not direct because the intersection contains the nonzero vector $e_1$.
+
+### Solution 4
+
+Since $\dim S=1$,
+
+$$
+\dim(\mathbb R^3/S)=2.
+$$
+
+The classes of $e_1,e_2$ are independent.
+
+Indeed, if
+
+$$
+ae_1+be_2\in S,
+$$
+
+then
+
+$$
+(a,b,0)=c(1,1,1).
+$$
+
+The third coordinate gives $c=0$, hence $a=b=0$.
+
+Their two classes therefore form a basis of the quotient.
+
+Now subtract $4(1,1,1)$ from $(2,-1,4)$:
+
+$$
+(2,-1,4)-4(1,1,1)=(-2,-5,0).
+$$
+
+Thus
+
+$$
+\boxed{ (2,-1,4)+S = -2(e_1+S)-5(e_2+S). }
+$$
+
+### Solution 5
+
+We have
+
+$$
+\ker T=\operatorname{span}\{(1,-1,0)\}, \qquad \operatorname{im}T=\mathbb R^2.
+$$
+
+The induced map is
+
+$$
+\boxed{ \widetilde T((x,y,z)+\ker T)=(x+y,z). }
+$$
+
+It is well-defined because adding $t(1,-1,0)$ to a representative does not change $x+y$ or $z$.
+
+It is linear because quotient addition and scalar multiplication are defined on representatives and $T$ is linear.
+
+It is injective because an equivalence class maps to $(0,0)$ precisely when its representatives belong to $\ker T$, which is the zero coset.
+
+It is surjective because
+
+$$
+\widetilde T((a,0,b)+\ker T)=(a,b)
+$$
+
+for every $(a,b)\in\mathbb R^2$.
+
+Hence it is an isomorphism.
+
+### Solution 6
+
+For every $s=t(1,1,0)\in S$,
+
+$$
+L(s)=t-t=0.
+$$
+
+Therefore,
+
+$$
+S\subseteq\ker L.
+$$
+
+By the quotient universal property, $L$ factors through $\mathbb R^3/S$.
+
+The induced functional is
+
+$$
+\boxed{ \overline L((x_1,x_2,x_3)+S) =x_1-x_2+2x_3. }
+$$
+
+If two representatives differ by $t(1,1,0)$, the value of the expression is unchanged.
+
+Thus the map is well-defined and satisfies
+
+$$
+L=\overline L\circ q.
+$$
+
+### Solution 7
+
+Direct multiplication gives
+
+$$
+P^2= \begin{pmatrix}
+  1&2\\
+  0&0
+\end{pmatrix}^2 = \begin{pmatrix}
+  1&2\\
+  0&0
+\end{pmatrix} =P.
+$$
+
+The image is
+
+$$
+\boxed{\operatorname{im}P=\operatorname{span}\{(1,0)\}.}
+$$
+
+To find the kernel, solve
+
+$$
+x_1+2x_2=0.
+$$
+
+Thus
+
+$$
+\boxed{\ker P=\operatorname{span}\{(-2,1)\}.}
+$$
+
+Consequently,
+
+$$
+\boxed{ \mathbb R^2 = \operatorname{span}\{(1,0)\} \oplus \operatorname{span}\{(-2,1)\}. }
+$$
+
+The two subspaces are not orthogonal, and
+
+$$
+P\ne P^T.
+$$
+
+Thus $P$ is an oblique projection rather than an orthogonal projection.
+
+### Solution 8
+
+The graph Laplacian satisfies
+
+$$
+L\mathbf1=0, \qquad \mathbf1=(1,1,1)^T.
+$$
+
+Its kernel is exactly
+
+$$
+\boxed{\ker L=\operatorname{span}\{\mathbf1\}.}
+$$
+
+Since $L$ is symmetric and has rank $2$, its image is the two-dimensional subspace orthogonal to $\mathbf1$:
+
+$$
+\operatorname{im}L = \{b:b_1+b_2+b_3=0\}.
+$$
+
+Therefore, $Lp=b$ is solvable precisely when the entries of $b$ sum to zero.
+
+For
+
+$$
+b=(1,-2,1)^T,
+$$
+
+one solution is
+
+$$
+p_0=(1,0,1)^T,
+$$
+
+since
+
+$$
+Lp_0=(1,-2,1)^T.
+$$
+
+All solutions are
+
+$$
+\boxed{ p= \begin{pmatrix}
+  1\\
+  0\\
+  1
+\end{pmatrix} +c\begin{pmatrix}
+  1\\
+  1\\
+  1
+\end{pmatrix}. }
+$$
+
+To obtain a solution whose entries sum to zero, require
+
+$$
+2+3c=0.
+$$
+
+Thus $c=-2/3$, giving
+
+$$
+\boxed{ p= \begin{pmatrix}
+  1/3\\
+  -2/3\\
+  1/3
+\end{pmatrix}. }
+$$
+
+This is the unique solution orthogonal to the constant-vector kernel.
+
+### Solution 9
+
+If $f''=0$, then $f'$ is constant, so $f$ is affine:
+
+$$
+f(x)=a+bx.
+$$
+
+Thus
+
+$$
+\boxed{\ker D^2=\operatorname{span}\{1,x\}.}
+$$
+
+For any continuous $g$, the function
+
+$$
+f(x)=\int_0^x(x-t)g(t)\,dt
+$$
+
+satisfies $f''=g$. Therefore the operator is surjective.
+
+The quotient theorem gives
+
+$$
+C^2([0,1])/\operatorname{span}\{1,x\} \cong C([0,1]).
+$$
+
+For $f''=2$, all solutions have the form
+
+$$
+f(x)=x^2+a+bx.
+$$
+
+The initial conditions give
+
+$$
+a=1,\qquad b=3.
+$$
+
+Hence the unique solution is
+
+$$
+\boxed{f(x)=x^2+3x+1.}
+$$
+
+The initial conditions select one representative of the coset of solutions.
+
+### Solution 10
+
+We have
+
+$$
+B(1,-1,0)^T=(1,-1,0)^T
+$$
+
+and
+
+$$
+B(1,1,0)^T=3(1,1,0)^T.
+$$
+
+Therefore $U$ is invariant under $B$.
+
+Since $B(U)\subseteq U$, induction shows that
+
+$$
+B^k(U)\subseteq U
+$$
+
+for every nonnegative integer $k$.
+
+Any polynomial $p(B)$ is a linear combination of these powers, so
+
+$$
+\boxed{p(B)(U)\subseteq U.}
+$$
+
+The third eigendirection is $\operatorname{span}\{(0,0,1)\}$, with eigenvalue $9$.
+
+For $p(t)=(9-t)/8$,
+
+$$
+p(1)=1,\qquad p(3)=\frac34,\qquad p(9)=0.
+$$
+
+Thus the filter preserves the first eigendirection, attenuates the second, and annihilates the third.
+
+Repeated application increasingly favors the first eigendirection relative to the second.
+
+This illustrates the basic mechanism of polynomial spectral filtering.
+
+## Computational laboratory — MATLAB {#sec-module-a-computational-laboratory-matlab}
+
+This laboratory connects the theoretical constructions to numerical computation. It uses the same matrices from the module.
+
+The main objective is to verify structural identities, rather than merely obtain numerical answers.
+
+```matlab
+%% Module A: Structural Linear Algebra
+clear; clc;
+
+%% 1. Kernel, rank, and image
+A = [1 2 -1 3;
+     2 4  1 9;
+     3 6  0 12];
+
+R = rref(A);
+
+% Exact kernel basis derived by hand
+K = [-2 -4;
+      1  0;
+      0 -1;
+      0  1];
+
+% Basis of the image: ORIGINAL pivot columns
+C = A(:, [1 3]);
+
+disp('Rank of A:');
+disp(rank(A));
+
+disp('Check A*K = 0:');
+disp(A*K);
+
+disp('Rank of kernel basis:');
+disp(rank(K));
+
+disp('Rank of image basis:');
+disp(rank(C));
+
+%% 2. Direct-sum decomposition and projection
+P = [0 -2 0 -4;
+     0  1 0  0;
+     0  0 0 -1;
+     0  0 0  1];
+
+x = [5; 2; 7; 3];
+
+k = P*x;
+u = x-k;
+
+disp('Kernel component:');
+disp(k);
+
+disp('Complement component:');
+disp(u);
+
+fprintf('||x-k-u|| = %.3e\n', norm(x-k-u));
+fprintf('||P^2-P||  = %.3e\n', norm(P*P-P));
+fprintf('||A*P||    = %.3e\n', norm(A*P));
+
+%% 3. Discrete gradient and graph Laplacian
+D = [-1  1  0;
+      0 -1  1];
+
+L = D.'*D;
+
+disp('Graph Laplacian:');
+disp(L);
+
+disp('Kernel check for constant vector:');
+disp(L*ones(3,1));
+
+%% 4. Spectral filtering
+B = [2 1 0;
+     1 2 0;
+     0 0 9];
+
+q1 = [1; -1; 0]/sqrt(2);
+q2 = [1;  1; 0]/sqrt(2);
+q3 = [0;  0; 1];
+
+Q = [q1 q2 q3];
+
+x = q1 + q2 + q3;
+
+% Polynomial p(t) = (9-t)/8
+pB = (9*eye(3)-B)/8;
+y = pB*x;
+
+disp('Filtered spectral coefficients:');
+disp(Q.'*y);
+
+% Expected: [1; 0.75; 0]
+```
+
+### Questions to investigate experimentally
+
+Try modifying the examples and checking whether the relevant identities still hold.
+
+In particular, experiment with changing the matrix $A$, constructing a different complement of its kernel, and comparing the resulting projections.
+
+For the graph example, change the number of vertices and examine how the dimension of the kernel depends on the number of connected components.
+
+For the spectral example, try different polynomials $p$ and observe how $p(B)$ scales different eigendirections.
+
+When using floating-point matrices, distinguish exact algebraic statements from numerical approximations. For example, an exact zero matrix may appear numerically as a matrix with very small nonzero entries.
+
+## Final mastery assessment {#sec-module-a-final-mastery-assessment}
+
+The module should not be considered complete merely because you've read the material.
+
+A stronger test is whether you can reconstruct its main ideas without referring to the notes.
+
+- [ ] **Definitions.** Define a kernel, image, direct sum, quotient space, and invariant subspace precisely.
+- [ ] **Proofs.** Prove rank–nullity, the direct-sum criterion, and the first isomorphism theorem.
+- [ ] **Computation.** Compute kernels, images, complements, projections, and quotient coordinates.
+- [ ] **Geometric intuition.** Explain what it means for a transformation to lose information or identify inputs.
+- [ ] **Structural understanding.** Relate quotients, complements, exact sequences, and projections.
+- [ ] **Universal understanding.** Explain the universal properties of quotients and direct sums.
+- [ ] **Applications.** Recognize the same structure in singular systems, graph Laplacians, and differential operators.
+- [ ] **Numerical connections.** Explain how invariant subspaces motivate spectral decomposition and polynomial filtering.
+
+### How I recommend studying the module
+
+Treat each session as an independent study block, but revisit the running matrix throughout the module.
+
+For each substantial topic, use this cycle:
+
+1. **Read the definition and theorem.** Identify the assumptions and understand what the result claims.
+2. **Reconstruct the proof.** First explain the logical argument verbally, then write it mathematically.
+3. **Work through a concrete example.** Perform the computation independently rather than copying the worked solution.
+4. **Identify the structural connection.** Ask which previous concepts the theorem depends on and whether it admits a more general interpretation.
+5. **Connect it to an application.** Explain which feature of a numerical method, differential equation, or scientific model the construction describes.
+
+For example, after studying quotient spaces, you should be able to connect the following without consulting the notes:
+
+$$
+\boxed{ \begin{gathered}
+  \text{Nontrivial kernel}\\
+  \downarrow\\
+  \text{Nonuniqueness of solutions}\\
+  \downarrow\\
+  \text{Equivalence classes modulo the kernel}\\
+  \downarrow\\
+  \text{First isomorphism theorem}\\
+  \downarrow\\
+  \text{Choosing a representative using a complement}\\
+  \downarrow\\
+  \text{A unique solution under an additional constraint}.
+\end{gathered} }
+$$
+
+That sequence is a useful synthesis of Module A.
+
+### Transition to Module B
+
+The next major topic is **duality and linear measurements**.
+
+So far, we have studied how a linear transformation acts on vectors.
+
+Module B will ask how it acts on linear functionals.
+
+That leads to the dual map
+
+$$
+T^\vee:W^*\to V^*, \qquad T^\vee(f)=f\circ T,
+$$
+
+and to the annihilator relationships
+
+$$
+\boxed{ \begin{aligned}
+  \operatorname{im}T^\vee&=(\ker T)^0,\\
+  \ker T^\vee&=(\operatorname{im}T)^0.
+\end{aligned} }
+$$
+
+These are the algebraic predecessors of the orthogonality identities used in numerical linear algebra.
+
+They also lead naturally to Riesz representation and adjoint operators in Module C.
+
+The most important result to retain from Module A is therefore not one formula, but an overall principle:
+
+**A linear map can be understood by investigating what it annihilates, what it reaches, and how its domain can be decomposed or quotiented to reveal an underlying isomorphism.**
+
+Once that principle is familiar, many constructions in algebra, numerical analysis, functional analysis, and differential equations become instances of the same mathematical pattern.
