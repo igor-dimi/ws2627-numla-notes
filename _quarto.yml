@@ -30,6 +30,9 @@ book:
       - review/06_matrix_norms_conditioning.qmd
       - review/07_direct_numerical_methods.qmd
       - review/08_basic_iterative_methods.qmd
+      - review/09_power_subspace_iteration.qmd
+      - review/10_matrix_polynomials_chebyshev_filtering.qmd
+      - review/11_rayleigh_ritz_integration.qmd
     - part: "Review II"
       chapters:
         # - review_2/a.qmd
