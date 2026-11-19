@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Session 4 — QR Factorization – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/05_eigenvalues_spectral_theorem.html" rel="next">
+<link href="../review/03_orthogonal_projections.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/04_qr_factorization.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#one-space-two-coordinate-systems" id="toc-one-space-two-coordinate-systems" class="nav-link active" data-scroll-target="#one-space-two-coordinate-systems"><span class="header-section-number">5.1</span> One space, two coordinate systems</a></li>
+  <li><a href="#gramschmidt-records-its-work-in-r" id="toc-gramschmidt-records-its-work-in-r" class="nav-link" data-scroll-target="#gramschmidt-records-its-work-in-r"><span class="header-section-number">5.2</span> Gram–Schmidt records its work in <span class="math inline">\(R\)</span></a>
+  <ul class="collapse">
+  <li><a href="#worked-example-a-plane-in-three-dimensions" id="toc-worked-example-a-plane-in-three-dimensions" class="nav-link" data-scroll-target="#worked-example-a-plane-in-three-dimensions">Worked example — a plane in three dimensions</a></li>
+  <li><a href="#classical-and-modified-gramschmidt" id="toc-classical-and-modified-gramschmidt" class="nav-link" data-scroll-target="#classical-and-modified-gramschmidt">Classical and modified Gram–Schmidt</a></li>
+  </ul></li>
+  <li><a href="#householder-qr-by-changing-the-ambient-coordinates" id="toc-householder-qr-by-changing-the-ambient-coordinates" class="nav-link" data-scroll-target="#householder-qr-by-changing-the-ambient-coordinates"><span class="header-section-number">5.3</span> Householder QR by changing the ambient coordinates</a>
+  <ul class="collapse">
+  <li><a href="#deriving-a-reflector" id="toc-deriving-a-reflector" class="nav-link" data-scroll-target="#deriving-a-reflector">Deriving a reflector</a></li>
+  <li><a href="#worked-example-two-eliminations" id="toc-worked-example-two-eliminations" class="nav-link" data-scroll-target="#worked-example-two-eliminations">Worked example — two eliminations</a></li>
+  </ul></li>
+  <li><a href="#what-should-a-numerical-qr-test-measure" id="toc-what-should-a-numerical-qr-test-measure" class="nav-link" data-scroll-target="#what-should-a-numerical-qr-test-measure"><span class="header-section-number">5.4</span> What should a numerical QR test measure?</a>
+  <ul class="collapse">
+  <li><a href="#experiment-making-columns-approach-a-common-direction" id="toc-experiment-making-columns-approach-a-common-direction" class="nav-link" data-scroll-target="#experiment-making-columns-approach-a-common-direction">Experiment — making columns approach a common direction</a></li>
+  </ul></li>
+  <li><a href="#least-squares-reduces-to-a-triangular-system" id="toc-least-squares-reduces-to-a-triangular-system" class="nav-link" data-scroll-target="#least-squares-reduces-to-a-triangular-system"><span class="header-section-number">5.5</span> Least squares reduces to a triangular system</a>
+  <ul class="collapse">
+  <li><a href="#worked-example-fitting-a-point-to-the-plane" id="toc-worked-example-fitting-a-point-to-the-plane" class="nav-link" data-scroll-target="#worked-example-fitting-a-point-to-the-plane">Worked example — fitting a point to the plane</a></li>
+  <li><a href="#why-avoid-explicitly-forming-the-normal-equations" id="toc-why-avoid-explicitly-forming-the-normal-equations" class="nav-link" data-scroll-target="#why-avoid-explicitly-forming-the-normal-equations">Why avoid explicitly forming the normal equations?</a></li>
+  </ul></li>
+  <li><a href="#from-qr-to-the-seminar" id="toc-from-qr-to-the-seminar" class="nav-link" data-scroll-target="#from-qr-to-the-seminar"><span class="header-section-number">5.6</span> From QR to the seminar</a></li>
+  <li><a href="#independent-exercises" id="toc-independent-exercises" class="nav-link" data-scroll-target="#independent-exercises"><span class="header-section-number">5.7</span> Independent exercises</a></li>
+  <li><a href="#solutions-consult-after-attempting-the-exercises" id="toc-solutions-consult-after-attempting-the-exercises" class="nav-link" data-scroll-target="#solutions-consult-after-attempting-the-exercises"><span class="header-section-number">5.8</span> Solutions — consult after attempting the exercises</a></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">5.9</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/04_qr_factorization.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Suppose two independent columns point almost in the same direction. They still form a basis of their plane, but recovering the small difference between their directions requires subtracting nearly equal vectors. Can we keep the plane, choose better axes in it, and still recover coordinates in the original basis? The two factors in <span class="math inline">\(A=QR\)</span> answer these questions separately.</p>
+<p><strong>Study route (90 minutes).</strong> Spend 20 minutes on coordinates and Gram–Schmidt, 20 on reflectors, 15 on floating-point behavior, 15 on least squares and the seminar connection, and 20 on the exercises. In the worked examples, cover the next line and predict either a coefficient, a zero, or the dimension of a factor before continuing.</p>
+<section id="one-space-two-coordinate-systems" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="one-space-two-coordinate-systems"><span class="header-section-number">5.1</span> One space, two coordinate systems</h2>
+<p>Let <span class="math inline">\(A=[a_1,\ldots,a_n]\in\mathbb F^{m\times n}\)</span>, where <span class="math inline">\(\mathbb F\)</span> is <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>, <span class="math inline">\(m\ge n\)</span>, and the columns are independent. A star denotes the conjugate transpose, which reduces to transpose over <span class="math inline">\(\mathbb R\)</span>. Write <span class="math inline">\(U=\operatorname{im} A\)</span>. From Session 1, <span class="math inline">\(x\mapsto Ax\)</span> takes coordinates in the ordered column basis to vectors in <span class="math inline">\(U\)</span>. Choose an orthonormal basis <span class="math inline">\(q_1,\ldots,q_n\)</span> of <span class="math inline">\(U\)</span> as in Session 2 and collect it in <span class="math inline">\(Q\)</span>. The coordinates of <span class="math inline">\(y\in U\)</span> in this basis are <span class="math inline">\(Q^*y\)</span>, since <span class="math inline">\(Q^*Q=I_n\)</span>. For arbitrary <span class="math inline">\(b\in\mathbb F^m\)</span>, Session 3 gives the projection <span class="math inline">\(P_Ub=QQ^*b\)</span>.</p>
+<p>What makes the coordinate matrix <strong>triangular</strong>? Choose the new basis to preserve every initial span, <span class="math display">\[
+\operatorname{span}(q_1,\ldots,q_j)=\operatorname{span}(a_1,\ldots,a_j).
+\]</span> Then <span class="math inline">\(a_j\)</span> uses only <span class="math inline">\(q_1,\ldots,q_j\)</span>. Writing its coordinates in column <span class="math inline">\(j\)</span> of <span class="math inline">\(R\)</span> places zeros below the diagonal. Thus <span class="math display">\[
+A=QR,\qquad Ax=Q(Rx),\qquad Q^*A=R.
+\]</span> The middle identity fixes the direction of the coordinate change. Given orthonormal coordinates <span class="math inline">\(c\)</span>, the original coordinates solve <span class="math inline">\(Rx=c\)</span> by back substitution, starting with <span class="math inline">\(x_n=c_n/r_{nn}\)</span>. Invertibility of <span class="math inline">\(R\)</span> implies <span class="math inline">\(\operatorname{im}A=\operatorname{im}Q\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Form</th>
+<th style="text-align: left;">Orthonormal factor</th>
+<th style="text-align: left;">Triangular factor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Reduced (thin)</td>
+<td style="text-align: left;"><span class="math inline">\(Q\)</span> is <span class="math inline">\(m\times n\)</span>, <span class="math inline">\(Q^*Q=I_n\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(R\)</span> is <span class="math inline">\(n\times n\)</span>, upper triangular</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Complete (full)</td>
+<td style="text-align: left;"><span class="math inline">\(U_f=[Q\ Q_\perp]\)</span> is <span class="math inline">\(m\times m\)</span>, unitary</td>
+<td style="text-align: left;"><span class="math inline">\(U_f^*A=\begin{bmatrix}R\\0\end{bmatrix}\)</span> is <span class="math inline">\(m\times n\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The zero block has <span class="math inline">\(m-n\)</span> rows. For square <span class="math inline">\(A\)</span> the two forms coincide. Thin <span class="math inline">\(Q\)</span> is an isometry from coefficient space into <span class="math inline">\(U\)</span>, since <span class="math inline">\(\|Qc\|_2^2=c^*Q^*Qc=c^*c\)</span>. A square unitary matrix preserves the norm of <strong>every</strong> vector in the ambient space. Consequently, transforming existing perturbations by a unitary matrix leaves their Euclidean lengths unchanged. Computing the transformation in floating point still introduces rounding errors.</p>
+<p><strong>Existence and uniqueness.</strong> Gram–Schmidt below constructs thin QR with <span class="math inline">\(r_{jj}&gt;0\)</span> real. This convention makes it unique: the first column fixes <span class="math inline">\(q_1=a_1/\|a_1\|_2\)</span>, and at each later step the previous columns determine a unique residual whose normalization fixes <span class="math inline">\(q_j\)</span>. Without the convention, <span class="math inline">\(QD\)</span> and <span class="math inline">\(D^*R\)</span> also work for any diagonal <span class="math inline">\(D\)</span> with entries of modulus one. An orthonormal completion <span class="math inline">\(Q_\perp\)</span> admits additional freedom. A QR factorization also exists for dependent columns (for example by Householder elimination), but then <span class="math inline">\(R\)</span> is singular and the positive-diagonal construction breaks down.</p>
+</section>
+<section id="gramschmidt-records-its-work-in-r" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="gramschmidt-records-its-work-in-r"><span class="header-section-number">5.2</span> Gram–Schmidt records its work in <span class="math inline">\(R\)</span></h2>
+<p>Suppose <span class="math inline">\(Q_{j-1}=[q_1,\ldots,q_{j-1}]\)</span> already spans the first <span class="math inline">\(j-1\)</span> columns. Remove the projection of <span class="math inline">\(a_j\)</span> onto this space, then normalize what remains: <span class="math display">\[
+\begin{aligned}
+r_{ij}&amp;=q_i^*a_j &amp;&amp;(i&lt;j),\\
+w_j&amp;=a_j-\sum_{i&lt;j}q_i r_{ij}=(I-Q_{j-1}Q_{j-1}^*)a_j,\\
+r_{jj}&amp;=\|w_j\|_2,\qquad q_j=w_j/r_{jj}.
+\end{aligned}
+\]</span> Here <span class="math inline">\(q_i^*w_j=0\)</span> for <span class="math inline">\(i&lt;j\)</span>, and independence gives <span class="math inline">\(w_j\ne0\)</span>. Rearranging yields <span class="math inline">\(a_j=\sum_{i=1}^j q_i r_{ij}\)</span>. This is column <span class="math inline">\(j\)</span> of <span class="math inline">\(QR\)</span> and proves the initial-span property by induction. Geometrically, the diagonal <span class="math inline">\(r_{jj}\)</span> is the distance of <span class="math inline">\(a_j\)</span> from the preceding span.</p>
+<section id="worked-example-a-plane-in-three-dimensions" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-a-plane-in-three-dimensions">Worked example — a plane in three dimensions</h3>
+<p>Use the matrix <span class="math display">\[
+A=\begin{bmatrix}3&amp;-2\\4&amp;4\\0&amp;3\end{bmatrix}.
+\]</span> The first column gives <span class="math inline">\(r_{11}=5\)</span> and <span class="math inline">\(q_1=(3,4,0)^T/5\)</span>. The component of <span class="math inline">\(a_2\)</span> along <span class="math inline">\(q_1\)</span> is <span class="math inline">\(r_{12}=(-6+16)/5=2\)</span>. Removing it gives <span class="math display">\[
+w_2=a_2-2q_1=\tfrac15(-16,12,15)^T,\qquad \|w_2\|_2=5.
+\]</span> Hence <span class="math display">\[
+Q=\tfrac1{25}\begin{bmatrix}15&amp;-16\\20&amp;12\\0&amp;15\end{bmatrix},
+\qquad R=\begin{bmatrix}5&amp;2\\0&amp;5\end{bmatrix}.
+\]</span> <strong>Verify both identities.</strong> The squared lengths of the integer columns in <span class="math inline">\(25Q\)</span> are <span class="math inline">\(625\)</span> and <span class="math inline">\(625\)</span>, and their dot product is <span class="math inline">\(-240+240=0\)</span>. Thus <span class="math inline">\(Q^*Q=I_2\)</span>. In <span class="math inline">\(QR\)</span> the first column is <span class="math inline">\(5q_1=(3,4,0)^T\)</span> and the second is <span class="math inline">\(2q_1+5q_2=(-2,4,3)^T\)</span>. In particular the second original basis vector has coordinates <span class="math inline">\((2,5)^T\)</span> in the new basis.</p>
+</section>
+<section id="classical-and-modified-gramschmidt" class="level3">
+<h3 class="anchored" data-anchor-id="classical-and-modified-gramschmidt">Classical and modified Gram–Schmidt</h3>
+<p>Classical Gram–Schmidt (CGS) computes all coefficients against the <strong>original</strong> column, then subtracts its projection. Modified Gram–Schmidt (MGS) starts with <span class="math inline">\(w=a_j\)</span> and for <span class="math inline">\(i=1,\ldots,j-1\)</span> computes <span class="math inline">\(r_{ij}=q_i^*w\)</span> and immediately updates <span class="math inline">\(w\leftarrow w-q_ir_{ij}\)</span>. Why does the changed inner product give the same coefficient? In exact arithmetic, <span class="math display">\[
+q_i^*\left(a_j-\sum_{k&lt;i}q_k r_{kj}\right)
+=q_i^*a_j-\sum_{k&lt;i}(q_i^*q_k)r_{kj}=q_i^*a_j.
+\]</span> Floating point changes this argument. A computed <span class="math inline">\(q_i\)</span> may still contain a small component along an earlier direction. With CGS that component is tested against the entire incoming column. MGS first removes the large earlier components, which often makes the next coefficient more accurate. When <span class="math inline">\(w\)</span> is very small, normalizing it magnifies any contamination it still carries. Even MGS can lose substantial orthogonality.</p>
+<p>The following single-pass implementations expose the one operation that changes. They assume independent columns. An exact zero check catches division by zero; deciding numerical rank requires a scale and a tolerance.</p>
+<div id="461bc025" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gram_schmidt(A, <span class="op">*</span>, modified):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.asarray(A, dtype<span class="op">=</span>np.result_type(A, np.float64))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    m, n <span class="op">=</span> A.shape</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.zeros((m, n), dtype<span class="op">=</span>A.dtype)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> np.zeros((n, n), dtype<span class="op">=</span>A.dtype)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        w <span class="op">=</span> A[:, j].copy()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> modified:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(j):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                R[i, j] <span class="op">=</span> np.vdot(Q[:, i], w)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                w <span class="op">-=</span> Q[:, i] <span class="op">*</span> R[i, j]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            basis <span class="op">=</span> Q[:, :j]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            R[:j, j] <span class="op">=</span> basis.conj().T <span class="op">@</span> w</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            w <span class="op">-=</span> basis <span class="op">@</span> R[:j, j]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        R[j, j] <span class="op">=</span> np.linalg.norm(w)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> R[j, j] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Zero residual during orthogonalization"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        Q[:, j] <span class="op">=</span> w <span class="op">/</span> R[j, j]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Q, R</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Reorthogonalization.</strong> Before normalizing, project the residual <span class="math inline">\(w\)</span> against the previous basis again. For a block projection compute <span class="math inline">\(h=Q_{j-1}^*w\)</span>, subtract <span class="math inline">\(Q_{j-1}h\)</span> from <span class="math inline">\(w\)</span>, and <strong>add</strong> <span class="math inline">\(h\)</span> to the already stored coefficients. This last update keeps the reconstruction of <span class="math inline">\(a_j\)</span> consistent. A second pass often restores near-working-precision orthogonality when the incoming directions are numerically resolvable. It costs additional inner products and vector updates.</p>
+</section>
+</section>
+<section id="householder-qr-by-changing-the-ambient-coordinates" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="householder-qr-by-changing-the-ambient-coordinates"><span class="header-section-number">5.3</span> Householder QR by changing the ambient coordinates</h2>
+<p>Gram–Schmidt builds one basis vector at a time. Householder QR instead transforms the whole matrix until the columns align with successive coordinate subspaces. The first transformation sends <span class="math inline">\(a_1\)</span> to the first axis. The next acts only below the first row, preserving the zeros already obtained.</p>
+<section id="deriving-a-reflector" class="level3">
+<h3 class="anchored" data-anchor-id="deriving-a-reflector">Deriving a reflector</h3>
+<p>For <span class="math inline">\(v\ne0\)</span> let <span class="math inline">\(P_v=vv^*/(v^*v)\)</span>. Decompose <span class="math inline">\(x=(I-P_v)x+P_vx\)</span>. Fixing the first component and reversing the second gives <span class="math display">\[
+Hx=(I-P_v)x-P_vx,\qquad H=I-2P_v.
+\]</span> Since <span class="math inline">\(P_v^*=P_v\)</span> and <span class="math inline">\(P_v^2=P_v\)</span>, we get <span class="math inline">\(H^*=H\)</span> and <span class="math inline">\(H^*H=I-4P_v+4P_v^2=I\)</span>. Over <span class="math inline">\(\mathbb R\)</span>, <span class="math inline">\(H\)</span> reflects across the hyperplane <span class="math inline">\(v^\perp\)</span>. Over <span class="math inline">\(\mathbb C\)</span>, the same orthogonal decomposition into complex subspaces applies: <span class="math inline">\(H\)</span> acts as <span class="math inline">\(+1\)</span> on <span class="math inline">\(v^\perp\)</span> and <span class="math inline">\(-1\)</span> on the complex line spanned by <span class="math inline">\(v\)</span>. This is a complex-linear unitary map.</p>
+<p><strong>How to choose the normal.</strong> For <span class="math inline">\(x\ne0\)</span>, set <span class="math inline">\(\rho=\|x\|_2\)</span>, <span class="math inline">\(s=x_1/|x_1|\)</span> when <span class="math inline">\(x_1\ne0\)</span>, and <span class="math inline">\(s=1\)</span> otherwise. Choose <span class="math inline">\(\alpha=-s\rho\)</span> and <span class="math inline">\(v=x-\alpha e_1\)</span>. Reflection should subtract precisely <span class="math inline">\(v\)</span> to take <span class="math inline">\(x\)</span> to <span class="math inline">\(\alpha e_1\)</span>. Indeed, <span class="math display">\[
+v^*x=\rho^2+\rho|x_1|,\qquad v^*v=2(\rho^2+\rho|x_1|).
+\]</span> Thus <span class="math inline">\(Hx=x-v=\alpha e_1\)</span>. The opposite-phase target gives <span class="math inline">\(|v_1|=|x_1|+\rho\)</span>, avoiding the cancellation that the other sign could cause when <span class="math inline">\(x\)</span> already lies close to the axis. For a zero active column use the identity.</p>
+</section>
+<section id="worked-example-two-eliminations" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-two-eliminations">Worked example — two eliminations</h3>
+<p>Return to the plane example. For <span class="math inline">\(x=(3,4,0)^T\)</span> the target is <span class="math inline">\(-5e_1\)</span>. The normal <span class="math inline">\(v=(8,4,0)^T\)</span> can be scaled to <span class="math inline">\((2,1,0)^T\)</span> without changing the reflector. Substitution gives <span class="math display">\[
+H_1=\begin{bmatrix}-3/5&amp;-4/5&amp;0\\-4/5&amp;3/5&amp;0\\0&amp;0&amp;1\end{bmatrix},
+\qquad H_1 A=\begin{bmatrix}-5&amp;-2\\0&amp;4\\0&amp;3\end{bmatrix}.
+\]</span> The active tail of column two is now <span class="math inline">\((4,3)^T\)</span>. To send it to <span class="math inline">\((-5,0)^T\)</span>, use normal <span class="math inline">\((9,3)^T\)</span>, proportional to <span class="math inline">\((3,1)^T\)</span>. Embed its reflector in the bottom-right corner: <span class="math display">\[
+H_2=\begin{bmatrix}1&amp;0&amp;0\\0&amp;-4/5&amp;-3/5\\0&amp;-3/5&amp;4/5\end{bmatrix},
+\qquad H_2 H_1 A=\begin{bmatrix}-5&amp;-2\\0&amp;-5\\0&amp;0\end{bmatrix}.
+\]</span> Which order gives <span class="math inline">\(Q\)</span>? Undo the left multiplications: <span class="math inline">\(U_f=(H_2H_1)^*=H_1H_2\)</span>. Its first two columns are <span class="math inline">\(-q_1,-q_2\)</span> from the Gram–Schmidt example. The top two rows of the transformed matrix are <span class="math inline">\(-R\)</span>, so the minus signs cancel in the product. The sign convention is the entire difference between these two exact reduced factorizations.</p>
+<p>In general, step <span class="math inline">\(j\)</span> uses <span class="math inline">\(H_j=\operatorname{diag}(I_{j-1},\widetilde H_j)\)</span> on rows <span class="math inline">\(j\)</span> through <span class="math inline">\(m\)</span>. Earlier columns already vanish in those rows. If <span class="math inline">\(H_t\cdots H_1 A=[R^T\ 0]^T\)</span>, the full unitary factor is <span class="math inline">\(H_1\cdots H_t\)</span>. In software, store the normals and apply each reflector to a trailing block <span class="math inline">\(B\)</span> by the rank-one update <span class="math inline">\(B\leftarrow B-v(2v^*B/(v^*v))\)</span>. This also lets us compute <span class="math inline">\(U_f^*b\)</span> without forming a dense <span class="math inline">\(U_f\)</span>.</p>
+</section>
+</section>
+<section id="what-should-a-numerical-qr-test-measure" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="what-should-a-numerical-qr-test-measure"><span class="header-section-number">5.4</span> What should a numerical QR test measure?</h2>
+<p>For computed factors, examine two quantities: <span class="math display">\[
+d_{\mathrm{fact}}=\|A-\widehat Q\widehat R\|_2,\qquad
+d_{\mathrm{orth}}=\|\widehat Q^*\widehat Q-I_n\|_2.
+\]</span> The first tests reconstruction. Divide it by <span class="math inline">\(\|A\|_2\)</span> when comparing matrices on different scales. The second tests whether coefficient lengths and projection formulas remain trustworthy. For example, doubling one column of an exact <span class="math inline">\(Q\)</span> and halving the corresponding row of <span class="math inline">\(R\)</span> leaves the product unchanged, yet the associated diagonal entry of <span class="math inline">\(\widehat Q^*\widehat Q\)</span> is now <span class="math inline">\(4\)</span>.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Work for dense real <span class="math inline">\(m\times n\)</span> input (leading terms)</th>
+<th style="text-align: left;">Numerical behavior and use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CGS, one pass</td>
+<td style="text-align: left;">About <span class="math inline">\(2mn^2\)</span></td>
+<td style="text-align: left;">Block inner products are convenient. Nearly dependent columns can produce severe loss of orthogonality.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MGS, one pass</td>
+<td style="text-align: left;">About <span class="math inline">\(2mn^2\)</span></td>
+<td style="text-align: left;">Sequential updates often maintain better orthogonality. Useful for appending one Krylov basis vector.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Householder</td>
+<td style="text-align: left;">About <span class="math inline">\(2mn^2-2n^3/3\)</span></td>
+<td style="text-align: left;">Standard dense QR. A product of nearly isometric steps gives backward stability and typically near-working-precision orthogonality.</td>
+</tr>
+</tbody>
+</table>
+<p>The Gram–Schmidt counts include explicit thin <span class="math inline">\(Q\)</span>. The Householder count stores <span class="math inline">\(Q\)</span> implicitly; explicitly generating a thin <span class="math inline">\(Q\)</span> adds work of the same order. Backward stability here means the computed triangular factor corresponds to a matrix close to <span class="math inline">\(A\)</span> under an exactly unitary transformation, up to dimension-dependent rounding bounds. It gives no guarantee that an intrinsically sensitive least-squares solution has small forward error.</p>
+<section id="experiment-making-columns-approach-a-common-direction" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-making-columns-approach-a-common-direction">Experiment — making columns approach a common direction</h3>
+<p>Use the <span class="math inline">\((n+1)\times n\)</span> real matrix with first row all ones and remaining block <span class="math inline">\(\delta I_n\)</span>. Two columns differ by a vector of length <span class="math inline">\(\sqrt2\,\delta\)</span>. Since <span class="math inline">\(A^*A=\mathbf1\mathbf1^T+\delta^2I_n\)</span>, its extreme eigenvalues are <span class="math inline">\(n+\delta^2\)</span> and <span class="math inline">\(\delta^2\)</span> for <span class="math inline">\(n&gt;1\)</span>. Hence <span class="math inline">\(\kappa_2(A)=\sqrt{n+\delta^2}/\delta\)</span>. The scale <span class="math inline">\(\|A\|_2\)</span> stays almost constant. This lets us vary column dependence without confounding it with the scale of the reconstruction error.</p>
+<div id="cell-fig-qr-diagnostics" class="cell" data-fig-height="3.4" data-fig-width="7" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>deltas <span class="op">=</span> np.logspace(<span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CGS"</span>: <span class="kw">lambda</span> A: gram_schmidt(A, modified<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MGS"</span>: <span class="kw">lambda</span> A: gram_schmidt(A, modified<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Householder"</span>: <span class="kw">lambda</span> A: np.linalg.qr(A, mode<span class="op">=</span><span class="st">"reduced"</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>errors <span class="op">=</span> {name: [] <span class="cf">for</span> name <span class="kw">in</span> methods}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>conditions <span class="op">=</span> np.sqrt(n <span class="op">+</span> deltas<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> deltas</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> delta <span class="kw">in</span> deltas:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.vstack((np.ones((<span class="dv">1</span>, n)), delta <span class="op">*</span> np.eye(n)))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, factor <span class="kw">in</span> methods.items():</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        Q, R <span class="op">=</span> factor(A)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        residual <span class="op">=</span> np.linalg.norm(A <span class="op">-</span> Q <span class="op">@</span> R, <span class="bu">ord</span><span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        defect <span class="op">=</span> np.linalg.norm(Q.T <span class="op">@</span> Q <span class="op">-</span> np.eye(n), <span class="bu">ord</span><span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        errors[name].append((residual, defect))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.4</span>), layout<span class="op">=</span><span class="st">"constrained"</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>floor <span class="op">=</span> <span class="fl">1e-19</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col, ax <span class="kw">in</span> <span class="bu">enumerate</span>(axes):</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (name, rows), marker <span class="kw">in</span> <span class="bu">zip</span>(errors.items(), (<span class="st">"o"</span>, <span class="st">"s"</span>, <span class="st">"^"</span>)):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        values <span class="op">=</span> np.array(rows)[:, col]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        ax.loglog(conditions, np.maximum(values, floor),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                  marker<span class="op">=</span>marker, ms<span class="op">=</span><span class="dv">4</span>, label<span class="op">=</span>name)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="vs">r"Condition number </span><span class="dv">$</span><span class="er">\</span><span class="vs">kappa_2</span><span class="kw">(</span><span class="vs">A</span><span class="kw">)</span><span class="dv">$</span><span class="vs">"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, which<span class="op">=</span><span class="st">"major"</span>, alpha<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Factorization residual"</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Orthogonality defect"</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-qr-diagnostics" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-qr-diagnostics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04_qr_factorization_files/figure-html/fig-qr-diagnostics-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-qr-diagnostics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Single-pass Gram–Schmidt and Householder QR in binary64. Each point corresponds to the same matrix in both panels. Errors below 1e-19, including zero, are plotted at 1e-19.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Read the two panels at the same horizontal position. At small <span class="math inline">\(\delta\)</span>, all three methods can still reconstruct the input to high absolute accuracy. CGS can meanwhile produce an orthogonality defect of order one. The first column is almost a coordinate vector, and the small corrections to inner products can fall below binary64 resolution. MGS removes successive components from the residual and does substantially better on this family. Householder QR maintains orthogonality close to rounding precision. For example, at <span class="math inline">\(\delta=10^{-10}\)</span>, one binary64 run gave orthogonality defects of about <span class="math inline">\(3\)</span>, <span class="math inline">\(9.4\times10^{-11}\)</span>, and <span class="math inline">\(7.2\times10^{-16}\)</span> for CGS, MGS, and Householder respectively. All three reconstruction residuals were below <span class="math inline">\(10^{-24}\)</span>. The exact residuals, including zeros for particularly simple arithmetic, can vary with the numerical libraries. These curves illustrate mechanisms on one family; they are not universal error laws.</p>
+</section>
+</section>
+<section id="least-squares-reduces-to-a-triangular-system" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="least-squares-reduces-to-a-triangular-system"><span class="header-section-number">5.5</span> Least squares reduces to a triangular system</h2>
+<p>Given <span class="math inline">\(m&gt;n\)</span> and <span class="math inline">\(b\in\mathbb F^m\)</span>, seek <span class="math inline">\(x\)</span> minimizing <span class="math inline">\(\|b-Ax\|_2\)</span>. Write <span class="math inline">\(b=QQ^*b+(I-QQ^*)b\)</span>. The first summand and <span class="math inline">\(Ax\)</span> lie in <span class="math inline">\(U\)</span>; the second summand lies in <span class="math inline">\(U^\perp\)</span>. Pythagoras and the isometry of <span class="math inline">\(Q\)</span> give <span class="math display">\[
+\begin{aligned}
+\|b-Ax\|_2^2
+&amp;=\|Q(Q^*b-Rx)\|_2^2+\|(I-QQ^*)b\|_2^2\\
+&amp;=\|Q^*b-Rx\|_2^2+\|(I-QQ^*)b\|_2^2.
+\end{aligned}
+\]</span> Only the first term depends on <span class="math inline">\(x\)</span>. Invertibility of <span class="math inline">\(R\)</span> makes that term zero for exactly one <span class="math inline">\(x\)</span>. Thus <strong>solve <span class="math inline">\(Rx=Q^*b\)</span></strong>. The vector <span class="math inline">\(Q^*b\)</span> contains the coordinates of the closest point in the orthonormal basis; back substitution expresses that same point in the original columns. The residual <span class="math inline">\(r=b-Ax=(I-QQ^*)b\)</span> satisfies <span class="math inline">\(Q^*r=0\)</span> and hence <span class="math inline">\(A^*r=0\)</span>. With implicit full QR, apply the stored reflectors to <span class="math inline">\(b\)</span>: the first <span class="math inline">\(n\)</span> transformed entries form the right-hand side and the norm of the remaining entries is the minimal residual norm.</p>
+<section id="worked-example-fitting-a-point-to-the-plane" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-fitting-a-point-to-the-plane">Worked example — fitting a point to the plane</h3>
+<p>Use the same <span class="math inline">\(A\)</span> and take <span class="math inline">\(b=(0,0,5)^T\)</span>. Dotting with <span class="math inline">\(q_1,q_2\)</span> gives <span class="math inline">\(Q^*b=(0,3)^T\)</span>. Back substitution gives <span class="math display">\[
+5x_2=3,\qquad 5x_1+2x_2=0,\qquad x=(-6/25,3/5)^T.
+\]</span> The closest point and the discrepancy are <span class="math display">\[
+Ax=3q_2=\tfrac1{25}(-48,36,45)^T,\qquad
+r=\tfrac1{25}(48,-36,80)^T.
+\]</span> Check <span class="math inline">\(a_1^Tr=(144-144)/25=0\)</span> and <span class="math inline">\(a_2^Tr=(-96-144+240)/25=0\)</span>. The residual length is <span class="math inline">\(4\)</span>; the fitted vector has length <span class="math inline">\(3\)</span>. Their squared lengths sum to <span class="math inline">\(\|b\|_2^2=25\)</span>. Adding any nonzero displacement within the fitted plane increases the squared distance by the squared length of that displacement.</p>
+</section>
+<section id="why-avoid-explicitly-forming-the-normal-equations" class="level3">
+<h3 class="anchored" data-anchor-id="why-avoid-explicitly-forming-the-normal-equations">Why avoid explicitly forming the normal equations?</h3>
+<p>Residual orthogonality also gives <span class="math inline">\(A^*Ax=A^*b\)</span>. For full column rank, the extreme eigenvalues of <span class="math inline">\(A^*A\)</span> are the squares of the extreme singular values of <span class="math inline">\(A\)</span>. Thus <span class="math inline">\(\kappa_2(A^*A)=\kappa_2(A)^2\)</span>. By contrast <span class="math inline">\(\|Ax\|_2=\|Rx\|_2\)</span> for every <span class="math inline">\(x\)</span>, so <span class="math inline">\(R\)</span> has the same extreme stretching factors and the same <span class="math inline">\(\kappa_2\)</span> as <span class="math inline">\(A\)</span>. Forming the Gram matrix can round away small independent directions: in the experiment its diagonal entries <span class="math inline">\(1+\delta^2\)</span> can round to <span class="math inline">\(1\)</span> even while the entries <span class="math inline">\(\delta\)</span> remain readily representable. QR avoids this extra loss. The sensitivity of a least-squares solution to changes in the original data also depends on the right-hand side and residual.</p>
+<p>If <span class="math inline">\(A\)</span> is rank deficient, the fitted point remains unique, but one may add any vector of <span class="math inline">\(\ker A\)</span> to a minimizer. The invertible triangular solve no longer applies. Column-pivoted QR helps identify independent columns and estimate numerical rank. An SVD permits a rank decision from singular values and produces a minimum-norm solution.</p>
+</section>
+</section>
+<section id="from-qr-to-the-seminar" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="from-qr-to-the-seminar"><span class="header-section-number">5.6</span> From QR to the seminar</h2>
+<ul>
+<li><strong>Power and subspace iteration.</strong> Normalizing a single nonzero iterate preserves its line and keeps its length manageable. For a block, normalizing each column separately still permits nearly parallel columns. Thin QR controls their mutual angles as well.</li>
+<li><strong>Chebyshev filtering.</strong> In <span class="math inline">\(Y_{k+1}=p_m(A)Q_k\)</span>, the filter changes the relative sizes of spectral components. Strong amplification can make several columns point almost along the same preferred direction. Factor <span class="math inline">\(Y_{k+1}=Q_{k+1}R_{k+1}\)</span>. For independent columns, <span class="math inline">\(R_{k+1}\)</span> is invertible, so the next basis spans precisely the filtered space. If filtering annihilates a direction, or rounding has already made it indistinguishable, QR cannot reconstruct it. Completing a deficient block would introduce a freely chosen direction.</li>
+<li><strong>Rayleigh–Ritz.</strong> For an approximate eigenvector <span class="math inline">\(Qz\)</span>, require <span class="math inline">\(AQz-\theta Qz\)</span> to be orthogonal to <span class="math inline">\(\operatorname{im}Q\)</span>. Multiplication by <span class="math inline">\(Q^*\)</span> gives the small problem <span class="math inline">\((Q^*AQ)z=\theta z\)</span> because <span class="math inline">\(Q^*Q=I\)</span>. Loss of orthogonality undermines this reduction.</li>
+<li><strong>Arnoldi and Lanczos.</strong> Arnoldi extends a Krylov basis by orthogonalizing <span class="math inline">\(Aq_j\)</span> against earlier vectors. For Hermitian <span class="math inline">\(A\)</span>, Lanczos admits a short recurrence in exact arithmetic. In finite precision, reorthogonalization can be important for maintaining independent approximate eigenvector information.</li>
+<li><strong>QR iteration.</strong> For square <span class="math inline">\(A_k=Q_kR_k\)</span>, reversing the factors gives <span class="math inline">\(A_{k+1}=R_kQ_k=Q_k^*A_kQ_k\)</span>. Each step preserves eigenvalues by unitary similarity. Here QR changes coordinates for a whole operator; in filtered subspace iteration it provides a basis for a trial space. Session 5 develops the eigenvalues and spectral theorem needed to analyze these operations.</li>
+</ul>
+<p><strong>Course reading.</strong> The revision plan in §1.4.4 and the seminar link in §1.3.3 of the book motivate this sequence. For the lecture algorithms see Kanschat and Scheichl, <em>Numerical Linear Algebra</em>, §§2.1–2.2 and Appendix A. For least squares and implicit reflector application see Scheichl and Zech, §§3.8–3.9, and Bastian, §§11–12.</p>
+</section>
+<section id="independent-exercises" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="independent-exercises"><span class="header-section-number">5.7</span> Independent exercises</h2>
+<ol type="1">
+<li><strong>Dimensions and coordinates.</strong> A <span class="math inline">\(5\times3\)</span> matrix <span class="math inline">\(B\)</span> has independent columns. Give the dimensions of both QR factorizations, the ranks of <span class="math inline">\(QQ^*\)</span> and <span class="math inline">\(I-QQ^*\)</span> for thin <span class="math inline">\(Q\)</span>, and the orthonormal coordinates of <span class="math inline">\(Bx\)</span>.</li>
+<li><strong>Hand factorization.</strong> Compute positive-diagonal thin QR for the columns <span class="math inline">\(a_1=(1,0,1)^T\)</span>, <span class="math inline">\(a_2=(1,1,1)^T\)</span>. Verify both identities and interpret <span class="math inline">\(r_{22}\)</span> geometrically.</li>
+<li><strong>Reflecting onto an axis.</strong> For <span class="math inline">\(x=(3,-4)^T\)</span>, construct the stable-sign reflector, verify <span class="math inline">\(Hx\)</span> and <span class="math inline">\(H^TH\)</span>, and explain using the inner product why every unitary matrix preserves distances.</li>
+<li><strong>Projection and triangular solve.</strong> For the matrix in Exercise 2 and <span class="math inline">\(b=(2,3,0)^T\)</span>, find the closest point to <span class="math inline">\(b\)</span> in the column plane, its original coordinates, and the distance. Check optimality using both columns.</li>
+<li><strong>A numerical diagnosis.</strong> A binary64 run on a matrix of norm near one gives <span class="math inline">\(d_{\mathrm{fact}}=10^{-16}\)</span> and <span class="math inline">\(d_{\mathrm{orth}}=10^{-2}\)</span>. Which identity is reliable at working precision? Would you use the columns directly in the projector formula? Explain how a second pass or Householder QR changes the computation. Use the experiment to determine why testing reconstruction alone misses the problem.</li>
+<li><strong>Filtering and rank.</strong> Take <span class="math inline">\(A=\operatorname{diag}(2,1,0)\)</span>, <span class="math inline">\(Q_0=[(e_1+e_2)/\sqrt2,\ e_3]\)</span>, and <span class="math inline">\(p(t)=t\)</span>. Find the filtered image and its dimension. Repeat with <span class="math inline">\(p(t)=t+\varepsilon\)</span> for small real <span class="math inline">\(\varepsilon&gt;0\)</span>. What does thin QR preserve, and what does the small diagonal of <span class="math inline">\(R\)</span> tell you in this example?</li>
+</ol>
+</section>
+<section id="solutions-consult-after-attempting-the-exercises" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="solutions-consult-after-attempting-the-exercises"><span class="header-section-number">5.8</span> Solutions — consult after attempting the exercises</h2>
+<p><strong>1. Dimensions and coordinates.</strong> Thin factors have sizes <span class="math inline">\(5\times3\)</span> and <span class="math inline">\(3\times3\)</span>. Full factors have sizes <span class="math inline">\(5\times5\)</span> and <span class="math inline">\(5\times3\)</span>, with a <span class="math inline">\(2\times3\)</span> zero block below the triangular part. The projector onto the column space has rank three; its complement has rank two. Since <span class="math inline">\(Bx=Q(Rx)\)</span>, <span class="math inline">\(Rx\)</span> gives the requested coordinates.</p>
+<p><strong>2. Hand factorization.</strong> Normalize <span class="math inline">\(a_1\)</span> to get <span class="math inline">\(q_1=(1,0,1)^T/\sqrt2\)</span>. Then <span class="math inline">\(r_{12}=q_1^Ta_2=\sqrt2\)</span>, and <span class="math inline">\(a_2-\sqrt2 q_1=(0,1,0)^T=q_2\)</span>. Thus <span class="math display">\[
+Q=\begin{bmatrix}1/\sqrt2&amp;0\\0&amp;1\\1/\sqrt2&amp;0\end{bmatrix},
+\qquad R=\begin{bmatrix}\sqrt2&amp;\sqrt2\\0&amp;1\end{bmatrix}.
+\]</span> Both columns of <span class="math inline">\(Q\)</span> have norm one and their dot product vanishes. Reconstruction gives <span class="math inline">\(\sqrt2q_1=a_1\)</span> and <span class="math inline">\(\sqrt2q_1+q_2=a_2\)</span>. Here <span class="math inline">\(r_{22}=1\)</span> measures the perpendicular distance of <span class="math inline">\(a_2\)</span> from the line through <span class="math inline">\(a_1\)</span>.</p>
+<p><strong>3. Reflecting onto an axis.</strong> Choose <span class="math inline">\(\alpha=-5\)</span>, so <span class="math inline">\(v=(8,-4)^T\)</span> is proportional to <span class="math inline">\((2,-1)^T\)</span>. Then <span class="math display">\[
+H=\tfrac15\begin{bmatrix}-3&amp;4\\4&amp;3\end{bmatrix},
+\qquad Hx=\tfrac15(-25,0)^T.
+\]</span> The columns of the integer matrix have squared length <span class="math inline">\(25\)</span> and dot product <span class="math inline">\(-12+12=0\)</span>, so <span class="math inline">\(H^TH=I\)</span>. For any unitary <span class="math inline">\(U\)</span> and <span class="math inline">\(d=x-y\)</span>, <span class="math inline">\(\|Ux-Uy\|_2^2=d^*U^*Ud=d^*d\)</span>. This proves distance preservation for complex vectors as well.</p>
+<p><strong>4. Projection and triangular solve.</strong> The orthonormal coordinates are <span class="math inline">\(Q^Tb=(\sqrt2,3)^T\)</span>, so the projection is <span class="math inline">\(\sqrt2q_1+3q_2=(1,3,1)^T\)</span>. Back substitution gives <span class="math inline">\(x_2=3\)</span> and <span class="math inline">\(\sqrt2(x_1+3)=\sqrt2\)</span>, hence <span class="math inline">\(x_1=-2\)</span>. Indeed <span class="math inline">\(-2a_1+3a_2=(1,3,1)^T\)</span>. The residual <span class="math inline">\((1,0,-1)^T\)</span> has dot product zero with both <span class="math inline">\(a_1\)</span> and <span class="math inline">\(a_2\)</span> and length <span class="math inline">\(\sqrt2\)</span>. This certifies the closest point geometrically.</p>
+<p><strong>5. A numerical diagnosis.</strong> Reconstruction is accurate on the input scale, but the Gram matrix deviates from identity by <span class="math inline">\(10^{-2}\)</span> in operator norm. The usual projector derivation uses <span class="math inline">\(Q^*Q=I\)</span>; a defect this large makes the columns unsuitable for a working-precision projection. In the experiment the CGS reconstruction curve stays small even where its orthogonality curve grows: the coefficients still express the input accurately in the computed, imperfect basis. MGS uses the evolving residual in each dot product. A second pass explicitly removes components left by the first pass and updates <span class="math inline">\(R\)</span>. Refactoring the original input with Householder transformations constructs the basis through unitary operations instead. Check both diagnostics after either remedy.</p>
+<p><strong>6. Filtering and rank.</strong> The first filtered block has columns <span class="math inline">\((2,1,0)^T/\sqrt2\)</span> and zero. Its image is a line. The first normalized direction is <span class="math inline">\((2,1,0)^T/\sqrt5\)</span>; no second filtered direction exists. For the shifted polynomial the columns are <span class="math inline">\(u=(2+\varepsilon,1+\varepsilon,0)^T/\sqrt2\)</span> and <span class="math inline">\(\varepsilon e_3\)</span>. They are orthogonal, so positive-diagonal QR gives <span class="math inline">\(Q=[u/\|u\|_2,\ e_3]\)</span> and <span class="math inline">\(R=\operatorname{diag}(\|u\|_2,\varepsilon)\)</span>. The image is now a plane. Here the small <span class="math inline">\(r_{22}\)</span> records attenuation of a genuinely independent direction. Its angle with the first column is still <span class="math inline">\(90^\circ\)</span>. Against perturbations comparable in norm to <span class="math inline">\(\varepsilon\)</span>, the second direction can be unreliable even though normalization in exact arithmetic is straightforward.</p>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">5.9</span> End-of-session mastery checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Explain <span class="math inline">\(Ax=Q(Rx)\)</span> and use it to identify the coordinate change and the preserved space.</label></li>
+<li><label><input type="checkbox">Give thin and full dimensions, state the uniqueness convention, and identify the orthogonal projector.</label></li>
+<li><label><input type="checkbox">Compute thin QR by Gram–Schmidt and verify reconstruction and orthonormality separately.</label></li>
+<li><label><input type="checkbox">Locate the differing dot product in CGS and MGS and explain when reorthogonalization helps.</label></li>
+<li><label><input type="checkbox">Derive a Householder reflector, choose a stable sign or phase, and prove unitarity.</label></li>
+<li><label><input type="checkbox">Eliminate a subdiagonal tail without disturbing earlier zeros and accumulate the factors in the correct order.</label></li>
+<li><label><input type="checkbox">Project a right-hand side, solve the triangular least-squares system, and check residual orthogonality.</label></li>
+<li><label><input type="checkbox">Explain the condition-number penalty incurred by explicitly forming the normal equations.</label></li>
+<li><label><input type="checkbox">Interpret both numerical diagnostics even when they give very different impressions.</label></li>
+<li><label><input type="checkbox">Explain which step in filtered subspace iteration changes the span, which step represents it in an orthonormal basis, and what happens when rank is lost.</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/03_orthogonal_projections.html" class="pagination-link" aria-label="Session 3 — Orthogonal Projections">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/05_eigenvalues_spectral_theorem.html" class="pagination-link" aria-label="Session 5 — Eigenvalues and the Spectral Theorem">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

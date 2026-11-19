@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>9&nbsp; Session 8 — Basic Iterative Methods – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/09_power_subspace_iteration.html" rel="next">
+<link href="../review/07_direct_numerical_methods.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/08_basic_iterative_methods.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-a-linear-system-to-a-fixed-point" id="toc-from-a-linear-system-to-a-fixed-point" class="nav-link active" data-scroll-target="#from-a-linear-system-to-a-fixed-point"><span class="header-section-number">9.1</span> From a linear system to a fixed point</a>
+  <ul class="collapse">
+  <li><a href="#build-the-update-by-choosing-an-easy-solve" id="toc-build-the-update-by-choosing-an-easy-solve" class="nav-link" data-scroll-target="#build-the-update-by-choosing-an-easy-solve">Build the update by choosing an easy solve</a></li>
+  </ul></li>
+  <li><a href="#two-choices-of-splitting-one-system" id="toc-two-choices-of-splitting-one-system" class="nav-link" data-scroll-target="#two-choices-of-splitting-one-system"><span class="header-section-number">9.2</span> Two choices of splitting, one system</a>
+  <ul class="collapse">
+  <li><a href="#jacobi-uses-a-snapshot" id="toc-jacobi-uses-a-snapshot" class="nav-link" data-scroll-target="#jacobi-uses-a-snapshot">Jacobi uses a snapshot</a></li>
+  <li><a href="#gaussseidel-reuses-a-corrected-component" id="toc-gaussseidel-reuses-a-corrected-component" class="nav-link" data-scroll-target="#gaussseidel-reuses-a-corrected-component">Gauss–Seidel reuses a corrected component</a></li>
+  <li><a href="#worked-example-when-does-the-second-unknown-first-change" id="toc-worked-example-when-does-the-second-unknown-first-change" class="nav-link" data-scroll-target="#worked-example-when-does-the-second-unknown-first-change">Worked example — when does the second unknown first change?</a></li>
+  </ul></li>
+  <li><a href="#the-error-obeys-a-homogeneous-equation" id="toc-the-error-obeys-a-homogeneous-equation" class="nav-link" data-scroll-target="#the-error-obeys-a-homogeneous-equation"><span class="header-section-number">9.3</span> The error obeys a homogeneous equation</a></li>
+  <li><a href="#when-do-all-matrix-powers-decay" id="toc-when-do-all-matrix-powers-decay" class="nav-link" data-scroll-target="#when-do-all-matrix-powers-decay"><span class="header-section-number">9.4</span> When do all matrix powers decay?</a></li>
+  <li><a href="#two-guarantees-that-avoid-computing-eigenvalues" id="toc-two-guarantees-that-avoid-computing-eigenvalues" class="nav-link" data-scroll-target="#two-guarantees-that-avoid-computing-eigenvalues"><span class="header-section-number">9.5</span> Two guarantees that avoid computing eigenvalues</a></li>
+  <li><a href="#what-can-we-measure-without-the-solution" id="toc-what-can-we-measure-without-the-solution" class="nav-link" data-scroll-target="#what-can-we-measure-without-the-solution"><span class="header-section-number">9.6</span> What can we measure without the solution?</a></li>
+  <li><a href="#computational-experiment-predict-the-slopes" id="toc-computational-experiment-predict-the-slopes" class="nav-link" data-scroll-target="#computational-experiment-predict-the-slopes"><span class="header-section-number">9.7</span> Computational experiment — predict the slopes</a></li>
+  <li><a href="#from-sparse-solves-to-spectral-filtering" id="toc-from-sparse-solves-to-spectral-filtering" class="nav-link" data-scroll-target="#from-sparse-solves-to-spectral-filtering"><span class="header-section-number">9.8</span> From sparse solves to spectral filtering</a></li>
+  <li><a href="#central-synthesis-iterative-solvers-as-spectral-error-dynamics" id="toc-central-synthesis-iterative-solvers-as-spectral-error-dynamics" class="nav-link" data-scroll-target="#central-synthesis-iterative-solvers-as-spectral-error-dynamics"><span class="header-section-number">9.9</span> Central Synthesis — Iterative Solvers as Spectral Error Dynamics</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">9.10</span> Exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">9.11</span> Worked solutions</a></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">9.12</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/08_basic_iterative_methods.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A factorization gives us a way to solve <span class="math inline">\(Ax=b\)</span>. An iteration poses a different design question. Can we compute an inexpensive correction from the data we have, and prove that applying it repeatedly removes an error we cannot observe?</p>
+<p><strong>Study route (75 minutes).</strong> Allow 12 minutes for splittings and fixed points, 10 for the two hand calculations, 15 for the convergence theorem and its guarantees, and 10 for stopping, the figure, and synthesis. Use the remaining 28 minutes for the exercises. Reading the Python implementation line by line is optional.</p>
+<section id="from-a-linear-system-to-a-fixed-point" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="from-a-linear-system-to-a-fixed-point"><span class="header-section-number">9.1</span> From a linear system to a fixed point</h2>
+<p>In Session 7, elimination reduced a system to triangular solves. Given suitable pivots, LU solves a nonsingular system in finitely many operations in exact arithmetic. Dense factorization costs order <span class="math inline">\(n^3\)</span> operations and order <span class="math inline">\(n^2\)</span> storage. Sparse elimination can introduce entries where the original matrix had zeros (<em>fill-in</em>). On a large grid, storing the factors can be a greater obstacle than storing the original equations. A sparse matrix-vector product needs work proportional to the number of stored nonzeros. A sparse triangular solve can also visit each stored coefficient once, although its rows depend on one another. The question is how many such inexpensive sweeps we need for a given accuracy.</p>
+<p>A <strong>fixed point</strong> of a map <span class="math inline">\(F\)</span> satisfies <span class="math inline">\(x^*=F(x^*)\)</span>. Starting with <span class="math inline">\(x^{(0)}\)</span>, evaluate <span class="math inline">\(x^{(k+1)}=F(x^{(k)})\)</span>. For continuous <span class="math inline">\(F\)</span>, any limit of the whole sequence is a fixed point, since passing to the limit gives <span class="math inline">\(x^*=F(x^*)\)</span>. Existence alone gives no assurance that the sequence approaches it.</p>
+<p>We study <strong>stationary linear iterations</strong>. The update is affine, <span class="math inline">\(F(x)=Bx+c\)</span>, and <em>stationary</em> means that the same <span class="math inline">\(B\)</span> and <span class="math inline">\(c\)</span> are used at every sweep. The fixed-point equation is <span class="math inline">\((I-B)x=c\)</span>. It has a unique solution exactly when <span class="math inline">\(I-B\)</span> is invertible.</p>
+<section id="build-the-update-by-choosing-an-easy-solve" class="level3">
+<h3 class="anchored" data-anchor-id="build-the-update-by-choosing-an-easy-solve">Build the update by choosing an easy solve</h3>
+<p>Let <span class="math inline">\(A\in\mathbb{F}^{n\times n}\)</span> be nonsingular, <span class="math inline">\(b\in\mathbb{F}^n\)</span>, and <span class="math inline">\(\mathbb{F}=\mathbb{R}\)</span> or <span class="math inline">\(\mathbb{C}\)</span>. Split <span class="math inline">\(A=M-N\)</span> with <span class="math inline">\(M\)</span> invertible. Since <span class="math inline">\(Ax=b\)</span> is equivalent to <span class="math inline">\(Mx=Nx+b\)</span>, evaluate the right-hand side at the current approximation and solve for the next one:</p>
+<p><span class="math display">\[
+Mx^{(k+1)}=Nx^{(k)}+b,\qquad
+x^{(k+1)}=Bx^{(k)}+c,\quad B=M^{-1}N,\quad c=M^{-1}b.
+\]</span></p>
+<p>The identity <span class="math inline">\(I-B=M^{-1}A\)</span> verifies consistency and uniqueness at once. Multiplying the fixed-point equation by <span class="math inline">\(M\)</span> recovers precisely the original system. Subtracting <span class="math inline">\(Mx^{(k)}\)</span> from both sides of the sweep gives another useful reading:</p>
+<p><span class="math display">\[
+r^{(k)}=b-Ax^{(k)},\qquad Md^{(k)}=r^{(k)},\qquad
+x^{(k+1)}=x^{(k)}+d^{(k)}.
+\]</span></p>
+<p>Thus <span class="math inline">\(M^{-1}r^{(k)}\)</span> approximates the exact correction <span class="math inline">\(A^{-1}r^{(k)}\)</span>. Taking <span class="math inline">\(M=A\)</span> would give that correction in one step, at the price of solving the original problem. A more economical <span class="math inline">\(M\)</span> changes the propagation matrix <span class="math inline">\(B=I-M^{-1}A\)</span>. In code, solve with <span class="math inline">\(M\)</span> using its structure. Forming its inverse can destroy sparsity and adds unnecessary work.</p>
+</section>
+</section>
+<section id="two-choices-of-splitting-one-system" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="two-choices-of-splitting-one-system"><span class="header-section-number">9.2</span> Two choices of splitting, one system</h2>
+<p>Write <span class="math inline">\(A=D+L+U\)</span>, retaining the actual signs of entries in the diagonal, strictly lower, and strictly upper parts. Assume <span class="math inline">\(a_{ii}\ne0\)</span> for each <span class="math inline">\(i\)</span>. This makes both <span class="math inline">\(D\)</span> and <span class="math inline">\(D+L\)</span> invertible. A nonsingular <span class="math inline">\(A\)</span> can have a zero diagonal entry, so this assumption needs its own check.</p>
+<section id="jacobi-uses-a-snapshot" class="level3">
+<h3 class="anchored" data-anchor-id="jacobi-uses-a-snapshot">Jacobi uses a snapshot</h3>
+<p>Take <span class="math inline">\(M=D\)</span>, <span class="math inline">\(N=-(L+U)\)</span>. Reading <span class="math inline">\(Dx^{(k+1)}=b-(L+U)x^{(k)}\)</span> by rows gives</p>
+<p><span class="math display">\[
+B_J=-D^{-1}(L+U),\qquad c_J=D^{-1}b,\qquad
+x_i^{(k+1)}=\frac{b_i-\sum_{j\ne i}a_{ij}x_j^{(k)}}{a_{ii}}.
+\]</span></p>
+<p>Every row reads the same old vector. Keep separate input and output arrays during the sweep. Rows can then be distributed across processors and the outputs become the common input for the next sweep.</p>
+</section>
+<section id="gaussseidel-reuses-a-corrected-component" class="level3">
+<h3 class="anchored" data-anchor-id="gaussseidel-reuses-a-corrected-component">Gauss–Seidel reuses a corrected component</h3>
+<p>Visit rows in order <span class="math inline">\(1,\ldots,n\)</span>. By row <span class="math inline">\(i\)</span>, the first <span class="math inline">\(i-1\)</span> components have already been updated. Moving their terms to the left gives <span class="math inline">\((D+L)x^{(k+1)}=b-Ux^{(k)}\)</span>, hence</p>
+<p><span class="math display">\[
+\begin{aligned}
+B_{GS}&amp;=-(D+L)^{-1}U, \qquad c_{GS}=(D+L)^{-1}b,\\
+x_i^{(k+1)}&amp;=\frac{1}{a_{ii}}\left(b_i-\sum_{j&lt;i}a_{ij}x_j^{(k+1)}-\sum_{j&gt;i}a_{ij}x_j^{(k)}\right).
+\end{aligned}
+\]</span></p>
+<p>This is forward substitution with <span class="math inline">\(M=D+L\)</span>. One array suffices. An entry below the diagonal creates a dependency on the newly computed component. A different ordering can change the sweep and its convergence behavior.</p>
+</section>
+<section id="worked-example-when-does-the-second-unknown-first-change" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-when-does-the-second-unknown-first-change">Worked example — when does the second unknown first change?</h3>
+<p>Use the same start <span class="math inline">\(x^{(0)}=(0,0)^T\)</span> for both methods, with</p>
+<p><span class="math display">\[
+A=\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix},\qquad
+b=\begin{pmatrix}1\\0\end{pmatrix},\qquad
+x^*=\begin{pmatrix}2/3\\1/3\end{pmatrix}.
+\]</span></p>
+<p>Write the old coordinates as <span class="math inline">\((u,v)\)</span> and the new ones as <span class="math inline">\((u',v')\)</span>. Both methods compute <span class="math inline">\(u'=(1+v)/2\)</span>. Jacobi takes <span class="math inline">\(v'=u/2\)</span> and Gauss–Seidel takes <span class="math inline">\(v'=u'/2=(1+v)/4\)</span>. Reading off the coefficients and constant terms gives</p>
+<p><span class="math display">\[
+B_J=\begin{pmatrix}0&amp;1/2\\1/2&amp;0\end{pmatrix},\quad c_J=\binom{1/2}{0},\qquad
+B_{GS}=\begin{pmatrix}0&amp;1/2\\0&amp;1/4\end{pmatrix},\quad c_{GS}=\binom{1/2}{1/4}.
+\]</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Sweep <span class="math inline">\(k\)</span></th>
+<th style="text-align: left;">Jacobi <span class="math inline">\((u,v)\)</span></th>
+<th style="text-align: left;">Gauss–Seidel <span class="math inline">\((u,v)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: left;"><span class="math inline">\((0,0)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((0,0)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;"><span class="math inline">\((1/2,0)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((1/2,1/4)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;"><span class="math inline">\((1/2,1/4)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((5/8,5/16)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;"><span class="math inline">\((5/8,1/4)\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((21/32,21/64)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>In the first Jacobi sweep the second row still sees <span class="math inline">\(u=0\)</span>. In the first Gauss–Seidel sweep it sees <span class="math inline">\(u'=1/2\)</span>, and its equation is already satisfied at the end of the sweep. The next first-row update can disturb that equation again. To decide whether these corrections solve <em>both</em> equations in the limit, track an entire error vector across a sweep.</p>
+</section>
+</section>
+<section id="the-error-obeys-a-homogeneous-equation" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="the-error-obeys-a-homogeneous-equation"><span class="header-section-number">9.3</span> The error obeys a homogeneous equation</h2>
+<p>Use the signed error <span class="math inline">\(e^{(k)}=x^{(k)}-x^*\)</span> throughout this session. This reverses the exact-minus-approximate convention of Session 6 and preserves all norm estimates. The solver stores <span class="math inline">\(x^{(k)}\)</span>. The vector <span class="math inline">\(x^*\)</span> is fixed and generally unknown. We can reason about their difference because both obey the same affine rule:</p>
+<p><span class="math display">\[
+\begin{aligned}
+x^{(k+1)}&amp;=Bx^{(k)}+c,\\
+x^*&amp;=Bx^*+c,\\
+e^{(k+1)}&amp;=B(x^{(k)}-x^*)=Be^{(k)}.
+\end{aligned}
+\]</span></p>
+<p>The translation <span class="math inline">\(c\)</span> cancels. Centered at the solution, every sweep is the same linear transformation. Applying it <span class="math inline">\(k\)</span> times yields</p>
+<p><span class="math display">\[
+\boxed{e^{(k)}=B^ke^{(0)}}.
+\]</span></p>
+<p>Since the starting guess is arbitrary, <span class="math inline">\(e^{(0)}\)</span> ranges over the entire space. Convergence for every start therefore requires all directions to decay. For the running example, <span class="math inline">\(B_J\)</span> swaps the coordinates and halves them, so every Euclidean error norm halves at every sweep. Meanwhile <span class="math inline">\(B_{GS}(u,v)^T=v(1/2,1/4)^T\)</span>. One sweep sends every error onto the line spanned by <span class="math inline">\((2,1)^T\)</span>, where every subsequent sweep multiplies it by <span class="math inline">\(1/4\)</span>. This advantage is specific to the system and splitting.</p>
+</section>
+<section id="when-do-all-matrix-powers-decay" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="when-do-all-matrix-powers-decay"><span class="header-section-number">9.4</span> When do all matrix powers decay?</h2>
+<p><strong>Convergence theorem.</strong> For any fixed finite square matrix <span class="math inline">\(B\)</span> over <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span> and fixed vector <span class="math inline">\(c\)</span>, the following are equivalent in exact arithmetic:</p>
+<ol type="1">
+<li>The map <span class="math inline">\(x\mapsto Bx+c\)</span> has a unique fixed point, and the iterates approach it for every initial vector.</li>
+<li><span class="math inline">\(B^k\to0\)</span> as <span class="math inline">\(k\to\infty\)</span>.</li>
+<li><span class="math inline">\(\rho(B)=\max_{\lambda\in\sigma(B)}|\lambda|&lt;1\)</span>, taking eigenvalues over <span class="math inline">\(\mathbb C\)</span>.</li>
+</ol>
+<p><strong>Proof.</strong> Under the first condition, choose initial errors equal to the coordinate vectors in turn. The error formula shows that every column of <span class="math inline">\(B^k\)</span> tends to zero. In finite dimensions this implies convergence to zero in any matrix norm. Conversely, if <span class="math inline">\(B^k\to0\)</span>, the eigenvector identity <span class="math inline">\(B^kv=\lambda^k v\)</span> forces <span class="math inline">\(|\lambda|&lt;1\)</span> for every eigenvalue. For real matrices the column argument also gives decay on complex vectors by linearity.</p>
+<p>To finish, assume <span class="math inline">\(\rho(B)&lt;1\)</span>. For diagonalizable <span class="math inline">\(B=V\Lambda V^{-1}\)</span>, cancellation of adjacent factors yields <span class="math inline">\(B^k=V\Lambda^kV^{-1}\)</span>. Each diagonal entry <span class="math inline">\(\lambda_i^k\)</span> vanishes. For a defective matrix, take its complex Jordan form. A block <span class="math inline">\(J=\lambda I+H\)</span> of size <span class="math inline">\(s\)</span> has <span class="math inline">\(H^s=0\)</span>. For <span class="math inline">\(k\ge s\)</span> its binomial expansion is</p>
+<p><span class="math display">\[
+J^k=\sum_{j=0}^{s-1}\binom{k}{j}\lambda^{k-j}H^j.
+\]</span></p>
+<p>For <span class="math inline">\(0&lt;|\lambda|&lt;1\)</span>, exponential decay dominates every fixed polynomial factor in <span class="math inline">\(k\)</span>. A block with <span class="math inline">\(\lambda=0\)</span> vanishes after <span class="math inline">\(s\)</span> powers. Thus all blocks tend to zero, and conjugating back gives <span class="math inline">\(B^k\to0\)</span>. Finally <span class="math inline">\(1\)</span> is absent from the spectrum, so <span class="math inline">\(x^*=(I-B)^{-1}c\)</span> exists uniquely and <span class="math inline">\(x^{(k)}-x^*=B^ke^{(0)}\to0\)</span>. This completes the proof.</p>
+<p><strong>How fast?</strong> For diagonalizable <span class="math inline">\(B\)</span>, <span class="math inline">\(\|B^k\|_2\le\kappa_2(V)\rho(B)^k\)</span>. For normal <span class="math inline">\(B\)</span>, a unitary eigenbasis gives <span class="math inline">\(\|B^k\|_2=\rho(B)^k\)</span>. In general the asymptotic worst-case exponential factor is <span class="math inline">\(\lim_{k\to\infty}\|B^k\|^{1/k}=\rho(B)\)</span>, by the same block argument and the eigenvector lower bound. An initial error can miss a slowly decaying eigendirection. Consecutive error ratios can also vary.</p>
+<p><strong>A sufficient norm test.</strong> In any chosen induced norm, <span class="math inline">\(q=\|B\|&lt;1\)</span> gives <span class="math inline">\(\|e^{(k)}\|\le q^k\|e^{(0)}\|\)</span> by submultiplicativity. This test can be inconclusive. For example,</p>
+<p><span class="math display">\[
+B=\begin{pmatrix}0&amp;4\\0&amp;0\end{pmatrix}
+\]</span></p>
+<p>has <span class="math inline">\(\|B\|_2=4\)</span> and sends <span class="math inline">\((0,1)^T\)</span> to <span class="math inline">\((4,0)^T\)</span> in the first step. Yet <span class="math inline">\(B^2=0\)</span> and <span class="math inline">\(\rho(B)=0\)</span>. This nonnormal example exhibits transient amplification before complete decay. The decisive condition concerns the powers of the <strong>iteration matrix</strong>. The eigenvalues of the original <span class="math inline">\(A\)</span> do not in general give those of <span class="math inline">\(B\)</span>.</p>
+</section>
+<section id="two-guarantees-that-avoid-computing-eigenvalues" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="two-guarantees-that-avoid-computing-eigenvalues"><span class="header-section-number">9.5</span> Two guarantees that avoid computing eigenvalues</h2>
+<p><strong>Strict row diagonal dominance.</strong> If <span class="math inline">\(|a_{ii}|&gt;\sum_{j\ne i}|a_{ij}|\)</span> for every row, Jacobi and forward Gauss–Seidel both converge from every start. For Jacobi the maximum absolute row sum of <span class="math inline">\(B_J\)</span> is directly less than one. For Gauss–Seidel let <span class="math inline">\(\ell_i=\sum_{j&lt;i}|a_{ij}|\)</span> and <span class="math inline">\(u_i=\sum_{j&gt;i}|a_{ij}|\)</span>. At a coordinate <span class="math inline">\(i\)</span> attaining the maximum new error, the homogeneous row update gives</p>
+<p><span class="math display">\[
+(|a_{ii}|-\ell_i)\|e^{(k+1)}\|_\infty\le u_i\|e^{(k)}\|_\infty.
+\]</span></p>
+<p>The largest of the ratios <span class="math inline">\(u_i/(|a_{ii}|-\ell_i)\)</span> is strictly below one. Thus the entire sweep contracts. These tests are sufficient. The spectral-radius criterion is exact.</p>
+<p><strong>Hermitian positive definiteness.</strong> If <span class="math inline">\(A=A^*\)</span> and <span class="math inline">\(z^*Az&gt;0\)</span> for all <span class="math inline">\(z\ne0\)</span>, Gauss–Seidel converges. To see why, measure error in the energy norm <span class="math inline">\(\|e\|_A^2=e^*Ae\)</span>. A row update changes one coordinate by <span class="math inline">\(t\)</span>. Along coordinate vector <span class="math inline">\(s_i\)</span>, the energy becomes</p>
+<p><span class="math display">\[
+\|e+t s_i\|_A^2=\|e\|_A^2+2\operatorname{Re}(\overline{t}(Ae)_i)+a_{ii}|t|^2.
+\]</span></p>
+<p>Its unique minimizer is <span class="math inline">\(t=-(Ae)_i/a_{ii}\)</span>, exactly the current row correction. Every nonzero correction strictly decreases energy. If a full sweep makes no correction, every row of <span class="math inline">\(Ae\)</span> was zero and <span class="math inline">\(e=0\)</span>. By continuity on the compact energy unit sphere, the maximum energy-norm ratio for a full sweep is strictly less than one. Jacobi evaluates all corrections at the old point, so this successive minimization argument does not apply.</p>
+<p><strong>Divergence in a uniquely solvable SPD system.</strong> Let <span class="math inline">\(w=(1,1,1)^T\)</span>, <span class="math inline">\(A=(I+3ww^T)/4\)</span>, and <span class="math inline">\(b=Aw\)</span>. The diagonal is one and every off-diagonal entry is <span class="math inline">\(3/4\)</span>. Along <span class="math inline">\(w\)</span>, <span class="math inline">\(A\)</span> has eigenvalue <span class="math inline">\(5/2\)</span>; on <span class="math inline">\(w^\perp\)</span> it has eigenvalue <span class="math inline">\(1/4\)</span>. Hence <span class="math inline">\(A\)</span> is SPD and <span class="math inline">\(x^*=w\)</span> is unique. Here <span class="math inline">\(B_J=I-A\)</span> has eigenvalue <span class="math inline">\(-3/2\)</span> along <span class="math inline">\(w\)</span> and <span class="math inline">\(3/4\)</span> on <span class="math inline">\(w^\perp\)</span>. From zero the initial error is <span class="math inline">\(-w\)</span>, so it alternates sign and grows by <span class="math inline">\(3/2\)</span> per sweep. An initial error orthogonal to <span class="math inline">\(w\)</span> decays by <span class="math inline">\(3/4\)</span> instead. This system shows both the limit of the SPD guarantee for Jacobi and the importance of the words <em>every initial guess</em>.</p>
+</section>
+<section id="what-can-we-measure-without-the-solution" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="what-can-we-measure-without-the-solution"><span class="header-section-number">9.6</span> What can we measure without the solution?</h2>
+<p>Since <span class="math inline">\(b=Ax^*\)</span>, our sign convention gives</p>
+<p><span class="math display">\[
+r^{(k)}=b-Ax^{(k)}=-Ae^{(k)},\qquad e^{(k)}=-A^{-1}r^{(k)}.
+\]</span></p>
+<p>The residual measures how much the right-hand side must change to make the current approximation exact (the required change is <span class="math inline">\(-r^{(k)}\)</span>). The error measures distance to the solution. In any compatible vector norm and its induced matrix norm, for <span class="math inline">\(b\ne0\)</span>,</p>
+<p><span class="math display">\[
+\frac{\|e^{(k)}\|}{\|x^*\|}\le
+\underbrace{\|A^{-1}\|\|A\|}_{\kappa(A)}
+\frac{\|r^{(k)}\|}{\|b\|}.
+\]</span></p>
+<p>Here we used <span class="math inline">\(\|b\|\le\|A\|\|x^*\|\)</span>. An ill-conditioned matrix can map a large error to a small residual. Assess the requested accuracy in light of this factor.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Diagnostic</th>
+<th style="text-align: left;">How to use it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Absolute and relative residual</td>
+<td style="text-align: left;">Recompute <span class="math inline">\(b-Ax^{(k)}\)</span>. Stop when its norm is at most <span class="math inline">\(\tau_{\mathrm{abs}}+\tau_{\mathrm{rel}}\|b\|\)</span>. The absolute term also handles <span class="math inline">\(b=0\)</span>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Size of the last change</td>
+<td style="text-align: left;">A small correction can signal slow progress or rounding. A verified contraction factor can turn it into an error bound.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Iteration budget and finite values</td>
+<td style="text-align: left;">Report exhaustion, stagnation, or nonfinite values separately from meeting the residual tolerance.</td>
+</tr>
+</tbody>
+</table>
+<p>For a contraction with known <span class="math inline">\(q=\|B\|&lt;1\)</span>, successive changes shrink at least geometrically since <span class="math inline">\(x^{(k+1)}-x^{(k)}=B(x^{(k)}-x^{(k-1)})\)</span>. Sum the tail from the current iterate to the limit to obtain, for <span class="math inline">\(k\ge1\)</span>,</p>
+<p><span class="math display">\[
+\|x^*-x^{(k)}\|
+\le\frac{q}{1-q}\|x^{(k)}-x^{(k-1)}\|.
+\]</span></p>
+<p>A factor <span class="math inline">\(q\)</span> close to one makes this certificate weak. In floating point, a computed sweep can be written as <span class="math inline">\(\widehat e^{(k+1)}=B\widehat e^{(k)}+\delta^{(k)}\)</span>, with <span class="math inline">\(\delta^{(k)}\)</span> the local arithmetic error. Earlier perturbations propagate through powers of <span class="math inline">\(B\)</span> and each sweep introduces a new one. Even for <span class="math inline">\(q&lt;1\)</span>, uniformly bounded perturbations of size <span class="math inline">\(\epsilon\)</span> contribute up to <span class="math inline">\(\epsilon/(1-q)\)</span> to the error. Recomputing the residual also incurs rounding. Exact-arithmetic convergence establishes neither attainable accuracy nor backward stability of an implementation.</p>
+</section>
+<section id="computational-experiment-predict-the-slopes" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="computational-experiment-predict-the-slopes"><span class="header-section-number">9.7</span> Computational experiment — predict the slopes</h2>
+<p>For the hand example, the characteristic polynomials are <span class="math inline">\(t^2-1/4\)</span> for Jacobi and <span class="math inline">\(t(t-1/4)\)</span> for Gauss–Seidel. Predict the two error slopes before reading the figure. The code computes the spectral radii independently and implements each sweep directly. Dense arrays keep the small experiment inspectable. The exact solution is used only for measurement.</p>
+<div id="s8-sweeps" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> jacobi(A, b, x):</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x <span class="op">+</span> (b <span class="op">-</span> A <span class="op">@</span> x) <span class="op">/</span> np.diag(A)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gauss_seidel(A, b, x):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> x.copy()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(b)):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        lower <span class="op">=</span> A[i, :i] <span class="op">@</span> y[:i]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        upper <span class="op">=</span> A[i, i<span class="op">+</span><span class="dv">1</span>:] <span class="op">@</span> x[i<span class="op">+</span><span class="dv">1</span>:]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        y[i] <span class="op">=</span> (b[i] <span class="op">-</span> lower <span class="op">-</span> upper) <span class="op">/</span> A[i, i]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> y</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> history(A, b, exact, x0, sweep, max_steps, rtol<span class="op">=</span><span class="fl">1e-11</span>):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">any</span>(np.diag(A) <span class="op">==</span> <span class="dv">0</span>):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"A diagonal entry is zero"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.array(x0, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> []</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    threshold <span class="op">=</span> <span class="fl">1e-14</span> <span class="op">+</span> rtol <span class="op">*</span> np.linalg.norm(b)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(max_steps <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        residual <span class="op">=</span> np.linalg.norm(b <span class="op">-</span> A <span class="op">@</span> x)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        error <span class="op">=</span> np.linalg.norm(x <span class="op">-</span> exact)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> np.isfinite([residual, error]).<span class="bu">all</span>():</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">FloatingPointError</span>(<span class="st">"Nonfinite history entry"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        rows.append((error, residual))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> residual <span class="op">&lt;=</span> threshold:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> np.array(rows), <span class="st">"residual tolerance"</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> k <span class="op">&lt;</span> max_steps:</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            y <span class="op">=</span> sweep(A, b, x)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.array_equal(y, x):</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> np.array(rows), <span class="st">"stagnation"</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> y</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(rows), <span class="st">"iteration limit"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-fig-s8-histories" class="cell" data-fig-height="3.1" data-fig-width="6.4" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="fl">2.</span>, <span class="op">-</span><span class="fl">1.</span>], [<span class="op">-</span><span class="fl">1.</span>, <span class="fl">2.</span>]])</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="fl">0.</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>exact <span class="op">=</span> np.array([<span class="dv">2</span><span class="op">/</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">3</span>])</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> np.zeros(<span class="dv">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">True</span>, layout<span class="op">=</span><span class="st">"constrained"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>methods <span class="op">=</span> [</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Jacobi"</span>, jacobi, np.diag(np.diag(A)), <span class="st">"-"</span>, <span class="st">"C0"</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Gauss–Seidel"</span>, gauss_seidel, np.tril(A), <span class="st">"--"</span>, <span class="st">"C1"</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, sweep, M, style, color <span class="kw">in</span> methods:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    B <span class="op">=</span> np.linalg.solve(M, M <span class="op">-</span> A)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    rho <span class="op">=</span> <span class="bu">max</span>(<span class="bu">abs</span>(np.linalg.eigvals(B)))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    values, status <span class="op">=</span> history(A, b, exact, start, sweep, <span class="dv">80</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> status <span class="op">==</span> <span class="st">"residual tolerance"</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check the sweep on a vector with both coordinates nonzero.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> np.array([<span class="fl">0.75</span>, <span class="op">-</span><span class="fl">0.25</span>])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> np.allclose(sweep(A, b, z), B <span class="op">@</span> z <span class="op">+</span> np.linalg.solve(M, b))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    label <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>rho<span class="sc">:.2f}</span><span class="ss">)"</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, column <span class="kw">in</span> <span class="bu">zip</span>(axes, values.T):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        ax.semilogy(column, style, color<span class="op">=</span>color, label<span class="op">=</span>label)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, title <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="st">"Error norm"</span>, <span class="st">"Residual norm"</span>]):</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    ax.<span class="bu">set</span>(title<span class="op">=</span>title, xlabel<span class="op">=</span><span class="st">"Sweep k"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, which<span class="op">=</span><span class="st">"major"</span>, alpha<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Euclidean norm"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(title<span class="op">=</span><span class="st">"Method (spectral radius)"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-s8-histories" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-s8-histories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="08_basic_iterative_methods_files/figure-html/fig-s8-histories-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-s8-histories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.1: Euclidean error and residual for the two sweeps from zero. Each curve ends at the first accepted residual.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The Jacobi curve loses a factor of two per sweep. The Gauss–Seidel curve loses a factor of four per sweep from the first updated vector onward. In this particular run even the first Gauss–Seidel error lies on the same line as the initial error. For Jacobi, the residual alternates between coordinate axes; for Gauss–Seidel its second coordinate is zero after each sweep. Both residual histories therefore have a direct interpretation in terms of the equations still violated. The straight lines here arise from the special matrices and starting vector. The nilpotent example above explains why a single sweep of another convergent method can increase the error.</p>
+<p><strong>Optional divergence check.</strong> Run eight sweeps on the SPD counterexample. The reported ratio is a measurement of the growing mode selected by the initial error.</p>
+<div id="s8-divergence" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> np.ones(<span class="dv">3</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> (np.eye(<span class="dv">3</span>) <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> np.outer(w, w)) <span class="op">/</span> <span class="dv">4</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>values, status <span class="op">=</span> history(C, C <span class="op">@</span> w, w, np.zeros(<span class="dv">3</span>), jacobi, <span class="dv">8</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ratios <span class="op">=</span> values[<span class="dv">1</span>:, <span class="dv">0</span>] <span class="op">/</span> values[:<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(ratios, <span class="fl">1.5</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>status<span class="sc">}</span><span class="ss"> after 8 sweeps; error factor </span><span class="sc">{</span>ratios[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>iteration limit after 8 sweeps; error factor 1.50</code></pre>
+</div>
+</div>
+</section>
+<section id="from-sparse-solves-to-spectral-filtering" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="from-sparse-solves-to-spectral-filtering"><span class="header-section-number">9.8</span> From sparse solves to spectral filtering</h2>
+<p>For large systems, the splitting gives two reusable operations: apply <span class="math inline">\(A\)</span> and solve approximately for a correction. A few sweeps can also serve as part of a preconditioner. In multigrid, suitable relaxation methods such as weighted Jacobi can damp oscillatory error on a grid, leaving smoother components for a coarser grid. Total cost depends on both the work per sweep and the number of sweeps.</p>
+<p>Krylov methods build approximations from a growing subspace. Starting with <span class="math inline">\(r_0=b-Ax^{(0)}\)</span>, a typical unpreconditioned approximation lies in <span class="math inline">\(x^{(0)}+\mathcal K_m(A,r_0)\)</span>, where</p>
+<p><span class="math display">\[
+\mathcal K_m(A,r_0)=\operatorname{span}\{r_0,Ar_0,\ldots,A^{m-1}r_0\}.
+\]</span></p>
+<p>Here the choice of approximation can adapt as the space grows. In our stationary methods the error polynomial in <span class="math inline">\(B\)</span> is already prescribed: <span class="math inline">\(p_k(t)=t^k\)</span>.</p>
+<p>Session 9 reuses the calculation <span class="math inline">\(B^kv=\lambda^kv\)</span> in a different role. Power iteration repeatedly applies an operator and normalizes, so directions with larger eigenvalue magnitudes can grow <em>relative to</em> other directions. Subspace iteration carries several directions together. In Session 10 a filter <span class="math inline">\(p_m(A)\)</span> multiplies an eigencomponent by <span class="math inline">\(p_m(\lambda)\)</span>. Its purpose is to separate wanted and unwanted spectral components. A convergent stationary solver must drive <strong>every</strong> initial error component to zero. This difference in objectives determines which spectral comparison matters.</p>
+</section>
+<section id="central-synthesis-iterative-solvers-as-spectral-error-dynamics" class="level2" data-number="9.9">
+<h2 data-number="9.9" class="anchored" data-anchor-id="central-synthesis-iterative-solvers-as-spectral-error-dynamics"><span class="header-section-number">9.9</span> Central Synthesis — Iterative Solvers as Spectral Error Dynamics</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Question</th>
+<th style="text-align: left;">Calculation</th>
+<th style="text-align: left;">What it establishes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Where is the fixed point?</td>
+<td style="text-align: left;"><span class="math inline">\(A=M-N\)</span> gives <span class="math inline">\(Mx=Nx+b\)</span>.</td>
+<td style="text-align: left;">The fixed points solve the original system. Invertibility of <span class="math inline">\(A\)</span> gives uniqueness.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">What does one sweep do?</td>
+<td style="text-align: left;">Solve <span class="math inline">\(Md=r^{(k)}\)</span>, then add <span class="math inline">\(d\)</span>.</td>
+<td style="text-align: left;">The choice of easy solve determines <span class="math inline">\(B=I-M^{-1}A\)</span>.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">What happens after many sweeps?</td>
+<td style="text-align: left;">Subtract the fixed-point identity. Then <span class="math inline">\(e^{(k+1)}=Be^{(k)}\)</span> and <span class="math inline">\(e^{(k)}=B^ke^{(0)}\)</span>.</td>
+<td style="text-align: left;">Every start succeeds exactly when <span class="math inline">\(B^k\to0\)</span>, equivalently <span class="math inline">\(\rho(B)&lt;1\)</span>.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">How accurate is the result in hand?</td>
+<td style="text-align: left;">Recompute <span class="math inline">\(r=b-A\widehat x\)</span> and relate it to <span class="math inline">\(e=-A^{-1}r\)</span>.</td>
+<td style="text-align: left;">Conditioning governs the forward-error certificate. Rounding and the stopping rule affect the delivered answer.</td>
+</tr>
+</tbody>
+</table>
+<p>For the SPD counterexample, both splittings target exactly the same unique point, yet Jacobi can move away from it at every step. For the running example both converge, yet the two methods require different numbers of sweeps to satisfy the same tolerance. Solvability, convergence of a chosen algorithm, and accuracy of a computed answer each require their own argument.</p>
+<p><strong>Course reading.</strong> Kanschat and Scheichl, <em>Numerical Linear Algebra</em>, §4.2 and Appendix B.1, connect stationary iterations with the spectral radius. Bastian, <em>num0</em>, §§13–14, develops splittings, convergence conditions, and stopping. Scheichl and Zech, <em>Num0 notes</em>, §6.3, gives the relaxation viewpoint. The notation here reserves <span class="math inline">\(M\)</span> for the easy solve and <span class="math inline">\(B\)</span> for error propagation.</p>
+</section>
+<section id="exercises" class="level2" data-number="9.10">
+<h2 data-number="9.10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">9.10</span> Exercises</h2>
+<ol type="1">
+<li><strong>Reconstruct a splitting (3 min).</strong> For <span class="math inline">\(A=\operatorname{diag}(2,3)\)</span>, <span class="math inline">\(b=(2,3)^T\)</span>, take <span class="math inline">\(M=4I\)</span>. Find <span class="math inline">\(N,B,c\)</span> and the fixed point. Which coordinate of a generic initial error decays more slowly?</li>
+<li><strong>Recover the theorem (5 min).</strong> Starting with an affine iteration and a fixed point, prove the power formula by induction. Explain why testing every initial error tests the columns of <span class="math inline">\(B^k\)</span>, why a unit-modulus eigenvalue prevents convergence from every start, and why defective blocks with eigenvalues inside the unit circle still decay.</li>
+<li><strong>Read a stopping report (4 min).</strong> Let <span class="math inline">\(A=\operatorname{diag}(1,10^{-6})\)</span>, <span class="math inline">\(b=(1,0)^T\)</span> and <span class="math inline">\(\widehat x=(1,1)^T\)</span>. Compute relative residual, relative error and the conditioning bound in the Euclidean norm. Separately, for <span class="math inline">\(F(x)=0.999x+0.001\)</span> starting at zero, what does a first change of <span class="math inline">\(0.001\)</span> certify about the error at the new iterate?</li>
+<li><strong>Which initial errors succeed? (5 min)</strong> Take <span class="math inline">\(B=\begin{pmatrix}-2&amp;1\\0&amp;1/2\end{pmatrix}\)</span> and <span class="math inline">\(c=0\)</span>. Find the unique fixed point and all starts that converge to it. Contrast applying <span class="math inline">\(B^k\)</span> to a generic start here with applying powers to select a dominant eigendirection.</li>
+<li><strong>Mastery problem — predict and audit two sweeps (11 min).</strong> Take <span class="math inline">\(A=\begin{pmatrix}4&amp;2\\-1&amp;2\end{pmatrix}\)</span>, <span class="math inline">\(b=(6,1)^T\)</span>, and start at zero. Derive the two component rules, both iteration matrices and their constant vectors. Compute their spectra, predict convergence, and perform two sweeps of each. Compute the second residual for each. Use the powers of the iteration matrices to explain which features of the observed behavior should persist.</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="9.11">
+<h2 data-number="9.11" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">9.11</span> Worked solutions</h2>
+<p><strong>1. Reconstruct a splitting.</strong> From <span class="math inline">\(N=M-A=\operatorname{diag}(2,1)\)</span> we obtain <span class="math inline">\(B=\operatorname{diag}(1/2,1/4)\)</span> and <span class="math inline">\(c=(1/2,3/4)^T\)</span>. Solving <span class="math inline">\((I-B)x=c\)</span> gives <span class="math inline">\((1,1)^T\)</span>, which also satisfies <span class="math inline">\(Ax=b\)</span>. After <span class="math inline">\(k\)</span> sweeps the first signed error is <span class="math inline">\(2^{-k}e_1^{(0)}\)</span> and the second is <span class="math inline">\(4^{-k}e_2^{(0)}\)</span>. The first coordinate dominates eventually if its initial error is nonzero.</p>
+<p><strong>2. Recover the theorem.</strong> Subtraction gives <span class="math inline">\(e^{(k+1)}=Be^{(k)}\)</span>. At <span class="math inline">\(k=0\)</span>, <span class="math inline">\(B^0e^{(0)}=e^{(0)}\)</span>. If the formula holds at <span class="math inline">\(k\)</span>, multiplication by <span class="math inline">\(B\)</span> establishes it at <span class="math inline">\(k+1\)</span>. Taking the initial errors to be coordinate vectors tests every column; decay of all columns implies <span class="math inline">\(B^k\to0\)</span> in finite dimensions. For a unit-modulus eigenvalue, <span class="math inline">\(\|B^kv\|=|\lambda|^k\|v\|=\|v\|\)</span> on a complex eigenvector. Decay on every real start would imply decay on its real and imaginary parts and hence on <span class="math inline">\(v\)</span> as well. Inside the unit disk a Jordan block contributes terms of the form <span class="math inline">\(\binom{k}{j}\lambda^{k-j}\)</span> for finitely many <span class="math inline">\(j\)</span>. These vanish by exponential decay for <span class="math inline">\(\lambda\ne0\)</span> and nilpotence for <span class="math inline">\(\lambda=0\)</span>. Thus every block decays. Also <span class="math inline">\(1\)</span> is excluded, so <span class="math inline">\((I-B)x=c\)</span> has one solution.</p>
+<p><strong>3. Read a stopping report.</strong> Here <span class="math inline">\(x^*=(1,0)^T\)</span>, <span class="math inline">\(e=(0,1)^T\)</span>, and <span class="math inline">\(r=(0,-10^{-6})^T\)</span>. The relative residual is <span class="math inline">\(10^{-6}\)</span> and the relative error is <span class="math inline">\(1\)</span>. The condition number is <span class="math inline">\(10^6\)</span>, so its upper bound on the relative error is <span class="math inline">\(1\)</span>, attained in this direction. In the scalar problem the fixed point is <span class="math inline">\(1\)</span> and <span class="math inline">\(x^{(1)}=0.001\)</span>. The a posteriori estimate gives <span class="math inline">\(0.999/(1-0.999)\)</span> times <span class="math inline">\(0.001\)</span>, hence <span class="math inline">\(0.999\)</span>. This equals the actual error magnitude. The small change certifies little progress toward a substantially accurate solution.</p>
+<p><strong>4. Which initial errors succeed?</strong> The diagonal entries are the eigenvalues <span class="math inline">\(-2\)</span> and <span class="math inline">\(1/2\)</span>. Since <span class="math inline">\(1\)</span> is absent, the unique fixed point is zero. Eigenvectors are <span class="math inline">\((1,0)^T\)</span> for <span class="math inline">\(-2\)</span> and <span class="math inline">\((2,5)^T\)</span> for <span class="math inline">\(1/2\)</span>. Writing the start as <span class="math inline">\(\alpha(1,0)^T+\beta(2,5)^T\)</span>, its two coefficients become <span class="math inline">\((-2)^k\alpha\)</span> and <span class="math inline">\(2^{-k}\beta\)</span>. Precisely the line <span class="math inline">\(\alpha=0\)</span> converges to zero. For generic starts the growth spoils the solve, while normalization would make the <em>direction</em>, up to sign, approach the dominant eigenline. The same powers explain both phenomena.</p>
+<p><strong>5. Mastery problem.</strong> Write <span class="math inline">\((u,v)\)</span> for the old coordinates. In both methods <span class="math inline">\(u'=(6-2v)/4\)</span>. Jacobi uses <span class="math inline">\(v'=(1+u)/2\)</span>; Gauss–Seidel uses <span class="math inline">\(v'=(1+u')/2=5/4-v/4\)</span>. Thus</p>
+<p><span class="math display">\[
+\begin{aligned}
+B_J&amp;=\begin{pmatrix}0&amp;-1/2\\1/2&amp;0\end{pmatrix}, &amp; c_J&amp;=(3/2,1/2)^T,\\
+B_{GS}&amp;=\begin{pmatrix}0&amp;-1/2\\0&amp;-1/4\end{pmatrix}, &amp; c_{GS}&amp;=(3/2,5/4)^T.
+\end{aligned}
+\]</span></p>
+<p>Jacobi has characteristic polynomial <span class="math inline">\(t^2+1/4\)</span> and eigenvalues <span class="math inline">\(\pm i/2\)</span>. The triangular Gauss–Seidel matrix has eigenvalues <span class="math inline">\(0,-1/4\)</span>. Both radii are below one. Substituting successively and multiplying by <span class="math inline">\(A\)</span> for the last column gives</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;"><span class="math inline">\(x^{(1)}\)</span></th>
+<th style="text-align: left;"><span class="math inline">\(x^{(2)}\)</span></th>
+<th style="text-align: left;"><span class="math inline">\(b-Ax^{(2)}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Jacobi</td>
+<td style="text-align: left;"><span class="math inline">\((3/2,1/2)^T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((5/4,5/4)^T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((-3/2,-1/4)^T\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gauss–Seidel</td>
+<td style="text-align: left;"><span class="math inline">\((3/2,5/4)^T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((7/8,15/16)^T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\((5/8,0)^T\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>The exact solution is <span class="math inline">\((1,1)^T\)</span>. Jacobi rotates the error through a quarter turn and halves its Euclidean length; <span class="math inline">\(B_J^2=-I/4\)</span>. After two sweeps its signed error is <span class="math inline">\((1/4,1/4)^T\)</span>. For Gauss–Seidel the range of <span class="math inline">\(B_{GS}\)</span> is the line spanned by <span class="math inline">\((2,1)^T\)</span>, on which <span class="math inline">\(B_{GS}\)</span> multiplies by <span class="math inline">\(-1/4\)</span>. Its first error <span class="math inline">\((1/2,1/4)^T\)</span> becomes <span class="math inline">\((-1/8,-1/16)^T\)</span>. Its second-row residual vanishes at the end of every sweep by construction.</p>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="9.12">
+<h2 data-number="9.12" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">9.12</span> End-of-session mastery checklist</h2>
+<p>Before Session 9, close the chapter and check that you can independently:</p>
+<ul>
+<li>Explain the sparse-system motivation and trade the cost of a sweep against the number of sweeps.</li>
+<li>Start from <span class="math inline">\(A=M-N\)</span>, identify <span class="math inline">\(B,c\)</span>, verify the fixed point, and recover the residual correction.</li>
+<li>Derive Jacobi and Gauss–Seidel by choosing the part of <span class="math inline">\(A\)</span> to solve with. Perform two sweeps of each and identify exactly which entries use new values.</li>
+<li>Derive <span class="math inline">\(e^{(k+1)}=Be^{(k)}\)</span> and prove <span class="math inline">\(e^{(k)}=B^ke^{(0)}\)</span>.</li>
+<li>Prove the equivalence of convergence from every start, decay of matrix powers, and <span class="math inline">\(\rho(B)&lt;1\)</span>, including the defective case.</li>
+<li>Distinguish a norm-based sufficient test from the spectral criterion. Give an example of transient growth.</li>
+<li>State the diagonal-dominance and positive-definiteness guarantees with the correct methods. Exhibit an invertible system on which Jacobi diverges.</li>
+<li>Relate the observable residual to the signed error, interpret a stopping tolerance, and explain what rounding changes.</li>
+<li>Explain how the same spectral-component calculation describes error elimination, selection of a dominant direction, and polynomial filtering.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/07_direct_numerical_methods.html" class="pagination-link" aria-label="Session 7 — Direct Numerical Methods">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/09_power_subspace_iteration.html" class="pagination-link" aria-label="Session 9 — Power and Subspace Iteration">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

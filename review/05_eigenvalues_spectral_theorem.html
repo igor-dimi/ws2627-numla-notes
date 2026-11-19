@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Session 5 — Eigenvalues and the Spectral Theorem – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/06_matrix_norms_conditioning.html" rel="next">
+<link href="../review/04_qr_factorization.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/05_eigenvalues_spectral_theorem.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#invariant-lines-and-the-shifted-kernel" id="toc-invariant-lines-and-the-shifted-kernel" class="nav-link active" data-scroll-target="#invariant-lines-and-the-shifted-kernel"><span class="header-section-number">6.1</span> Invariant lines and the shifted kernel</a></li>
+  <li><a href="#counting-roots-and-counting-independent-directions" id="toc-counting-roots-and-counting-independent-directions" class="nav-link" data-scroll-target="#counting-roots-and-counting-independent-directions"><span class="header-section-number">6.2</span> Counting roots and counting independent directions</a></li>
+  <li><a href="#diagonalization-as-a-change-of-coordinates" id="toc-diagonalization-as-a-change-of-coordinates" class="nav-link" data-scroll-target="#diagonalization-as-a-change-of-coordinates"><span class="header-section-number">6.3</span> Diagonalization as a change of coordinates</a></li>
+  <li><a href="#why-symmetry-gives-orthonormal-eigencoordinates" id="toc-why-symmetry-gives-orthonormal-eigencoordinates" class="nav-link" data-scroll-target="#why-symmetry-gives-orthonormal-eigencoordinates"><span class="header-section-number">6.4</span> Why symmetry gives orthonormal eigencoordinates</a></li>
+  <li><a href="#spectral-projectors-and-matrix-powers" id="toc-spectral-projectors-and-matrix-powers" class="nav-link" data-scroll-target="#spectral-projectors-and-matrix-powers"><span class="header-section-number">6.5</span> Spectral projectors and matrix powers</a></li>
+  <li><a href="#positive-definiteness-and-the-geometry-of-energy" id="toc-positive-definiteness-and-the-geometry-of-energy" class="nav-link" data-scroll-target="#positive-definiteness-and-the-geometry-of-energy"><span class="header-section-number">6.6</span> Positive definiteness and the geometry of energy</a></li>
+  <li><a href="#numerical-experiment" id="toc-numerical-experiment" class="nav-link" data-scroll-target="#numerical-experiment"><span class="header-section-number">6.7</span> Numerical experiment</a></li>
+  <li><a href="#what-the-seminar-algorithms-exploit" id="toc-what-the-seminar-algorithms-exploit" class="nav-link" data-scroll-target="#what-the-seminar-algorithms-exploit"><span class="header-section-number">6.8</span> What the seminar algorithms exploit</a></li>
+  <li><a href="#independent-exercises" id="toc-independent-exercises" class="nav-link" data-scroll-target="#independent-exercises"><span class="header-section-number">6.9</span> Independent exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">6.10</span> Worked solutions</a></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">6.11</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/05_eigenvalues_spectral_theorem.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Session 4 gave us orthonormal coordinates for a subspace. Can we choose coordinates that also simplify the <em>action of an operator</em>? Consider the map <span class="math inline">\((x,y)\mapsto(2x+y,x+2y)\)</span>. Each output mixes both inputs. Yet a vector with <span class="math inline">\(x=y\)</span> is simply tripled, and one with <span class="math inline">\(x=-y\)</span> stays fixed. If we resolve the input along those two lines, even a hundred applications become a pair of scalar calculations.</p>
+<p><strong>Study route (90 minutes).</strong> Spend 15 minutes on invariant lines and multiplicity, 10 on change of basis, 15 on the spectral theorem, and 20 on powers, energy, and the numerical experiment. Reserve 25 minutes for the exercises and 5 for the final check. Keep a blank page for reconstructing the argument from <span class="math inline">\(Av=\lambda v\)</span> to a formula for <span class="math inline">\(A^k v\)</span>.</p>
+<section id="invariant-lines-and-the-shifted-kernel" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="invariant-lines-and-the-shifted-kernel"><span class="header-section-number">6.1</span> Invariant lines and the shifted kernel</h2>
+<p>Let <span class="math inline">\(T:V\to V\)</span> be a linear operator on a finite-dimensional space over <span class="math inline">\(\mathbb F=\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>. A nonzero vector <span class="math inline">\(v\)</span> is an <strong>eigenvector</strong> with <strong>eigenvalue</strong> <span class="math inline">\(\lambda\in\mathbb F\)</span> if <span class="math inline">\(Tv=\lambda v\)</span>. The line spanned by <span class="math inline">\(v\)</span> is invariant since <span class="math inline">\(T(cv)=c\lambda v\)</span>. Conversely, an invariant line gives an eigenvector by choosing any nonzero vector on it. Over <span class="math inline">\(\mathbb R\)</span>, <span class="math inline">\(|\lambda|\)</span> is the length multiplier. A negative sign reverses direction, and <span class="math inline">\(\lambda=0\)</span> collapses the whole line to the origin. The zero vector itself would satisfy the equation for every scalar, hence the requirement <span class="math inline">\(v\ne0\)</span>.</p>
+<p>An operator acts on vectors. Its matrix <span class="math inline">\(A\)</span> acts on their coordinate columns in a chosen basis. We use <span class="math inline">\(v\)</span> also for the coordinate column when the basis is understood. The equation <span class="math inline">\(Av=\lambda v\)</span> compares two vectors in the <em>same</em> space. For a map between different spaces the comparison would require an additional identification. Invertibility of <span class="math inline">\(A\)</span> itself is unnecessary. Indeed, zero is an eigenvalue precisely when <span class="math inline">\(A\)</span> is singular.</p>
+<p><strong>Finding the special directions.</strong> Move the right-hand side to the left. For square <span class="math inline">\(A\)</span>, Session 1’s kernel criterion gives</p>
+<p><span class="math display">\[
+\begin{aligned}
+\lambda\text{ is an eigenvalue}
+&amp;\iff (A-\lambda I)v=0\text{ for some }v\ne0\\
+&amp;\iff \ker(A-\lambda I)\ne\{0\}\\
+&amp;\iff A-\lambda I\text{ is singular}\\
+&amp;\iff \det(A-\lambda I)=0 .
+\end{aligned}
+\]</span></p>
+<p>Thus a determinant supplies candidate scalars, and solving a homogeneous system supplies their directions. We use the characteristic polynomial <span class="math inline">\(\chi_A(t)=\det(tI-A)\)</span>, which is monic and has the same roots as <span class="math inline">\(\det(A-tI)\)</span>. The set of eigenvalues is the <strong>spectrum</strong>. For each eigenvalue the <strong>eigenspace</strong> <span class="math inline">\(E_\lambda=\ker(A-\lambda I)\)</span> is a subspace because it is a kernel. It includes zero, and every other member is an eigenvector.</p>
+<p>A change of coordinates <span class="math inline">\(v=Sw\)</span> gives <span class="math inline">\(Av=\lambda v\)</span> exactly when <span class="math inline">\((S^{-1}AS)w=\lambda w\)</span>. The eigenvalue and the underlying subspace belong to <span class="math inline">\(T\)</span>. The coordinate description of that subspace changes to <span class="math inline">\(S^{-1}E_\lambda\)</span>.</p>
+<p><strong>Example (the field matters).</strong> A real quarter-turn has matrix <span class="math inline">\(R=\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}\)</span>. It takes every real nonzero vector to a perpendicular vector, so it preserves no real line. Its characteristic polynomial <span class="math inline">\(t^2+1\)</span> has roots <span class="math inline">\(i\)</span> and <span class="math inline">\(-i\)</span> over <span class="math inline">\(\mathbb C\)</span>. For example, <span class="math inline">\(R(1,-i)^T=(i,1)^T=i(1,-i)^T\)</span>. A complex invariant line can therefore exist even when no real line has that property.</p>
+</section>
+<section id="counting-roots-and-counting-independent-directions" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="counting-roots-and-counting-independent-directions"><span class="header-section-number">6.2</span> Counting roots and counting independent directions</h2>
+<p>The <strong>algebraic multiplicity</strong> <span class="math inline">\(a_\lambda\)</span> counts occurrences of the factor <span class="math inline">\(t-\lambda\)</span> in <span class="math inline">\(\chi_A(t)\)</span>. The <strong>geometric multiplicity</strong> <span class="math inline">\(g_\lambda=\dim E_\lambda\)</span> counts independent eigenvectors available at that eigenvalue. To see why <span class="math inline">\(1\le g_\lambda\le a_\lambda\)</span>, extend a basis of <span class="math inline">\(E_\lambda\)</span> to a basis of the whole space. In those coordinates the first <span class="math inline">\(g_\lambda\)</span> columns are the corresponding columns of <span class="math inline">\(\lambda I\)</span>, so the matrix is block upper triangular. Its characteristic polynomial contains the factor <span class="math inline">\((t-\lambda)^{g_\lambda}\)</span>.</p>
+<p>Eigenvectors from distinct eigenvalues are linearly independent. More precisely, if <span class="math inline">\(\sum_{j=1}^s u_j=0\)</span> with <span class="math inline">\(u_j\in E_{\lambda_j}\)</span> for distinct <span class="math inline">\(\lambda_j\)</span>, apply <span class="math inline">\(\prod_{j\ne r}(A-\lambda_j I)\)</span>. Every term disappears except <span class="math inline">\(\bigl(\prod_{j\ne r}(\lambda_r-\lambda_j)\bigr)u_r\)</span>. Its scalar multiplier is nonzero, so <span class="math inline">\(u_r=0\)</span> for every <span class="math inline">\(r\)</span>. Consequently the sum of the eigenspaces is direct. Its dimension is <span class="math inline">\(\sum_\lambda g_\lambda\)</span>.</p>
+<p><strong>Example (the same polynomial, two outcomes).</strong> Compare</p>
+<p><span class="math display">\[
+D=\begin{pmatrix}2&amp;0\\0&amp;2\end{pmatrix},
+\qquad
+J=\begin{pmatrix}2&amp;1\\0&amp;2\end{pmatrix}.
+\]</span></p>
+<p>Both have <span class="math inline">\(\chi(t)=(t-2)^2\)</span>. For <span class="math inline">\(D\)</span>, the equation <span class="math inline">\((D-2I)v=0\)</span> imposes no restriction, so <span class="math inline">\(E_2=\mathbb F^2\)</span>. For <span class="math inline">\(J\)</span>, <span class="math inline">\((J-2I)(x,y)^T=(y,0)^T\)</span>, so <span class="math inline">\(E_2=\operatorname{span}\{(1,0)^T\}\)</span>. The vector <span class="math inline">\((0,1)^T\)</span> acquires a first component under <span class="math inline">\(J\)</span>. There is only one independent eigendirection. We call <span class="math inline">\(J\)</span> <strong>defective</strong>. Over <span class="math inline">\(\mathbb C\)</span> the characteristic polynomial always has <span class="math inline">\(n\)</span> roots counted with multiplicity, but the calculation for <span class="math inline">\(J\)</span> shows exactly where a basis vector can be missing.</p>
+</section>
+<section id="diagonalization-as-a-change-of-coordinates" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="diagonalization-as-a-change-of-coordinates"><span class="header-section-number">6.3</span> Diagonalization as a change of coordinates</h2>
+<p>Suppose the columns of <span class="math inline">\(V=[v_1,\ldots,v_n]\)</span> form an eigenbasis and set <span class="math inline">\(\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_n)\)</span> in the same order. The <span class="math inline">\(j\)</span>th column of <span class="math inline">\(AV\)</span> is <span class="math inline">\(\lambda_j v_j\)</span>, the <span class="math inline">\(j\)</span>th column of <span class="math inline">\(V\Lambda\)</span>. Hence</p>
+<p><span class="math display">\[
+AV=V\Lambda,\qquad V^{-1}AV=\Lambda,\qquad A=V\Lambda V^{-1}.
+\]</span></p>
+<p>Independence makes <span class="math inline">\(V\)</span> invertible. Session 1’s change-of-basis formula now has a concrete interpretation. For an input <span class="math inline">\(x\)</span>, <span class="math inline">\(V^{-1}x\)</span> gives eigenbasis coordinates, <span class="math inline">\(\Lambda\)</span> scales each coordinate independently, and <span class="math inline">\(V\)</span> returns the result to the original coordinates. The two matrices <span class="math inline">\(A\)</span> and <span class="math inline">\(\Lambda\)</span> represent the same operator and are <strong>similar</strong>.</p>
+<p>Conversely, an invertible <span class="math inline">\(V\)</span> satisfying <span class="math inline">\(AV=V\Lambda\)</span> supplies an eigenbasis column by column. Thus <span class="math inline">\(A\)</span> is <strong>diagonalizable over <span class="math inline">\(\mathbb F\)</span></strong> precisely when <span class="math inline">\(\mathbb F^n=\bigoplus_\lambda E_\lambda\)</span>, or equivalently when <span class="math inline">\(\sum_\lambda g_\lambda=n\)</span>. Having <span class="math inline">\(n\)</span> distinct eigenvalues in the field suffices. Repeated eigenvalues also work if the characteristic polynomial splits in the field and every <span class="math inline">\(g_\lambda=a_\lambda\)</span>, as <span class="math inline">\(D\)</span> illustrates.</p>
+<p><strong>Worked example (an oblique eigenbasis).</strong> Let <span class="math inline">\(B=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix}\)</span>. Triangularity gives roots <span class="math inline">\(2,1\)</span>. The equation for <span class="math inline">\(2\)</span> gives <span class="math inline">\(y=0\)</span> and that for <span class="math inline">\(1\)</span> gives <span class="math inline">\(x+y=0\)</span>. Choose <span class="math inline">\((1,0)^T\)</span> and <span class="math inline">\((-1,1)^T\)</span>, respectively. Then</p>
+<p><span class="math display">\[
+V=\begin{pmatrix}1&amp;-1\\0&amp;1\end{pmatrix},\quad
+V^{-1}=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix},\quad
+V\begin{pmatrix}2&amp;0\\0&amp;1\end{pmatrix}V^{-1}
+=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix}.
+\]</span></p>
+<p>For input <span class="math inline">\((0,1)^T\)</span> the eigenbasis coordinates are <span class="math inline">\((1,1)^T\)</span>. Scaling them gives <span class="math inline">\((2,1)^T\)</span> in that basis and <span class="math inline">\((1,1)^T\)</span> in the original basis. The eigenvectors have dot product <span class="math inline">\(-1\)</span>. Normalizing each column keeps the oblique angle, while Gram–Schmidt across the two lines would generally spoil the eigenvector property.</p>
+</section>
+<section id="why-symmetry-gives-orthonormal-eigencoordinates" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="why-symmetry-gives-orthonormal-eigencoordinates"><span class="header-section-number">6.4</span> Why symmetry gives orthonormal eigencoordinates</h2>
+<p>Write <span class="math inline">\(A^*=\overline A^T\)</span>. A real matrix is <strong>symmetric</strong> when <span class="math inline">\(A^T=A\)</span>. A complex matrix is <strong>Hermitian</strong> when <span class="math inline">\(A^*=A\)</span>. With Session 2’s convention <span class="math inline">\(\langle x,y\rangle=y^*x\)</span>, linear in the first argument, Hermitian symmetry says <span class="math inline">\(\langle Ax,y\rangle=\langle x,Ay\rangle\)</span>. Two consequences drive the theorem.</p>
+<ol type="1">
+<li><strong>Reality.</strong> If <span class="math inline">\(Av=\lambda v\)</span>, then <span class="math inline">\(v^*Av=\lambda v^*v\)</span>. The left side equals its own conjugate since <span class="math inline">\(A^*=A\)</span>, and <span class="math inline">\(v^*v&gt;0\)</span>. Dividing shows <span class="math inline">\(\lambda\in\mathbb R\)</span>.</li>
+<li><strong>Orthogonality.</strong> If <span class="math inline">\(Au=\lambda u\)</span> and <span class="math inline">\(Av=\mu v\)</span>, then <span class="math inline">\(\mu u^*v=u^*Av=(Au)^*v=\overline\lambda u^*v\)</span>. Both eigenvalues are real. If they differ, <span class="math inline">\(u^*v=0\)</span>.</li>
+</ol>
+<p><strong>Finite-dimensional spectral theorem.</strong></p>
+<p>Every Hermitian <span class="math inline">\(A\in\mathbb C^{n\times n}\)</span> has an orthonormal eigenbasis. Equivalently <span class="math inline">\(A=Q\Lambda Q^*\)</span> with <span class="math inline">\(Q^*Q=QQ^*=I\)</span> and <span class="math inline">\(\Lambda\)</span> real diagonal. Every real symmetric <span class="math inline">\(A\)</span> admits the real form <span class="math inline">\(A=Q\Lambda Q^T\)</span> with <span class="math inline">\(Q\)</span> orthogonal.</p>
+<p><strong>Proof.</strong> Over <span class="math inline">\(\mathbb C\)</span>, the characteristic polynomial has a root, so choose a unit eigenvector <span class="math inline">\(q\)</span>. For a real symmetric matrix we can also start over <span class="math inline">\(\mathbb C\)</span>. Its eigenvalue is real by the argument above, and the real and imaginary parts of an eigenvector separately satisfy the real eigenvector equation. At least one part is nonzero and can be normalized. Now take <span class="math inline">\(x\in q^\perp\)</span>. Then <span class="math inline">\(q^*Ax=(Aq)^*x=\lambda q^*x=0\)</span>. Thus <span class="math inline">\(q^\perp\)</span> is invariant, and the restriction of <span class="math inline">\(A\)</span> to it is again self-adjoint in its inherited inner product. Apply the same argument in this space of dimension <span class="math inline">\(n-1\)</span>. Induction supplies the remaining orthonormal eigenvectors. The factorization follows from <span class="math inline">\(AQ=Q\Lambda\)</span> and <span class="math inline">\(Q^{-1}=Q^*\)</span>.</p>
+<p>Distinct eigenspaces are mutually orthogonal. Inside a repeated eigenspace, any linear combination stays in that eigenspace, so Session 2’s Gram–Schmidt procedure can be used freely there. The full decomposition is an orthogonal direct sum. The inverse coordinate map is just <span class="math inline">\(Q^*\)</span>, and a coordinate error <span class="math inline">\(\delta c\)</span> satisfies <span class="math inline">\(\|Q\delta c\|_2^2=\delta c^*Q^*Q\delta c=\|\delta c\|_2^2\)</span>. This length preservation explains a numerical advantage over an oblique eigenbasis. More generally a complex <strong>normal</strong> matrix (<span class="math inline">\(A^*A=AA^*\)</span>) admits unitary diagonalization. Its diagonal entries can be complex, as the quarter-turn illustrates.</p>
+</section>
+<section id="spectral-projectors-and-matrix-powers" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="spectral-projectors-and-matrix-powers"><span class="header-section-number">6.5</span> Spectral projectors and matrix powers</h2>
+<p>For an orthonormal eigenbasis write <span class="math inline">\(c_i=q_i^*v\)</span>. Session 3 identifies <span class="math inline">\(P_i=q_iq_i^*\)</span> as the orthogonal projector onto <span class="math inline">\(\operatorname{span}\{q_i\}\)</span>, since <span class="math inline">\(P_iv=(q_i^*v)q_i\)</span>. Orthonormality gives <span class="math inline">\(P_iP_j=0\)</span> for <span class="math inline">\(i\ne j\)</span>, <span class="math inline">\(P_i^2=P_i\)</span>, and <span class="math inline">\(\sum_iP_i=I\)</span>. Expanding the matrix product gives the <strong>spectral decomposition</strong></p>
+<p><span class="math display">\[
+A=Q\Lambda Q^*=\sum_i\lambda_i q_iq_i^*.
+\]</span></p>
+<p>For a repeated eigenvalue use <span class="math inline">\(P_\lambda=\sum_{i:\lambda_i=\lambda}q_iq_i^*\)</span>. This is the unique orthogonal projector onto the entire eigenspace, independent of the chosen basis there. Then <span class="math inline">\(A=\sum_{\lambda}\lambda P_\lambda\)</span>, summing once per distinct eigenvalue.</p>
+<p><strong>Derive the power formula.</strong> Multiply two copies of the factorization. The middle <span class="math inline">\(Q^*Q\)</span> cancels, giving <span class="math inline">\(A^2=Q\Lambda^2 Q^*\)</span>. Each additional multiplication adds one diagonal factor. For <span class="math inline">\(k=0\)</span> use <span class="math inline">\(A^0=I\)</span> and <span class="math inline">\(\Lambda^0=I\)</span>, including on a zero eigenspace. Hence for any integer <span class="math inline">\(k\ge0\)</span>,</p>
+<p><span class="math display">\[
+A^k v=Q\Lambda^kQ^*v
+=\sum_i \lambda_i^k(q_i^*v)q_i
+=\sum_{\lambda}\lambda^k P_\lambda v .
+\]</span></p>
+<p>Read this from right to left in the matrix product. Compute the coordinates once, raise scalar multipliers to the desired power, and reassemble. No component can feed into another. A component with <span class="math inline">\(|\lambda|&lt;1\)</span> decays, one with <span class="math inline">\(|\lambda|&gt;1\)</span> grows in magnitude if present, and a negative eigenvalue alternates its sign. An initially absent component remains absent however large its multiplier.</p>
+<p><strong>Worked example (from a kernel to a power).</strong> Return to the opening map with</p>
+<p><span class="math display">\[
+A=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix},\qquad v=(1,0)^T.
+\]</span></p>
+<p>The equation <span class="math inline">\((2-t)^2-1=0\)</span> gives <span class="math inline">\(3\)</span> and <span class="math inline">\(1\)</span>. The first row of <span class="math inline">\(A-3I\)</span> gives <span class="math inline">\(y=x\)</span>, and that of <span class="math inline">\(A-I\)</span> gives <span class="math inline">\(y=-x\)</span>. Normalize to obtain <span class="math inline">\(q_+=(1,1)^T/\sqrt2\)</span>, <span class="math inline">\(q_-=(1,-1)^T/\sqrt2\)</span>. In that order <span class="math inline">\(Q=[q_+,q_-]\)</span> has <span class="math inline">\(Q^TQ=I\)</span> and <span class="math inline">\(\Lambda=\operatorname{diag}(3,1)\)</span>. Explicitly,</p>
+<p><span class="math display">\[
+P_+=\tfrac12\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix},\qquad
+P_-=\tfrac12\begin{pmatrix}1&amp;-1\\-1&amp;1\end{pmatrix},\qquad
+A=3P_++P_-.
+\]</span></p>
+<p>The first columns of the projectors give <span class="math inline">\(P_+v=(1,1)^T/2\)</span> and <span class="math inline">\(P_-v=(1,-1)^T/2\)</span>. Thus</p>
+<p><span class="math display">\[
+A^kv=\tfrac12(3^k+1,\,3^k-1)^T,\qquad A^3v=(14,13)^T.
+\]</span></p>
+<p>Check directly. Starting from <span class="math inline">\((1,0)^T\)</span>, successive applications give <span class="math inline">\((2,1)^T\)</span>, <span class="math inline">\((5,4)^T\)</span>, then <span class="math inline">\((14,13)^T\)</span>. The two entries approach equality <em>relative to their size</em>, because the ratio of the two eigencoordinate magnitudes is <span class="math inline">\(3^{-k}\)</span>. Starting instead on <span class="math inline">\(y=-x\)</span> would give a stationary vector for every <span class="math inline">\(k\)</span>.</p>
+</section>
+<section id="positive-definiteness-and-the-geometry-of-energy" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="positive-definiteness-and-the-geometry-of-energy"><span class="header-section-number">6.6</span> Positive definiteness and the geometry of energy</h2>
+<p>For Hermitian <span class="math inline">\(A\)</span>, the scalar <span class="math inline">\(x^*Ax\)</span> is real. We call <span class="math inline">\(A\)</span> <strong>positive definite</strong> if <span class="math inline">\(x^*Ax&gt;0\)</span> for every nonzero <span class="math inline">\(x\)</span>, and <strong>positive semidefinite</strong> if <span class="math inline">\(x^*Ax\ge0\)</span> for every <span class="math inline">\(x\)</span>. The same definitions with transpose apply to real symmetric matrices. Write <span class="math inline">\(c=Q^*x\)</span>. Then</p>
+<p><span class="math display">\[
+x^*Ax=c^*\Lambda c=\sum_i\lambda_i|c_i|^2 .
+\]</span></p>
+<p>If every eigenvalue is positive, every nonzero <span class="math inline">\(x\)</span> contributes at least one positive term. If all eigenvalues are nonnegative, the sum is nonnegative. Conversely, substituting each unit eigenvector yields <span class="math inline">\(q_i^*Aq_i=\lambda_i\)</span>. This proves both equivalences, including strict positivity in the definite case. For a semidefinite matrix, zero energy occurs exactly in its kernel.</p>
+<p>For the running matrix, <span class="math inline">\(x^TAx=2x_1^2+2x_1x_2+2x_2^2=3c_+^2+c_-^2\)</span>. The level set <span class="math inline">\(x^TAx=1\)</span> is an ellipse with semiaxes <span class="math inline">\(1/\sqrt3\)</span> along <span class="math inline">\(q_+\)</span> and <span class="math inline">\(1\)</span> along <span class="math inline">\(q_-\)</span>. A larger eigenvalue means that the energy reaches one after a shorter displacement. Compare the two panels below. The same direction that <span class="math inline">\(A\)</span> stretches most is the shortest semiaxis of its unit-energy ellipse.</p>
+<div id="cell-fig-s5-eigengeometry" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-s5-eigengeometry" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-s5-eigengeometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05_eigenvalues_spectral_theorem_files/figure-html/fig-s5-eigengeometry-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-s5-eigengeometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: Left: the two arrows along the dashed eigenlines are the projections of v. Dotted segments complete their vector sum. Right: the semiaxes of the unit-energy ellipse lie on the same eigenlines.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In real quadratic optimization the energy <span class="math inline">\(F(x)=\tfrac12 x^TAx-b^Tx\)</span> has gradient <span class="math inline">\(Ax-b\)</span> for symmetric <span class="math inline">\(A\)</span>. Positive definiteness gives strictly positive curvature in every direction and a unique minimizer <span class="math inline">\(A^{-1}b\)</span>. In a stiffness matrix this form can measure deformation energy. The same structure permits Cholesky factorization <span class="math inline">\(A=LL^*\)</span> and underlies the conjugate gradient method for minimizing the quadratic energy of a real SPD system.</p>
+</section>
+<section id="numerical-experiment" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="numerical-experiment"><span class="header-section-number">6.7</span> Numerical experiment</h2>
+<p>Use a Hermitian eigensolver for the running example. NumPy returns eigenvalues in ascending order and the corresponding eigenvectors in columns. A column may have the opposite sign from a hand calculation. Its projector and its contribution to <span class="math inline">\(A^kv\)</span> remain identical.</p>
+<div id="s5-check-decomposition" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> np.array([[<span class="fl">2.</span>, <span class="fl">1.</span>], [<span class="fl">1.</span>, <span class="fl">2.</span>]])</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="fl">0.</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>lam, Q <span class="op">=</span> np.linalg.eigh(A)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>reconstructed <span class="op">=</span> (Q <span class="op">*</span> lam) <span class="op">@</span> Q.T  <span class="co"># scale column j by lam[j]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>spectral <span class="op">=</span> Q <span class="op">@</span> (lam<span class="op">**</span>k <span class="op">*</span> (Q.T <span class="op">@</span> v))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>direct <span class="op">=</span> np.linalg.matrix_power(A, k) <span class="op">@</span> v</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Eigenvalues:"</span>, lam)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Orthogonality error:"</span>, np.linalg.norm(Q.T <span class="op">@</span> Q <span class="op">-</span> np.eye(<span class="dv">2</span>)))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reconstruction error:"</span>, np.linalg.norm(A <span class="op">-</span> reconstructed))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Spectral and direct results:"</span>, spectral, direct)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> computed, expected <span class="kw">in</span> [(Q.T <span class="op">@</span> Q, np.eye(<span class="dv">2</span>)),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                           (reconstructed, A), (spectral, direct)]:</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    np.testing.assert_allclose(computed, expected, rtol<span class="op">=</span><span class="dv">0</span>, atol<span class="op">=</span><span class="fl">1e-12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Eigenvalues: [1. 3.]
+Orthogonality error: 3.1560822113208575e-16
+Reconstruction error: 6.473657049138938e-16
+Spectral and direct results: [14. 13.] [14. 13.]</code></pre>
+</div>
+</div>
+<p>In exact arithmetic both matrix errors vanish and the two vectors equal <span class="math inline">\((14,13)^T\)</span>. Floating-point normalization introduces rounding, so inspect the errors and compare against a tolerance. The absolute tolerance here is chosen for this small example and its scale.</p>
+</section>
+<section id="what-the-seminar-algorithms-exploit" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="what-the-seminar-algorithms-exploit"><span class="header-section-number">6.8</span> What the seminar algorithms exploit</h2>
+<ul>
+<li><strong>Power iteration.</strong> Suppose <span class="math inline">\(|\lambda_1|&gt;|\lambda_2|\ge\cdots\)</span> and <span class="math inline">\(c_1\ne0\)</span>. For <span class="math inline">\(j&gt;1\)</span> the magnitude of component <span class="math inline">\(j\)</span> relative to component <span class="math inline">\(1\)</span> is <span class="math inline">\(|c_j/c_1|\,|\lambda_j/\lambda_1|^k\)</span>. The ratio of eigenvalue magnitudes determines how rapidly directions separate. Normalization preserves those ratios. A tie in magnitude removes this separation, and a negative dominant eigenvalue can make the normalized vector alternate sign.</li>
+<li><strong>Subspace iteration.</strong> A block <span class="math inline">\(X\)</span> carries several input vectors. In eigencoordinates <span class="math inline">\(Q^*A^kX=\Lambda^k Q^*X\)</span>, so each row of coefficients is scaled by the corresponding power. Several wanted directions can survive if the initial block represents them independently. Session 4’s thin QR supplies a fresh orthonormal basis of the current block’s range when it has full column rank. The target is an invariant subspace <span class="math inline">\(U\)</span> satisfying <span class="math inline">\(AU\subseteq U\)</span>.</li>
+<li><strong>Polynomial filtering.</strong> For <span class="math inline">\(p(t)=\sum_{j=0}^d a_jt^j\)</span>, the identity <span class="math inline">\(A^jq_i=\lambda_i^j q_i\)</span> gives <span class="math inline">\(p(A)q_i=\sum_j a_j\lambda_i^j q_i=p(\lambda_i)q_i\)</span>. A Chebyshev filter is designed to make <span class="math inline">\(|p(\lambda)|\)</span> large on wanted eigenvalues relative to its size on the unwanted interval. Filtering changes the weights while preserving the eigenvectors.</li>
+<li><strong>Rayleigh–Ritz.</strong> Let <span class="math inline">\(W\)</span> have orthonormal columns spanning a trial subspace. The projection of <span class="math inline">\(AWz\)</span> back into the subspace is <span class="math inline">\(WW^*AWz\)</span>. Its small coordinate vector is <span class="math inline">\(Hz\)</span> with <span class="math inline">\(H=W^*AW\)</span>, Hermitian when <span class="math inline">\(A\)</span> is Hermitian. If <span class="math inline">\(Hz=\theta z\)</span>, the lifted residual <span class="math inline">\(AWz-\theta Wz\)</span> is orthogonal to the trial space. This gives a way to extract approximate eigenpairs from the block.</li>
+</ul>
+<p><strong>Course reading.</strong> The revision route follows §§1.3, 1.3.3 and 1.4.4 of the book. For the lecture’s spectral terminology and similarity conventions see Kanschat and Scheichl, <em>Numerical Linear Algebra</em>, §3.1 and Appendix A.1.2. Section 3.2 begins the later conditioning discussion. For the real symmetric case see Scheichl and Zech, <em>Numerik 0</em>, §3.2, and Bastian, <em>Numerik 0</em>, §§5.3 and 5.6.</p>
+</section>
+<section id="independent-exercises" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="independent-exercises"><span class="header-section-number">6.9</span> Independent exercises</h2>
+<ol type="1">
+<li><strong>Shift and solve (3 min).</strong> For <span class="math inline">\(C=\begin{pmatrix}0&amp;2\\0&amp;2\end{pmatrix}\)</span>, find both eigenvalues and eigenspaces. Give their dimensions and an eigenbasis. What happens geometrically on the zero eigenspace?</li>
+<li><strong>A repeated root (4 min).</strong> Let <span class="math inline">\(B_s=\begin{pmatrix}4&amp;s&amp;0\\0&amp;4&amp;0\\0&amp;0&amp;1\end{pmatrix}\)</span>. Give both multiplicities at every eigenvalue and decide for which real <span class="math inline">\(s\)</span> the matrix is diagonalizable. Identify the equation responsible for the change.</li>
+<li><strong>Reconstruct the proof (4 min).</strong> Starting from <span class="math inline">\(A^*=A\)</span>, prove that all eigenvalues are real and that the orthogonal complement of a unit eigenvector is invariant. Explain how this yields an orthonormal eigenbasis even if the characteristic polynomial has a repeated root.</li>
+<li><strong>Mastery problem (7 min).</strong> For <span class="math inline">\(S=\begin{pmatrix}3&amp;-1\\-1&amp;3\end{pmatrix}\)</span> and <span class="math inline">\(w=(2,0)^T\)</span>, find the eigenvalues and an orthonormal eigenbasis. Write the two spectral projectors and the decomposition of <span class="math inline">\(S\)</span>. Compute <span class="math inline">\(S^4w\)</span>, decide definiteness, and identify the shorter semiaxis of <span class="math inline">\(x^TSx=1\)</span>.</li>
+<li><strong>A complex eigenspace (3 min).</strong> For <span class="math inline">\(H=\begin{pmatrix}1&amp;i\\-i&amp;1\end{pmatrix}\)</span>, find unit eigenvectors. Classify its quadratic form and give a nonzero vector of zero energy. Check orthogonality using the complex inner product.</li>
+<li><strong>Design a filter (4 min).</strong> A Hermitian operator has eigenvalues <span class="math inline">\(-2,1,4\)</span>, with orthogonal spectral projectors <span class="math inline">\(P_{-2},P_1,P_4\)</span>. Construct a polynomial of degree at most two whose matrix action is exactly <span class="math inline">\(P_4\)</span>. Prove your claim for arbitrary input. What happens if the initial vector has no component in <span class="math inline">\(E_4\)</span>?</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">6.10</span> Worked solutions</h2>
+<p><strong>1. Shift and solve.</strong> Triangularity gives <span class="math inline">\(\chi_C(t)=t(t-2)\)</span>. At <span class="math inline">\(0\)</span> the kernel equation is <span class="math inline">\(2y=0\)</span>, so <span class="math inline">\(E_0=\operatorname{span}\{(1,0)^T\}\)</span>. At <span class="math inline">\(2\)</span> the first row gives <span class="math inline">\(-2x+2y=0\)</span>, so <span class="math inline">\(E_2=\operatorname{span}\{(1,1)^T\}\)</span>. Both have dimension one. The displayed spanning vectors are independent and form an eigenbasis. The first line maps entirely to the origin.</p>
+<p><strong>2. A repeated root.</strong> The diagonal gives algebraic multiplicities two at <span class="math inline">\(4\)</span> and one at <span class="math inline">\(1\)</span>. At <span class="math inline">\(4\)</span> the equations reduce to <span class="math inline">\(sy=0\)</span> and <span class="math inline">\(z=0\)</span>. When <span class="math inline">\(s=0\)</span> the eigenspace is the entire <span class="math inline">\(xy\)</span>-plane and has dimension two. For <span class="math inline">\(s\ne0\)</span> it is the <span class="math inline">\(x\)</span>-axis and has dimension one. At <span class="math inline">\(1\)</span>, <span class="math inline">\(3y=0\)</span> and <span class="math inline">\(3x+sy=0\)</span> give <span class="math inline">\(x=y=0\)</span> for every <span class="math inline">\(s\)</span>, leaving the <span class="math inline">\(z\)</span>-axis. Thus the dimensions add to three exactly when <span class="math inline">\(s=0\)</span>.</p>
+<p><strong>3. Reconstruct the proof.</strong> For <span class="math inline">\(Av=\lambda v\)</span> with <span class="math inline">\(v\ne0\)</span>, conjugating <span class="math inline">\(v^*Av\)</span> leaves it unchanged. Its ratio to <span class="math inline">\(v^*v\)</span> is therefore real and equals <span class="math inline">\(\lambda\)</span>. Choose a unit eigenvector <span class="math inline">\(q\)</span> using a root of the characteristic polynomial over <span class="math inline">\(\mathbb C\)</span> (for real symmetric <span class="math inline">\(A\)</span> take a nonzero real or imaginary part and normalize). For <span class="math inline">\(q^*x=0\)</span>, <span class="math inline">\(q^*Ax=(Aq)^*x=\lambda q^*x=0\)</span>. Thus the restriction to <span class="math inline">\(q^\perp\)</span> maps that space into itself and retains the self-adjoint inner product identity. Induct on its dimension, with the one-dimensional case immediate. This removes one orthogonal direction per step, regardless of root multiplicities.</p>
+<p><strong>4. Mastery problem.</strong> The characteristic polynomial <span class="math inline">\((t-3)^2-1\)</span> gives <span class="math inline">\(2,4\)</span>. At <span class="math inline">\(2\)</span> the kernel condition is <span class="math inline">\(x=y\)</span>, and at <span class="math inline">\(4\)</span> it is <span class="math inline">\(x=-y\)</span>. Unit eigenvectors are <span class="math inline">\(u=(1,1)^T/\sqrt2\)</span> and <span class="math inline">\(z=(1,-1)^T/\sqrt2\)</span>, respectively. Thus <span class="math inline">\(S=2P_2+4P_4\)</span> with</p>
+<p><span class="math display">\[
+P_2=uu^T=\tfrac12\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix},\qquad
+P_4=zz^T=\tfrac12\begin{pmatrix}1&amp;-1\\-1&amp;1\end{pmatrix}.
+\]</span></p>
+<p>The projected inputs are <span class="math inline">\((1,1)^T\)</span> and <span class="math inline">\((1,-1)^T\)</span>. Raising only the multipliers gives <span class="math inline">\(S^4w=16(1,1)^T+256(1,-1)^T=(272,-240)^T\)</span>. Both eigenvalues are positive, so <span class="math inline">\(S\)</span> is positive definite. It doubles lengths along <span class="math inline">\(u\)</span> and quadruples them along <span class="math inline">\(z\)</span>. Unit energy is reached at distances <span class="math inline">\(1/\sqrt2\)</span> and <span class="math inline">\(1/2\)</span>, respectively, giving the shorter semiaxis along <span class="math inline">\(z\)</span>.</p>
+<p><strong>5. A complex eigenspace.</strong> The characteristic polynomial <span class="math inline">\((t-1)^2-1\)</span> gives <span class="math inline">\(0,2\)</span>. At <span class="math inline">\(0\)</span> solve <span class="math inline">\(x+iy=0\)</span>, and at <span class="math inline">\(2\)</span> solve <span class="math inline">\(-x+iy=0\)</span>. Take <span class="math inline">\(u=(-i,1)^T/\sqrt2\)</span> and <span class="math inline">\(z=(i,1)^T/\sqrt2\)</span>, respectively. Then <span class="math inline">\(u^*z=(i\cdot i+1)/2=0\)</span>. Since <span class="math inline">\(H^*=H\)</span> and its eigenvalues are nonnegative with one zero, it is positive semidefinite and singular. In particular <span class="math inline">\(u^*Hu=0\)</span>.</p>
+<p><strong>6. Design a filter.</strong> Both unwanted eigenvalues must be roots. Choose <span class="math inline">\(p(t)=(t+2)(t-1)/18\)</span> so <span class="math inline">\(p(4)=1\)</span>. On <span class="math inline">\(E_\lambda\)</span> each power <span class="math inline">\(A^j\)</span> acts by <span class="math inline">\(\lambda^j\)</span>, hence <span class="math inline">\(p(A)\)</span> acts by <span class="math inline">\(p(\lambda)\)</span>. Decompose any input into its three orthogonal projections. The first two vanish after filtering and the third is unchanged, so <span class="math inline">\(p(A)v=P_4v\)</span>. If the wanted component was absent the output is zero. This exact filter uses known eigenvalues. Interval filtering in the seminar uses bounds on a spectral interval instead.</p>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="6.11">
+<h2 data-number="6.11" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">6.11</span> End-of-session mastery checklist</h2>
+<p>On a blank page, check whether you can do each of the following.</p>
+<ul class="task-list">
+<li><label><input type="checkbox">Define an eigenpair over a specified field, identify its invariant line, and derive the characteristic equation from a shifted kernel.</label></li>
+<li><label><input type="checkbox">Read algebraic multiplicity from a polynomial and geometric multiplicity from a kernel. Use their dimensions to decide diagonalizability.</label></li>
+<li><label><input type="checkbox">Derive <span class="math inline">\(AV=V\Lambda\)</span> column by column and explain the coordinate maps in <span class="math inline">\(V\Lambda V^{-1}\)</span>.</label></li>
+<li><label><input type="checkbox">State both forms of the spectral theorem. Prove reality, orthogonality across distinct eigenvalues, and invariance of the orthogonal complement.</label></li>
+<li><label><input type="checkbox">Construct an orthonormal eigenbasis from a small symmetric matrix, form its projectors, and recover the matrix from their weighted sum.</label></li>
+<li><label><input type="checkbox">Derive <span class="math inline">\(A^k=Q\Lambda^kQ^*\)</span> and compute <span class="math inline">\(A^kv\)</span> from projected components. Predict growth, decay, sign alternation, and the effect of an absent component.</label></li>
+<li><label><input type="checkbox">Derive the positive-definite and semidefinite criteria from <span class="math inline">\(x^*Ax\)</span> and identify the principal axes of a real unit-energy ellipse.</label></li>
+<li><label><input type="checkbox">Explain why powers favor components with larger eigenvalue magnitude and why polynomial filters can favor a different part of the spectrum.</label></li>
+</ul>
+<p><strong>Ready for Session 6.</strong> Redo the mastery problem without the solution. Check your projectors by verifying <span class="math inline">\(P_2+P_4=I\)</span>, then use them to explain why <span class="math inline">\(\|Sx\|_2\)</span> for a unit vector lies between <span class="math inline">\(2\)</span> and <span class="math inline">\(4\)</span>. Identifying the directions that attain those endpoints is the bridge to matrix norms and conditioning.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/04_qr_factorization.html" class="pagination-link" aria-label="Session 4 — QR Factorization">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/06_matrix_norms_conditioning.html" class="pagination-link" aria-label="Session 6 — Matrix Norms and Conditioning">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

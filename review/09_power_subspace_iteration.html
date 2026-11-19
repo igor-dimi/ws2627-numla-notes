@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; Session 9 — Power and Subspace Iteration – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/10_matrix_polynomials_chebyshev_filtering.html" rel="next">
+<link href="../review/08_basic_iterative_methods.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/09_power_subspace_iteration.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-a-linear-solve-to-a-spectral-question" id="toc-from-a-linear-solve-to-a-spectral-question" class="nav-link active" data-scroll-target="#from-a-linear-solve-to-a-spectral-question"><span class="header-section-number">10.1</span> From a linear solve to a spectral question</a></li>
+  <li><a href="#what-survives-repeated-multiplication" id="toc-what-survives-repeated-multiplication" class="nav-link" data-scroll-target="#what-survives-repeated-multiplication"><span class="header-section-number">10.2</span> What survives repeated multiplication?</a>
+  <ul class="collapse">
+  <li><a href="#normalized-power-iteration" id="toc-normalized-power-iteration" class="nav-link" data-scroll-target="#normalized-power-iteration">Normalized power iteration</a></li>
+  <li><a href="#the-direction-error-and-its-rate" id="toc-the-direction-error-and-its-rate" class="nav-link" data-scroll-target="#the-direction-error-and-its-rate">The direction error and its rate</a></li>
+  <li><a href="#worked-example-1-rotate-into-eigencoordinates" id="toc-worked-example-1-rotate-into-eigencoordinates" class="nav-link" data-scroll-target="#worked-example-1-rotate-into-eigencoordinates">Worked example 1 — rotate into eigencoordinates</a></li>
+  <li><a href="#worked-example-2-where-selection-fails" id="toc-worked-example-2-where-selection-fails" class="nav-link" data-scroll-target="#worked-example-2-where-selection-fails">Worked example 2 — where selection fails</a></li>
+  </ul></li>
+  <li><a href="#estimating-and-checking-an-eigenpair" id="toc-estimating-and-checking-an-eigenpair" class="nav-link" data-scroll-target="#estimating-and-checking-an-eigenpair"><span class="header-section-number">10.3</span> Estimating and checking an eigenpair</a></li>
+  <li><a href="#which-object-should-a-block-approximate" id="toc-which-object-should-a-block-approximate" class="nav-link" data-scroll-target="#which-object-should-a-block-approximate"><span class="header-section-number">10.4</span> Which object should a block approximate?</a>
+  <ul class="collapse">
+  <li><a href="#why-separate-column-normalizations-are-insufficient" id="toc-why-separate-column-normalizations-are-insufficient" class="nav-link" data-scroll-target="#why-separate-column-normalizations-are-insufficient">Why separate column normalizations are insufficient</a></li>
+  <li><a href="#orthogonal-subspace-iteration" id="toc-orthogonal-subspace-iteration" class="nav-link" data-scroll-target="#orthogonal-subspace-iteration">Orthogonal subspace iteration</a></li>
+  <li><a href="#worked-example-3-a-plane-moves-qr-represents-it" id="toc-worked-example-3-a-plane-moves-qr-represents-it" class="nav-link" data-scroll-target="#worked-example-3-a-plane-moves-qr-represents-it">Worked example 3 — a plane moves, QR represents it</a></li>
+  </ul></li>
+  <li><a href="#the-block-convergence-estimate" id="toc-the-block-convergence-estimate" class="nav-link" data-scroll-target="#the-block-convergence-estimate"><span class="header-section-number">10.5</span> The block convergence estimate</a></li>
+  <li><a href="#how-can-we-tell-whether-a-computed-plane-is-good" id="toc-how-can-we-tell-whether-a-computed-plane-is-good" class="nav-link" data-scroll-target="#how-can-we-tell-whether-a-computed-plane-is-good"><span class="header-section-number">10.6</span> How can we tell whether a computed plane is good?</a></li>
+  <li><a href="#experiment-one-matrix-three-iterations" id="toc-experiment-one-matrix-three-iterations" class="nav-link" data-scroll-target="#experiment-one-matrix-three-iterations"><span class="header-section-number">10.7</span> Experiment — one matrix, three iterations</a></li>
+  <li><a href="#central-synthesis-from-spectral-amplification-to-invariant-subspace-computation" id="toc-central-synthesis-from-spectral-amplification-to-invariant-subspace-computation" class="nav-link" data-scroll-target="#central-synthesis-from-spectral-amplification-to-invariant-subspace-computation"><span class="header-section-number">10.8</span> Central Synthesis — From Spectral Amplification to Invariant Subspace Computation</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">10.9</span> Exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">10.10</span> Worked solutions</a></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">10.11</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/09_power_subspace_iteration.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="from-a-linear-solve-to-a-spectral-question" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="from-a-linear-solve-to-a-spectral-question"><span class="header-section-number">10.1</span> From a linear solve to a spectral question</h2>
+<p>Given <span class="math inline">\(A\in\mathbb F^{n\times n}\)</span>, with <span class="math inline">\(\mathbb F=\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>, seek <span class="math inline">\(v\ne0\)</span> and <span class="math inline">\(\lambda\)</span> such that <span class="math inline">\(Av=\lambda v\)</span>. If <span class="math inline">\(A\)</span> has a million rows and we want just one eigenpair, what operation should we ask the matrix to perform? Forming the coefficients of <span class="math inline">\(\det(tI-A)\)</span> and finding all its roots introduces a potentially ill-conditioned polynomial problem, does work for the entire spectrum, and still leaves us to find <span class="math inline">\(v\)</span>. In contrast, a single sparse product <span class="math inline">\(Av\)</span> costs work proportional to the number of stored entries plus the vector dimensions. Sometimes a routine applying <span class="math inline">\(A\)</span> is all we have.</p>
+<p>Session 7 used factorizations to solve <span class="math inline">\(Ax=b\)</span>. In Session 8, a stationary iteration propagated the solution error as <span class="math inline">\(e^{(k)}=B^ke^{(0)}\)</span>. Convergence for every start required <span class="math inline">\(\rho(B)&lt;1\)</span>. Here we deliberately retain a component. Even when <strong>every</strong> component of <span class="math inline">\(A^kv\)</span> shrinks, its <em>direction</em> can reveal an eigenvector. The decisive quantity compares two rates of shrinkage or growth.</p>
+<p><strong>Study route (90 minutes).</strong> Spend 20 minutes on the single-vector derivation and diagnostics, 25 on invariant subspaces and the block proof, and 15 on the experiment and seminar connection. Reserve 30 minutes for the exercises, including checking your solutions.</p>
+</section>
+<section id="what-survives-repeated-multiplication" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="what-survives-repeated-multiplication"><span class="header-section-number">10.2</span> What survives repeated multiplication?</h2>
+<p>Use the spectral theorem from Session 5. For Hermitian <span class="math inline">\(A=A^*\)</span>, write <span class="math inline">\(A=Q\Lambda Q^*\)</span>, where <span class="math inline">\(Q=[q_1,\ldots,q_n]\)</span> is unitary and <span class="math inline">\(\Lambda\)</span> is real diagonal. The star denotes conjugate transpose. Normalize the start to unit length. Orthogonal expansion (Session 2) gives <span class="math inline">\(v^{(0)}=\sum_i c_iq_i\)</span> with <span class="math inline">\(c_i=q_i^*v^{(0)}\)</span>. Since each application multiplies <span class="math inline">\(q_i\)</span> by <span class="math inline">\(\lambda_i\)</span>, induction gives</p>
+<p><span class="math display">\[
+A^kv^{(0)}=\sum_{i=1}^n c_i\lambda_i^k q_i.
+\]</span></p>
+<p>Order by magnitude, <span class="math inline">\(|\lambda_1|&gt;|\lambda_2|\ge\cdots\ge|\lambda_n|\)</span>, and assume <span class="math inline">\(c_1\ne0\)</span>. Factoring out the largest weight gives</p>
+<p><span class="math display">\[
+A^kv^{(0)}=\lambda_1^k\left(c_1q_1+
+\sum_{i=2}^n c_i(\lambda_i/\lambda_1)^kq_i\right).
+\]</span></p>
+<p>Each unwanted coefficient divided by the wanted coefficient tends to zero. The prefactor can be huge, tiny, or alternate in sign. We can discard its magnitude after <em>each</em> product because multiplying an input by a nonzero scalar preserves the output line whenever the output is nonzero.</p>
+<section id="normalized-power-iteration" class="level3">
+<h3 class="anchored" data-anchor-id="normalized-power-iteration">Normalized power iteration</h3>
+<p>Starting with a unit vector, repeat</p>
+<p><span class="math display">\[
+w^{(k+1)}=Av^{(k)},\qquad
+v^{(k+1)}=\frac{w^{(k+1)}}{\|w^{(k+1)}\|_2}.
+\]</span></p>
+<p>Check for a zero product before dividing. It means the current vector lies in the kernel. Under the stated gap and overlap assumptions the wanted coefficient survives every finite step in exact arithmetic. By induction <span class="math inline">\(v^{(k)}=A^kv^{(0)}/\|A^kv^{(0)}\|_2\)</span>. Normalization limits accumulation of extreme scales across steps. The implementation needs one product per update and never forms <span class="math inline">\(A^k\)</span>.</p>
+</section>
+<section id="the-direction-error-and-its-rate" class="level3">
+<h3 class="anchored" data-anchor-id="the-direction-error-and-its-rate">The direction error and its rate</h3>
+<p>The acute angle <span class="math inline">\(\theta_k\)</span> between two <strong>lines</strong> satisfies <span class="math inline">\(\cos\theta_k=|q_1^*v^{(k)}|\)</span>. The absolute value identifies unit representatives that differ by a sign or a complex phase. With <span class="math inline">\(P_1=q_1q_1^*\)</span>, Session 3 gives the tangent as the length perpendicular to the target divided by the length parallel to it. Taking these lengths before normalization cancels a common factor.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\tan\theta_k
+&amp;=\frac{\|(I-P_1)A^kv^{(0)}\|_2}{\|P_1A^kv^{(0)}\|_2}\\
+&amp;=\frac{\bigl(\sum_{i=2}^n |c_i|^2|\lambda_i/\lambda_1|^{2k}\bigr)^{1/2}}{|c_1|}\\
+&amp;\le \left|\frac{\lambda_2}{\lambda_1}\right|^k\tan\theta_0 .
+\end{aligned}
+\]</span></p>
+<p><strong>Power convergence theorem.</strong> For an orthonormal eigenbasis, a strict magnitude gap at the first eigenvalue, and nonzero initial overlap, this bound implies convergence of the line. A smaller ratio means fewer steps for the same guaranteed angular reduction. The absolute magnitude gap <span class="math inline">\(g=|\lambda_1|-|\lambda_2|\)</span> has the units of <span class="math inline">\(A\)</span>. The factor <span class="math inline">\(1-g/|\lambda_1|\)</span> is dimensionless and unchanged by scaling <span class="math inline">\(A\)</span> by a nonzero scalar. A nearly orthogonal start can have a large <span class="math inline">\(\tan\theta_0\)</span>. Missing slow modes can make convergence faster than the bound.</p>
+<p>The normalized vector approaches the moving representative <span class="math inline">\((\lambda_1/|\lambda_1|)^k(c_1/|c_1|)q_1\)</span> in the sense that their difference tends to zero. A negative dominant eigenvalue alternates the sign. For a complex normal matrix the same proof uses a unitary eigenbasis, and a nonreal dominant eigenvalue rotates the phase. In all these cases the orthogonal projector onto the line has a single limit.</p>
+</section>
+<section id="worked-example-1-rotate-into-eigencoordinates" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-1-rotate-into-eigencoordinates">Worked example 1 — rotate into eigencoordinates</h3>
+<p>Take <span class="math inline">\(A=\begin{pmatrix}3&amp;1\\1&amp;3\end{pmatrix}\)</span> and <span class="math inline">\(v^{(0)}=e_1\)</span>. Its orthonormal eigenvectors are <span class="math inline">\(q_1=(1,1)^T/\sqrt2\)</span> and <span class="math inline">\(q_2=(1,-1)^T/\sqrt2\)</span>, with eigenvalues <span class="math inline">\(4\)</span> and <span class="math inline">\(2\)</span>. Thus <span class="math inline">\(e_1=(q_1+q_2)/\sqrt2\)</span> and <span class="math inline">\(A^ke_1=(4^kq_1+2^kq_2)/\sqrt2\)</span>. Three applications in the original coordinates give</p>
+<p><span class="math display">\[
+\begin{aligned}
+w^{(1)}&amp;=(3,1)^T,              &amp;v^{(1)}&amp;=(3,1)^T/\sqrt{10},\\
+w^{(2)}&amp;=(10,6)^T/\sqrt{10},   &amp;v^{(2)}&amp;=(5,3)^T/\sqrt{34},\\
+w^{(3)}&amp;=(18,14)^T/\sqrt{34},  &amp;v^{(3)}&amp;=(9,7)^T/\sqrt{130}.
+\end{aligned}
+\]</span></p>
+<p>For <span class="math inline">\((x,y)^T\)</span> the ratio of the two eigenbasis coefficients in magnitude is <span class="math inline">\(|x-y|/|x+y|\)</span>. Across the four vectors it is <span class="math inline">\(1,1/2,1/4,1/8\)</span>. Here the tangent bound is exact. In ordinary coordinates the entries are becoming equal because the <em>difference</em> direction is being suppressed.</p>
+</section>
+<section id="worked-example-2-where-selection-fails" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-2-where-selection-fails">Worked example 2 — where selection fails</h3>
+<p>Let <span class="math inline">\(A=\operatorname{diag}(2,-2,1)\)</span> and <span class="math inline">\(v^{(0)}=(1,1,0)^T/\sqrt2\)</span>. The first two weights have equal magnitude. The lines alternate between the spans of <span class="math inline">\((1,1,0)^T\)</span> and <span class="math inline">\((1,-1,0)^T\)</span>, which are perpendicular. Both lie in the same invariant plane. Equal magnitudes of <em>different</em> eigenvalues can therefore prevent even line convergence. For a repeated copy of the <em>same</em> dominant eigenvalue, the whole dominant eigenspace receives one common weight. With a gap below it and nonzero projection onto it, the limiting line is the line of that projection and depends on the start.</p>
+<p>If the dominant component is absent, its coefficient stays zero. Starting Example 1 at <span class="math inline">\(q_2\)</span> gives the eigenpair for <span class="math inline">\(2\)</span> forever. For a general diagonalizable matrix the expansion uses coefficients in a possibly ill-conditioned eigenvector basis, and the orthogonal sum-of-squares proof no longer applies. With defective matrices even the pure-power expansion can fail. For example a Jordan block <span class="math inline">\(\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix}\)</span> has upper-right entry <span class="math inline">\(k\)</span> in its <span class="math inline">\(k\)</span>th power.</p>
+</section>
+</section>
+<section id="estimating-and-checking-an-eigenpair" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="estimating-and-checking-an-eigenpair"><span class="header-section-number">10.3</span> Estimating and checking an eigenpair</h2>
+<p>For <span class="math inline">\(v\ne0\)</span> define the Rayleigh quotient <span class="math inline">\(\rho_A(v)=v^*Av/(v^*v)\)</span>. It is the coefficient of the orthogonal projection of <span class="math inline">\(Av\)</span> onto <span class="math inline">\(v\)</span>. Hence <span class="math inline">\(r=Av-\rho_A(v)v\)</span> satisfies <span class="math inline">\(v^*r=0\)</span>, and <span class="math inline">\(r=0\)</span> precisely for an eigenvector. If <span class="math inline">\(Av=\lambda v\)</span>, substitution gives <span class="math inline">\(\rho_A(v)=\lambda\)</span>, including its sign. In a loop, reuse the product <span class="math inline">\(Av\)</span> to evaluate the quotient and residual for the <strong>current</strong> iterate.</p>
+<p>In Example 1, <span class="math inline">\(A(5,3)^T=(18,14)^T\)</span>, so <span class="math inline">\(\rho_A(v^{(2)})=132/34=66/17\)</span>. The exact value is <span class="math inline">\(4\)</span>. More generally, for a unit vector <span class="math inline">\(v=\sum_i a_iq_i\)</span> the Hermitian quotient is <span class="math inline">\(\sum_i |a_i|^2\lambda_i\)</span>. Therefore <span class="math inline">\(|\rho_A(v)-\lambda_1|\le\max_i|\lambda_i-\lambda_1|\sin^2\theta\)</span>. A good direction can give an even more accurate eigenvalue.</p>
+<p>As in Session 6, a small residual needs a scale and an interpretation. For unit <span class="math inline">\(v\)</span>, <span class="math inline">\(\|r\|_2^2=\sum_i|a_i|^2|\lambda_i-\rho_A(v)|^2\)</span>. Thus some eigenvalue lies within <span class="math inline">\(\|r\|_2\)</span> of the quotient. In a tight cluster, a mixture of well-separated <em>directions</em> can have a small residual because their eigenvalues are close. Even a zero residual can identify a different eigenpair from the one sought. For scale-independent monitoring one can compare <span class="math inline">\(\|r\|_2\)</span> with a tolerance times <span class="math inline">\(\|A\|_2\|v\|_2\)</span> or an available operator scale.</p>
+</section>
+<section id="which-object-should-a-block-approximate" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="which-object-should-a-block-approximate"><span class="header-section-number">10.4</span> Which object should a block approximate?</h2>
+<p>A subspace <span class="math inline">\(U\)</span> is <strong>invariant</strong> under <span class="math inline">\(A\)</span> if <span class="math inline">\(A(U)\subseteq U\)</span>. Once a vector is in <span class="math inline">\(U\)</span>, repeated products stay there. An eigenline is the one-dimensional case. Any span of eigenvectors is invariant by linearity. By contrast the line through <span class="math inline">\(e_1\)</span> in Example 1 leaves itself on the first multiplication. An invariant subspace can contain very few eigenvectors: the entire plane of the Jordan block above is invariant, but its only eigenline is the first coordinate axis.</p>
+<p>For Hermitian <span class="math inline">\(A\)</span>, an invariant <span class="math inline">\(U\)</span> also has invariant orthogonal complement: if <span class="math inline">\(x\perp U\)</span>, then <span class="math inline">\(u^*Ax=(Au)^*x=0\)</span> for every <span class="math inline">\(u\in U\)</span>. The restrictions are Hermitian and admit orthonormal eigenbases. In particular a group of eigenvalues identifies a spectral subspace. When eigenvalues inside the group coincide, individual basis vectors are nonunique. A gap to the <strong>outside</strong> can still distinguish the group cleanly. This is a reason to ask an eigensolver for a subspace.</p>
+<p>Start with <span class="math inline">\(p\)</span> independent columns, <span class="math inline">\(X_0\in\mathbb F^{n\times p}\)</span>, <span class="math inline">\(1\le p&lt;n\)</span>. The raw block iteration is <span class="math inline">\(X_{k+1}=AX_k\)</span>, hence <span class="math inline">\(X_k=A^kX_0\)</span>. Its geometric iterate is <span class="math inline">\(\mathcal S_k=\operatorname{range}(X_k)\)</span>. Right multiplication by any invertible <span class="math inline">\(p\times p\)</span> matrix changes the coordinates of a basis, preserving its span. This is the block analogue of choosing a different length for a vector. It gives us freedom to choose a numerically favorable basis at every step.</p>
+<section id="why-separate-column-normalizations-are-insufficient" class="level3">
+<h3 class="anchored" data-anchor-id="why-separate-column-normalizations-are-insufficient">Why separate column normalizations are insufficient</h3>
+<p>Let <span class="math inline">\(A=\operatorname{diag}(8,2,1)\)</span> and start with columns <span class="math inline">\(e_1+e_2\)</span> and <span class="math inline">\(e_1-e_2\)</span>. After <span class="math inline">\(k\)</span> steps the columns are <span class="math inline">\(8^ke_1\pm2^ke_2\)</span>. For every finite <span class="math inline">\(k\)</span> their sum and difference recover <span class="math inline">\(e_1\)</span> and <span class="math inline">\(e_2\)</span> up to nonzero factors. <strong>The subspace is already exactly the desired plane.</strong> Nevertheless the cosine between the columns is <span class="math inline">\((8^{2k}-2^{2k})/(8^{2k}+2^{2k})\)</span>, tending to one. Normalizing each column leaves this angle unchanged.</p>
+<p>The two nonzero singular values are <span class="math inline">\(\sqrt2\,8^k\)</span> and <span class="math inline">\(\sqrt2\,2^k\)</span> (compute <span class="math inline">\(X_kX_k^*\)</span>). Thus <span class="math inline">\(\kappa_2(X_k)=4^k\)</span>, also after independent column normalization in this example since the two norms agree. In exact arithmetic there are still two independent directions. In floating point, a perturbation of order machine precision times the large singular value can swamp the small one. Extreme overall scaling introduces a further risk of overflow or underflow. The task for orthogonalization is to represent the second direction <strong>while it is still resolved</strong>.</p>
+</section>
+<section id="orthogonal-subspace-iteration" class="level3">
+<h3 class="anchored" data-anchor-id="orthogonal-subspace-iteration">Orthogonal subspace iteration</h3>
+<p>Take a reduced QR factorization of the starting block and use its orthonormal factor <span class="math inline">\(Q_0\)</span>. Repeat</p>
+<p><span class="math display">\[
+Y_{k+1}=AQ_k,\qquad Y_{k+1}=Q_{k+1}R_{k+1}.
+\]</span></p>
+<p>Session 4 supplies the reduced QR with <span class="math inline">\(Q_{k+1}^*Q_{k+1}=I_p\)</span> and upper triangular <span class="math inline">\(R_{k+1}\)</span>. At full column rank <span class="math inline">\(R_{k+1}\)</span> is invertible, so <span class="math inline">\(Q_{k+1}=Y_{k+1}R_{k+1}^{-1}\)</span> proves equality of the ranges. This identity is a proof, not an instruction to form an inverse. Induction now gives <span class="math inline">\(\operatorname{range}(Q_k)=\operatorname{range}(A^kX_0)\)</span>. Multiplication advances the plane. QR assigns it coordinates in which all singular values of the basis are one. Householder QR provides this change of basis reliably for a resolved block. If the product loses rank, an orthonormal completion returned by a QR routine can contain directions outside the product range. It cannot recover missing information.</p>
+</section>
+<section id="worked-example-3-a-plane-moves-qr-represents-it" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-3-a-plane-moves-qr-represents-it">Worked example 3 — a plane moves, QR represents it</h3>
+<p>Use <span class="math display">\[
+A=\begin{pmatrix}3&amp;1&amp;0\\1&amp;3&amp;0\\0&amp;0&amp;1\end{pmatrix},
+\qquad Q_0=[e_1,\,(e_2+e_3)/\sqrt2].
+\]</span> Example 1 identifies the wanted eigenvalues <span class="math inline">\(4,2\)</span> in the first coordinate plane. The initial columns project to independent vectors there. The product columns are <span class="math inline">\(y_1=(3,1,0)^T\)</span> and <span class="math inline">\(y_2=(1,3,1)^T/\sqrt2\)</span>. Subtract the component of <span class="math inline">\(y_2\)</span> along <span class="math inline">\(y_1\)</span> to get <span class="math inline">\((-4,12,5)^T/(5\sqrt2)\)</span>. Normalizing gives <span class="math display">\[
+Q_1=\left[\frac{(3,1,0)^T}{\sqrt{10}},\,
+           \frac{(-4,12,5)^T}{\sqrt{185}}\right],
+\qquad
+R_1=\begin{pmatrix}\sqrt{10}&amp;6/\sqrt{20}\\0&amp;\sqrt{185}/(5\sqrt2)\end{pmatrix}.
+\]</span> The dot product numerator is <span class="math inline">\(-12+12=0\)</span> and the squared lengths before normalization are <span class="math inline">\(10\)</span> and <span class="math inline">\(185\)</span>. Thus <span class="math inline">\(Q_1^TQ_1=I_2\)</span>. To see what happened to the plane, write it as a height <span class="math inline">\(z\)</span> over <span class="math inline">\((x,y)\)</span>. Initially <span class="math inline">\(z=y\)</span>. After one product both new columns satisfy <span class="math inline">\(z=(-x+3y)/8\)</span>. The maximum absolute height above a unit horizontal vector has fallen from <span class="math inline">\(1\)</span> to <span class="math inline">\(\sqrt{10}/8\)</span>. This slope is the tangent of the largest angle to the target plane. The next proof generalizes exactly this calculation.</p>
+</section>
+</section>
+<section id="the-block-convergence-estimate" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="the-block-convergence-estimate"><span class="header-section-number">10.5</span> The block convergence estimate</h2>
+<p>Partition the orthonormal eigenbasis as <span class="math inline">\([U_1,U_2]\)</span>, where <span class="math inline">\(U_1\)</span> spans the wanted <span class="math inline">\(p\)</span> directions. Write <span class="math inline">\(\Lambda_1,\Lambda_2\)</span> for the corresponding diagonal blocks. Assume <span class="math inline">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span> in decreasing magnitude order. Decompose the starting block as <span class="math inline">\(X_0=U_1C+U_2D\)</span>, with <span class="math inline">\(C=U_1^*X_0\)</span> and <span class="math inline">\(D=U_2^*X_0\)</span>. The exact overlap condition is that the square matrix <span class="math inline">\(C\)</span> is invertible: the projected starting vectors must span the <em>entire</em> target. It is possible for every starting vector to have a wanted component and for all those components to lie on the same line.</p>
+<p><strong>Claim.</strong> Under these assumptions, in exact arithmetic every product has rank <span class="math inline">\(p\)</span> and the largest principal angle <span class="math inline">\(\Theta_k\)</span> between <span class="math inline">\(\mathcal S_k\)</span> and <span class="math inline">\(\operatorname{range}(U_1)\)</span> satisfies <span class="math display">\[
+\tan\Theta_k\le \left|\frac{\lambda_{p+1}}{\lambda_p}\right|^k\tan\Theta_0 .
+\]</span></p>
+<p><strong>Proof.</strong> In eigencoordinates the top and bottom blocks of <span class="math inline">\(A^kX_0\)</span> are <span class="math inline">\(\Lambda_1^k C\)</span> and <span class="math inline">\(\Lambda_2^k D\)</span>. The top block is invertible since the gap implies <span class="math inline">\(|\lambda_p|&gt;0\)</span>. This proves the rank assertion. Right-multiply by the inverse of that top block. The resulting basis is <span class="math inline">\(U_1+U_2T_k\)</span>, where <span class="math display">\[
+T_k=\Lambda_2^k DC^{-1}\Lambda_1^{-k}.
+\]</span> Every vector in the trial subspace now has a unique representation <span class="math inline">\(U_1s+U_2T_ks\)</span>. Its tangent of the angle to the target is <span class="math inline">\(\|T_ks\|_2/\|s\|_2\)</span> for <span class="math inline">\(s\ne0\)</span>, by orthogonality. Maximizing gives <span class="math inline">\(\tan\Theta_k=\|T_k\|_2\)</span>. Submultiplicativity (Session 6) and the norms of the diagonal factors give the claim, since <span class="math inline">\(T_0=DC^{-1}\)</span>. This proof also covers complex normal <span class="math inline">\(A\)</span>. For <span class="math inline">\(p=1\)</span>, <span class="math inline">\(T_k\)</span> is a column of unwanted-to-wanted coefficient ratios, precisely the single-vector argument.</p>
+<p>The numerator uses the <strong>strongest unwanted</strong> mode and the denominator the <strong>weakest wanted</strong> mode. Internal ties are harmless if the boundary gap holds. A nearly singular overlap can make the initial angle close to a right angle. Full rank of <span class="math inline">\(X_0\)</span> alone says nothing about that overlap: for <span class="math inline">\(A=\operatorname{diag}(4,2,1)\)</span> the block <span class="math inline">\([e_1,e_3]\)</span> has full rank and stays in the wrong invariant plane forever.</p>
+</section>
+<section id="how-can-we-tell-whether-a-computed-plane-is-good" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="how-can-we-tell-whether-a-computed-plane-is-good"><span class="header-section-number">10.6</span> How can we tell whether a computed plane is good?</h2>
+<p>For an orthonormal basis <span class="math inline">\(Q_k\)</span>, the projector is <span class="math inline">\(P_k=Q_kQ_k^*\)</span>. Replacing <span class="math inline">\(Q_k\)</span> by <span class="math inline">\(Q_kW\)</span> for unitary <span class="math inline">\(W\)</span> leaves <span class="math inline">\(P_k\)</span> unchanged. Even <span class="math inline">\(-Q_k\)</span> represents exactly the same plane while <span class="math inline">\(\|Q_k-(-Q_k)\|_2=2\)</span>. For equal-dimensional spaces the spectral norm of the difference of their orthogonal projectors equals the sine of their largest principal angle. Thus <span class="math inline">\(\|P_k-U_1U_1^*\|_2=\sin\Theta_k\)</span> when the target is known. Without it, <span class="math inline">\(\|P_{k+1}-P_k\|_2\)</span> measures movement. A wrong invariant plane can be motionless, and a small boundary gap can make progress slow.</p>
+<p>A complementary test uses only a product and a small matrix: <span class="math display">\[
+H_k=Q_k^*AQ_k,\qquad F_k=AQ_k-Q_kH_k=(I-P_k)AQ_k.
+\]</span> Here <span class="math inline">\(F_k\)</span> denotes the <strong>invariance residual</strong>, reserving <span class="math inline">\(R_k\)</span> for the triangular QR factor. The columns of <span class="math inline">\(H_k\)</span> give the coordinates of the projected images of the basis vectors. <span class="math inline">\(F_k\)</span> contains exactly the parts outside the trial space. Hence <span class="math inline">\(F_k=0\)</span> if and only if the space is invariant. Under <span class="math inline">\(Q_k\mapsto Q_kW\)</span>, <span class="math inline">\(F_k\)</span> becomes <span class="math inline">\(F_kW\)</span>, preserving its norm. In practice one can monitor <span class="math inline">\(\|F_k\|_2\)</span> relative to an operator scale alongside the spectral region represented by <span class="math inline">\(H_k\)</span>. Small leakage measures near-invariance and cannot by itself identify which cluster has been found.</p>
+</section>
+<section id="experiment-one-matrix-three-iterations" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="experiment-one-matrix-three-iterations"><span class="header-section-number">10.7</span> Experiment — one matrix, three iterations</h2>
+<p>Use a real symmetric matrix with known eigenvalues <span class="math inline">\(8,2,1,1/2\)</span>. Rotate the eigenbasis into ordinary coordinates so that a small spectral component can be hidden by cancellation. In eigencoordinates take the first starting vector proportional to <span class="math inline">\((1,1,1,0)^T\)</span> and the second block column proportional to <span class="math inline">\((1,-1,-1,0)^T\)</span>. Adding and subtracting the columns isolates the first eigenvector and a mixture of the second and third. Predict the two curves before running the code. The line has tangent <span class="math inline">\(\sqrt{(2/8)^{2k}+(1/8)^{2k}}\)</span>, while the plane has tangent <span class="math inline">\((1/2)^k\)</span>. Its projector distance is therefore <span class="math inline">\(t/\sqrt{1+t^2}\)</span> for <span class="math inline">\(t=(1/2)^k\)</span>.</p>
+<div id="cell-fig-s9-iteration" class="cell" data-fig-height="3.6" data-fig-width="7" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>U <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> np.array([[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                    [<span class="dv">1</span>, <span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> (U <span class="op">*</span> [<span class="fl">8.</span>, <span class="fl">2.</span>, <span class="fl">1.</span>, <span class="fl">0.5</span>]) <span class="op">@</span> U.T</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> U <span class="op">@</span> np.array([[<span class="fl">1.</span>, <span class="fl">1.</span>], [<span class="fl">1.</span>, <span class="op">-</span><span class="fl">1.</span>], [<span class="fl">1.</span>, <span class="op">-</span><span class="fl">1.</span>], [<span class="fl">0.</span>, <span class="fl">0.</span>]])</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Q <span class="op">=</span> np.linalg.qr(X, mode<span class="op">=</span><span class="st">"reduced"</span>)[<span class="dv">0</span>]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> X[:, <span class="dv">0</span>] <span class="op">/</span> np.linalg.norm(X[:, <span class="dv">0</span>])</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> U[:, :<span class="dv">2</span>] <span class="op">@</span> U[:, :<span class="dv">2</span>].T</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> np.finfo(<span class="bu">float</span>).eps</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resolved(s, shape):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> s[<span class="op">-</span><span class="dv">1</span>] <span class="op">&gt;</span> <span class="bu">max</span>(shape) <span class="op">*</span> eps <span class="op">*</span> s[<span class="dv">0</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plane_error(basis):</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.norm(basis <span class="op">@</span> basis.T <span class="op">-</span> target, <span class="bu">ord</span><span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>steps <span class="op">=</span> np.arange(<span class="dv">37</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>line, raw, orth, cond, defect <span class="op">=</span> [], [], [], [], []</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> steps:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> U.T <span class="op">@</span> v</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    line.append(np.linalg.norm(a[<span class="dv">1</span>:]) <span class="op">/</span> <span class="bu">abs</span>(a[<span class="dv">0</span>]))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    left, s, _ <span class="op">=</span> np.linalg.svd(X, full_matrices<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    ok <span class="op">=</span> resolved(s, X.shape)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    raw.append(plane_error(left) <span class="cf">if</span> ok <span class="cf">else</span> np.nan)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    cond.append(s[<span class="dv">0</span>] <span class="op">/</span> s[<span class="op">-</span><span class="dv">1</span>] <span class="cf">if</span> s[<span class="op">-</span><span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.inf)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    orth.append(plane_error(Q))</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    defect.append(np.linalg.norm(Q.T <span class="op">@</span> Q <span class="op">-</span> np.eye(<span class="dv">2</span>), <span class="bu">ord</span><span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> k <span class="op">==</span> steps[<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> A <span class="op">@</span> v</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    length <span class="op">=</span> np.linalg.norm(w)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> length <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> <span class="kw">not</span> np.isfinite(length):</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ArithmeticError</span>(<span class="st">"Power product cannot be normalized"</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    v <span class="op">=</span> w <span class="op">/</span> length</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> A <span class="op">@</span> X</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> A <span class="op">@</span> Q</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> resolved(np.linalg.svd(Y, compute_uv<span class="op">=</span><span class="va">False</span>), Y.shape):</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ArithmeticError</span>(<span class="st">"QR input has lost numerical rank"</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    Q <span class="op">=</span> np.linalg.qr(Y, mode<span class="op">=</span><span class="st">"reduced"</span>)[<span class="dv">0</span>]</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>fig, (ax, bx) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.6</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                             constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Exact zeros cannot be plotted on logarithmic axes.</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> positive(values):</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> np.asarray(values, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.where((values <span class="op">&gt;</span> <span class="dv">0</span>) <span class="op">&amp;</span> np.isfinite(values), values, np.nan)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">0.5</span> <span class="op">**</span> steps</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>ax.semilogy(steps, positive(line), <span class="st">"C0.-"</span>, label<span class="op">=</span><span class="st">"Power tangent"</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>ax.semilogy(steps, positive(raw), <span class="st">"C3x"</span>, label<span class="op">=</span><span class="st">"Raw plane"</span>)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>ax.semilogy(steps, orth, <span class="st">"C2-"</span>, label<span class="op">=</span><span class="st">"QR plane"</span>)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>ax.semilogy(steps, t <span class="op">/</span> np.hypot(<span class="dv">1</span>, t), <span class="st">"k:"</span>, label<span class="op">=</span><span class="st">"Exact plane"</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>bx.semilogy(steps, positive(cond), <span class="st">"C3.-"</span>, label<span class="op">=</span><span class="st">"Raw condition number"</span>)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>bx.semilogy(steps, positive(defect), <span class="st">"C2."</span>, label<span class="op">=</span><span class="st">"QR orthogonality error"</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>bx.axhline(eps, color<span class="op">=</span><span class="st">"0.4"</span>, ls<span class="op">=</span><span class="st">":"</span>, label<span class="op">=</span><span class="st">"Machine epsilon"</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> axis, ylabel <span class="kw">in</span> [(ax, <span class="st">"Angle or projector error"</span>), (bx, <span class="st">"Basis diagnostic"</span>)]:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    axis.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Iteration"</span>, ylabel<span class="op">=</span>ylabel)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    axis.grid(<span class="va">True</span>, which<span class="op">=</span><span class="st">"major"</span>, alpha<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    axis.legend(fontsize<span class="op">=</span><span class="dv">7</span>)</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-s9-iteration" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-s9-iteration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="09_power_subspace_iteration_files/figure-html/fig-s9-iteration-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-s9-iteration-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.1: Direction and plane errors (left), and basis quality (right). The raw plane is plotted only while its second singular direction passes the numerical rank test.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Reading the curves.</strong> The line initially contracts faster than the plane because its slowest relative weight is <span class="math inline">\(1/4\)</span> versus <span class="math inline">\(1/2\)</span> for the plane. Once components reach rounding scale the exact-arithmetic rates cease to predict further measured improvement. The QR plane follows the predicted curve even as the raw columns become difficult to distinguish. Here the raw dominant singular value grows relative to the second roughly as <span class="math inline">\(4^k\)</span>. Before the threshold is reached, the raw-plane error turns upward: the weaker direction is already sensitive to rounding. In a binary64 run the raw block last passed the test at step 24, while at step 36 the QR projector error was about <span class="math inline">\(1.46\times10^{-11}\)</span>, in agreement with <span class="math inline">\(2^{-36}\)</span>. The precise rank-loss step can vary with the numerical libraries. Computing a second orthogonal vector from a numerical completion at that point would give a misleading plane comparison. The right panel measures two different properties: the sensitivity of the raw basis and the deviation of the QR Gram matrix from identity. Exact zeros are omitted on logarithmic axes. Explicit projectors and diagnostic SVDs are affordable for this four-row experiment.</p>
+</section>
+<section id="central-synthesis-from-spectral-amplification-to-invariant-subspace-computation" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="central-synthesis-from-spectral-amplification-to-invariant-subspace-computation"><span class="header-section-number">10.8</span> Central Synthesis — From Spectral Amplification to Invariant Subspace Computation</h2>
+<p>For one vector, spectral decomposition turns a product into independent scalar multiplications. Repetition raises each weight to the <span class="math inline">\(k\)</span>th power, so ratios select a line. For a block, every column undergoes the same weighting. Provided the wanted projections span their target, the graph <span class="math inline">\(T_k\)</span> measures the largest surviving unwanted component per unit wanted component. The boundary ratio controls the decay of this graph. It says nothing about how nearly parallel the raw columns may have become along the way.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Task</th>
+<th>Operation</th>
+<th>What it accomplishes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Select components</td>
+<td>Apply <span class="math inline">\(A\)</span>, or <span class="math inline">\(p_m(A)\)</span></td>
+<td>Weight an eigenvector by <span class="math inline">\(\lambda_i\)</span>, or by <span class="math inline">\(p_m(\lambda_i)\)</span>.</td>
+</tr>
+<tr class="even">
+<td>Approximate a space</td>
+<td>Iterate the image of a block</td>
+<td>Reduce the tilt of the trial space toward unwanted directions.</td>
+</tr>
+<tr class="odd">
+<td>Represent the space</td>
+<td>Compute reduced QR after each product</td>
+<td>Preserve the full-rank image with orthonormal coordinates.</td>
+</tr>
+<tr class="even">
+<td>Extract eigenpairs</td>
+<td>Compress to <span class="math inline">\(Q^*AQ\)</span> and solve the small eigenproblem</td>
+<td>Choose directions <em>within</em> the computed space and lift them with <span class="math inline">\(Q\)</span>.</td>
+</tr>
+</tbody>
+</table>
+<p>In the seminar algorithm the update changes from <span class="math inline">\(Y=AQ\)</span> to <span class="math inline">\(Y=p_m(A)Q\)</span>. From <span class="math inline">\(A^jq_i=\lambda_i^jq_i\)</span>, linearity gives <span class="math inline">\(p_m(A)q_i=p_m(\lambda_i)q_i\)</span>. For a Hermitian matrix, the same block proof applies with the per-sweep factor <span class="math display">\[
+\frac{\max_{i\ \mathrm{unwanted}}|p_m(\lambda_i)|}
+     {\min_{i\ \mathrm{wanted}}|p_m(\lambda_i)|}.
+\]</span> The denominator must be positive, the ratio strictly below one, and the initial wanted overlap invertible. This can select a spectral region whose original eigenvalues are small in magnitude. QR after filtering preserves the computed full-rank image and keeps its directions resolved for the next sweep. Session 10 develops interval scaling, Chebyshev polynomials and their recurrence for applying the filter. Session 11 develops Rayleigh–Ritz extraction, residual orthogonality and their place in the complete iteration.</p>
+<p><strong>Reading connections.</strong> The course book’s §§1.3, 1.3.3 and 1.4.4 locate this session at the start of Week 3. Kanschat and Scheichl, <em>Numerical Linear Algebra</em>, §§3.3.1–3.3.2 give the vector and orthogonal iterations (Algorithms 3.3.3 and 3.3.20). Their §5.1, especially Algorithm 5.1.10, leads to the projected problem. For supporting definitions see Scheichl and Zech, §3.2 on symmetric matrices and the spectral norm, and Bastian, §5.3 on eigenvalues and eigenvectors.</p>
+</section>
+<section id="exercises" class="level2" data-number="10.9">
+<h2 data-number="10.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">10.9</span> Exercises</h2>
+<ol type="1">
+<li><strong>Compute a line (4 min).</strong> For <span class="math inline">\(A=\begin{pmatrix}1&amp;2\\2&amp;1\end{pmatrix}\)</span> start at <span class="math inline">\(e_1\)</span>. Decompose it in an orthonormal eigenbasis. Compute the first two normalized iterates, their angular tangents to the dominant line, and the Rayleigh quotient after the second step.</li>
+<li><strong>Prove a rate (5 min).</strong> For Hermitian <span class="math inline">\(A\)</span> with a strict first magnitude gap and <span class="math inline">\(c_1\ne0\)</span>, derive the tangent bound from <span class="math inline">\(A^kv^{(0)}\)</span>. When is it an equality for every <span class="math inline">\(k\)</span>? Compare spectra <span class="math inline">\((5,4)\)</span> and <span class="math inline">\((101,100)\)</span> for equal starting angles.</li>
+<li><strong>Diagnose selection (4 min).</strong> For <span class="math inline">\(A=\operatorname{diag}(-5,5,2)\)</span> describe the normalized vectors and lines from <span class="math inline">\(e_1\)</span>, <span class="math inline">\((e_1+e_2)/\sqrt2\)</span>, and <span class="math inline">\(e_3\)</span>. Identify the dominant plane and its block convergence factor. Which starts give an exact eigenpair residual of zero immediately?</li>
+<li><strong>A misleading basis (4 min).</strong> For the block <span class="math inline">\([8^ke_1+2^ke_2,8^ke_1-2^ke_2]\)</span> find an orthonormal basis for its range and its orthogonal projector. Explain the consequence of perturbations of relative size <span class="math inline">\(4^{-k}\)</span>. If a QR routine returns the two orthonormal columns in reverse order at the next step, what do the projector change and invariance residual report for <span class="math inline">\(A=\operatorname{diag}(8,2,1)\)</span>?</li>
+<li><strong>Track a plane (8 min).</strong> Let <span class="math inline">\(A=\operatorname{diag}(6,3,1)\)</span>. Identify the dominant plane and choose an orthonormal starting block containing <span class="math inline">\(e_1\)</span> whose other column is equally inclined to <span class="math inline">\(e_2\)</span> and <span class="math inline">\(e_3\)</span> in their plane. Take one product, compute a reduced QR, verify the initial overlap condition, and find the initial and updated projector distances to the target. Predict the distance after <span class="math inline">\(k\)</span> steps. Would <span class="math inline">\([e_1,e_3]\)</span> work?</li>
+<li><strong>Redirect the iteration (4 min).</strong> For the same spectrum <span class="math inline">\((6,3,1)\)</span> seek the plane for eigenvalues <span class="math inline">\(3,1\)</span>. Compare ordinary iteration with the filter <span class="math inline">\(p(t)=7-t\)</span>. Determine the filtered convergence factor under suitable initial overlap. Explain what QR and the later projected eigenproblem each contribute.</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="10.10">
+<h2 data-number="10.10" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">10.10</span> Worked solutions</h2>
+<p><strong>1.</strong> The sum and difference directions <span class="math inline">\(q_+=(1,1)^T/\sqrt2\)</span> and <span class="math inline">\(q_-=(1,-1)^T/\sqrt2\)</span> have eigenvalues <span class="math inline">\(3,-1\)</span>. The start is <span class="math inline">\((q_++q_-)/\sqrt2\)</span>. The first product is <span class="math inline">\((1,2)^T\)</span> and its normalization divides by <span class="math inline">\(\sqrt5\)</span>. The next product is <span class="math inline">\((5,4)^T/\sqrt5\)</span>, giving <span class="math inline">\((5,4)^T/\sqrt{41}\)</span>. The ratios <span class="math inline">\(|x-y|/|x+y|\)</span> are <span class="math inline">\(1/3\)</span> and <span class="math inline">\(1/9\)</span>. The unwanted coefficient alternates in sign. The second quotient is <span class="math inline">\((5,4)(13,14)^T/41=121/41\)</span>.</p>
+<p><strong>2.</strong> Project <span class="math inline">\(\sum_i c_i\lambda_i^kq_i\)</span> onto <span class="math inline">\(q_1\)</span> and its complement. Orthogonality gives squared lengths <span class="math inline">\(|c_1\lambda_1^k|^2\)</span> and <span class="math inline">\(\sum_{i&gt;1}|c_i\lambda_i^k|^2\)</span>. Divide the latter by the former and take the square root. Bounding each unwanted weight by <span class="math inline">\(|\lambda_2/\lambda_1|^k\)</span> gives the claim. Equality for every <span class="math inline">\(k\)</span> holds precisely when each nonzero unwanted coefficient has <span class="math inline">\(|\lambda_i|=|\lambda_2|\)</span> (including the case of no unwanted coefficient). The absolute gaps both equal one. The tangent contracts by <span class="math inline">\(4/5\)</span> in the first two-mode problem and <span class="math inline">\(100/101\)</span> in the second, so the first is faster for a nonzero finite starting tangent.</p>
+<p><strong>3.</strong> From <span class="math inline">\(e_1\)</span> the vectors are <span class="math inline">\((-1)^ke_1\)</span> and the line is fixed. From the mixed vector they are <span class="math inline">\(((-1)^ke_1+e_2)/\sqrt2\)</span> and the two lines alternate. From <span class="math inline">\(e_3\)</span> both vector and line are fixed. The first and third starts have zero residual, although the third selects the smallest magnitude. The dominant plane is <span class="math inline">\(\operatorname{span}(e_1,e_2)\)</span>, with a boundary ratio <span class="math inline">\(2/5\)</span> for a two-column start with invertible wanted projection.</p>
+<p><strong>4.</strong> The sum and difference of the columns give multiples of <span class="math inline">\(e_1,e_2\)</span>. These unit vectors form an orthonormal basis and the projector is <span class="math inline">\(\operatorname{diag}(1,1,0)\)</span> at every step. Because the smaller singular value is <span class="math inline">\(4^{-k}\)</span> times the larger, a relative perturbation of that size in spectral norm can erase the smaller singular direction entirely. Column normalization cannot change the angle. Swapping the basis order preserves the projector, so its change is zero. The residual is also zero since both images remain in the plane. Individual columns can change by a large amount even with these two quantities exactly zero.</p>
+<p><strong>5.</strong> The wanted plane is <span class="math inline">\(\operatorname{span}(e_1,e_2)\)</span>. Use <span class="math inline">\(Q_0=[e_1,(e_2+e_3)/\sqrt2]\)</span>. The wanted projection in target coordinates is <span class="math inline">\(\operatorname{diag}(1,1/\sqrt2)\)</span>, which is invertible. The product columns <span class="math inline">\(6e_1\)</span> and <span class="math inline">\((3e_2+e_3)/\sqrt2\)</span> are orthogonal. Dividing by their lengths gives <span class="math display">\[
+Q_1=[e_1,(3e_2+e_3)/\sqrt{10}],\qquad
+R_1=\operatorname{diag}(6,\sqrt5).
+\]</span> The Gram matrix of <span class="math inline">\(Q_1\)</span> is <span class="math inline">\(I_2\)</span>. One principal angle stays zero because the planes share <span class="math inline">\(e_1\)</span>. The other’s sine falls from <span class="math inline">\(1/\sqrt2\)</span> to <span class="math inline">\(1/\sqrt{10}\)</span>, the out-of-plane component of the unit second column. These are the projector distances. After <span class="math inline">\(k\)</span> steps the second direction is proportional to <span class="math inline">\(3^ke_2+e_3\)</span>, so the distance is <span class="math inline">\(1/\sqrt{3^{2k}+1}\)</span>. It is the tangent that contracts exactly by <span class="math inline">\(1/3\)</span> each step. With <span class="math inline">\([e_1,e_3]\)</span> the projected block has rank one and the iteration remains in that starting plane.</p>
+<p><strong>6.</strong> Ordinary iteration generally favors <span class="math inline">\(6\)</span> and <span class="math inline">\(3\)</span> when their projected block has full rank. The filter assigns values <span class="math inline">\(1,4,6\)</span> to <span class="math inline">\(6,3,1\)</span>, respectively. The weakest wanted weight is <span class="math inline">\(4\)</span>, the unwanted weight <span class="math inline">\(1\)</span>, and the block factor is <span class="math inline">\(1/4\)</span>. The required overlap is full rank on the plane for <span class="math inline">\(3,1\)</span>. QR gives an orthonormal basis for the filtered image. The later eigensolve on <span class="math inline">\(Q^*AQ\)</span> resolves approximate eigenpairs of the original <span class="math inline">\(A\)</span> within this space.</p>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="10.11">
+<h2 data-number="10.11" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">10.11</span> End-of-session mastery checklist</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Expand a start in eigencoordinates, derive the normalized power iteration and its tangent bound, and state the gap, overlap and nonbreakdown assumptions.</label></li>
+<li><label><input type="checkbox">Explain the difference between a magnitude gap and a convergence factor, and predict the effects of a negative, phase-rotating or tied dominant eigenvalue on a vector and its line.</label></li>
+<li><label><input type="checkbox">Compute a Rayleigh quotient and residual, and explain what each can establish about an approximate eigenpair.</label></li>
+<li><label><input type="checkbox">Define invariance, give an example, and derive the block update from repeated image spaces.</label></li>
+<li><label><input type="checkbox">Identify the boundary gap and full-rank overlap; derive the graph bound using the strongest unwanted and weakest wanted weights.</label></li>
+<li><label><input type="checkbox">Derive the QR update, prove full-rank span preservation, and explain numerical rank loss using two nearly parallel unit columns.</label></li>
+<li><label><input type="checkbox">Compare subspaces with projectors and assess invariance with a residual even when basis vectors rotate.</label></li>
+<li><label><input type="checkbox">Predict how polynomial weights redirect or accelerate selection, and distinguish the roles of filtering, orthonormalization and eigenpair extraction.</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/08_basic_iterative_methods.html" class="pagination-link" aria-label="Session 8 — Basic Iterative Methods">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="pagination-link" aria-label="Session 10 — Matrix Polynomials and Chebyshev Filtering">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>23&nbsp; Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review_2/f2.html" rel="next">
+<link href="../review_3/e03.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_2/f1.html"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#session-1-what-is-a-limit-of-vectors" id="toc-session-1-what-is-a-limit-of-vectors" class="nav-link active" data-scroll-target="#session-1-what-is-a-limit-of-vectors"><span class="header-section-number">23.1</span> Session 1 — What is a limit of vectors?</a>
+  <ul class="collapse">
+  <li><a href="#distance-adds-structure-to-a-vector-space" id="toc-distance-adds-structure-to-a-vector-space" class="nav-link" data-scroll-target="#distance-adds-structure-to-a-vector-space">Distance adds structure to a vector space</a></li>
+  <li><a href="#why-the-choice-of-norm-used-to-be-harmless" id="toc-why-the-choice-of-norm-used-to-be-harmless" class="nav-link" data-scroll-target="#why-the-choice-of-norm-used-to-be-harmless">Why the choice of norm used to be harmless</a></li>
+  <li><a href="#a-dictionary-of-spaces" id="toc-a-dictionary-of-spaces" class="nav-link" data-scroll-target="#a-dictionary-of-spaces">A dictionary of spaces</a></li>
+  <li><a href="#completing-an-unfinished-space" id="toc-completing-an-unfinished-space" class="nav-link" data-scroll-target="#completing-an-unfinished-space">Completing an unfinished space</a></li>
+  </ul></li>
+  <li><a href="#session-2-which-measurements-survive-approximation" id="toc-session-2-which-measurements-survive-approximation" class="nav-link" data-scroll-target="#session-2-which-measurements-survive-approximation"><span class="header-section-number">23.2</span> Session 2 — Which measurements survive approximation?</a>
+  <ul class="collapse">
+  <li><a href="#a-global-bound-from-continuity-at-one-point" id="toc-a-global-bound-from-continuity-at-one-point" class="nav-link" data-scroll-target="#a-global-bound-from-continuity-at-one-point">A global bound from continuity at one point</a></li>
+  <li><a href="#two-notions-of-duality" id="toc-two-notions-of-duality" class="nav-link" data-scroll-target="#two-notions-of-duality">Two notions of duality</a></li>
+  <li><a href="#quotients-and-annihilators-revisited" id="toc-quotients-and-annihilators-revisited" class="nav-link" data-scroll-target="#quotients-and-annihilators-revisited">Quotients and annihilators revisited</a></li>
+  </ul></li>
+  <li><a href="#session-3-geometry-that-survives-an-infinite-sum" id="toc-session-3-geometry-that-survives-an-infinite-sum" class="nav-link" data-scroll-target="#session-3-geometry-that-survives-an-infinite-sum"><span class="header-section-number">23.3</span> Session 3 — Geometry that survives an infinite sum</a>
+  <ul class="collapse">
+  <li><a href="#existence-of-a-nearest-vector" id="toc-existence-of-a-nearest-vector" class="nav-link" data-scroll-target="#existence-of-a-nearest-vector">Existence of a nearest vector</a></li>
+  <li><a href="#orthonormal-coordinates-and-their-limits" id="toc-orthonormal-coordinates-and-their-limits" class="nav-link" data-scroll-target="#orthonormal-coordinates-and-their-limits">Orthonormal coordinates and their limits</a></li>
+  <li><a href="#the-representing-vector-and-weak-convergence" id="toc-the-representing-vector-and-weak-convergence" class="nav-link" data-scroll-target="#the-representing-vector-and-weak-convergence">The representing vector and weak convergence</a></li>
+  </ul></li>
+  <li><a href="#session-4-solvability-adjoints-and-the-missing-closure" id="toc-session-4-solvability-adjoints-and-the-missing-closure" class="nav-link" data-scroll-target="#session-4-solvability-adjoints-and-the-missing-closure"><span class="header-section-number">23.4</span> Session 4 — Solvability, adjoints and the missing closure</a>
+  <ul class="collapse">
+  <li><a href="#compatibility-and-stability-ask-different-questions" id="toc-compatibility-and-stability-ask-different-questions" class="nav-link" data-scroll-target="#compatibility-and-stability-ask-different-questions">Compatibility and stability ask different questions</a></li>
+  </ul></li>
+  <li><a href="#session-5-from-eigenvalues-to-spectra" id="toc-session-5-from-eigenvalues-to-spectra" class="nav-link" data-scroll-target="#session-5-from-eigenvalues-to-spectra"><span class="header-section-number">23.5</span> Session 5 — From eigenvalues to spectra</a>
+  <ul class="collapse">
+  <li><a href="#compactness-as-uniform-finite-dimensional-approximation" id="toc-compactness-as-uniform-finite-dimensional-approximation" class="nav-link" data-scroll-target="#compactness-as-uniform-finite-dimensional-approximation">Compactness as uniform finite-dimensional approximation</a></li>
+  <li><a href="#an-inverse-based-definition-of-spectrum" id="toc-an-inverse-based-definition-of-spectrum" class="nav-link" data-scroll-target="#an-inverse-based-definition-of-spectrum">An inverse-based definition of spectrum</a></li>
+  <li><a href="#what-additional-structure-restores-eigenvectors" id="toc-what-additional-structure-restores-eigenvectors" class="nav-link" data-scroll-target="#what-additional-structure-restores-eigenvectors">What additional structure restores eigenvectors?</a></li>
+  </ul></li>
+  <li><a href="#session-6-solving-an-equation-by-testing-it" id="toc-session-6-solving-an-equation-by-testing-it" class="nav-link" data-scroll-target="#session-6-solving-an-equation-by-testing-it"><span class="header-section-number">23.6</span> Session 6 — Solving an equation by testing it</a>
+  <ul class="collapse">
+  <li><a href="#from-infinitely-many-probes-to-a-linear-system" id="toc-from-infinitely-many-probes-to-a-linear-system" class="nav-link" data-scroll-target="#from-infinitely-many-probes-to-a-linear-system">From infinitely many probes to a linear system</a></li>
+  </ul></li>
+  <li><a href="#session-7-which-space-should-a-differential-equation-live-in" id="toc-session-7-which-space-should-a-differential-equation-live-in" class="nav-link" data-scroll-target="#session-7-which-space-should-a-differential-equation-live-in"><span class="header-section-number">23.7</span> Session 7 — Which space should a differential equation live in?</a>
+  <ul class="collapse">
+  <li><a href="#one-derivative-in-the-weak-sense" id="toc-one-derivative-in-the-weak-sense" class="nav-link" data-scroll-target="#one-derivative-in-the-weak-sense">One derivative in the weak sense</a></li>
+  <li><a href="#one-boundary-value-problem-two-operators" id="toc-one-boundary-value-problem-two-operators" class="nav-link" data-scroll-target="#one-boundary-value-problem-two-operators">One boundary-value problem, two operators</a></li>
+  <li><a href="#assembly-on-an-interval" id="toc-assembly-on-an-interval" class="nav-link" data-scroll-target="#assembly-on-an-interval">Assembly on an interval</a></li>
+  </ul></li>
+  <li><a href="#session-8-from-a-compact-inverse-to-computed-eigenpairs" id="toc-session-8-from-a-compact-inverse-to-computed-eigenpairs" class="nav-link" data-scroll-target="#session-8-from-a-compact-inverse-to-computed-eigenpairs"><span class="header-section-number">23.8</span> Session 8 — From a compact inverse to computed eigenpairs</a>
+  <ul class="collapse">
+  <li><a href="#the-variational-characterization-and-its-discretization" id="toc-the-variational-characterization-and-its-discretization" class="nav-link" data-scroll-target="#the-variational-characterization-and-its-discretization">The variational characterization and its discretization</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">23.9</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions">Worked solutions</a></li>
+  </ul></li>
+  <li><a href="#computational-laboratory-what-does-refinement-actually-measure" id="toc-computational-laboratory-what-does-refinement-actually-measure" class="nav-link" data-scroll-target="#computational-laboratory-what-does-refinement-actually-measure"><span class="header-section-number">23.10</span> Computational laboratory — What does refinement actually measure?</a>
+  <ul class="collapse">
+  <li><a href="#experiment-1-a-tail-a-unit-ball-and-amplified-noise" id="toc-experiment-1-a-tail-a-unit-ball-and-amplified-noise" class="nav-link" data-scroll-target="#experiment-1-a-tail-a-unit-ball-and-amplified-noise">Experiment 1 — A tail, a unit ball and amplified noise</a></li>
+  <li><a href="#experiment-2-a-galerkin-solution-with-zero-nodal-error" id="toc-experiment-2-a-galerkin-solution-with-zero-nodal-error" class="nav-link" data-scroll-target="#experiment-2-a-galerkin-solution-with-zero-nodal-error">Experiment 2 — A Galerkin solution with zero nodal error</a></li>
+  <li><a href="#experiment-3-eigenvalue-convergence-and-solver-residual" id="toc-experiment-3-eigenvalue-convergence-and-solver-residual" class="nav-link" data-scroll-target="#experiment-3-eigenvalue-convergence-and-solver-residual">Experiment 3 — Eigenvalue convergence and solver residual</a></li>
+  </ul></li>
+  <li><a href="#synthesis-what-did-the-topology-change" id="toc-synthesis-what-did-the-topology-change" class="nav-link" data-scroll-target="#synthesis-what-did-the-topology-change"><span class="header-section-number">23.11</span> Synthesis — What did the topology change?</a>
+  <ul class="collapse">
+  <li><a href="#theorem-map" id="toc-theorem-map" class="nav-link" data-scroll-target="#theorem-map">Theorem map</a></li>
+  <li><a href="#mastery-assessment" id="toc-mastery-assessment" class="nav-link" data-scroll-target="#mastery-assessment">Mastery assessment</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_2/f1.html"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-module-f1" class="quarto-section-identifier"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A matrix can be injective and still amplify errors enormously when inverted. Now imagine a sequence of unit input directions whose outputs tend to zero. Each direction remains distinguishable in exact arithmetic, yet no single stability constant controls inversion. In an infinite-dimensional space a <em>single operator</em> can exhibit this behavior. Understanding how it happens will take us from linear algebra to inverse problems, and ultimately to the numerical spectrum of a differential equation.</p>
+<p><strong>Starting point.</strong> Review II, §4.16 connects kernels, quotients and uniqueness. Section 5.11.3 interprets a load as a functional on test functions. Module C supplies the geometry of representing vectors and adjoints. Sections 7.11.5–6 arrive at the stiffness–mass eigenproblem. Here we recover those constructions with precise hypotheses on the underlying function spaces. F1 and F2 are parallel extensions of the core modules. The numerical connections to Module E can be read along the way.</p>
+<p><strong>Conventions.</strong> Scalars are real or complex. As in Module C, <span class="math inline">\(\langle x,y\rangle\)</span> is linear in <span class="math inline">\(x\)</span>. Functionals in <span class="math inline">\(X^*\)</span> are linear. Write <span class="math inline">\(T'\)</span> for the continuous dual map (Module B’s pullback) and <span class="math inline">\(T^*\)</span> for the Hilbert adjoint. Sessions 6–8 use real spaces for the PDE examples.</p>
+<section id="session-1-what-is-a-limit-of-vectors" class="level2" data-number="23.1">
+<h2 data-number="23.1" class="anchored" data-anchor-id="session-1-what-is-a-limit-of-vectors"><span class="header-section-number">23.1</span> Session 1 — What is a limit of vectors?</h2>
+<section id="distance-adds-structure-to-a-vector-space" class="level3">
+<h3 class="anchored" data-anchor-id="distance-adds-structure-to-a-vector-space">Distance adds structure to a vector space</h3>
+<p>A norm assigns <span class="math inline">\(x\)</span> a length <span class="math inline">\(\|x\|\ge0\)</span>, zero exactly at <span class="math inline">\(0\)</span>, with <span class="math inline">\(\|cx\|=|c|\|x\|\)</span> and <span class="math inline">\(\|x+y\|\le\|x\|+\|y\|\)</span>. Translation now preserves distance <span class="math inline">\(d(x,y)=\|x-y\|\)</span>. The open ball <span class="math inline">\(B(x,r)\)</span> consists of points at distance less than <span class="math inline">\(r\)</span>. A set is open if each of its points belongs to a ball contained in the set. These open sets form the <strong>norm topology</strong>. The reverse triangle inequality <span class="math inline">\(|\|x\|-\|y\||\le\|x-y\|\)</span> follows by bounding each norm in terms of the other.</p>
+<p>A sequence converges to <span class="math inline">\(x\)</span> if eventually every term lies in every prescribed ball about <span class="math inline">\(x\)</span>. It is <strong>Cauchy</strong> if for every <span class="math inline">\(\varepsilon&gt;0\)</span>, all pairs of sufficiently late terms have distance less than <span class="math inline">\(\varepsilon\)</span>. Convergence implies Cauchy by inserting the limit into the triangle inequality. Completeness is the converse for every Cauchy sequence in the space. A complete normed space is a <strong>Banach space</strong>.</p>
+<p>The closure <span class="math inline">\(\overline M\)</span> consists of limits in the ambient space of sequences from <span class="math inline">\(M\)</span>. Equivalently every ball about such a point meets <span class="math inline">\(M\)</span> (choose radii <span class="math inline">\(1/n\)</span>). A closed set contains all its limit points. A dense set has closure equal to the whole space. A map <span class="math inline">\(S\)</span> is continuous at <span class="math inline">\(x\)</span> if for each output tolerance <span class="math inline">\(\varepsilon&gt;0\)</span> some input radius <span class="math inline">\(\delta&gt;0\)</span> ensures <span class="math inline">\(d(Sz,Sx)&lt;\varepsilon\)</span> whenever <span class="math inline">\(d(z,x)&lt;\delta\)</span>. Equivalently, <span class="math inline">\(x_n\to x\)</span> implies <span class="math inline">\(Sx_n\to Sx\)</span>; failure of the radius condition gives a counterexample sequence by choosing <span class="math inline">\(\delta=1/n\)</span>.</p>
+</section>
+<section id="why-the-choice-of-norm-used-to-be-harmless" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-choice-of-norm-used-to-be-harmless">Why the choice of norm used to be harmless</h3>
+<p>Two norms are equivalent if <span class="math inline">\(c\|x\|_a\le\|x\|_b\le C\|x\|_a\)</span> for positive constants independent of <span class="math inline">\(x\)</span>. Both identity maps are continuous and the two notions of Cauchy sequence agree.</p>
+<p><strong>Finite-dimensional norm equivalence.</strong> Choose a basis and write <span class="math inline">\(x=\sum x_jb_j\)</span>. For any norm <span class="math inline">\(N\)</span>, Cauchy–Schwarz in the coordinates gives <span class="math inline">\(N(x)\le(\sum N(b_j)^2)^{1/2}|x|_2\)</span>. The reverse triangle inequality now makes <span class="math inline">\(N\)</span> continuous in Euclidean coordinates. On the compact Euclidean unit sphere it attains a strictly positive minimum <span class="math inline">\(m\)</span>. Scaling gives <span class="math inline">\(m|x|_2\le N(x)\)</span>. Comparing each of two norms with <span class="math inline">\(|\cdot|_2\)</span> proves the theorem. Coordinatewise completeness of <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span> then gives completeness in every such norm. Every finite-dimensional subspace of any normed space is closed: a convergent sequence in it is Cauchy there, has an internal limit, and limits are unique. The compact sphere was the decisive ingredient.</p>
+</section>
+<section id="a-dictionary-of-spaces" class="level3">
+<h3 class="anchored" data-anchor-id="a-dictionary-of-spaces">A dictionary of spaces</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Space</th>
+<th>Elements and norm</th>
+<th>Meaning of small error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\ell^p\)</span>, <span class="math inline">\(1\le p&lt;\infty\)</span></td>
+<td>Sequences with <span class="math inline">\(\|x\|_p=(\sum_{j\ge1}|x_j|^p)^{1/p}&lt;\infty\)</span></td>
+<td>Small aggregate error over all coordinates</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\ell^\infty\)</span></td>
+<td>Bounded sequences, <span class="math inline">\(\|x\|_\infty=\sup_j|x_j|\)</span></td>
+<td>Every coordinate accurate to the same tolerance</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(C[a,b]\)</span></td>
+<td>Continuous functions, <span class="math inline">\(\|u\|_\infty=\max|u|\)</span></td>
+<td>Uniform control, including endpoints</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(L^p(a,b)\)</span>, <span class="math inline">\(1\le p&lt;\infty\)</span></td>
+<td>Measurable functions modulo equality almost everywhere, <span class="math inline">\(\|u\|_p=(\int_a^b|u|^p)^{1/p}\)</span></td>
+<td>Integrated error, allowing high narrow peaks</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(L^\infty(a,b)\)</span></td>
+<td>Essentially bounded measurable functions, essential supremum norm</td>
+<td>Uniform bound outside a set of measure zero</td>
+</tr>
+</tbody>
+</table>
+<p>Here length extends to a measure of sets. A null set can be covered by intervals with arbitrarily small total length. “Almost everywhere” permits exceptions on a null set. Measurability ensures that level sets can be measured and the Lebesgue integral defined; it agrees with the usual integral for continuous functions. Changing a function at a single point leaves its integral unchanged. Passing to equivalence classes makes the integral expression a genuine norm. For <span class="math inline">\(1&lt;p&lt;\infty\)</span> the triangle inequality for these norms is Minkowski’s inequality. The table lists Banach spaces. Completeness of general <span class="math inline">\(L^p\)</span> uses integration theory (the Riesz–Fischer completeness theorem); the following sequence-space argument gives its essential mechanism without measure theory.</p>
+<p><strong>Proof for <span class="math inline">\(\ell^p\)</span>, <span class="math inline">\(p&lt;\infty\)</span>.</strong> If <span class="math inline">\(x^{(k)}\)</span> is Cauchy, each coordinate is Cauchy since <span class="math inline">\(|x_j^{(k)}-x_j^{(l)}|\le\|x^{(k)}-x^{(l)}\|_p\)</span>. Call its limit <span class="math inline">\(x_j\)</span>. For <span class="math inline">\(k,l\)</span> sufficiently large, the sum of the first <span class="math inline">\(m\)</span> difference powers is at most <span class="math inline">\(\varepsilon^p\)</span>. First send <span class="math inline">\(l\to\infty\)</span> in that finite sum, then <span class="math inline">\(m\to\infty\)</span>. Thus <span class="math inline">\(\|x-x^{(k)}\|_p\le\varepsilon\)</span>, and <span class="math inline">\(x\in\ell^p\)</span> by addition. For the sup norm take the coordinate limit in the bound for each coordinate and then the supremum. The same uniform Cauchy argument works in <span class="math inline">\(C[a,b]\)</span> because uniform limits preserve continuity: approximate the limit uniformly to <span class="math inline">\(\varepsilon/3\)</span> by one continuous function and use its continuity for the middle term.</p>
+<p><strong>Three convergence tests.</strong> On <span class="math inline">\([0,1]\)</span>, <span class="math inline">\(x^n\)</span> converges pointwise to zero except at <span class="math inline">\(1\)</span>, where it remains one. Its <span class="math inline">\(L^2\)</span> norm is <span class="math inline">\((2n+1)^{-1/2}\)</span>, whereas its uniform norm stays one. Pointwise asks about each fixed point, uniform uses a single index for every point, and norm convergence depends on the specified norm. For pointwise convergence everywhere to zero without uniform convergence, take the triangular hat supported on <span class="math inline">\([0,2/n]\)</span> of height one at <span class="math inline">\(1/n\)</span>. Conversely, growing the height of that hat to <span class="math inline">\(\sqrt n\)</span> keeps its squared integral <span class="math inline">\(2/3\)</span> while it still tends to zero pointwise. In <span class="math inline">\(L^2\)</span> even the phrase “value at <span class="math inline">\(x\)</span>” requires a choice of representative.</p>
+</section>
+<section id="completing-an-unfinished-space" class="level3">
+<h3 class="anchored" data-anchor-id="completing-an-unfinished-space">Completing an unfinished space</h3>
+<p>Let <span class="math inline">\(c_{00}\)</span> consist of finite-support sequences with the <span class="math inline">\(\ell^2\)</span> norm. Truncate <span class="math inline">\(x=(1,1/2,1/3,\dots)\)</span> at index <span class="math inline">\(N\)</span>. The truncations are Cauchy by convergence of <span class="math inline">\(\sum j^{-2}\)</span>, but their only possible coordinatewise limit has infinite support. Every <span class="math inline">\(\ell^2\)</span> sequence is approximated by its truncations, so the completion of <span class="math inline">\(c_{00}\)</span> is <span class="math inline">\(\ell^2\)</span>.</p>
+<p>In general, take Cauchy sequences modulo <span class="math inline">\((x_n)\sim(y_n)\)</span> when <span class="math inline">\(\|x_n-y_n\|\to0\)</span>. Coordinatewise operations and <span class="math inline">\(\|[(x_n)]\|=\lim\|x_n\|\)</span> are well defined by the triangle inequality. Constant sequences embed <span class="math inline">\(X\)</span> isometrically and densely: the constants <span class="math inline">\(x_k\)</span> approach <span class="math inline">\([(x_n)]\)</span> as <span class="math inline">\(k\to\infty\)</span>. For a Cauchy sequence of classes <span class="math inline">\(z_k\)</span>, choose <span class="math inline">\(y_k\in X\)</span> within <span class="math inline">\(1/k\)</span> of <span class="math inline">\(z_k\)</span>. Then <span class="math inline">\((y_k)\)</span> is Cauchy and its class is the limit of <span class="math inline">\(z_k\)</span>. This proves completeness.</p>
+<p><strong>Universal property.</strong> For any bounded linear <span class="math inline">\(T:X\to Y\)</span> with <span class="math inline">\(Y\)</span> Banach there is a unique bounded linear extension to the completion, given by <span class="math inline">\([(x_n)]\mapsto\lim Tx_n\)</span>. Boundedness makes the images Cauchy and equivalent representatives have equal limits. Density forces uniqueness and preserves the norm. This determines the completion up to a unique isometry fixing <span class="math inline">\(X\)</span>. The coordinates used in an example are optional; the extension property identifies the construction.</p>
+<p><strong>Checkpoint.</strong> Find the precise step in the norm-equivalence proof that fails on <span class="math inline">\(\ell^2\)</span>. The unit vectors <span class="math inline">\(e_j\)</span> have pairwise distance <span class="math inline">\(\sqrt2\)</span>, so the unit sphere contains a sequence with no convergent subsequence.</p>
+</section>
+</section>
+<section id="session-2-which-measurements-survive-approximation" class="level2" data-number="23.2">
+<h2 data-number="23.2" class="anchored" data-anchor-id="session-2-which-measurements-survive-approximation"><span class="header-section-number">23.2</span> Session 2 — Which measurements survive approximation?</h2>
+<section id="a-global-bound-from-continuity-at-one-point" class="level3">
+<h3 class="anchored" data-anchor-id="a-global-bound-from-continuity-at-one-point">A global bound from continuity at one point</h3>
+<p>For a linear <span class="math inline">\(T:X\to Y\)</span>, the following are equivalent: continuity, continuity at zero, and existence of <span class="math inline">\(C&lt;\infty\)</span> with <span class="math inline">\(\|Tx\|\le C\|x\|\)</span> for all <span class="math inline">\(x\)</span>. Indeed, continuity at zero supplies <span class="math inline">\(\delta&gt;0\)</span> such that <span class="math inline">\(\|z\|&lt;\delta\)</span> gives <span class="math inline">\(\|Tz\|&lt;1\)</span>. Apply this to <span class="math inline">\(z=\delta x/(2\|x\|)\)</span> for <span class="math inline">\(x\ne0\)</span>. Conversely a bound gives <span class="math inline">\(\|Tx-Ty\|\le C\|x-y\|\)</span>, hence continuity everywhere. The least possible bound is <span class="math display">\[\|T\|=\sup_{\|x\|\le1}\|Tx\|.\]</span> The supremum need not be attained. The diagonal map <span class="math inline">\(e_j\mapsto(1-1/j)e_j\)</span> on <span class="math inline">\(\ell^2\)</span> has norm one; every individual unit vector has strictly smaller image norm.</p>
+<p>Write <span class="math inline">\(\mathcal L(X,Y)\)</span> for the bounded linear maps. Norm submultiplicativity <span class="math inline">\(\|ST\|\le\|S\|\|T\|\)</span> follows by applying the two bounds successively. If <span class="math inline">\(Y\)</span> is Banach, <span class="math inline">\(\mathcal L(X,Y)\)</span> is Banach even when <span class="math inline">\(X\)</span> is incomplete. Indeed a norm-Cauchy sequence <span class="math inline">\(T_n\)</span> has pointwise limits <span class="math inline">\(Tx=\lim T_nx\)</span>, linear by the limit laws. For large <span class="math inline">\(n,m\)</span>, <span class="math inline">\(\|(T_n-T_m)x\|\le\varepsilon\|x\|\)</span>. Passing <span class="math inline">\(m\)</span> to infinity shows both boundedness of <span class="math inline">\(T\)</span> and norm convergence. In particular <span class="math inline">\(X^*=\mathcal L(X,\mathbb F)\)</span> is always Banach.</p>
+</section>
+<section id="two-notions-of-duality" class="level3">
+<h3 class="anchored" data-anchor-id="two-notions-of-duality">Two notions of duality</h3>
+<p>The algebraic dual contains every linear functional. A continuous functional permits reliable passage from approximate inputs to measured outputs. On <span class="math inline">\(C[0,1]\)</span> with the sup norm, <span class="math inline">\(\delta_t(u)=u(t)\)</span> has norm one, as seen from the constant function. With the <span class="math inline">\(L^2\)</span> norm on the same continuous functions, shrinking triangular hats centered at <span class="math inline">\(t\)</span> give arbitrarily small inputs with output one. Evaluation is now discontinuous. Its formula cannot even be defined on all <span class="math inline">\(L^2\)</span> classes by choosing an arbitrary representative. On <span class="math inline">\(c_{00}\)</span> the sum <span class="math inline">\(s(x)=\sum_j x_j\)</span> is algebraically legitimate, but a vector with its first <span class="math inline">\(N\)</span> entries <span class="math inline">\(1/\sqrt N\)</span> has unit norm and <span class="math inline">\(s(x)=\sqrt N\)</span>.</p>
+<p>For bounded <span class="math inline">\(T:X\to Y\)</span>, <span class="math inline">\(T'g=g\circ T\)</span> pulls continuous measurements back from <span class="math inline">\(Y\)</span> to <span class="math inline">\(X\)</span>. It satisfies <span class="math inline">\((ST)'=T'S'\)</span> and <span class="math inline">\(\|T'\|\le\|T\|\)</span>. Its definition uses only composition. An adjoint acting on <em>vectors</em> requires something further in Session 4.</p>
+<p><strong>Hahn–Banach.</strong> Every bounded linear functional <span class="math inline">\(f\)</span> on a subspace <span class="math inline">\(M\)</span> of a real or complex normed space extends to the whole space with exactly the same norm. Neither closedness of <span class="math inline">\(M\)</span> nor completeness of <span class="math inline">\(X\)</span> is required.</p>
+<p><strong>Proof outline with the extension step.</strong> Over <span class="math inline">\(\mathbb R\)</span>, set <span class="math inline">\(p(x)=\|f\|\|x\|\)</span>. To assign the value <span class="math inline">\(c\)</span> at one new vector <span class="math inline">\(z\)</span>, domination by <span class="math inline">\(p\)</span> requires <span class="math display">\[\sup_{m\in M}\{f(m)-p(m-z)\}\le c\le
+\inf_{n\in M}\{p(n+z)-f(n)\}.\]</span> Every lower candidate is below every upper candidate because <span class="math inline">\(f(m+n)\le p(m+n)\le p(m-z)+p(n+z)\)</span>. Choose a <span class="math inline">\(c\)</span> in the interval. Scaling separately for positive and negative coefficients proves <span class="math inline">\(f(m)+tc\le p(m+tz)\)</span>; applying this to the negative vector gives the absolute bound. Order all dominated extensions by inclusion. A chain has an upper bound by taking its union. Zorn’s lemma (a choice principle) yields a maximal extension; the one-vector step forces its domain to be <span class="math inline">\(X\)</span>. In the complex case extend <span class="math inline">\(g=\operatorname{Re}f\)</span> over the underlying real space and set <span class="math inline">\(F(x)=g(x)-i g(ix)\)</span> using the extended <span class="math inline">\(g\)</span>. This is complex linear and extends <span class="math inline">\(f\)</span>. Rotate <span class="math inline">\(x\)</span> by a scalar of modulus one so <span class="math inline">\(F\)</span> is real and nonnegative there; the real bound gives <span class="math inline">\(|F(x)|\le\|f\|\|x\|\)</span>.</p>
+<p>For <span class="math inline">\(x\ne0\)</span> prescribe <span class="math inline">\(f(cx)=c\|x\|\)</span> on its line. Extension gives <span class="math inline">\(\|f\|=1\)</span> and <span class="math inline">\(f(x)=\|x\|\)</span>. Consequently <span class="math inline">\(\|x\|=\sup_{\|f\|\le1}|f(x)|\)</span>. Applying this at each <span class="math inline">\(Tx\)</span> proves <span class="math inline">\(\|T'\|=\|T\|\)</span>. The canonical evaluation map <span class="math inline">\(J:X\to X^{**}\)</span>, <span class="math inline">\(Jx(f)=f(x)\)</span>, is therefore isometric. Surjectivity is a separate property called <strong>reflexivity</strong>. Hilbert spaces have it by Riesz representation. The norming functional and the extension can depend on choices; the map <span class="math inline">\(J\)</span> does not.</p>
+</section>
+<section id="quotients-and-annihilators-revisited" class="level3">
+<h3 class="anchored" data-anchor-id="quotients-and-annihilators-revisited">Quotients and annihilators revisited</h3>
+<p>For a linear subspace <span class="math inline">\(M\)</span>, set <span class="math inline">\(\|x+M\|=\inf_{m\in M}\|x-m\|\)</span>. Changing representatives leaves the infimum unchanged. Scaling and adding near-minimizers proves homogeneity and the triangle inequality. The null classes correspond precisely to <span class="math inline">\(x\in\overline M\)</span>, so one gets a norm precisely when <span class="math inline">\(M\)</span> is closed. If <span class="math inline">\(X\)</span> is Banach and <span class="math inline">\(M\)</span> closed the quotient is Banach: from a Cauchy sequence of classes select a subsequence with successive quotient distances below <span class="math inline">\(2^{-k}\)</span>. Lift each difference to a representative of norm below <span class="math inline">\(2^{1-k}\)</span>. The lifted increments sum in <span class="math inline">\(X\)</span> by completeness, giving a limit class for the subsequence and hence the whole sequence.</p>
+<p>Every bounded <span class="math inline">\(T\)</span> vanishing on <span class="math inline">\(M\)</span> factors uniquely through the quotient by <span class="math inline">\([x]\mapsto Tx\)</span>. Indeed <span class="math inline">\(\|Tx\|\le\|T\|\|x-m\|\)</span> for every <span class="math inline">\(m\)</span>. Taking the infimum gives a factor of the same norm (the quotient map is contractive). Applying this to scalar-valued maps identifies <span class="math inline">\((X/M)^*\)</span> isometrically with the annihilator <span class="math inline">\(M^\circ=\{f\in X^*:f|_M=0\}\)</span> for closed <span class="math inline">\(M\)</span>. For <span class="math inline">\(x\notin M\)</span> the nonzero class <span class="math inline">\([x]\)</span> has a norming functional; pulling it back separates <span class="math inline">\(x\)</span> from <span class="math inline">\(M\)</span>. For a dense proper subspace no continuous functional can separate it from any point. This explains why the analytic counterpart of Module B’s annihilator remembers a closure.</p>
+<p><strong>Checkpoint.</strong> If two bounded maps agree on a dense set, where can they differ? Approximate any input by a sequence from that set and pass to the limit. Why does the argument fail for the summation functional on <span class="math inline">\(c_{00}\)</span> when one tries to extend it to <span class="math inline">\(\ell^2\)</span>?</p>
+</section>
+</section>
+<section id="session-3-geometry-that-survives-an-infinite-sum" class="level2" data-number="23.3">
+<h2 data-number="23.3" class="anchored" data-anchor-id="session-3-geometry-that-survives-an-infinite-sum"><span class="header-section-number">23.3</span> Session 3 — Geometry that survives an infinite sum</h2>
+<p>An inner product is positive definite, conjugate symmetric and linear in its first argument. Minimizing <span class="math inline">\(\|x-ty\|^2\)</span> over scalar <span class="math inline">\(t\)</span> gives <span class="math inline">\(|\langle x,y\rangle|\le\|x\|\|y\|\)</span>, with <span class="math inline">\(\|x\|^2=\langle x,x\rangle\)</span>. A <strong>Hilbert space</strong> is complete for this particular norm. Examples are <span class="math inline">\(\ell^2\)</span> with <span class="math inline">\(\sum x_j\overline{y_j}\)</span> and <span class="math inline">\(L^2\)</span> with <span class="math inline">\(\int u\bar v\)</span>. The parallelogram identity follows by expanding the four inner products. A norm violating that identity cannot arise from any inner product. For instance <span class="math inline">\(\|(1,0)\pm(0,1)\|_1=2\)</span>, which gives <span class="math inline">\(8\)</span> on one side and <span class="math inline">\(4\)</span> on the other.</p>
+<section id="existence-of-a-nearest-vector" class="level3">
+<h3 class="anchored" data-anchor-id="existence-of-a-nearest-vector">Existence of a nearest vector</h3>
+<p><strong>Projection theorem.</strong> For a closed linear subspace <span class="math inline">\(M\)</span> of a Hilbert space <span class="math inline">\(H\)</span>, each <span class="math inline">\(x\in H\)</span> has a unique nearest <span class="math inline">\(p\in M\)</span>. It is characterized by <span class="math inline">\(x-p\in M^\perp\)</span>, where <span class="math inline">\(M^\perp=\{z:\langle z,m\rangle=0\ \forall m\in M\}\)</span>.</p>
+<p><strong>Proof.</strong> Put <span class="math inline">\(d=\inf_{m\in M}\|x-m\|\)</span>. Choose <span class="math inline">\(m_n\in M\)</span> whose distances tend to <span class="math inline">\(d\)</span>. Applying the parallelogram identity to <span class="math inline">\(x-m_n,x-m_k\)</span> gives <span class="math display">\[\|m_n-m_k\|^2=2\|x-m_n\|^2+2\|x-m_k\|^2
+-4\|x-(m_n+m_k)/2\|^2.\]</span> The midpoint lies in <span class="math inline">\(M\)</span>, so the right side is at most the first two terms minus <span class="math inline">\(4d^2\)</span>, tending to zero. Completeness gives a limit, closedness puts it in <span class="math inline">\(M\)</span>, and norm continuity gives distance <span class="math inline">\(d\)</span>. For any nonzero <span class="math inline">\(m\in M\)</span>, subtracting <span class="math inline">\(\langle x-p,m\rangle m/\|m\|^2\)</span> from the residual would shorten it unless that coefficient vanishes. Conversely if <span class="math inline">\(x-p\perp M\)</span>, Pythagoras gives <span class="math inline">\(\|x-q\|^2=\|x-p\|^2+\|p-q\|^2\)</span> for all <span class="math inline">\(q\in M\)</span>. This proves uniqueness as well as optimality.</p>
+<p>Thus <span class="math inline">\(H=M\oplus M^\perp\)</span>. The decomposition is algebraically unique and its coordinate maps are continuous: <span class="math inline">\(P_Mx=p\)</span> is linear by uniqueness and contractive by Pythagoras. For arbitrary <span class="math inline">\(M\)</span>, <span class="math inline">\(M^\perp=(\overline M)^\perp\)</span> by continuity, and applying the decomposition to <span class="math inline">\(\overline M\)</span> gives <span class="math inline">\((M^\perp)^\perp=\overline M\)</span>. For <span class="math inline">\(M=c_{00}\subset\ell^2\)</span>, <span class="math inline">\(M^\perp=0\)</span>; an infinite-support vector has infimum distance zero but no nearest vector in <span class="math inline">\(M\)</span>. An algebraic complement obtained by extending a Hamel basis supplies no such best approximation.</p>
+</section>
+<section id="orthonormal-coordinates-and-their-limits" class="level3">
+<h3 class="anchored" data-anchor-id="orthonormal-coordinates-and-their-limits">Orthonormal coordinates and their limits</h3>
+<p>Let <span class="math inline">\((u_j)\)</span> be orthonormal, meaning <span class="math inline">\(\langle u_i,u_j\rangle=\delta_{ij}\)</span>. For <span class="math inline">\(P_nx=\sum_{j=1}^n\langle x,u_j\rangle u_j\)</span> the residual is orthogonal to each <span class="math inline">\(u_i\)</span>, <span class="math inline">\(i\le n\)</span>. Hence <span class="math display">\[\|x-P_nx\|^2=\|x\|^2-\sum_{j=1}^n|\langle x,u_j\rangle|^2.\]</span> Nonnegativity and passage to the limit prove Bessel’s inequality. Moreover <span class="math inline">\(\|P_mx-P_nx\|^2\)</span> is the corresponding tail sum for <span class="math inline">\(m&gt;n\)</span>. Completeness supplies a limit <span class="math inline">\(p\)</span> in the closed span, and continuity makes <span class="math inline">\(x-p\)</span> orthogonal to every <span class="math inline">\(u_j\)</span>. Thus <span class="math inline">\(p\)</span> is the projection onto the closed span. If that span is <span class="math inline">\(H\)</span>, the system is a <strong>Hilbert basis</strong>, <span class="math inline">\(x=\sum_j\langle x,u_j\rangle u_j\)</span> in norm, and Parseval’s identity equates the full sum of squares to <span class="math inline">\(\|x\|^2\)</span>. The standard vectors form such a basis of <span class="math inline">\(\ell^2\)</span>. A Hamel basis allows each vector a finite expansion; the vector <span class="math inline">\((1/j)\)</span> immediately distinguishes the two concepts. We use countable systems here, as appropriate for the separable spaces in these examples.</p>
+</section>
+<section id="the-representing-vector-and-weak-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="the-representing-vector-and-weak-convergence">The representing vector and weak convergence</h3>
+<p><strong>Riesz representation.</strong> For each <span class="math inline">\(f\in H^*\)</span> there is exactly one <span class="math inline">\(y\in H\)</span> with <span class="math inline">\(f(x)=\langle x,y\rangle\)</span> for all <span class="math inline">\(x\)</span>, and <span class="math inline">\(\|f\|=\|y\|\)</span>.</p>
+<p><strong>Proof.</strong> Take <span class="math inline">\(y=0\)</span> for the zero functional. Otherwise <span class="math inline">\(N=\ker f\)</span> is closed. Choose <span class="math inline">\(w\)</span> with <span class="math inline">\(f(w)=1\)</span> and set <span class="math inline">\(z=w-P_Nw\)</span>. Then <span class="math inline">\(f(z)=1\)</span> and <span class="math inline">\(z\perp N\)</span>. For each <span class="math inline">\(x\)</span>, <span class="math inline">\(x-f(x)z\)</span> lies in <span class="math inline">\(N\)</span>, so <span class="math inline">\(\langle x,z\rangle=f(x)\|z\|^2\)</span>. Set <span class="math inline">\(y=z/\|z\|^2\)</span>. If two vectors represent <span class="math inline">\(f\)</span>, their difference is orthogonal to itself. Cauchy–Schwarz gives the upper norm bound, and evaluation at <span class="math inline">\(y/\|y\|\)</span> attains it. The Riesz map <span class="math inline">\(R_H:y\mapsto\langle\,\cdot\,,y\rangle\)</span> is a conjugate-linear isometric bijection, dependent on the inner product.</p>
+<p>A sequence <span class="math inline">\(x_n\)</span> <strong>converges weakly</strong> to <span class="math inline">\(x\)</span> if <span class="math inline">\(f(x_n)\to f(x)\)</span> for every fixed <span class="math inline">\(f\in X^*\)</span>. Norm convergence implies weak convergence by boundedness. In <span class="math inline">\(\ell^2\)</span>, <span class="math inline">\(e_n\rightharpoonup0\)</span> because <span class="math inline">\(\langle e_n,y\rangle=\bar y_n\to0\)</span> for every <span class="math inline">\(y\in\ell^2\)</span>, yet <span class="math inline">\(\|e_n\|=1\)</span>. The norm formula in Session 2 takes a supremum over measurements. For weak convergence each measurement is fixed <em>before</em> taking the limit; the measurement attaining the norm can change with <span class="math inline">\(n\)</span>. Weak limits can preserve all fixed linear observations while losing energy.</p>
+<p><strong>Checkpoint.</strong> If <span class="math inline">\(x_n\rightharpoonup x\)</span> in a Hilbert space and <span class="math inline">\(\|x_n\|\to\|x\|\)</span>, recover norm convergence by expanding <span class="math inline">\(\|x_n-x\|^2\)</span>. Identify the one weak observation the proof uses.</p>
+</section>
+</section>
+<section id="session-4-solvability-adjoints-and-the-missing-closure" class="level2" data-number="23.4">
+<h2 data-number="23.4" class="anchored" data-anchor-id="session-4-solvability-adjoints-and-the-missing-closure"><span class="header-section-number">23.4</span> Session 4 — Solvability, adjoints and the missing closure</h2>
+<p>For bounded <span class="math inline">\(T:H\to G\)</span>, the functional <span class="math inline">\(x\mapsto\langle Tx,y\rangle\)</span> has norm at most <span class="math inline">\(\|T\|\|y\|\)</span>. Riesz supplies a unique vector <span class="math inline">\(T^*y\)</span> satisfying <span class="math inline">\(\langle Tx,y\rangle=\langle x,T^*y\rangle\)</span>. Uniqueness and the inner-product convention give linearity in <span class="math inline">\(y\)</span> and <span class="math inline">\(\|T^*\|\le\|T\|\)</span>. Conjugate symmetry yields <span class="math inline">\(T^{**}=T\)</span> here for the iterated Hilbert adjoint, hence equality of norms. In the notation of Session 2, <span class="math inline">\(T^*=R_H^{-1}T'R_G\)</span>. This identity explains how a pullback of measurements becomes a map between vectors.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operator on <span class="math inline">\(H\)</span></th>
+<th>Definition</th>
+<th>Geometric consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Self-adjoint</td>
+<td><span class="math inline">\(T=T^*\)</span></td>
+<td><span class="math inline">\(\langle Tx,x\rangle\)</span> is real</td>
+</tr>
+<tr class="even">
+<td>Positive</td>
+<td>Self-adjoint with <span class="math inline">\(\langle Tx,x\rangle\ge0\)</span></td>
+<td>Measures a nonnegative quadratic energy</td>
+</tr>
+<tr class="odd">
+<td>Normal</td>
+<td><span class="math inline">\(TT^*=T^*T\)</span></td>
+<td><span class="math inline">\(\|Tx\|=\|T^*x\|\)</span></td>
+</tr>
+<tr class="even">
+<td>Orthogonal projection</td>
+<td><span class="math inline">\(P^2=P=P^*\)</span></td>
+<td>Identity on its closed range and zero on its orthogonal complement</td>
+</tr>
+</tbody>
+</table>
+<p>The last row follows by decomposing <span class="math inline">\(x=Px+(I-P)x\)</span> and testing the inner product of the two terms. Conversely the projection from Session 3 has these identities by the orthogonal decomposition. Mere idempotence permits oblique projections.</p>
+<section id="compatibility-and-stability-ask-different-questions" class="level3">
+<h3 class="anchored" data-anchor-id="compatibility-and-stability-ask-different-questions">Compatibility and stability ask different questions</h3>
+<p>The identity defining the adjoint immediately yields <span class="math display">\[y\in(\operatorname{ran}T)^\perp
+\iff \langle x,T^*y\rangle=0\ \forall x
+\iff y\in\ker T^*.\]</span> Taking orthogonal complements proves <span class="math inline">\(\overline{\operatorname{ran}T}=(\ker T^*)^\perp\)</span>. Thus compatibility with all adjoint null vectors guarantees arbitrarily accurate residuals. Exact solvability requires membership in the range itself. Injectivity is still exactly <span class="math inline">\(\ker T=0\)</span> by linearity; it says nothing about onto-ness in infinite dimensions. The right shift <span class="math inline">\(S(x_1,x_2,\ldots)=(0,x_1,x_2,\ldots)\)</span> is injective and misses <span class="math inline">\(e_1\)</span>. Its adjoint, the left shift, is onto and kills <span class="math inline">\(e_1\)</span>.</p>
+<p><strong>A model inverse problem.</strong> Let <span class="math inline">\(De_j=e_j/j\)</span> on <span class="math inline">\(\ell^2\)</span>. It is positive, self-adjoint, injective and bounded. Its range consists precisely of <span class="math inline">\(f\)</span> with <span class="math inline">\(\sum j^2|f_j|^2&lt;\infty\)</span>, since the only candidate solution is <span class="math inline">\(x_j=jf_j\)</span>. Every finite sequence belongs to the range. The datum <span class="math inline">\(f=(1/j)\)</span> is in its closure but has no solution. Moreover <span class="math inline">\(\|De_j\|=1/j\)</span> while <span class="math inline">\(\|e_j\|=1\)</span>: arbitrarily small data errors can conceal unit input errors. Finite truncation gives condition number <span class="math inline">\(N\)</span>. Removing high indices stabilizes inversion at the price of a bias.</p>
+<p><strong>Closed range theorem (Hilbert spaces).</strong> For bounded <span class="math inline">\(T:H\to G\)</span>, the following are equivalent:</p>
+<ol type="1">
+<li><span class="math inline">\(\operatorname{ran}T\)</span> is closed.</li>
+<li><span class="math inline">\(\|Tx\|\ge c\|x\|\)</span> for some <span class="math inline">\(c&gt;0\)</span> on <span class="math inline">\(H_0=(\ker T)^\perp\)</span>.</li>
+<li><span class="math inline">\(\operatorname{ran}T^*\)</span> is closed.</li>
+</ol>
+<p>Here is the proof with its Banach-space dependency explicit. Restriction <span class="math inline">\(T_0:H_0\to\operatorname{ran}T\)</span> is a bounded bijection by projection onto <span class="math inline">\(H_0\)</span>. If the range is closed both spaces are Banach, so the <strong>bounded inverse theorem</strong> gives a bounded inverse. This general theorem follows from the open mapping theorem via the Baire category theorem; we use it here without proof. Conversely the lower bound makes the representatives of any convergent sequence of images Cauchy in <span class="math inline">\(H_0\)</span>, proving closedness. Under the lower bound, for <span class="math inline">\(z\in H_0\)</span> define <span class="math inline">\(g(Tx)=\langle x,z\rangle\)</span>. It is well defined and bounded by <span class="math inline">\(\|z\|\|Tx\|/c\)</span> using the orthogonal representative. Extend it to <span class="math inline">\(G\)</span> by Hahn–Banach and represent it by <span class="math inline">\(y\)</span>. Then <span class="math inline">\(T^*y=z\)</span>, giving <span class="math inline">\(\operatorname{ran}T^*=H_0\)</span>. Interchanging <span class="math inline">\(T\)</span> and <span class="math inline">\(T^*\)</span> gives the reverse implication.</p>
+<p><strong>Least squares.</strong> Minimizing <span class="math inline">\(\|Tx-f\|\)</span> asks whether <span class="math inline">\(P_{\overline{\operatorname{ran}T}}f\)</span> is in the range. A minimizer exists exactly then and satisfies <span class="math inline">\(T^*(Tx-f)=0\)</span> by orthogonality. Its companions differ by <span class="math inline">\(\ker T\)</span>. For closed range the unique representative in <span class="math inline">\(H_0\)</span> is <span class="math inline">\(T^\dagger f=T_0^{-1}P_{\operatorname{ran}T}f\)</span>, a bounded pseudoinverse. For <span class="math inline">\(D\)</span> above, the formal inverse on the range is unbounded. In Module A the quotient by the kernel always gives an algebraic isomorphism onto the image. The closed range criterion tells us when its inverse also respects errors in the ambient data norm.</p>
+<p><strong>Checkpoint.</strong> For <span class="math inline">\(f=(1/j)\)</span>, construct approximants with residual tending to zero and compute their solution norms. Which component of the finite-dimensional least-squares argument fails?</p>
+</section>
+</section>
+<section id="session-5-from-eigenvalues-to-spectra" class="level2" data-number="23.5">
+<h2 data-number="23.5" class="anchored" data-anchor-id="session-5-from-eigenvalues-to-spectra"><span class="header-section-number">23.5</span> Session 5 — From eigenvalues to spectra</h2>
+<section id="compactness-as-uniform-finite-dimensional-approximation" class="level3">
+<h3 class="anchored" data-anchor-id="compactness-as-uniform-finite-dimensional-approximation">Compactness as uniform finite-dimensional approximation</h3>
+<p>A bounded linear operator is <strong>compact</strong> if images of bounded sequences always have norm-convergent subsequences. Finite-rank maps are compact by finite-dimensional compactness of closed bounded sets. An operator-norm limit <span class="math inline">\(K\)</span> of finite-rank maps into a Banach space is compact: approximate <span class="math inline">\(K\)</span> on the unit ball uniformly to <span class="math inline">\(\varepsilon\)</span> by one finite-rank map, whose bounded image has a finite <span class="math inline">\(\varepsilon\)</span>-net. Thus <span class="math inline">\(K\)</span>’s image has a finite <span class="math inline">\(2\varepsilon\)</span>-net for every <span class="math inline">\(\varepsilon\)</span>. Successively extracting subsequences from balls of shrinking radii gives a Cauchy subsequence; completeness gives its limit. Conversely for a compact operator into a Hilbert space, project onto the span of a finite <span class="math inline">\(\varepsilon\)</span>-net of its unit-ball image to get a finite-rank approximation within <span class="math inline">\(\varepsilon\)</span>.</p>
+<p>For <span class="math inline">\(De_j=e_j/j\)</span>, truncation after <span class="math inline">\(N\)</span> coordinates has uniform error <span class="math inline">\(1/(N+1)\)</span>. For the identity the same projections <span class="math inline">\(P_N\)</span> converge <strong>strongly</strong> (<span class="math inline">\(\|P_Nx-x\|\to0\)</span> for each <span class="math inline">\(x\)</span>), but <span class="math inline">\(\|I-P_N\|=1\)</span> for every <span class="math inline">\(N\)</span>, by testing <span class="math inline">\(e_{N+1}\)</span>. The identity on <span class="math inline">\(\ell^2\)</span> is noncompact by the separated sequence <span class="math inline">\((e_j)\)</span>. This is the difference between resolving a fixed vector and resolving a whole unit ball.</p>
+<p>For a continuous kernel <span class="math inline">\(k\)</span> on <span class="math inline">\([0,1]^2\)</span>, <span class="math inline">\(Ku(s)=\int k(s,t)u(t)\,dt\)</span> is compact on <span class="math inline">\(L^2\)</span>. Uniform continuity allows approximation by kernels constant on finitely many rectangles of a grid. Their outputs are piecewise constant on one fixed finite partition. Cauchy–Schwarz in <span class="math inline">\(t\)</span> followed by integration in <span class="math inline">\(s\)</span> gives <span class="math inline">\(\|K-K_h\|\le\|k-k_h\|_{L^2([0,1]^2)}\to0\)</span>. Integral smoothing can therefore have the same inverse-instability mechanism as a rapidly decaying diagonal.</p>
+</section>
+<section id="an-inverse-based-definition-of-spectrum" class="level3">
+<h3 class="anchored" data-anchor-id="an-inverse-based-definition-of-spectrum">An inverse-based definition of spectrum</h3>
+<p>For a bounded operator <span class="math inline">\(T\)</span> on a complex Banach space the resolvent set consists of <span class="math inline">\(\lambda\)</span> for which <span class="math inline">\(T-\lambda I\)</span> has a bounded everywhere-defined inverse. Its complement is <span class="math inline">\(\sigma(T)\)</span>. A bijective bounded map between Banach spaces has bounded inverse; checking injectivity alone no longer suffices. For <span class="math inline">\(|\lambda|&gt;\|T\|\)</span> the geometric series for <span class="math inline">\((I-T/\lambda)^{-1}\)</span> converges in operator norm, so the spectrum lies in the closed norm disk. We use the disjoint classification below.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Behavior of <span class="math inline">\(T-\lambda I\)</span></th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Point</td>
+<td>Nonzero kernel</td>
+<td><span class="math inline">\(1/j\)</span> for <span class="math inline">\(D\)</span></td>
+</tr>
+<tr class="even">
+<td>Continuous</td>
+<td>Injective, dense range, fails to be onto</td>
+<td><span class="math inline">\(0\)</span> for <span class="math inline">\(D\)</span></td>
+</tr>
+<tr class="odd">
+<td>Residual</td>
+<td>Injective, range fails to be dense</td>
+<td><span class="math inline">\(0\)</span> for the right shift</td>
+</tr>
+</tbody>
+</table>
+<p><strong>An interval of spectrum without eigenfunctions.</strong> On <span class="math inline">\(L^2(0,1)\)</span> take <span class="math inline">\(Mu(t)=t u(t)\)</span>. Multiplication by a real bounded function is self-adjoint. If <span class="math inline">\(Mu=\lambda u\)</span>, the support of <span class="math inline">\(u\)</span> lies up to null sets in a singleton or the empty set. Thus <span class="math inline">\(u=0\)</span> as an <span class="math inline">\(L^2\)</span> class. For <span class="math inline">\(\lambda\notin[0,1]\)</span>, division by <span class="math inline">\(t-\lambda\)</span> is bounded by <span class="math inline">\(1/\operatorname{dist}(\lambda,[0,1])\)</span>. For <span class="math inline">\(\lambda\in[0,1]\)</span> take the normalized indicator of <span class="math inline">\((\lambda-\varepsilon,\lambda+\varepsilon)\cap(0,1)\)</span>. Its norm is one but <span class="math inline">\(\|(M-\lambda I)u_\varepsilon\|\le\varepsilon\)</span>. A bounded inverse is impossible. The range is dense by the adjoint kernel identity, so the entire interval is continuous spectrum, endpoints included. This operator is noncompact: normalized indicators of disjoint subintervals of <span class="math inline">\((1/2,1)\)</span> have mutually orthogonal images of norm at least <span class="math inline">\(1/2\)</span>.</p>
+</section>
+<section id="what-additional-structure-restores-eigenvectors" class="level3">
+<h3 class="anchored" data-anchor-id="what-additional-structure-restores-eigenvectors">What additional structure restores eigenvectors?</h3>
+<p><strong>Compact self-adjoint spectral theorem.</strong> For compact self-adjoint <span class="math inline">\(K\)</span> on a Hilbert space, its nonzero spectral values are real eigenvalues of finite multiplicity. Only zero can be their accumulation point. The space is the orthogonal sum of <span class="math inline">\(\ker K\)</span> and the closed span of eigenvectors for the nonzero eigenvalues. Choosing orthonormal vectors in these spaces yields a Hilbert basis. Zero lies in the spectrum in infinite dimension (otherwise <span class="math inline">\(I=K^{-1}K\)</span> would be compact); it may or may not be an eigenvalue.</p>
+<p><strong>Proof mechanism.</strong> For self-adjoint <span class="math inline">\(K\)</span>, <span class="math inline">\(\|K\|=\sup_{\|x\|=1}|\langle Kx,x\rangle|\)</span>. To see the difficult inequality, write <span class="math inline">\(q(x)=\langle Kx,x\rangle\)</span> and bound <span class="math inline">\(4\operatorname{Re}\langle Kx,y\rangle=q(x+y)-q(x-y)\)</span> using the parallelogram identity; rotate a unit <span class="math inline">\(y\)</span> to make the pairing real. For <span class="math inline">\(K\ne0\)</span>, choose unit vectors with quadratic forms approaching <span class="math inline">\(\lambda=\|K\|\)</span> or <span class="math inline">\(-\|K\|\)</span> along a subsequence. Then <span class="math display">\[\|Kx_n-\lambda x_n\|^2\le 2\lambda^2-2\lambda\langle Kx_n,x_n\rangle\to0.\]</span> Compactness makes a subsequence of <span class="math inline">\(Kx_n\)</span> converge. Since <span class="math inline">\(\lambda\ne0\)</span>, the corresponding <span class="math inline">\(x_n\)</span> converge to a unit eigenvector. Its orthogonal complement is invariant by self-adjointness. Repeat there. An infinite orthonormal sequence of extracted vectors must have eigenvalues tending to zero, since otherwise their images have a separated subsequence. This also rules out infinite multiplicity away from zero. The remaining restriction vanishes: its norm is bounded by each successive extremal modulus. In these diagonal coordinates division by the diagonal entries minus <span class="math inline">\(\lambda\)</span> is bounded whenever <span class="math inline">\(\lambda\)</span> is separated from their closure, proving the spectral assertion.</p>
+<p><strong>Beyond compactness (theorem statement).</strong> Every bounded self-adjoint <span class="math inline">\(T\)</span> has a projection-valued spectral measure <span class="math inline">\(E\)</span> on the real line. To each measurable spectral band <span class="math inline">\(B\)</span> it assigns an orthogonal projection, with <span class="math inline">\(E(\mathbb R)=I\)</span>, <span class="math inline">\(E(B)E(C)=E(B\cap C)\)</span>, and countable additivity on disjoint bands in the strong sense. Then <span class="math display">\[T=\int_{\sigma(T)}t\,dE(t),\qquad g(T)=\int_{\sigma(T)}g(t)\,dE(t)\]</span> for bounded Borel functions <span class="math inline">\(g\)</span> on the spectrum. For a step function the second integral is simply a weighted sum of band projections. For <span class="math inline">\(M\)</span>, <span class="math inline">\(E(B)u=\mathbf1_B u\)</span> and <span class="math inline">\(g(M)u(t)=g(t)u(t)\)</span>. A singleton projection detects an eigenspace; for <span class="math inline">\(M\)</span> all singleton projections vanish while the projection for the whole interval is the identity. The general existence proof requires spectral integration or the representation theory of commutative operator algebras and is deferred. For polynomials this calculus is the usual repeated operator multiplication and addition from Module D. Choosing a polynomial large on a desired band and small elsewhere approximately selects that band.</p>
+<p><strong>Checkpoint.</strong> Does a diagonal matrix obtained by sampling the function <span class="math inline">\(t\)</span> accurately represent the eigenvectors of <span class="math inline">\(M\)</span>? Explain how a collection of sampled eigenvalues can approximate a spectral interval even though the limiting operator has no eigenvectors.</p>
+</section>
+</section>
+<section id="session-6-solving-an-equation-by-testing-it" class="level2" data-number="23.6">
+<h2 data-number="23.6" class="anchored" data-anchor-id="session-6-solving-an-equation-by-testing-it"><span class="header-section-number">23.6</span> Session 6 — Solving an equation by testing it</h2>
+<p>Let <span class="math inline">\(V\)</span> be a real Hilbert space. A bilinear form <span class="math inline">\(a\)</span> assigns each pair <span class="math inline">\((u,v)\)</span> a scalar. Think of <span class="math inline">\(u\)</span> as the state and <span class="math inline">\(v\)</span> as the probe used to measure its response. Suppose for all <span class="math inline">\(u,v\)</span>, <span class="math display">\[|a(u,v)|\le C\|u\|\|v\|,\qquad a(v,v)\ge\alpha\|v\|^2,\quad \alpha&gt;0.\]</span> These are <strong>boundedness</strong> and <strong>coercivity</strong>. The second requires a single lower constant across the unit sphere. Strict positivity on each nonzero vector is weaker: <span class="math inline">\(\langle De_j,e_j\rangle=1/j\)</span> for the strictly positive diagonal of Session 4. The form defines <span class="math inline">\(A:V\to V^*\)</span> by <span class="math inline">\((Au)(v)=a(u,v)\)</span>. A given load <span class="math inline">\(F\in V^*\)</span> prescribes the response to <em>every</em> probe. Seeking <span class="math inline">\(u\)</span> with <span class="math inline">\(a(u,v)=F(v)\)</span> for all <span class="math inline">\(v\)</span> is exactly solving <span class="math inline">\(Au=F\)</span>.</p>
+<p><strong>Lax–Milgram.</strong> Under these hypotheses each load has a unique solution, with <span class="math inline">\(\|u\|\le\|F\|/\alpha\)</span>. Symmetry is optional.</p>
+<p><strong>Proof.</strong> Riesz converts <span class="math inline">\(a(u,\cdot)\)</span> to a vector <span class="math inline">\(Bu\)</span> such that <span class="math inline">\(a(u,v)=\langle Bu,v\rangle\)</span>. Then <span class="math inline">\(B\)</span> is bounded and linear, and <span class="math inline">\(\|Bu\|\ge\alpha\|u\|\)</span> by coercivity and Cauchy–Schwarz. Hence <span class="math inline">\(B\)</span> is injective and has closed range by the Cauchy argument of Session 4. If <span class="math inline">\(y\perp\operatorname{ran}B\)</span>, set <span class="math inline">\(u=y\)</span> to obtain <span class="math inline">\(0=\langle By,y\rangle\ge\alpha\|y\|^2\)</span>. Thus the range is dense as well, hence all of <span class="math inline">\(V\)</span>. Represent <span class="math inline">\(F\)</span> by a vector <span class="math inline">\(g\)</span> and solve <span class="math inline">\(Bu=g\)</span>. The lower bound gives the estimate. In a complex space take <span class="math inline">\(a\)</span> linear in the trial variable and conjugate-linear in the test variable, require <span class="math inline">\(\operatorname{Re}a(v,v)\ge\alpha\|v\|^2\)</span>, and take <span class="math inline">\(F\)</span> in the continuous <strong>antidual</strong>. Represent <span class="math inline">\(F(v)=\langle g,v\rangle\)</span>; the same proof applies.</p>
+<section id="from-infinitely-many-probes-to-a-linear-system" class="level3">
+<h3 class="anchored" data-anchor-id="from-infinitely-many-probes-to-a-linear-system">From infinitely many probes to a linear system</h3>
+<p>Choose a finite-dimensional conforming space <span class="math inline">\(V_h\subset V\)</span> and require <span class="math inline">\(u_h\in V_h\)</span> to satisfy <span class="math inline">\(a(u_h,v_h)=F(v_h)\)</span> for all <span class="math inline">\(v_h\in V_h\)</span>. Restricted to this Hilbert space the same constants work, so existence, uniqueness and stability survive discretization. Subtraction gives <strong>Galerkin orthogonality</strong> <span class="math inline">\(a(u-u_h,v_h)=0\)</span>. Setting <span class="math inline">\(e=u-u_h\)</span> and taking any <span class="math inline">\(w_h\in V_h\)</span> yields <span class="math display">\[\alpha\|e\|^2\le a(e,e)=a(e,u-w_h)\le C\|e\|\|u-w_h\|.\]</span> If <span class="math inline">\(e=0\)</span> the estimate is immediate; otherwise divide and take the infimum. <strong>Céa’s lemma</strong> gives <span class="math display">\[\|u-u_h\|\le(C/\alpha)\inf_{w_h\in V_h}\|u-w_h\|.\]</span> The theorem shifts the analytical work to constructing good approximating spaces. For a symmetric form <span class="math inline">\(a\)</span> is an inner product and <span class="math inline">\(\|v\|_a^2=a(v,v)\)</span> is equivalent to <span class="math inline">\(\|v\|^2\)</span>. Now Pythagoras gives <em>equality</em> with the best approximation error in energy norm. Equivalently <span class="math inline">\(u_h\)</span> minimizes <span class="math inline">\(\tfrac12a(w,w)-F(w)\)</span> on <span class="math inline">\(V_h\)</span>, since its excess at <span class="math inline">\(w\)</span> equals <span class="math inline">\(\tfrac12\|w-u_h\|_a^2\)</span>. For nonsymmetric coercive forms Céa still applies; the form itself supplies no orthogonal distance.</p>
+<p>In a basis <span class="math inline">\(\phi_1,\ldots,\phi_n\)</span>, <span class="math inline">\(K_{ij}=a(\phi_j,\phi_i)\)</span>, <span class="math inline">\(b_i=F(\phi_i)\)</span> and <span class="math inline">\(Kc=b\)</span>. With a symmetric coercive form, <span class="math inline">\(c^\top Kc=a(\sum c_j\phi_j,\sum c_j\phi_j)&gt;0\)</span> for nonzero <span class="math inline">\(c\)</span>. This proves positive definiteness but does not guarantee small Euclidean matrix condition number. The relation between coefficient norm and function norm depends on the basis and mesh.</p>
+<p><strong>Checkpoint.</strong> In the existence proof separately identify the argument that makes the range closed and the argument that makes it dense. Why would a lower bound on <span class="math inline">\(\|Bv\|\)</span> alone be insufficient? Test the right shift.</p>
+</section>
+</section>
+<section id="session-7-which-space-should-a-differential-equation-live-in" class="level2" data-number="23.7">
+<h2 data-number="23.7" class="anchored" data-anchor-id="session-7-which-space-should-a-differential-equation-live-in"><span class="header-section-number">23.7</span> Session 7 — Which space should a differential equation live in?</h2>
+<p>A piecewise linear finite-element function can have corners. Its ordinary second derivative vanishes inside every element, so asking for <span class="math inline">\(-u_h''=f\)</span> pointwise would discard the changes of slope at the nodes. Integration against smooth probes records exactly those changes.</p>
+<section id="one-derivative-in-the-weak-sense" class="level3">
+<h3 class="anchored" data-anchor-id="one-derivative-in-the-weak-sense">One derivative in the weak sense</h3>
+<p>A <strong>test function</strong> <span class="math inline">\(\varphi\in C_c^\infty(0,1)\)</span> is smooth and zero near both endpoints. For <span class="math inline">\(u,g\in L^2(0,1)\)</span> we call <span class="math inline">\(g\)</span> the weak derivative <span class="math inline">\(u'\)</span> when <span class="math display">\[\int u\varphi'=-\int g\varphi\quad\text{for all such }\varphi.\]</span> This agrees with integration by parts for smooth <span class="math inline">\(u\)</span>. Uniqueness follows from density of smooth compactly supported functions in <span class="math inline">\(L^2\)</span>. For <span class="math inline">\(u(x)=|x-1/2|\)</span>, split the integral at <span class="math inline">\(1/2\)</span>. The two interior boundary terms cancel by continuity and <span class="math inline">\(g\)</span> equals the ordinary slope on each side. A jump in <span class="math inline">\(u\)</span> leaves a multiple of <span class="math inline">\(\varphi(1/2)\)</span>, which cannot equal integration against an <span class="math inline">\(L^2\)</span> function: smooth shrinking bumps of height one there have <span class="math inline">\(L^2\)</span> norms tending to zero.</p>
+<p>Define <span class="math inline">\(H^1=\{u\in L^2:u'\in L^2\}\)</span> with norm squared <span class="math inline">\(\|u\|_2^2+\|u'\|_2^2\)</span>. It is Hilbert: a Cauchy sequence has limits <span class="math inline">\(u,g\)</span> in <span class="math inline">\(L^2\)</span> for its two components. Passing to the limit in the test identity shows <span class="math inline">\(g=u'\)</span>. Likewise <span class="math inline">\(H^2\)</span> requires the weak derivative of <span class="math inline">\(u'\)</span> to belong to <span class="math inline">\(L^2\)</span>. Define <span class="math inline">\(H_0^1\)</span> as the closure of <span class="math inline">\(C_c^\infty\)</span> in <span class="math inline">\(H^1\)</span>.</p>
+<p>We use two elementary one-dimensional Sobolev facts. Each <span class="math inline">\(H^1\)</span> class has an absolutely continuous representative satisfying <span class="math inline">\(u(x)=u(0)+\int_0^x u'(t)\,dt\)</span>. Also <span class="math inline">\(H_0^1\)</span> consists exactly of representatives with both endpoint values zero. For the first fact, subtract the integral of the weak derivative: the remainder has zero weak derivative, so is a constant almost everywhere. For the latter assertion the forward inclusion follows by continuity of endpoint evaluation in <span class="math inline">\(H^1\)</span> (bound <span class="math inline">\(|u(0)|\)</span> by <span class="math inline">\(\|u\|_2+\|u'\|_2\)</span> using the integral formula and averaging). The converse is the one-dimensional density theorem, proved by cutoff and smooth approximation. These density and representative results are the Sobolev prerequisites used here.</p>
+<p>For <span class="math inline">\(u(0)=0\)</span>, Cauchy–Schwarz gives <span class="math inline">\(|u(x)|\le\sqrt x\|u'\|_2\)</span>. Integrating gives the <strong>Poincaré inequality</strong> <span class="math inline">\(\|u\|_2\le\|u'\|_2/\sqrt2\)</span> (a sufficient constant). Hence <span class="math inline">\(V=H_0^1\)</span> is Hilbert in the equivalent energy norm <span class="math inline">\(\|u\|_V=\|u'\|_2\)</span>. Bounded sets in <span class="math inline">\(V\)</span> obey <span class="math inline">\(|u(x)-u(y)|\le C|x-y|^{1/2}\)</span> and are uniformly bounded. The Arzelà–Ascoli theorem gives a uniformly convergent subsequence, hence an <span class="math inline">\(L^2\)</span>-convergent one. Its mechanism is diagonal subsequence extraction on a countable dense grid followed by the common modulus of continuity to control between grid points. Thus the embedding <span class="math inline">\(V\hookrightarrow L^2\)</span> is compact.</p>
+</section>
+<section id="one-boundary-value-problem-two-operators" class="level3">
+<h3 class="anchored" data-anchor-id="one-boundary-value-problem-two-operators">One boundary-value problem, two operators</h3>
+<p>For <span class="math inline">\(-u''=f\)</span> on <span class="math inline">\((0,1)\)</span> with <span class="math inline">\(u(0)=u(1)=0\)</span>, multiply by <span class="math inline">\(v\)</span>, integrate and remove the boundary term using <span class="math inline">\(v(0)=v(1)=0\)</span>. The resulting problem is <span class="math display">\[u\in V,\qquad \int_0^1u'v'=\int_0^1fv\qquad(v\in V).\]</span> The left side is bounded and coercive with both constants one in the energy norm. For <span class="math inline">\(f\in L^2\)</span>, <span class="math inline">\(|F(v)|\le\|f\|_2\|v\|_2\le\|f\|_2\|v\|_V/\sqrt2\)</span>. Lax–Milgram applies. The notation <span class="math inline">\(H^{-1}=(H_0^1)^*\)</span> means all continuous loads for this energy space, including point loads <span class="math inline">\(F(v)=v(1/2)\)</span> by the pointwise estimate above. Thus the variational operator <span class="math inline">\(A:V\to H^{-1}\)</span> sending <span class="math inline">\(u\)</span> to the functional <span class="math inline">\(v\mapsto\int u'v'\)</span> is a bounded isometric isomorphism in the chosen norms.</p>
+<p>Alternatively define <span class="math inline">\(Lu=-u''\)</span> <strong>on <span class="math inline">\(L^2\)</span></strong> with domain <span class="math inline">\(\mathcal D(L)=H^2(0,1)\cap H_0^1(0,1)\)</span>. This domain specifies both regularity and boundary conditions. On unit vectors <span class="math inline">\(s_k=\sqrt2\sin(k\pi x)\)</span>, <span class="math inline">\(\|Ls_k\|_2=k^2\pi^2\)</span>, proving unboundedness in <span class="math inline">\(L^2\)</span>. For <span class="math inline">\(f\in L^2\)</span>, the weak equation implies <span class="math inline">\(u''=-f\)</span> weakly by testing smooth functions, hence <span class="math inline">\(u\in\mathcal D(L)\)</span>. Conversely integration by parts gives the weak equation for each such solution. Thus <span class="math inline">\(L\)</span> and <span class="math inline">\(A\)</span> agree via the embedding of <span class="math inline">\(L^2\)</span> loads into <span class="math inline">\(H^{-1}\)</span> on this domain. The broader class of weak loads can yield solutions outside <span class="math inline">\(H^2\)</span>.</p>
+</section>
+<section id="assembly-on-an-interval" class="level3">
+<h3 class="anchored" data-anchor-id="assembly-on-an-interval">Assembly on an interval</h3>
+<p>On nodes <span class="math inline">\(x_i=ih\)</span>, <span class="math inline">\(h=1/N\)</span>, let <span class="math inline">\(\phi_i\)</span> equal one at the <span class="math inline">\(i\)</span>th interior node, zero at the others and linear between nodes. Adjacent slopes are <span class="math inline">\(\pm1/h\)</span>. On a single element the two local shape functions <span class="math inline">\(1-t/h,t/h\)</span> in local coordinates give <span class="math display">\[K_e=\frac1h\begin{pmatrix}1&amp;-1\\-1&amp;1\end{pmatrix},\qquad
+M_e=\frac h6\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix}.\]</span> The first integrates products of slopes, the second integrates products of values. Adding contributions at shared nodes and dropping the fixed endpoint unknowns gives <span class="math inline">\(K=h^{-1}\operatorname{tridiag}(-1,2,-1)\)</span> and <span class="math inline">\(M=(h/6)\operatorname{tridiag}(1,4,1)\)</span>. Both are SPD since a nonzero coefficient vector gives a nonzero function and the corresponding quadratic forms are its squared energy and <span class="math inline">\(L^2\)</span> norms.</p>
+<p>For <span class="math inline">\(f=1\)</span> every interior load is the area of a hat, <span class="math inline">\(b_i=h\)</span>. With <span class="math inline">\(N=2\)</span> there is one interior unknown and <span class="math inline">\(4c=1/2\)</span>, so <span class="math inline">\(c=1/8\)</span>. The exact solution <span class="math inline">\(u=x(1-x)/2\)</span> also has midpoint value <span class="math inline">\(1/8\)</span>, yet the energy error is positive: one trial function has two constant slopes and the exact slope varies continuously. Nodal comparisons alone would miss this error.</p>
+<p><strong>Checkpoint.</strong> Remove both endpoint conditions. Which part of the stiffness argument breaks down? The constant function now has zero energy. Solvability of the pure Neumann problem requires the load to annihilate constants; fixing the mean restores uniqueness.</p>
+</section>
+</section>
+<section id="session-8-from-a-compact-inverse-to-computed-eigenpairs" class="level2" data-number="23.8">
+<h2 data-number="23.8" class="anchored" data-anchor-id="session-8-from-a-compact-inverse-to-computed-eigenpairs"><span class="header-section-number">23.8</span> Session 8 — From a compact inverse to computed eigenpairs</h2>
+<p>Let <span class="math inline">\(Sf\)</span> solve the weak Dirichlet problem for <span class="math inline">\(f\in L^2\)</span>, considered as a map from <span class="math inline">\(L^2\)</span> back to <span class="math inline">\(L^2\)</span>. Its factorization is a bounded load embedding <span class="math inline">\(L^2\to H^{-1}\)</span>, the bounded solution map <span class="math inline">\(A^{-1}:H^{-1}\to V\)</span>, and the compact embedding <span class="math inline">\(V\hookrightarrow L^2\)</span>. Thus <span class="math inline">\(S=L^{-1}\)</span> is compact. Symmetry gives <span class="math display">\[\langle Sf,g\rangle=a(Sg,Sf)=a(Sf,Sg)=\langle f,Sg\rangle.\]</span> Also <span class="math inline">\(\langle Sf,f\rangle=a(Sf,Sf)\ge0\)</span>. It is injective since <span class="math inline">\(Sf=0\)</span> implies <span class="math inline">\(f\)</span> annihilates the dense space <span class="math inline">\(V\subset L^2\)</span>. Its nonzero eigenvalues <span class="math inline">\(\mu\)</span> correspond to eigenvalues <span class="math inline">\(\lambda=1/\mu\)</span> of <span class="math inline">\(L\)</span>, since <span class="math inline">\(Su=\mu u\)</span> implies <span class="math inline">\(u\in\mathcal D(L)\)</span> and <span class="math inline">\(Lu=u/\mu\)</span>.</p>
+<p>Testing <span class="math inline">\(a(u,v)=\lambda\langle u,v\rangle\)</span> with <span class="math inline">\(v=u\)</span> gives <span class="math inline">\(\lambda&gt;0\)</span>. The differential equation then gives <span class="math inline">\(u(x)=b\sin(\sqrt\lambda x)+c\cos(\sqrt\lambda x)\)</span> (the weak equation gives <span class="math inline">\(H^2\)</span> and, here, classical regularity by integration). The endpoints force <span class="math inline">\(c=0\)</span> and <span class="math inline">\(\sqrt\lambda=k\pi\)</span>. Consequently <span class="math display">\[\lambda_k=(k\pi)^2,\qquad s_k(x)=\sqrt2\sin(k\pi x),\quad k\ge1.\]</span> Solving the ODE identifies the possible eigenfunctions. The compact self-adjoint spectral theorem for <span class="math inline">\(S\)</span>, together with <span class="math inline">\(\ker S=0\)</span>, supplies the additional conclusion that these functions span <span class="math inline">\(L^2\)</span> after closure. The inverse suppresses the <span class="math inline">\(k\)</span>th mode by <span class="math inline">\((k\pi)^{-2}\)</span>. Zero is in the continuous spectrum of <span class="math inline">\(S\)</span> while the eigenvalues of <span class="math inline">\(L\)</span> escape to infinity.</p>
+<section id="the-variational-characterization-and-its-discretization" class="level3">
+<h3 class="anchored" data-anchor-id="the-variational-characterization-and-its-discretization">The variational characterization and its discretization</h3>
+<p>For <span class="math inline">\(0\ne v\in V\)</span> set <span class="math inline">\(\rho(v)=\|v'\|_2^2/\|v\|_2^2\)</span>. The scaled functions <span class="math inline">\(s_j/\sqrt{\lambda_j}\)</span> are an orthonormal basis in the energy inner product: orthogonality follows from the eigen-equation, and energy orthogonality to all <span class="math inline">\(s_j\)</span> implies <span class="math inline">\(L^2\)</span> orthogonality to all <span class="math inline">\(s_j\)</span>, hence vanishing. Applying Parseval twice gives <span class="math display">\[\rho(v)=\frac{\sum_j\lambda_j|\langle v,s_j\rangle|^2}
+{\sum_j|\langle v,s_j\rangle|^2}.\]</span> On the first <span class="math inline">\(k\)</span> modes this weighted average is at most <span class="math inline">\(\lambda_k\)</span>. Every <span class="math inline">\(k\)</span>-dimensional trial space has a nonzero vector orthogonal in <span class="math inline">\(L^2\)</span> to the first <span class="math inline">\(k-1\)</span> modes by rank–nullity, and that vector’s quotient is at least <span class="math inline">\(\lambda_k\)</span>. Together these give <span class="math display">\[\lambda_k=\min_{\substack{W\subset V\\\dim W=k}}\ \max_{0\ne w\in W}\rho(w).\]</span> Restricting the competition to <span class="math inline">\(W\subset V_h\)</span> gives the Ritz value <span class="math inline">\(\lambda_{k,h}\ge\lambda_k\)</span> for <span class="math inline">\(\dim V_h\ge k\)</span>. Enlarging a nested space decreases each ordered value. For fixed <span class="math inline">\(k\)</span>, if the spaces approximate every element of <span class="math inline">\(V\)</span> in energy norm as <span class="math inline">\(h\to0\)</span>, these upper bounds converge: approximate each of the first <span class="math inline">\(k\)</span> modes by trial vectors. Their <span class="math inline">\(k\times k\)</span> mass and stiffness Gram matrices converge entrywise to <span class="math inline">\(I\)</span> and <span class="math inline">\(\operatorname{diag}(\lambda_1,\ldots,\lambda_k)\)</span>. On the unit coefficient sphere this convergence is uniform, so their maximal quotient tends to <span class="math inline">\(\lambda_k\)</span>. These <span class="math inline">\(k\)</span> vectors are eventually independent and furnish admissible competitors. For refining linear elements the density hypothesis follows by approximating first by smooth functions and then interpolating: the elementwise slope is the average derivative, converging uniformly to that derivative for smooth inputs.</p>
+<p>The discrete quotient is <span class="math inline">\(c^\top Kc/(c^\top Mc)\)</span>; stationarity yields <span class="math inline">\(Kc=\lambda_h Mc\)</span>. The mass matrix is the <span class="math inline">\(L^2\)</span> inner product in nodal coordinates. For <span class="math inline">\(M=RR^\top\)</span> (Cholesky), <span class="math inline">\(R^{-1}KR^{-\top}\)</span> is symmetric in ordinary coordinates and <span class="math inline">\(y=R^\top c\)</span>. In large problems apply factors or solves without forming dense inverses. Alternatively work directly with the <span class="math inline">\(M\)</span> inner product. An eigenvector residual <span class="math inline">\(Kc-\theta Mc\)</span> measures failure of the <strong>discrete</strong> equation. A zero discrete residual can coexist with nonzero continuum eigenvalue error.</p>
+<p><strong>Seminar connection.</strong> In block subspace iteration each column carries a mixture of modes. For a symmetric transformed operator <span class="math inline">\(B\)</span> with eigenvectors <span class="math inline">\(q_j\)</span>, <span class="math inline">\(p(B)q_j=p(\lambda_j)q_j\)</span>. If a target cluster is separated and the starting block has full overlap with it, repeated filtering attenuates unwanted components according to <span class="math inline">\(\max_{\mathrm{out}}|p(\lambda)|/\min_{\mathrm{in}}|p(\lambda)|\)</span>, provided this ratio is below one. Orthonormalization maintains a basis and Rayleigh–Ritz extracts pairs in its span. Chebyshev polynomials offer a concrete design: map the unwanted interval to <span class="math inline">\([-1,1]\)</span>, where <span class="math inline">\(|T_m(t)|\le1\)</span>; outside it their magnitudes grow as <span class="math inline">\(\cosh(m\,\operatorname{arcosh}|t|)\)</span>. This gives a filter for a separated exterior cluster. The desired spectral interval, mesh-dependent spectral bounds, conditioning of the basis, and rounding errors in the recurrence all matter. F1 explains the operator and approximation target; Module E and the HASC seminar analyze how accurately a finite iteration captures the corresponding subspace.</p>
+<p><strong>Checkpoint.</strong> Which operation changes the mathematical space: mesh refinement or increasing the filter degree on a fixed mesh? Which error can persist after an eigensolver has converged to machine precision?</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="23.9">
+<h2 data-number="23.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">23.9</span> Exercises</h2>
+<p>Try each problem before consulting its solution. For proofs, mark where boundedness, closedness or completeness first enters.</p>
+<ol type="1">
+<li><strong>Two norms on one vector space.</strong> On <span class="math inline">\(c_{00}\)</span> decide which identity map between the <span class="math inline">\(1\)</span>- and <span class="math inline">\(2\)</span>-norms is continuous. Construct vectors converging to zero in only one of the norms. Explain why each fixed-dimensional coordinate section gives a different impression.</li>
+<li><strong>A dual measurement.</strong> On <span class="math inline">\(c_{00}\)</span> define <span class="math inline">\(f_a(x)=\sum x_j\bar a_j\)</span> for an arbitrary sequence <span class="math inline">\(a\)</span>. In the <span class="math inline">\(2\)</span>-norm, characterize exactly when <span class="math inline">\(f_a\)</span> extends continuously to <span class="math inline">\(\ell^2\)</span> and compute the norm.</li>
+<li><strong>Dual of a quotient.</strong> With <span class="math inline">\(X=C[0,1]\)</span> in the sup norm and <span class="math inline">\(M=\{u:u(0)=0\}\)</span>, identify <span class="math inline">\(X/M\)</span> isometrically. Determine <span class="math inline">\(M^\circ\)</span>. What changes if <span class="math inline">\(X\)</span> is instead the continuous functions equipped with the <span class="math inline">\(L^2\)</span> norm?</li>
+<li><strong>Reconstruct the projection proof.</strong> Find the nearest vector to <span class="math inline">\(x=(1,0,\ldots)\)</span> in <span class="math inline">\(M=\{y\in\ell^2:\sum y_j/j=0\}\)</span>. Explain first why a minimizer exists without computing it. Give an example of an incomplete inner-product space with a relatively closed subspace for which a nearest vector fails to exist.</li>
+<li><strong>Weak limits and compactness.</strong> Verify that <span class="math inline">\(e_n\rightharpoonup0\)</span> and <span class="math inline">\(\|(I-P_n)e_{n+1}\|=1\)</span>. Prove that a compact operator takes any bounded weakly convergent sequence to a norm-convergent sequence.</li>
+<li><strong>Compatible data and exploding solutions.</strong> For <span class="math inline">\(De_j=e_j/j\)</span>, find the least residual norm for <span class="math inline">\(f_j=1/j\)</span>. Is it attained? For <span class="math inline">\(f_j=j^{-s}\)</span>, distinguish membership in the data space and exact solvability.</li>
+<li><strong>Locate a spectral value.</strong> For the right shift <span class="math inline">\(S\)</span>, classify <span class="math inline">\(0\)</span> for <span class="math inline">\(S\)</span> and <span class="math inline">\(S^*\)</span>. Prove directly that <span class="math inline">\(1\)</span> is in the continuous spectrum of <span class="math inline">\(S\)</span> using normalized finite blocks.</li>
+<li><strong>A compact integral inverse.</strong> Let <span class="math inline">\(G(x,t)=\min(x,t)-xt\)</span>. Show that integration against <span class="math inline">\(G\)</span> gives the Dirichlet solution operator. Explain how to see compactness and self-adjointness without solving an eigenproblem.</li>
+<li><strong>Coercivity without symmetry.</strong> On real <span class="math inline">\(\mathbb R^2\)</span> take <span class="math inline">\(a(u,v)=v^\top Bu\)</span> with <span class="math inline">\(B=\left(\begin{smallmatrix}1&amp;-2\\2&amp;1\end{smallmatrix}\right)\)</span>. Find <span class="math inline">\(C,\alpha\)</span>, solve with <span class="math inline">\(F(v)=v_2\)</span>, and compute the Galerkin approximation in <span class="math inline">\(\operatorname{span}(e_1)\)</span>. Check which orthogonality actually holds.</li>
+<li><strong>A point load.</strong> Find <span class="math inline">\(u\in H_0^1\)</span> such that <span class="math inline">\(\int u'v'=v(1/2)\)</span>. Compute its energy and decide if <span class="math inline">\(u\in H^2\)</span>. What happens when a finite-element mesh includes the midpoint?</li>
+<li><strong>From interpolation to actual error.</strong> For the constant-load Dirichlet problem, show on a uniform mesh that the piecewise linear interpolant is the Galerkin solution. Compute its exact energy and <span class="math inline">\(L^2\)</span> errors.</li>
+<li><strong>Discrete eigenvalues and their limits.</strong> Insert <span class="math inline">\(c_i=\sin(k\pi i/N)\)</span> into the assembled generalized eigenproblem. Derive an explicit eigenvalue, the fixed-mode convergence rate, and the limiting relative error for the highest-frequency mode. Reconcile these with min–max.</li>
+</ol>
+<section id="worked-solutions" class="level3">
+<h3 class="anchored" data-anchor-id="worked-solutions">Worked solutions</h3>
+<p><strong>1.</strong> Expanding <span class="math inline">\((\sum|x_j|)^2\)</span> shows <span class="math inline">\(\|x\|_2\le\|x\|_1\)</span>. Let the first <span class="math inline">\(n\)</span> entries of <span class="math inline">\(x^{(n)}\)</span> equal <span class="math inline">\(1/n\)</span> and the rest zero. Then <span class="math inline">\(\|x^{(n)}\|_1=1\)</span> and <span class="math inline">\(\|x^{(n)}\|_2=n^{-1/2}\)</span>. Thus only the identity from the <span class="math inline">\(1\)</span>-norm to the <span class="math inline">\(2\)</span>-norm is continuous. On the first <span class="math inline">\(n\)</span> coordinates Cauchy–Schwarz gives the reverse estimate with factor <span class="math inline">\(\sqrt n\)</span>; our vector attains it. There is no common constant as the dimension grows.</p>
+<p><strong>2.</strong> If <span class="math inline">\(a\in\ell^2\)</span>, Cauchy–Schwarz bounds <span class="math inline">\(|f_a(x)|\)</span> by <span class="math inline">\(\|a\|_2\|x\|_2\)</span>. The extension follows by density or the absolutely convergent series. Conversely insert the normalized first <span class="math inline">\(N\)</span> entries of <span class="math inline">\(a\)</span> as the test vector whenever the truncated vector is nonzero. The output is <span class="math inline">\((\sum_{j\le N}|a_j|^2)^{1/2}\)</span>. Any continuous extension must bound every one of these quantities by its norm. This proves necessity and norm equality, including the zero case. The formula constructs Riesz’s vector in coordinates.</p>
+<p><strong>3.</strong> Evaluation at zero is bounded in the sup norm, hence its kernel is closed. Every representative in <span class="math inline">\(u+M\)</span> has norm at least <span class="math inline">\(|u(0)|\)</span>; the constant function <span class="math inline">\(u(0)\)</span> attains it. The quotient is isometric to the scalars by evaluation, so every functional annihilating <span class="math inline">\(M\)</span> is a scalar multiple of evaluation. With the <span class="math inline">\(L^2\)</span> norm let <span class="math inline">\(h_n(x)=\max(1-nx,0)\)</span>. Then <span class="math inline">\(u-u(0)h_n\)</span> vanishes at zero and approaches <span class="math inline">\(u\)</span> in norm. Thus <span class="math inline">\(M\)</span> is dense, every quotient class has seminorm zero, and the continuous annihilator is trivial. The algebraic quotient is still one-dimensional.</p>
+<p><strong>4.</strong> The defining functional has Riesz vector <span class="math inline">\(a_j=1/j\)</span> and is continuous, so <span class="math inline">\(M=a^\perp\)</span> is closed in the complete space <span class="math inline">\(\ell^2\)</span>. Projection gives <span class="math inline">\(p=x-\langle x,a\rangle a/\|a\|^2=e_1-a/\sum j^{-2}\)</span>. The subtraction removes the unique component normal to <span class="math inline">\(M\)</span>. Now replace the ambient space by <span class="math inline">\(c_{00}\)</span> and take the kernel of the same bounded functional restricted there. It is relatively closed. If <span class="math inline">\(e_1\)</span> had a nearest vector there, the residual <span class="math inline">\(r\)</span> would be perpendicular to the kernel by the one-direction minimization argument. For each <span class="math inline">\(j&gt;1\)</span>, <span class="math inline">\(e_j-e_1/j\)</span> is in this kernel. Thus <span class="math inline">\(r_j=r_1/j\)</span> for all <span class="math inline">\(j\)</span>. Finite support forces <span class="math inline">\(r=0\)</span>, but <span class="math inline">\(e_1\)</span> is outside the kernel. The proof of the theorem constructed a Cauchy sequence; only completeness guaranteed a limit inside the ambient space.</p>
+<p><strong>5.</strong> Coordinate observations via Riesz give <span class="math inline">\(\langle e_n,y\rangle\to0\)</span>. The coordinate projector misses <span class="math inline">\(e_{n+1}\)</span> entirely. If <span class="math inline">\(x_n\rightharpoonup x\)</span> is bounded and <span class="math inline">\(K\)</span> is compact, each subsequence of <span class="math inline">\(Kx_n\)</span> has a norm-convergent subsubsequence. Every such limit equals <span class="math inline">\(Kx\)</span>, because bounded maps preserve weak convergence (<span class="math inline">\(f(Kx_n)=(K'f)(x_n)\)</span>) and continuous functionals separate points. If norm convergence to <span class="math inline">\(Kx\)</span> failed, one could choose a subsequence at distance at least <span class="math inline">\(\varepsilon\)</span>, contradicting this conclusion.</p>
+<p><strong>6.</strong> The first <span class="math inline">\(N\)</span> entries of <span class="math inline">\(f\)</span> are attained by <span class="math inline">\(x^{(N)}=(1,\dots,1,0,\ldots)\)</span>. The residual norm is <span class="math inline">\((\sum_{j&gt;N}j^{-2})^{1/2}\to0\)</span> but <span class="math inline">\(\|x^{(N)}\|=\sqrt N\)</span>. Residual zero would force all entries equal to one. Thus the infimum is zero and no minimizer exists. For real <span class="math inline">\(s\)</span>, a datum belongs to <span class="math inline">\(\ell^2\)</span> exactly when <span class="math inline">\(2s&gt;1\)</span>, and <span class="math inline">\(x_j=j^{1-s}\)</span> belongs to <span class="math inline">\(\ell^2\)</span> exactly when <span class="math inline">\(2s-2&gt;1\)</span>. The endpoints fail by divergence of the harmonic series.</p>
+<p><strong>7.</strong> <span class="math inline">\(S\)</span> has zero kernel and closed range <span class="math inline">\(e_1^\perp\)</span>, so zero is residual. <span class="math inline">\(S^*e_1=0\)</span>, hence zero is point spectrum for <span class="math inline">\(S^*\)</span>. At one, neither <span class="math inline">\(S\)</span> nor its adjoint has a nonzero fixed vector: the first coordinate and recurrence force zero for <span class="math inline">\(S\)</span>, and a constant sequence in <span class="math inline">\(\ell^2\)</span> vanishes for <span class="math inline">\(S^*\)</span>. Thus <span class="math inline">\(S-I\)</span> is injective with dense range. Let <span class="math inline">\(v_n\)</span> be <span class="math inline">\(1/\sqrt n\)</span> on the first <span class="math inline">\(n\)</span> coordinates and zero thereafter. Only the two boundary coordinates survive in <span class="math inline">\((S-I)v_n\)</span>, giving norm <span class="math inline">\(\sqrt{2/n}\)</span>. A bounded inverse is impossible. The bounded inverse theorem rules out surjectivity, giving continuous spectrum.</p>
+<p><strong>8.</strong> For fixed <span class="math inline">\(t\)</span>, <span class="math inline">\(G\)</span> vanishes at both endpoints; its <span class="math inline">\(x\)</span>-derivative is <span class="math inline">\(1-t\)</span> to the left of <span class="math inline">\(t\)</span> and <span class="math inline">\(-t\)</span> to the right. Integrating this slope against <span class="math inline">\(v'\)</span> gives <span class="math inline">\((1-t)v(t)+t v(t)=v(t)\)</span>. Multiply by <span class="math inline">\(f(t)\)</span> and integrate. Switching the order of integration gives <span class="math inline">\(a(\int G(\cdot,t)f(t)\,dt,v)=\int fv\)</span>; the switch is justified by bounded slopes and integrability on a finite square. The endpoint values and bounded integrated slope place the candidate in <span class="math inline">\(V\)</span>. Uniqueness identifies the inverse. The kernel is symmetric and continuous, so symmetry of integration yields self-adjointness and the rectangle approximation in Session 5 gives compactness.</p>
+<p><strong>9.</strong> <span class="math inline">\(B^\top B=5I\)</span>, hence <span class="math inline">\(C=\sqrt5\)</span>; <span class="math inline">\(u^\top Bu=\|u\|^2\)</span> gives <span class="math inline">\(\alpha=1\)</span>. Solving <span class="math inline">\(Bu=e_2\)</span> gives <span class="math inline">\(u=(2,1)^\top/5\)</span>. Testing <span class="math inline">\(ce_1\)</span> against <span class="math inline">\(e_1\)</span> gives <span class="math inline">\(c=0\)</span>. Therefore <span class="math inline">\(a(u-u_h,e_1)=e_1^\top Bu=0\)</span>, yet <span class="math inline">\(\langle u-u_h,e_1\rangle=2/5\)</span>. The Euclidean best approximation is <span class="math inline">\((2/5)e_1\)</span>, with error <span class="math inline">\(1/5\)</span>. Galerkin’s error is <span class="math inline">\(1/\sqrt5\)</span>, attaining the Céa factor <span class="math inline">\(\sqrt5\)</span> in this example.</p>
+<p><strong>10.</strong> Take <span class="math inline">\(u(x)=G(x,1/2)=\tfrac12\min(x,1-x)\)</span>. Its slopes are <span class="math inline">\(\pm1/2\)</span>; splitting <span class="math inline">\(\int u'v'\)</span> yields <span class="math inline">\(v(1/2)\)</span> as in Exercise 8. Thus <span class="math inline">\(\|u\|_V^2=1/4=u(1/2)\)</span>. The slope has a jump, so its weak derivative cannot be an <span class="math inline">\(L^2\)</span> function by the bump test of Session 7. If the mesh contains <span class="math inline">\(1/2\)</span>, <span class="math inline">\(u\)</span> already belongs to the conforming piecewise linear space. The Galerkin solution is exact by uniqueness. A singular load and an exactly representable solution can occur together.</p>
+<p><strong>11.</strong> The derivative of the nodal interpolant <span class="math inline">\(I_hu\)</span> on each element is the average of <span class="math inline">\(u'\)</span>. Therefore <span class="math inline">\(\int_e(u-I_hu)'v_h'=0\)</span> since <span class="math inline">\(v_h'\)</span> is constant there. Summing proves Galerkin orthogonality and uniqueness identifies <span class="math inline">\(I_hu=u_h\)</span>. In a local coordinate <span class="math inline">\(t\in[0,h]\)</span> the interpolation error is <span class="math inline">\(t(h-t)/2\)</span> and its derivative is <span class="math inline">\(h/2-t\)</span>. The squared local errors integrate to <span class="math inline">\(h^5/120\)</span> and <span class="math inline">\(h^3/12\)</span> respectively. Summing <span class="math inline">\(1/h\)</span> elements gives <span class="math inline">\(\|u-u_h\|_2=h^2/\sqrt{120}\)</span> and <span class="math inline">\(\|u-u_h\|_V=h/\sqrt{12}\)</span>. This calculation measures error between the nodes.</p>
+<p><strong>12.</strong> Write <span class="math inline">\(\theta=k\pi/N\)</span> for <span class="math inline">\(1\le k&lt;N\)</span>. The adjacent sine samples sum to <span class="math inline">\(2\cos\theta\,c_i\)</span>. Thus the eigenvalues are <span class="math display">\[\lambda_{k,h}=\frac{6(1-\cos\theta)}{h^2(2+\cos\theta)}.\]</span> For fixed <span class="math inline">\(k\)</span>, expanding the cosine gives <span class="math inline">\(\lambda_{k,h}=(k\pi)^2[1+(k\pi h)^2/12+O((k\pi h)^4)]\)</span>. For <span class="math inline">\(k=N-1\)</span>, <span class="math inline">\(\theta\to\pi\)</span> and <span class="math inline">\(\lambda_{k,h}/(k\pi)^2\to12/\pi^2\)</span>, giving relative error approaching <span class="math inline">\(12/\pi^2-1\)</span>. Min–max gives upper bounds in both cases, while the convergence theorem fixes the mode index <em>before</em> refining. The oscillation wavelength of the last mode always spans only about two elements.</p>
+</section>
+</section>
+<section id="computational-laboratory-what-does-refinement-actually-measure" class="level2" data-number="23.10">
+<h2 data-number="23.10" class="anchored" data-anchor-id="computational-laboratory-what-does-refinement-actually-measure"><span class="header-section-number">23.10</span> Computational laboratory — What does refinement actually measure?</h2>
+<p>The three cells run in order in a Quarto Python notebook or Jupyter with NumPy, SciPy, and Matplotlib. The first experiment compares two ways of measuring the <em>same</em> truncation error. The second and third solve the source and eigenvalue problems using the assembled matrices. Predict each slope before running the cell.</p>
+<section id="experiment-1-a-tail-a-unit-ball-and-amplified-noise" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-1-a-tail-a-unit-ball-and-amplified-noise">Experiment 1 — A tail, a unit ball and amplified noise</h3>
+<p>For an exact test vector use <span class="math inline">\(x_j=\sqrt{1/j-1/(j+1)}\)</span>, whose squared tail beyond <span class="math inline">\(N\)</span> is <span class="math inline">\(1/(N+1)\)</span> by telescoping. The unit-ball error for truncating <span class="math inline">\(I\)</span> is witnessed by <span class="math inline">\(e_{N+1}\)</span>; for <span class="math inline">\(D\)</span> it is <span class="math inline">\(1/(N+1)\)</span>. A data perturbation <span class="math inline">\(\delta e_N\)</span> becomes <span class="math inline">\(N\delta e_N\)</span> under inversion of the retained block.</p>
+<div id="cell-fig-f1-tails" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> eigh</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse <span class="im">import</span> diags</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse.linalg <span class="im">import</span> spsolve</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sizes <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">2</span>, <span class="dv">10</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="fl">3.6</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].loglog(sizes, <span class="dv">1</span> <span class="op">/</span> np.sqrt(sizes <span class="op">+</span> <span class="dv">1</span>), <span class="st">'o-'</span>, label<span class="op">=</span><span class="st">'fixed vector tail'</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].loglog(sizes, np.ones_like(sizes), <span class="st">'s-'</span>, label<span class="op">=</span><span class="st">'identity, unit ball'</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].loglog(sizes, <span class="dv">1</span> <span class="op">/</span> (sizes <span class="op">+</span> <span class="dv">1</span>), <span class="st">'^-'</span>, label<span class="op">=</span><span class="st">'diagonal D, unit ball'</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'retained coordinates N'</span>, ylabel<span class="op">=</span><span class="st">'norm error'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>gains <span class="op">=</span> []</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> sizes:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    sigma <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.arange(<span class="dv">1</span>, n <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    noise <span class="op">=</span> np.zeros(n)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    noise[<span class="op">-</span><span class="dv">1</span>] <span class="op">=</span> <span class="fl">1e-6</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    gains.append(np.linalg.norm(noise <span class="op">/</span> sigma) <span class="op">/</span> np.linalg.norm(noise))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].loglog(sizes, gains, <span class="st">'o-'</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">'retained coordinates N'</span>, ylabel<span class="op">=</span><span class="st">'solution error / data error'</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-f1-tails" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-f1-tails-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="f1_files/figure-html/fig-f1-tails-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-f1-tails-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23.1: Truncation error for a fixed vector and on the unit ball, alongside inverse amplification.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The left panel uses exact infinite-tail formulas. Summing a fixed reference vector of length 512 would instead force its measured tail to zero at 512. The right panel performs actual finite-dimensional inversion in singular coordinates. Its growing slope is explained by the analytical range calculation in Session 4.</p>
+</section>
+<section id="experiment-2-a-galerkin-solution-with-zero-nodal-error" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-2-a-galerkin-solution-with-zero-nodal-error">Experiment 2 — A Galerkin solution with zero nodal error</h3>
+<p>Assemble <span class="math inline">\(K\)</span> and <span class="math inline">\(M\)</span> after enforcing homogeneous boundary conditions. Evaluate errors inside each interval with three-point Gauss quadrature, exact for polynomials through degree five. The squared value error is quartic in this example.</p>
+<div id="cell-fig-f1-galerkin" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> assemble(n):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> n</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    main <span class="op">=</span> np.ones(n <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    side <span class="op">=</span> np.ones(n <span class="op">-</span> <span class="dv">2</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    stiffness <span class="op">=</span> diags([<span class="op">-</span>side, <span class="dv">2</span> <span class="op">*</span> main, <span class="op">-</span>side], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'csc'</span>) <span class="op">/</span> h</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    mass <span class="op">=</span> diags([side, <span class="dv">4</span> <span class="op">*</span> main, side], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'csc'</span>) <span class="op">*</span> (h <span class="op">/</span> <span class="dv">6</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stiffness, mass</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>meshes <span class="op">=</span> np.array([<span class="dv">8</span>, <span class="dv">16</span>, <span class="dv">32</span>, <span class="dv">64</span>, <span class="dv">128</span>])</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>energy_errors, value_errors <span class="op">=</span> [], []</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>points, weights <span class="op">=</span> np.polynomial.legendre.leggauss(<span class="dv">3</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> (points <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> meshes:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> n</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    K, M <span class="op">=</span> assemble(n)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    coeff <span class="op">=</span> np.r_[<span class="fl">0.</span>, spsolve(K, np.full(n <span class="op">-</span> <span class="dv">1</span>, h)), <span class="fl">0.</span>]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    left <span class="op">=</span> np.arange(n)[:, <span class="va">None</span>] <span class="op">*</span> h</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> left <span class="op">+</span> h <span class="op">*</span> t</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    uh <span class="op">=</span> coeff[:<span class="op">-</span><span class="dv">1</span>, <span class="va">None</span>] <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> t) <span class="op">+</span> coeff[<span class="dv">1</span>:, <span class="va">None</span>] <span class="op">*</span> t</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    slopes <span class="op">=</span> np.diff(coeff)[:, <span class="va">None</span>] <span class="op">/</span> h</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> integrated_norm(error):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.sqrt(h <span class="op">/</span> <span class="dv">2</span> <span class="op">*</span> np.<span class="bu">sum</span>(error<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> weights))</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    value_errors.append(integrated_norm(x <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> x) <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> uh))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    energy_errors.append(integrated_norm(<span class="fl">0.5</span> <span class="op">-</span> x <span class="op">-</span> slopes))</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>hvals <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> meshes</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(value_errors, hvals<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> np.sqrt(<span class="dv">120</span>))</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(energy_errors, hvals <span class="op">/</span> np.sqrt(<span class="dv">12</span>))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">3.8</span>))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>plt.loglog(hvals, energy_errors, <span class="st">'o-'</span>, label<span class="op">=</span><span class="st">'energy norm'</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>plt.loglog(hvals, value_errors, <span class="st">'s-'</span>, label<span class="op">=</span><span class="st">'L² norm'</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'mesh width h'</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'integrated error'</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div id="fig-f1-galerkin" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-f1-galerkin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="f1_files/figure-html/fig-f1-galerkin-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-f1-galerkin-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23.2: Energy and integral errors for the linear finite-element solution with constant load.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Halving <span class="math inline">\(h\)</span> halves the energy error and quarters the <span class="math inline">\(L^2\)</span> error. Both conclusions here refer to this smooth quadratic solution and the chosen conforming spaces. Exercise 10 gives a different outcome for a point load.</p>
+</section>
+<section id="experiment-3-eigenvalue-convergence-and-solver-residual" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-3-eigenvalue-convergence-and-solver-residual">Experiment 3 — Eigenvalue convergence and solver residual</h3>
+<p>Use the consistent mass matrix. The matrices are deliberately small so a dense symmetric generalized eigensolver can compute both a low and a high mode. Compare each with the corresponding continuum eigenvalue, and compare the low-mode error with the residual of the discrete equation.</p>
+<div id="cell-fig-f1-ritz" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>low_errors, high_errors <span class="op">=</span> [], []</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'elements   first Ritz value   relative residual'</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> meshes:</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    K, M <span class="op">=</span> assemble(n)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    lam, vectors <span class="op">=</span> eigh(K.toarray(), M.toarray())</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> vectors[:, <span class="dv">0</span>]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> K <span class="op">@</span> c <span class="op">-</span> lam[<span class="dv">0</span>] <span class="op">*</span> (M <span class="op">@</span> c)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    scale <span class="op">=</span> np.linalg.norm(K <span class="op">@</span> c) <span class="op">+</span> lam[<span class="dv">0</span>] <span class="op">*</span> np.linalg.norm(M <span class="op">@</span> c)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>n<span class="sc">:8d}</span><span class="ss">   </span><span class="sc">{</span>lam[<span class="dv">0</span>]<span class="sc">:16.10f}</span><span class="ss">   </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(residual)<span class="op">/</span>scale<span class="sc">:.2e}</span><span class="ss">'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    low_errors.append(lam[<span class="dv">0</span>] <span class="op">/</span> np.pi<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    high_errors.append(lam[<span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> ((n <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> np.pi)<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> np.arange(<span class="dv">1</span>, n)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    theta <span class="op">=</span> k <span class="op">*</span> np.pi <span class="op">/</span> n</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    exact_discrete <span class="op">=</span> <span class="dv">12</span> <span class="op">*</span> n<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> np.sin(theta <span class="op">/</span> <span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="dv">2</span> <span class="op">+</span> np.cos(theta))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> np.allclose(lam, exact_discrete)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">3.8</span>))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>plt.loglog(hvals, low_errors, <span class="st">'o-'</span>, label<span class="op">=</span><span class="st">'first mode'</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>plt.loglog(hvals, high_errors, <span class="st">'s-'</span>, label<span class="op">=</span><span class="st">'last mode'</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">12</span> <span class="op">/</span> np.pi<span class="op">**</span><span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>, ls<span class="op">=</span><span class="st">':'</span>, color<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'last-mode limit'</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'mesh width h'</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'relative eigenvalue error'</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>elements   first Ritz value   relative residual
+       8       9.9970806562   6.34e-15
+      16       9.9013536784   3.47e-14
+      32       9.8775341175   1.63e-13
+      64       9.8715863533   5.85e-13
+     128       9.8700998593   3.72e-12</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-f1-ritz" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-f1-ritz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="f1_files/figure-html/fig-f1-ritz-output-2.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-f1-ritz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;23.3: Relative continuum eigenvalue errors for a fixed mode and the highest available mode.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>For <span class="math inline">\(N=8\)</span> expect <span class="math inline">\(\lambda_{1,h}\approx9.9971\)</span>, above <span class="math inline">\(\pi^2\approx9.8696\)</span>. The residual can already be tiny. Refinement steadily improves this fixed mode, whereas tracking the last mode on successive meshes changes the target. A finite spectrum alone cannot establish compactness, range closure or completeness of the sine functions; the proofs explain which limits the calculations illustrate.</p>
+</section>
+</section>
+<section id="synthesis-what-did-the-topology-change" class="level2" data-number="23.11">
+<h2 data-number="23.11" class="anchored" data-anchor-id="synthesis-what-did-the-topology-change"><span class="header-section-number">23.11</span> Synthesis — What did the topology change?</h2>
+<p>Module A asks whether a linear equation has a solution and how the kernel accounts for its nonuniqueness. The quotient <span class="math inline">\(X/\ker T\)</span> still parametrizes the image algebraically. The diagonal example introduces a new question: does a small change in data produce a small change in the solution class? For a bounded Hilbert-space operator, closed range answers precisely that question. The right shift separates uniqueness from existence, while the decaying diagonal separates arbitrarily small residuals from actual solvability.</p>
+<p>Module B views functionals as measurements. Restricting morphisms to bounded linear maps gives a category in which composition preserves continuity. Three familiar constructions now have analytic content. Completion extends bounded maps to limits, the normed quotient factors maps that kill a closed subspace, and the continuous dual reverses arrows by composition. Hahn–Banach explains why continuous measurements still detect every point. They cannot detect the difference between a dense subspace and its closure by annihilation. In particular Module B’s finite-dimensional identity <span class="math inline">\(\operatorname{ran}T'=(\ker T)^\circ\)</span> can fail: for the real diagonal <span class="math inline">\(D\)</span> under the Riesz identification the right side is the entire dual, while the left is a proper dense range.</p>
+<p>Module C adds an inner product. With completeness it turns minimizing sequences into projections, makes compatible infinite coordinate lists into vectors, and gives every continuous measurement a representing vector. These results lead directly to least squares and coercive variational equations. An adjoint depends on the two Hilbert structures. Changing the test-space norm also changes what counts as a bounded load. A point force is a particularly concrete witness: it is continuous on the one-dimensional energy space and cannot be represented by an <span class="math inline">\(L^2\)</span> load.</p>
+<p>Module D resolves operators into modes. In F1 compact self-adjoint operators retain an orthonormal eigenvector expansion, while a general self-adjoint operator may require projections onto spectral bands. For the Dirichlet problem the decisive compact operator is the <em>solution</em> operator. It sends bounded data to a family of functions with enough common regularity for a convergent subsequence. This explains both the sine expansion and the decay of the inverse eigenvalues.</p>
+<p>For numerical PDEs the trial space, test space, norm and boundary conditions are parts of the mathematical model. Galerkin approximation transports their structure into matrices. For numerical linear algebra there are then two approximation questions: how accurately the trial space captures a continuum invariant subspace, and how accurately a numerical iteration captures the corresponding matrix invariant subspace. For F2 a further question remains: which constructions are characterized by the maps they admit? Completion and quotient already provide examples. Riesz representation shows what an additional geometric structure can supply beyond the underlying algebraic category.</p>
+<section id="theorem-map" class="level3">
+<h3 class="anchored" data-anchor-id="theorem-map">Theorem map</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Result</th>
+<th>Hypotheses</th>
+<th>Conclusion</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Equivalence of norms</td>
+<td>Finite-dimensional space</td>
+<td>Two-sided norm bounds</td>
+<td>Choice of error norm preserves convergence there</td>
+</tr>
+<tr class="even">
+<td>Completion</td>
+<td>Normed domain, Banach target</td>
+<td>Bounded maps extend uniquely to the completion</td>
+<td>Defines operations on limits of approximations</td>
+</tr>
+<tr class="odd">
+<td>Boundedness criterion</td>
+<td>Linear map of normed spaces</td>
+<td>Continuity iff a global norm bound exists</td>
+<td>Turns continuity into an error estimate</td>
+</tr>
+<tr class="even">
+<td>Hahn–Banach</td>
+<td>Bounded functional on any subspace</td>
+<td>Norm-preserving extension</td>
+<td>Norm recovery and separation in quotients</td>
+</tr>
+<tr class="odd">
+<td>Projection</td>
+<td>Hilbert space, closed subspace</td>
+<td>Unique orthogonal best approximation</td>
+<td>Existence of a best vector even without a finite basis</td>
+</tr>
+<tr class="even">
+<td>Riesz representation</td>
+<td>Hilbert space, continuous functional</td>
+<td>Unique representing vector of equal norm</td>
+<td>Converts dual equations into vector equations</td>
+</tr>
+<tr class="odd">
+<td>Parseval</td>
+<td>Total orthonormal system</td>
+<td>Coefficient energy equals squared norm</td>
+<td>Justifies infinite expansions and truncation errors</td>
+</tr>
+<tr class="even">
+<td>Closed range</td>
+<td>Bounded Hilbert-space operator</td>
+<td>Closed range iff bounded below off kernel</td>
+<td>Stability of least squares and the pseudoinverse</td>
+</tr>
+<tr class="odd">
+<td>Compact spectral theorem</td>
+<td>Compact, self-adjoint</td>
+<td>Mode expansion; possible accumulation only at zero</td>
+<td>Explains smoothing and unstable inversion</td>
+</tr>
+<tr class="even">
+<td>Spectral measure theorem</td>
+<td>Bounded, self-adjoint</td>
+<td>Resolution by band projections</td>
+<td>Functional calculus even without eigenvectors</td>
+</tr>
+<tr class="odd">
+<td>Lax–Milgram</td>
+<td>Hilbert space, bounded coercive form, continuous load</td>
+<td>Unique solution, inverse bound <span class="math inline">\(1/\alpha\)</span></td>
+<td>Well-posed weak boundary-value problems</td>
+</tr>
+<tr class="even">
+<td>Céa</td>
+<td>Same assumptions, conforming Galerkin space</td>
+<td>Error within <span class="math inline">\(C/\alpha\)</span> of best</td>
+<td>Reduces the error analysis to approximation</td>
+</tr>
+<tr class="odd">
+<td>Variational min–max</td>
+<td>Positive Dirichlet operator with compact inverse here</td>
+<td>Ordered Rayleigh quotient characterization</td>
+<td>Conforming Ritz upper bounds and fixed-mode convergence</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mastery-assessment" class="level3">
+<h3 class="anchored" data-anchor-id="mastery-assessment">Mastery assessment</h3>
+<p>Work from a blank page. For each item aim to give a definition, a proof or calculation, and one example in which a hypothesis matters.</p>
+<ul class="task-list">
+<li><label><input type="checkbox">Distinguish normed, Banach and Hilbert spaces. Exhibit an incomplete inner-product space and a Banach norm that cannot arise from an inner product.</label></li>
+<li><label><input type="checkbox">Construct the completion of <span class="math inline">\(c_{00}\)</span> in the <span class="math inline">\(2\)</span>-norm. Explain why its identity into a complete target extends uniquely when bounded.</label></li>
+<li><label><input type="checkbox">Derive boundedness of a linear map from continuity at zero. Test whether a proposed measurement extends to the completion.</label></li>
+<li><label><input type="checkbox">Identify the continuous dual of a quotient and use Hahn–Banach to separate a point from a closed subspace.</label></li>
+<li><label><input type="checkbox">Rebuild the projection proof from the midpoint estimate, then derive Riesz from the kernel of a functional.</label></li>
+<li><label><input type="checkbox">Use <span class="math inline">\(\ell^2\)</span> to distinguish weak convergence, norm convergence, strong operator convergence and operator-norm convergence.</label></li>
+<li><label><input type="checkbox">Derive the adjoint range identities and give data orthogonal to the adjoint kernel for which there is no exact solution.</label></li>
+<li><label><input type="checkbox">Recognize compactness from finite-rank approximation. Explain the differing spectral behavior of a decaying diagonal and multiplication by <span class="math inline">\(t\)</span>.</label></li>
+<li><label><input type="checkbox">Derive the weak Dirichlet equation, identify its domain and loads, and explain the two different meanings of its operator bound.</label></li>
+<li><label><input type="checkbox">Reconstruct Lax–Milgram and Céa. Identify the extra symmetry that turns quasi-optimality into exact energy best approximation.</label></li>
+<li><label><input type="checkbox">Assemble a stiffness–mass pencil, justify both definiteness claims, and distinguish a discrete eigenpair residual from continuum error.</label></li>
+<li><label><input type="checkbox">Starting with compactness of the solution operator, derive the sine basis, min–max upper bounds, and a reason a fixed low mode improves under mesh refinement.</label></li>
+</ul>
+<p><strong>Final reconstruction problem.</strong> Explain to a fellow student how <span class="math inline">\(\int u'v'=F(v)\)</span> leads both to a stable inverse and to an inverse with eigenvalues tending to zero. Specify each domain, codomain and norm. In energy and dual norms <span class="math inline">\(A:V\to V^*\)</span> is an isometric isomorphism. Viewing the solution instead as <span class="math inline">\(S:L^2\to L^2\)</span> introduces a compact embedding and yields eigenvalues <span class="math inline">\((k\pi)^{-2}\)</span>. Inverting this last map on its range differentiates twice and amplifies high frequencies. The choice of spaces is exactly what reconciles the two conclusions.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review_3/e03.html" class="pagination-link" aria-label="Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review_2/f2.html" class="pagination-link" aria-label="Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory">
+        <span class="nav-page-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

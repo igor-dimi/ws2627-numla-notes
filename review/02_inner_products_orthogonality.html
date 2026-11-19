@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Session 2 — Inner Products and Orthogonality – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/03_orthogonal_projections.html" rel="next">
+<link href="../review/01_vector_spaces.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/02_inner_products_orthogonality.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-coordinates-to-geometry" id="toc-from-coordinates-to-geometry" class="nav-link active" data-scroll-target="#from-coordinates-to-geometry"><span class="header-section-number">3.1</span> From coordinates to geometry</a>
+  <ul class="collapse">
+  <li><a href="#one-subtraction-gives-cauchyschwarz" id="toc-one-subtraction-gives-cauchyschwarz" class="nav-link" data-scroll-target="#one-subtraction-gives-cauchyschwarz">One subtraction gives Cauchy–Schwarz</a></li>
+  </ul></li>
+  <li><a href="#orthogonal-complements-turn-span-questions-into-kernel-questions" id="toc-orthogonal-complements-turn-span-questions-into-kernel-questions" class="nav-link" data-scroll-target="#orthogonal-complements-turn-span-questions-into-kernel-questions"><span class="header-section-number">3.2</span> Orthogonal complements turn span questions into kernel questions</a></li>
+  <li><a href="#orthonormal-coordinates-and-orthogonal-decomposition" id="toc-orthonormal-coordinates-and-orthogonal-decomposition" class="nav-link" data-scroll-target="#orthonormal-coordinates-and-orthogonal-decomposition"><span class="header-section-number">3.3</span> Orthonormal coordinates and orthogonal decomposition</a></li>
+  <li><a href="#gramschmidt-from-the-residual-equation" id="toc-gramschmidt-from-the-residual-equation" class="nav-link" data-scroll-target="#gramschmidt-from-the-residual-equation"><span class="header-section-number">3.4</span> Gram–Schmidt from the residual equation</a>
+  <ul class="collapse">
+  <li><a href="#worked-construction-in-the-running-plane" id="toc-worked-construction-in-the-running-plane" class="nav-link" data-scroll-target="#worked-construction-in-the-running-plane">Worked construction in the running plane</a></li>
+  </ul></li>
+  <li><a href="#what-changes-in-numerical-algorithms" id="toc-what-changes-in-numerical-algorithms" class="nav-link" data-scroll-target="#what-changes-in-numerical-algorithms"><span class="header-section-number">3.5</span> What changes in numerical algorithms?</a></li>
+  <li><a href="#independent-exercises" id="toc-independent-exercises" class="nav-link" data-scroll-target="#independent-exercises"><span class="header-section-number">3.6</span> Independent exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">3.7</span> Worked solutions</a>
+  <ul class="collapse">
+  <li><a href="#choosing-a-geometry" id="toc-choosing-a-geometry" class="nav-link" data-scroll-target="#choosing-a-geometry">Choosing a geometry</a></li>
+  <li><a href="#recovering-a-normal" id="toc-recovering-a-normal" class="nav-link" data-scroll-target="#recovering-a-normal">Recovering a normal</a></li>
+  <li><a href="#decomposing-a-vector" id="toc-decomposing-a-vector" class="nav-link" data-scroll-target="#decomposing-a-vector">Decomposing a vector</a></li>
+  <li><a href="#orthogonalization-by-hand" id="toc-orthogonalization-by-hand" class="nav-link" data-scroll-target="#orthogonalization-by-hand">Orthogonalization by hand</a></li>
+  <li><a href="#complex-coordinates" id="toc-complex-coordinates" class="nav-link" data-scroll-target="#complex-coordinates">Complex coordinates</a></li>
+  <li><a href="#a-filtered-block" id="toc-a-filtered-block" class="nav-link" data-scroll-target="#a-filtered-block">A filtered block</a></li>
+  </ul></li>
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist"><span class="header-section-number">3.8</span> End-of-session mastery checklist</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/02_inner_products_orthogonality.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In Session 1, the plane <span class="math inline">\(U=\{(s,t,s+t)^T:s,t\in\mathbb R\}\)</span> had a basis, and each <span class="math inline">\(x\in U\)</span> had unique coordinates. But how much of <span class="math inline">\(x\)</span> lies along a given basis vector? With an arbitrary basis, a coordinate need not answer that question. An inner product lets us measure components. Choosing an orthonormal basis makes those measurements <em>equal</em> to the coordinates.</p>
+<p>Allow <strong>45–50 minutes</strong> for the text and worked examples and <strong>25–30 minutes</strong> for the exercises and recall. The mastery task is to start with independent columns, build an orthonormal basis of their span by hand, and justify each subtraction and division. Throughout, spaces are finite-dimensional over <span class="math inline">\(\mathbb F=\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>, and coordinate vectors are columns.</p>
+<section id="from-coordinates-to-geometry" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="from-coordinates-to-geometry"><span class="header-section-number">3.1</span> From coordinates to geometry</h2>
+<p>A vector space specifies which linear combinations can be formed. It takes additional structure to measure their lengths or say that two directions meet at a right angle. Following Kanschat and Scheichl, Appendix A.2, we take the inner product <strong>linear in the first argument</strong>. For all <span class="math inline">\(x,y,z\in V\)</span> and <span class="math inline">\(\alpha,\beta\in\mathbb F\)</span>, its axioms are</p>
+<p><span class="math display">\[
+\begin{aligned}
+\langle \alpha x+\beta y,z\rangle
+&amp;=\alpha\langle x,z\rangle+\beta\langle y,z\rangle,\\
+\langle x,y\rangle &amp;=\overline{\langle y,x\rangle},\\
+\langle x,x\rangle &amp;\ge 0,\qquad
+\langle x,x\rangle=0 \iff x=0.
+\end{aligned}
+\]</span></p>
+<p>Conjugate symmetry gives conjugate linearity in the second argument and ensures <span class="math inline">\(\langle x,x\rangle\)</span> is real. In real spaces conjugation disappears. The standard Euclidean and Hermitian products are respectively <span class="math inline">\(y^Tx\)</span> and <span class="math inline">\(y^*x=\sum_j x_j\overline{y_j}\)</span>, where <span class="math inline">\(y^*=\overline y^T\)</span>. For instance, <span class="math inline">\(x=(1,i)^T\)</span> has <span class="math inline">\(x^*x=2\)</span>, even though <span class="math inline">\(x^Tx=0\)</span>.</p>
+<p>The induced length is <span class="math inline">\(\|x\|=\sqrt{\langle x,x\rangle}\)</span>. Two vectors are <strong>orthogonal</strong>, written <span class="math inline">\(x\perp y\)</span>, if <span class="math inline">\(\langle x,y\rangle=0\)</span>. Geometry depends on the chosen product. In <span class="math inline">\(\mathbb R^2\)</span>, <span class="math inline">\(u=(1,1)^T\)</span> and <span class="math inline">\(v=(1,-1)^T\)</span> are Euclidean-orthogonal. With <span class="math inline">\(W=\operatorname{diag}(4,1)\)</span>, the product <span class="math inline">\(\langle x,y\rangle_W=y^TWx\)</span> gives <span class="math inline">\(\langle u,v\rangle_W=3\)</span>. Its unit circle has equation <span class="math inline">\(4x_1^2+x_2^2=1\)</span> because displacement along the first axis costs twice as much in length. Orthogonality has changed while spans and linear independence are exactly as before.</p>
+<section id="one-subtraction-gives-cauchyschwarz" class="level3">
+<h3 class="anchored" data-anchor-id="one-subtraction-gives-cauchyschwarz">One subtraction gives Cauchy–Schwarz</h3>
+<p>For <span class="math inline">\(y\ne0\)</span>, seek a scalar <span class="math inline">\(c\)</span> making <span class="math inline">\(r=x-cy\)</span> perpendicular to <span class="math inline">\(y\)</span>. Linearity in the first slot gives <span class="math display">\[
+0=\langle r,y\rangle=\langle x,y\rangle-c\|y\|^2,
+\qquad c=\frac{\langle x,y\rangle}{\|y\|^2}.
+\]</span> Since <span class="math inline">\(x=cy+r\)</span> and both cross terms vanish, expansion yields <span class="math display">\[
+\|x\|^2=|c|^2\|y\|^2+\|r\|^2
+\ge \frac{|\langle x,y\rangle|^2}{\|y\|^2}.
+\]</span> Taking square roots proves <strong>Cauchy–Schwarz</strong>, <span class="math inline">\(|\langle x,y\rangle|\le\|x\|\,\|y\|\)</span>. Equality holds exactly when <span class="math inline">\(x,y\)</span> are linearly dependent (including the case <span class="math inline">\(y=0\)</span>). Remember the residual <span class="math inline">\(r\)</span>: Gram–Schmidt repeats this construction.</p>
+<p>For real nonzero vectors the quotient <span class="math inline">\(\langle x,y\rangle/(\|x\|\|y\|)\)</span> thus lies in <span class="math inline">\([-1,1]\)</span> and defines the cosine of their angle. In complex space the quotient may have a phase. Its absolute value gives the cosine of the acute or right angle between the corresponding complex lines, allowing angle zero for coincident lines.</p>
+<p>In either field, <span class="math display">\[
+\|x+y\|^2=\|x\|^2+2\operatorname{Re}\langle x,y\rangle+\|y\|^2.
+\]</span> Cauchy–Schwarz bounds the right side by <span class="math inline">\((\|x\|+\|y\|)^2\)</span>, giving the triangle inequality. Together with positivity and <span class="math inline">\(\|\alpha x\|=|\alpha|\|x\|\)</span>, this verifies that the induced length is a norm. For orthogonal vectors the middle term vanishes, giving <strong>Pythagoras</strong>. Over <span class="math inline">\(\mathbb R\)</span> the identity also implies orthogonality. Over <span class="math inline">\(\mathbb C\)</span> it only forces the real part to vanish, as <span class="math inline">\(1\)</span> and <span class="math inline">\(i\)</span> illustrate.</p>
+</section>
+</section>
+<section id="orthogonal-complements-turn-span-questions-into-kernel-questions" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="orthogonal-complements-turn-span-questions-into-kernel-questions"><span class="header-section-number">3.2</span> Orthogonal complements turn span questions into kernel questions</h2>
+<p>An <strong>orthogonal family</strong> has <span class="math inline">\(u_i\perp u_j\)</span> for <span class="math inline">\(i\ne j\)</span>. An <strong>orthonormal family</strong> also has <span class="math inline">\(\|u_i\|=1\)</span>, so <span class="math inline">\(\langle u_i,u_j\rangle=\delta_{ij}\)</span> (one for equal indices and zero otherwise). Any orthogonal family of nonzero vectors is independent: taking the inner product of <span class="math inline">\(\sum_i c_i u_i=0\)</span> with <span class="math inline">\(u_j\)</span> gives <span class="math inline">\(c_j\|u_j\|^2=0\)</span> for every <span class="math inline">\(j\)</span>.</p>
+<p>For a subspace <span class="math inline">\(U\subseteq V\)</span>, define <span class="math display">\[
+U^\perp=\{z\in V:\langle z,u\rangle=0\text{ for every }u\in U\}.
+\]</span> Linearity makes this a subspace. Testing a spanning family suffices because the inner product with any linear combination of its members also vanishes. In the standard geometry, if <span class="math inline">\(U=\operatorname{im} B\)</span>, this turns the geometric definition into the Session 1 operation of solving a homogeneous system: <span class="math display">\[
+z\in U^\perp \iff B^*z=0.
+\]</span> Indeed, each entry of <span class="math inline">\(B^*z\)</span> tests one column. For a map <span class="math inline">\(A:\mathbb F^n\to\mathbb F^m\)</span> the two corresponding identities are <span class="math display">\[
+(\operatorname{im} A)^\perp=\ker A^*\subseteq\mathbb F^m,
+\qquad
+(\operatorname{im} A^*)^\perp=\ker A\subseteq\mathbb F^n.
+\]</span> The second follows by applying the first to <span class="math inline">\(A^*\)</span>. Abstractly, the adjoint satisfies <span class="math inline">\(\langle Ax,y\rangle=\langle x,A^*y\rangle\)</span>. The conjugate-transpose formula assumes standard products in coordinates (or orthonormal bases). For example, with ambient product <span class="math inline">\(y^*Wx\)</span>, testing the columns of <span class="math inline">\(B\)</span> gives <span class="math inline">\(B^*Wz=0\)</span>.</p>
+<p><strong>The plane from Session 1.</strong> Take its natural spanning columns <span class="math display">\[
+a=(1,0,1)^T,\qquad b=(0,1,1)^T,\qquad B=[\,a\ b\,].
+\]</span> They are independent but <span class="math inline">\(a^Tb=1\)</span>. A vector <span class="math inline">\(z\)</span> perpendicular to the plane satisfies <span class="math inline">\(z_1+z_3=z_2+z_3=0\)</span>, hence <span class="math display">\[
+U^\perp=\operatorname{span}\{n\},\qquad n=(-1,-1,1)^T.
+\]</span> The equation of the plane itself is <span class="math inline">\(n^Tx=0\)</span>. Thus the same plane is an image when built from spanning directions and a kernel when specified by its normal. In <span class="math inline">\(\mathbb R^2\)</span> the analogous calculation sends the line through <span class="math inline">\((s,t)^T\ne0\)</span> to the line through <span class="math inline">\((-t,s)^T\)</span>.</p>
+</section>
+<section id="orthonormal-coordinates-and-orthogonal-decomposition" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="orthonormal-coordinates-and-orthogonal-decomposition"><span class="header-section-number">3.3</span> Orthonormal coordinates and orthogonal decomposition</h2>
+<p>Suppose <span class="math inline">\(q_1,\ldots,q_k\)</span> is an orthonormal basis of <span class="math inline">\(U\)</span>. For <span class="math inline">\(x=\sum_i c_iq_i\)</span> in <span class="math inline">\(U\)</span>, pairing with <span class="math inline">\(q_j\)</span> isolates <span class="math inline">\(c_j\)</span>. In standard coordinates, writing <span class="math inline">\(Q=[\,q_1\ \cdots\ q_k\,]\)</span>, we obtain <span class="math display">\[
+c_j=\langle x,q_j\rangle=q_j^*x,\qquad c=Q^*x,\qquad x=Qc.
+\]</span> Session 1 used <span class="math inline">\(B\)</span> to assemble a vector from its coordinates. For an orthonormal basis, the adjoint reads those coordinates back: the <span class="math inline">\((i,j)\)</span> entry of <span class="math inline">\(Q^*Q\)</span> is <span class="math inline">\(q_i^*q_j=\delta_{ij}\)</span>. Therefore <span class="math inline">\(Q^*Q=I_k\)</span> and <span class="math inline">\(\|Qc\|_2^2=c^*Q^*Qc=\|c\|_2^2\)</span>. A rectangular <span class="math inline">\(Q\)</span> is an isometry from coordinate space onto <span class="math inline">\(U\)</span>. A square <span class="math inline">\(Q\)</span> additionally satisfies <span class="math inline">\(QQ^*=I\)</span> and is called <strong>unitary</strong>, or <strong>orthogonal</strong> over the reals. For <span class="math inline">\(k&lt;n\)</span>, a nonzero normal to <span class="math inline">\(U\)</span> is sent to zero by <span class="math inline">\(Q^*\)</span>, so <span class="math inline">\(Q^*\)</span> cannot be a two-sided inverse.</p>
+<p>What if <span class="math inline">\(x\)</span> is anywhere in <span class="math inline">\(V\)</span>? Form <span class="math display">\[
+u=\sum_{j=1}^k\langle x,q_j\rangle q_j,\qquad z=x-u.
+\]</span> Testing <span class="math inline">\(z\)</span> against each <span class="math inline">\(q_i\)</span> gives zero, so <span class="math inline">\(u\in U\)</span> and <span class="math inline">\(z\in U^\perp\)</span>. The decomposition is unique: two such decompositions would give a difference in <span class="math inline">\(U\cap U^\perp\)</span>, where a vector is orthogonal to itself and hence zero. We have proved <span class="math display">\[
+V=U\oplus U^\perp,\qquad \dim V=\dim U+\dim U^\perp.
+\]</span> The dimension count follows by concatenating bases of the two summands. The construction in the next section supplies the orthonormal basis used in this proof for every nonzero subspace (the zero subspace uses the empty basis).</p>
+<p><strong>Check in the running plane.</strong> For <span class="math inline">\(x=(0,0,3)^T\)</span>, the coefficient along its normal <span class="math inline">\(n\)</span> is <span class="math inline">\(n^Tx/(n^Tn)=1\)</span>. Thus <span class="math inline">\(x=(1,1,2)^T+n\)</span>. The first term equals <span class="math inline">\(a+b\)</span> and is perpendicular to <span class="math inline">\(n\)</span>. The squared lengths are <span class="math inline">\(9=6+3\)</span>.</p>
+</section>
+<section id="gramschmidt-from-the-residual-equation" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="gramschmidt-from-the-residual-equation"><span class="header-section-number">3.4</span> Gram–Schmidt from the residual equation</h2>
+<p>Given independent <span class="math inline">\(a_1,\ldots,a_k\)</span>, we want each new basis vector to contribute the direction still missing from the preceding span. Suppose <span class="math inline">\(q_1,\ldots,q_{j-1}\)</span> already form an orthonormal basis of that span. Write <span class="math inline">\(w_j=a_j-\sum_{i&lt;j}c_iq_i\)</span>. Requiring <span class="math inline">\(\langle w_j,q_\ell\rangle=0\)</span> gives <span class="math inline">\(c_\ell=\langle a_j,q_\ell\rangle\)</span>. This determines <strong>classical Gram–Schmidt</strong>: <span class="math display">\[
+w_j=a_j-\sum_{i=1}^{j-1}\langle a_j,q_i\rangle q_i,
+\qquad q_j=\frac{w_j}{\|w_j\|},\qquad j=1,\ldots,k.
+\]</span> The first sum is empty, so <span class="math inline">\(w_1=a_1\)</span>. Subtraction <strong>orthogonalizes</strong> the residual against the earlier vectors. Division <strong>normalizes</strong> its length. Division alone leaves any nonzero pairwise correlation in place.</p>
+<p><strong>Why the algorithm works.</strong> Each <span class="math inline">\(w_j\)</span> belongs to the first <span class="math inline">\(j\)</span> input vectors’ span. It is nonzero, since <span class="math inline">\(w_j=0\)</span> would express <span class="math inline">\(a_j\)</span> in the preceding span. Testing against the earlier <span class="math inline">\(q_i\)</span> proves orthogonality, and normalization yields unit length. Conversely, <span class="math inline">\(a_j=\|w_j\|q_j+\sum_{i&lt;j}\langle a_j,q_i\rangle q_i\)</span>. Starting with <span class="math inline">\(q_1\)</span>, induction now gives <span class="math display">\[
+\operatorname{span}\{q_1,\ldots,q_j\}
+=\operatorname{span}\{a_1,\ldots,a_j\}\quad\text{at every step.}
+\]</span> For a dependent input column a zero residual signals that its entire direction is already represented. In exact arithmetic one can skip that column when constructing a basis of the image.</p>
+<section id="worked-construction-in-the-running-plane" class="level3">
+<h3 class="anchored" data-anchor-id="worked-construction-in-the-running-plane">Worked construction in the running plane</h3>
+<p>Start with <span class="math inline">\(a_1=a=(1,0,1)^T\)</span> and <span class="math inline">\(a_2=b=(0,1,1)^T\)</span>. The first direction and the coefficient of the second vector along it are <span class="math display">\[
+q_1=\frac{(1,0,1)^T}{\sqrt2},\qquad
+\langle b,q_1\rangle=\frac{1}{\sqrt2}.
+\]</span> Subtracting the parallel component gives <span class="math display">\[
+w_2=b-\tfrac12(1,0,1)^T
+=\tfrac12(-1,2,1)^T,\qquad
+\|w_2\|=\frac{\sqrt6}{2},\qquad q_2=\frac{(-1,2,1)^T}{\sqrt6}.
+\]</span> Viewed <em>inside the plane</em>, <span class="math inline">\(b\)</span> is the diagonal of a right triangle. Its two legs are the amount already represented and the residual that supplies the new direction.</p>
+<div id="cell-fig-session-two-residual" class="cell" data-fig-height="3.5" data-fig-width="6" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-session-two-residual" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-session-two-residual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="02_inner_products_orthogonality_files/figure-html/fig-session-two-residual-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-session-two-residual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: The running example in orthonormal coordinates within its plane. Subtracting the horizontal component of b leaves the vertical residual. Translating that residual to the origin gives the direction of the second basis vector.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The matrix check uses just three dot products: <span class="math display">\[
+Q=\begin{pmatrix}
+1/\sqrt2 &amp; -1/\sqrt6\\
+0 &amp; 2/\sqrt6\\
+1/\sqrt2 &amp; 1/\sqrt6
+\end{pmatrix},
+\qquad
+Q^TQ=\begin{pmatrix}
+(1+1)/2 &amp; (-1+1)/\sqrt{12}\\
+(-1+1)/\sqrt{12} &amp; (1+4+1)/6
+\end{pmatrix}=I_2.
+\]</span> For <span class="math inline">\(x=(3,1,4)^T=3a+b\)</span> from Session 1, <span class="math inline">\(Q^Tx=(7/\sqrt2,3/\sqrt6)^T\)</span>. The squared coordinate length is <span class="math inline">\(49/2+9/6=26=\|x\|_2^2\)</span>. The coefficients <span class="math inline">\((3,1)^T\)</span> in the original basis describe the same vector, but their squared length is only <span class="math inline">\(10\)</span>.</p>
+</section>
+</section>
+<section id="what-changes-in-numerical-algorithms" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="what-changes-in-numerical-algorithms"><span class="header-section-number">3.5</span> What changes in numerical algorithms?</h2>
+<p><strong>Classical and modified Gram–Schmidt.</strong> For classical Gram–Schmidt each coefficient uses the original <span class="math inline">\(a_j\)</span>. Modified Gram–Schmidt (MGS) initializes <span class="math inline">\(w=a_j\)</span> and, for each earlier <span class="math inline">\(q_i\)</span> in order, computes <span class="math inline">\(h=\langle w,q_i\rangle\)</span> and updates <span class="math inline">\(w\leftarrow w-hq_i\)</span>. It then normalizes the final <span class="math inline">\(w\)</span>. In exact arithmetic, previously subtracted directions have zero inner product with <span class="math inline">\(q_i\)</span>, so both algorithms give the same coefficients and residual. In floating point, cancellation can leave a residual whose rounding error is large relative to its length. Normalizing magnifies that error. MGS measures what is present in the <em>updated</em> vector and generally retains orthogonality better. Severe near-dependence can still require a second orthogonalization pass or a numerical rank decision. Monitoring <span class="math inline">\(\|Q^*Q-I\|\)</span> tests the property one intended to construct.</p>
+<p><strong>Why basis quality matters.</strong> Consider <span class="math inline">\(B_\varepsilon=[\,e_1,\ e_1+\varepsilon e_2\,]\)</span> for real <span class="math inline">\(\varepsilon&gt;0\)</span>. It spans <span class="math inline">\(\mathbb R^2\)</span>, yet <span class="math inline">\(e_2\)</span> requires coordinates <span class="math inline">\((-1/\varepsilon,1/\varepsilon)^T\)</span>. Two large contributions nearly cancel. With an orthonormal <span class="math inline">\(Q\)</span>, <span class="math inline">\(\|Q\,\delta c\|_2=\|\delta c\|_2\)</span>: every singular value of <span class="math inline">\(Q\)</span> is one. This is a statement about the basis representation. A nearly dependent input may still make its inferred span sensitive to perturbations. Recording the coefficients that express each input in the successive <span class="math inline">\(q_i\)</span> gives the triangular factor in QR (Session 4).</p>
+<p><strong>Why the seminar alternates filtering and orthonormalization.</strong> Power iteration normalizes one nonzero vector after multiplying by <span class="math inline">\(A\)</span>. Subspace iteration applies <span class="math inline">\(A\)</span> to a block and orthonormalizes its columns. Normalizing columns individually controls lengths but lets several columns align with the same dominant direction. For a Chebyshev filter <span class="math inline">\(p\)</span>, an eigenvector <span class="math inline">\(v\)</span> with eigenvalue <span class="math inline">\(\lambda\)</span> satisfies <span class="math inline">\(p(A)v=p(\lambda)v\)</span>. Thus each eigencomponent is rescaled and the trial subspace can move: <span class="math display">\[
+Y=p(A)Q,\qquad \operatorname{im}Y=p(A)(\operatorname{im}Q).
+\]</span> In contrast, if <span class="math inline">\(Y\)</span> has independent columns, <span class="math inline">\(Q_{\mathrm{new}}=\operatorname{orth}(Y)\)</span> has exactly the same image as <span class="math inline">\(Y\)</span> in exact arithmetic. Filtering changes the balance of spectral components. Orthonormalization changes the coordinates used to represent the resulting subspace. If the filter annihilates a direction and reduces rank, orthogonalization alone cannot restore it.</p>
+<p><strong>Where the same residual appears.</strong> Arnoldi takes <span class="math inline">\(Aq_j\)</span>, removes components along the current Krylov basis, and normalizes the remainder if nonzero. For Hermitian <span class="math inline">\(A\)</span>, Lanczos uses symmetry to obtain a short recurrence in exact arithmetic. Both methods need accurate orthogonality to interpret the resulting small matrix. Session 3 develops the projection underlying the residual. Rayleigh–Ritz later uses <span class="math inline">\(Q^*AQ\)</span> to represent the action seen within a trial subspace and asks for a residual perpendicular to that subspace.</p>
+<p><em>Reading connections.</em> Kanschat and Scheichl, Appendix A.2 and §2.1, give the convention and two Gram–Schmidt algorithms used here. Bastian, §5 and Algorithm 11.2, connects inner-product geometry to orthogonalization. Scheichl and Zech, §§3.8–3.9, give the subsequent least-squares and QR context.</p>
+</section>
+<section id="independent-exercises" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="independent-exercises"><span class="header-section-number">3.6</span> Independent exercises</h2>
+<p>Allow about 25 minutes. Keep the solutions covered until you have a derivation or a calculation to check.</p>
+<ol type="1">
+<li><strong>Choosing a geometry.</strong> On <span class="math inline">\(\mathbb C^2\)</span> set <span class="math inline">\(\langle x,y\rangle_W=2x_1\overline{y_1}+x_2\overline{y_2}\)</span>. Verify the axioms. Find a nonzero vector perpendicular to <span class="math inline">\((1,i)^T\)</span> in this product. Check your answer against the standard product.</li>
+<li><strong>Recovering a normal.</strong> For <span class="math inline">\(a,b\)</span> from the running plane, find <span class="math inline">\((\operatorname{im} B)^\perp\)</span> by row equations. Which <span class="math inline">\(d\)</span> make <span class="math inline">\(Bc=d\)</span> solvable? Explain why the same vector answers both questions.</li>
+<li><strong>Decomposing a vector.</strong> Decompose <span class="math inline">\(e_1\)</span> into a vector in the running plane and a vector in its complement. Verify membership and Pythagoras. Explain why a second decomposition is impossible.</li>
+<li><strong>Orthogonalization by hand.</strong> Apply classical Gram–Schmidt in order to <span class="math inline">\((1,1,0)^T\)</span>, <span class="math inline">\((1,0,1)^T\)</span>, <span class="math inline">\((0,1,1)^T\)</span>. Give all three unit vectors. Verify orthogonality and express the last input in your new basis.</li>
+<li><strong>Complex coordinates.</strong> Let <span class="math inline">\(q=(1,i)^T/\sqrt2\)</span> and <span class="math inline">\(x=(i,0)^T\)</span>. Find the scalar <span class="math inline">\(c\)</span> such that <span class="math inline">\(x-cq\perp q\)</span>. Check what happens if you reverse the two arguments when computing <span class="math inline">\(c\)</span>. Prove for any orthonormal family that <span class="math inline">\(\sum_j|\langle x,q_j\rangle|^2\le\|x\|^2\)</span>, and characterize equality.</li>
+<li><strong>A filtered block.</strong> Let <span class="math inline">\(Q=[\,(e_1+e_3)/\sqrt2,\ e_2\,]\)</span> in <span class="math inline">\(\mathbb R^3\)</span>, and suppose <span class="math inline">\(p(A)=\operatorname{diag}(4,2,1)\)</span>. Find <span class="math inline">\(Y=p(A)Q\)</span> and an orthonormal basis of its image. Decide whether filtering and then orthonormalizing each changed the span in this example. Would normalizing columns separately suffice for a general filtered block? Justify your answer.</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">3.7</span> Worked solutions</h2>
+<section id="choosing-a-geometry" class="level3">
+<h3 class="anchored" data-anchor-id="choosing-a-geometry">Choosing a geometry</h3>
+<p>Each summand is linear in <span class="math inline">\(x\)</span>, and swapping <span class="math inline">\(x,y\)</span> conjugates the sum because the weights are real. The value on <span class="math inline">\((x,x)\)</span> is <span class="math inline">\(2|x_1|^2+|x_2|^2\)</span>, strictly positive for <span class="math inline">\(x\ne0\)</span>. Orthogonality to <span class="math inline">\((1,i)^T\)</span> requires <span class="math inline">\(2z_1-iz_2=0\)</span>. Choose <span class="math inline">\(z=(1,-2i)^T\)</span>: the weighted test is <span class="math inline">\(2+(-i)(-2i)=0\)</span>, whereas the standard test gives <span class="math inline">\(1-2=-1\)</span>.</p>
+</section>
+<section id="recovering-a-normal" class="level3">
+<h3 class="anchored" data-anchor-id="recovering-a-normal">Recovering a normal</h3>
+<p>The two tests are <span class="math inline">\(z_1+z_3=0\)</span> and <span class="math inline">\(z_2+z_3=0\)</span>. Putting <span class="math inline">\(z_3=t\)</span> gives <span class="math inline">\(z=t(-1,-1,1)^T=tn\)</span>. Also <span class="math inline">\(Bc=(c_1,c_2,c_1+c_2)^T\)</span>. Thus solvability requires and suffices that <span class="math inline">\(d_3=d_1+d_2\)</span>, or <span class="math inline">\(n^Td=0\)</span>. The normal annihilates both columns, and its perpendicular plane has the same dimension as the column span.</p>
+</section>
+<section id="decomposing-a-vector" class="level3">
+<h3 class="anchored" data-anchor-id="decomposing-a-vector">Decomposing a vector</h3>
+<p>Write <span class="math inline">\(e_1=u+tn\)</span>. Pairing with <span class="math inline">\(n\)</span> gives <span class="math inline">\(t=-1/3\)</span>. Hence the perpendicular part is <span class="math inline">\((1,1,-1)^T/3\)</span> and <span class="math inline">\(u=(2,-1,1)^T/3\)</span> lies in the plane since <span class="math inline">\(2-1=1\)</span>. The squared lengths are <span class="math inline">\(3/9\)</span> and <span class="math inline">\(6/9\)</span>, which sum to one. Two decompositions would put their difference in both the plane and its perpendicular line, whose intersection is zero.</p>
+</section>
+<section id="orthogonalization-by-hand" class="level3">
+<h3 class="anchored" data-anchor-id="orthogonalization-by-hand">Orthogonalization by hand</h3>
+<p>The first unit vector is <span class="math inline">\(q_1=(1,1,0)^T/\sqrt2\)</span>. Removing <span class="math inline">\((1,1,0)^T/2\)</span> from the second input leaves <span class="math inline">\((1,-1,2)^T/2\)</span>, so <span class="math inline">\(q_2=(1,-1,2)^T/\sqrt6\)</span>. For <span class="math inline">\(a_3=(0,1,1)^T\)</span>, the first two coefficients are <span class="math inline">\(1/\sqrt2\)</span> and <span class="math inline">\(1/\sqrt6\)</span>. The remaining vector is <span class="math display">\[
+w_3=(0,1,1)^T-\tfrac12(1,1,0)^T-\tfrac16(1,-1,2)^T
+=\tfrac23(-1,1,1)^T.
+\]</span> Thus <span class="math inline">\(q_3=(-1,1,1)^T/\sqrt3\)</span>. The unscaled dot products are <span class="math inline">\(1-1=0\)</span>, <span class="math inline">\(-1+1=0\)</span>, and <span class="math inline">\(-1-1+2=0\)</span>; the denominators are precisely the lengths. Reconstruction gives <span class="math inline">\(a_3=q_1/\sqrt2+q_2/\sqrt6+(2/\sqrt3)q_3\)</span>.</p>
+</section>
+<section id="complex-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="complex-coordinates">Complex coordinates</h3>
+<p><span class="math inline">\(c=q^*x=i/\sqrt2\)</span> gives <span class="math inline">\(x-cq=(i,1)^T/2\)</span> and <span class="math inline">\(q^*(x-cq)=0\)</span>. The reversed product gives <span class="math inline">\(-i/\sqrt2\)</span>, leaving coefficient <span class="math inline">\(q^*x-(-i/\sqrt2)=\sqrt2\,i\)</span> along <span class="math inline">\(q\)</span>. For the general claim, let <span class="math inline">\(u=\sum_j\langle x,q_j\rangle q_j\)</span>. Orthonormality gives <span class="math inline">\(\|u\|^2=\sum_j|\langle x,q_j\rangle|^2\)</span>, while <span class="math inline">\(x-u\perp u\)</span>. Thus <span class="math inline">\(\|x\|^2=\|u\|^2+\|x-u\|^2\)</span>. Equality holds precisely when <span class="math inline">\(x\)</span> lies in the span of the family.</p>
+</section>
+<section id="a-filtered-block" class="level3">
+<h3 class="anchored" data-anchor-id="a-filtered-block">A filtered block</h3>
+<p>The columns of <span class="math inline">\(Y\)</span> are <span class="math inline">\((4,0,1)^T/\sqrt2\)</span> and <span class="math inline">\(2e_2\)</span>. They are perpendicular, so dividing each by its length gives <span class="math inline">\((4,0,1)^T/\sqrt{17}\)</span> and <span class="math inline">\(e_2\)</span>. Originally the plane obeyed <span class="math inline">\(x_1=x_3\)</span>. Its filtered image obeys <span class="math inline">\(x_1=4x_3\)</span>, so filtering changed the plane. Orthonormalization just rescaled these particular columns. In general, <span class="math inline">\(\langle p(A)q_i,p(A)q_j\rangle=q_j^*p(A)^*p(A)q_i\)</span> can be nonzero even if <span class="math inline">\(q_j^*q_i=0\)</span>. Dividing by lengths cannot remove that component.</p>
+</section>
+</section>
+<section id="end-of-session-mastery-checklist" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="end-of-session-mastery-checklist"><span class="header-section-number">3.8</span> End-of-session mastery checklist</h2>
+<p>Without consulting the notes, you should be able to:</p>
+<ul>
+<li>State the inner-product axioms, identify the linear slot, and compute a complex coefficient with the correct conjugation.</li>
+<li>Derive Cauchy–Schwarz by constructing a perpendicular residual and identify when equality holds.</li>
+<li>Compute a complement as a kernel and explain which ambient space contains it.</li>
+<li>Construct <span class="math inline">\(x=u+z\)</span> with <span class="math inline">\(u\in U\)</span>, <span class="math inline">\(z\in U^\perp\)</span>, and prove uniqueness and the dimension identity.</li>
+<li>Recover coordinates with <span class="math inline">\(Q^*\)</span>, verify <span class="math inline">\(Q^*Q=I\)</span>, and explain why orthonormal coordinates preserve length.</li>
+<li>Perform Gram–Schmidt on independent columns and prove nonbreakdown, orthonormality, and preservation of every successive span.</li>
+<li>Identify which vector classical and modified Gram–Schmidt use to compute each coefficient, and explain the risk when a residual is tiny.</li>
+<li>Distinguish the subspace change caused by a polynomial filter from the basis change caused by orthonormalization.</li>
+</ul>
+<p><strong>Ready for Session 3:</strong> reconstruct Exercise 4 on blank paper and explain why the parallel component you subtracted was uniquely determined. That uniqueness is the starting point for orthogonal projection.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/01_vector_spaces.html" class="pagination-link" aria-label="Session 1 — Vector Spaces and Linear Maps">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/03_orthogonal_projections.html" class="pagination-link" aria-label="Session 3 — Orthogonal Projections">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

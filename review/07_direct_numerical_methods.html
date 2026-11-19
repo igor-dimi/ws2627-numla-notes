@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Session 7 — Direct Numerical Methods – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review/08_basic_iterative_methods.html" rel="next">
+<link href="../review/06_matrix_norms_conditioning.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/07_direct_numerical_methods.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#elimination-changes-the-equations" id="toc-elimination-changes-the-equations" class="nav-link active" data-scroll-target="#elimination-changes-the-equations"><span class="header-section-number">8.1</span> Elimination changes the equations</a></li>
+  <li><a href="#triangular-systems-have-a-natural-order" id="toc-triangular-systems-have-a-natural-order" class="nav-link" data-scroll-target="#triangular-systems-have-a-natural-order"><span class="header-section-number">8.2</span> Triangular systems have a natural order</a></li>
+  <li><a href="#lu-remembers-the-elimination" id="toc-lu-remembers-the-elimination" class="nav-link" data-scroll-target="#lu-remembers-the-elimination"><span class="header-section-number">8.3</span> LU remembers the elimination</a></li>
+  <li><a href="#pivot-choice-and-element-growth" id="toc-pivot-choice-and-element-growth" class="nav-link" data-scroll-target="#pivot-choice-and-element-growth"><span class="header-section-number">8.4</span> Pivot choice and element growth</a>
+  <ul class="collapse">
+  <li><a href="#experiment-hold-conditioning-nearly-fixed-and-change-the-pivot" id="toc-experiment-hold-conditioning-nearly-fixed-and-change-the-pivot" class="nav-link" data-scroll-target="#experiment-hold-conditioning-nearly-fixed-and-change-the-pivot">Experiment: hold conditioning nearly fixed and change the pivot</a></li>
+  </ul></li>
+  <li><a href="#cholesky-uses-positive-definiteness" id="toc-cholesky-uses-positive-definiteness" class="nav-link" data-scroll-target="#cholesky-uses-positive-definiteness"><span class="header-section-number">8.5</span> Cholesky uses positive definiteness</a></li>
+  <li><a href="#choosing-and-assessing-a-solver" id="toc-choosing-and-assessing-a-solver" class="nav-link" data-scroll-target="#choosing-and-assessing-a-solver"><span class="header-section-number">8.6</span> Choosing and assessing a solver</a></li>
+  <li><a href="#where-the-factors-reappear" id="toc-where-the-factors-reappear" class="nav-link" data-scroll-target="#where-the-factors-reappear"><span class="header-section-number">8.7</span> Where the factors reappear</a></li>
+  <li><a href="#central-synthesis-from-elimination-to-reliable-numerical-solvers" id="toc-central-synthesis-from-elimination-to-reliable-numerical-solvers" class="nav-link" data-scroll-target="#central-synthesis-from-elimination-to-reliable-numerical-solvers"><span class="header-section-number">8.8</span> Central Synthesis — From Elimination to Reliable Numerical Solvers</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">8.9</span> Exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">8.10</span> Worked solutions</a>
+  <ul class="collapse">
+  <li><a href="#end-of-session-mastery-checklist" id="toc-end-of-session-mastery-checklist" class="nav-link" data-scroll-target="#end-of-session-mastery-checklist">End-of-session mastery checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review/01_vector_spaces.html">Review I</a></li><li class="breadcrumb-item"><a href="../review/07_direct_numerical_methods.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Given <span class="math inline">\(Ax=b\)</span>, how can we turn the equations into a form we can solve one unknown at a time? Session 1 supplies the algebraic idea of composing linear maps. Session 6 supplies a separate question about the answer we compute: how much uncertainty does a small residual leave in the solution? A direct solver brings these questions together. Its transformations determine the work, the intermediate numbers and, ultimately, how much accuracy survives.</p>
+<p><strong>One-hour route.</strong> Spend 12 minutes on elimination, substitution and LU, 9 on pivoting and the experiment results, 8 on Cholesky, and 8 on comparing and assessing solvers. Reserve 23 minutes for the exercises. The experiment runs during rendering. Studying its implementation is optional.</p>
+<p>Throughout, <span class="math inline">\(A\in\mathbb F^{n\times n}\)</span> with <span class="math inline">\(\mathbb F=\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>, and <span class="math inline">\(A^*\)</span> denotes the conjugate transpose. Derivations use exact arithmetic unless rounding is mentioned.</p>
+<section id="elimination-changes-the-equations" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="elimination-changes-the-equations"><span class="header-section-number">8.1</span> Elimination changes the equations</h2>
+<p>In <span class="math inline">\(Ax=b\)</span>, applying an invertible map <span class="math inline">\(E\)</span> to the equation space gives <span class="math inline">\(EAx=Eb\)</span>. Every solution satisfies the transformed equations, and multiplication by <span class="math inline">\(E^{-1}\)</span> recovers the originals. In particular, the unknown <span class="math inline">\(x\)</span> keeps its original coordinates. Each elementary row operation has an explicit inverse: swap the same rows again, scale by the reciprocal of a nonzero scale factor, or undo a row addition by subtracting the same multiple. Carry the right-hand side through every operation.</p>
+<p>Starting with <span class="math inline">\(A^{(1)}=A\)</span>, suppose the first <span class="math inline">\(k-1\)</span> columns already have zeros below their diagonals. The <strong>pivot</strong> <span class="math inline">\(a^{(k)}_{kk}\)</span> is the coefficient used to eliminate the remaining entries below it in column <span class="math inline">\(k\)</span>. For a nonzero pivot and each <span class="math inline">\(i&gt;k\)</span>, set <span class="math display">\[
+m_{ik}=\frac{a^{(k)}_{ik}}{a^{(k)}_{kk}},
+\qquad R_i\gets R_i-m_{ik}R_k .
+\]</span> The new column entry is zero by construction. The pivot row has zeros in the preceding columns, so those columns stay triangular. <strong>Gaussian elimination</strong> stops at upper-triangular form and uses substitution. <strong>Gauss–Jordan elimination</strong> continues by normalizing pivots and clearing entries above them to obtain reduced row echelon form.</p>
+<p><strong>Running example.</strong> Start with the augmented matrix below. Subtract twice row 1 from row 2 and add row 1 to row 3: <span class="math display">\[
+\left[\begin{array}{rrr|r}2&amp;1&amp;1&amp;3\\4&amp;5&amp;0&amp;14\\-2&amp;2&amp;5&amp;-3\end{array}\right]
+\longrightarrow
+\left[\begin{array}{rrr|r}2&amp;1&amp;1&amp;3\\0&amp;3&amp;-2&amp;8\\0&amp;3&amp;6&amp;0\end{array}\right].
+\]</span> The first two multipliers were <span class="math inline">\(2\)</span> and <span class="math inline">\(-1\)</span>. Now subtract row 2 from row 3. The multiplier is <span class="math inline">\(1\)</span>, using the <em>current</em> entries <span class="math inline">\(3/3\)</span>. The final system is <span class="math display">\[
+Ux=y,\qquad U=\begin{pmatrix}2&amp;1&amp;1\\0&amp;3&amp;-2\\0&amp;0&amp;8\end{pmatrix},
+\qquad y=\begin{pmatrix}3\\8\\-8\end{pmatrix}.
+\]</span> The three diagonal entries <span class="math inline">\(2,3,8\)</span> are the pivots, including the last coefficient used in the solve.</p>
+</section>
+<section id="triangular-systems-have-a-natural-order" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="triangular-systems-have-a-natural-order"><span class="header-section-number">8.2</span> Triangular systems have a natural order</h2>
+<p>The last equation of <span class="math inline">\(Ux=y\)</span> determines <span class="math inline">\(x_n\)</span>. At row <span class="math inline">\(i\)</span>, all terms to the right of <span class="math inline">\(u_{ii}x_i\)</span> are already known. Isolating that term gives <strong>backward substitution</strong>. A lower-triangular system <span class="math inline">\(Ly=b\)</span> has the reverse dependency and gives <strong>forward substitution</strong>: <span class="math display">\[
+\begin{aligned}
+x_i &amp;= \frac{y_i-\sum_{j=i+1}^n u_{ij}x_j}{u_{ii}},
+   &amp;&amp;i=n,n-1,\ldots,1,\\
+y_i &amp;= \frac{b_i-\sum_{j=1}^{i-1}\ell_{ij}y_j}{\ell_{ii}},
+   &amp;&amp;i=1,2,\ldots,n.
+\end{aligned}
+\]</span> An empty sum is zero. For a <strong>unit lower-triangular</strong> matrix every <span class="math inline">\(\ell_{ii}=1\)</span>, so the divisions disappear. A square triangular matrix has a unique solution for every right-hand side exactly when every diagonal entry is nonzero: its determinant is their product. With a zero on the diagonal, consistency determines whether there are infinitely many solutions or none.</p>
+<p>In the example the last equation gives <span class="math inline">\(x_3=-1\)</span>, the second gives <span class="math inline">\(x_2=(8+2x_3)/3=2\)</span>, and the first gives <span class="math inline">\(x_1=(3-x_2-x_3)/2=1\)</span>. Across all rows there are <span class="math inline">\(n(n-1)/2\)</span> off-diagonal products to subtract, hence <span class="math inline">\(O(n^2)\)</span> work. Substitution computes the action of an inverse on the one vector we need. Forming the whole inverse would solve for all its columns and introduce extra work and rounding.</p>
+</section>
+<section id="lu-remembers-the-elimination" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="lu-remembers-the-elimination"><span class="header-section-number">8.3</span> LU remembers the elimination</h2>
+<p>Let <span class="math inline">\(e_k\)</span> be the <span class="math inline">\(k\)</span>th coordinate vector and <span class="math inline">\(m_k\)</span> the column containing <span class="math inline">\(m_{ik}\)</span> for <span class="math inline">\(i&gt;k\)</span> and zeros elsewhere. Since <span class="math inline">\(e_k^T A^{(k)}\)</span> extracts row <span class="math inline">\(k\)</span>, one stage is <span class="math display">\[
+A^{(k+1)}=E_k A^{(k)},\qquad
+E_k=I-m_k e_k^T,\qquad E_k^{-1}=I+m_k e_k^T.
+\]</span> The inverse follows from <span class="math inline">\(e_k^T m_k=0\)</span>. After the last stage, <span class="math display">\[
+U=E_{n-1}\cdots E_1 A,\qquad
+A=LU,\qquad L=E_1^{-1}\cdots E_{n-1}^{-1}.
+\]</span> The inverse factors occur in reverse order from the elimination factors. In this product every cross term with indices <span class="math inline">\(j&lt;k\)</span> contains <span class="math inline">\(e_j^T m_k=0\)</span>. Thus <span class="math inline">\(L=I+\sum_k m_k e_k^T\)</span>: write each multiplier, with its original sign, below the diagonal in the column where it was used.</p>
+<p><strong>Verification and reuse.</strong> In the running example, <span class="math display">\[
+\underbrace{\begin{pmatrix}1&amp;0&amp;0\\2&amp;1&amp;0\\-1&amp;1&amp;1\end{pmatrix}}_{L}
+\underbrace{\begin{pmatrix}2&amp;1&amp;1\\0&amp;3&amp;-2\\0&amp;0&amp;8\end{pmatrix}}_{U}
+=\begin{pmatrix}2&amp;1&amp;1\\4&amp;5&amp;0\\-2&amp;2&amp;5\end{pmatrix}=A.
+\]</span> For instance, row 3 of the product is minus row 1 of <span class="math inline">\(U\)</span> plus rows 2 and 3. Solve <span class="math inline">\(Ly=b\)</span> from the top: <span class="math inline">\(y_1=3\)</span>, <span class="math inline">\(y_2=14-2(3)=8\)</span>, and <span class="math inline">\(y_3=-3+3-8=-8\)</span>. This recovers exactly the transformed right-hand side. Backward substitution then gives the previously obtained <span class="math inline">\(x=(1,2,-1)^T\)</span>. For a new load vector <span class="math inline">\(b\)</span>, only these two substitutions change. The same factors solve a whole block <span class="math inline">\(AX=B\)</span> by solving <span class="math inline">\(LY=B\)</span> and <span class="math inline">\(UX=Y\)</span> column by column or in a block.</p>
+<p><strong>When does this work without exchanges?</strong> For nonsingular <span class="math inline">\(A\)</span>, unpivoted elimination succeeds exactly when every leading principal minor <span class="math inline">\(d_k=\det A_{1:k,1:k}\)</span> is nonzero. To see why, set <span class="math inline">\(d_0=1\)</span>. Once the first <span class="math inline">\(k-1\)</span> stages succeed, row additions restricted to the leading <span class="math inline">\(k\)</span> rows triangularize the leading <span class="math inline">\(k\)</span>-by-<span class="math inline">\(k\)</span> block. Thus <span class="math inline">\(d_k=d_{k-1}u_{kk}\)</span>. Induction gives the criterion and the pivot formula <span class="math inline">\(u_{kk}=d_k/d_{k-1}\)</span>. Nonsingularity alone guarantees only <span class="math inline">\(d_n\ne0\)</span>.</p>
+<p>For a real dense matrix, updating a trailing <span class="math inline">\(j\)</span>-by-<span class="math inline">\(j\)</span> block takes about <span class="math inline">\(2j^2\)</span> flops when a multiplication and a subtraction count separately. Summing over <span class="math inline">\(j=1,\ldots,n-1\)</span> gives <span class="math inline">\(2n^3/3+O(n^2)\)</span>; multiplier divisions affect lower-order terms. Each further right-hand side costs about <span class="math inline">\(2n^2\)</span> flops for both substitutions together.</p>
+</section>
+<section id="pivot-choice-and-element-growth" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="pivot-choice-and-element-growth"><span class="header-section-number">8.4</span> Pivot choice and element growth</h2>
+<p><strong>A zero pivot on a perfectly conditioned system.</strong> Take <span class="math display">\[
+A=\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix},\qquad b=(2,3)^T.
+\]</span> Unpivoted elimination asks for division by zero. Yet <span class="math inline">\(A^*A=I\)</span>, so both singular values are one and <span class="math inline">\(\kappa_2(A)=1\)</span>. With the row swap <span class="math inline">\(P=A\)</span>, we obtain <span class="math inline">\(PA=I=LU\)</span> with <span class="math inline">\(L=U=I\)</span>. The transformed right-hand side <span class="math inline">\(Pb=(3,2)^T\)</span> is already the solution. It was the ordering of the equations that failed.</p>
+<p><strong>Partial pivoting.</strong> At stage <span class="math inline">\(k\)</span>, select a row <span class="math inline">\(p\ge k\)</span> maximizing <span class="math inline">\(|a^{(k)}_{pk}|\)</span> and exchange it with row <span class="math inline">\(k\)</span>. If the maximum is zero, the active column is zero and the remaining square system is singular in exact arithmetic. Otherwise the multipliers have magnitude at most one. Each exchange is multiplication on the left by a permutation matrix. Their chronological action on the original equations gives a net permutation <span class="math inline">\(P\)</span>. Think of replaying elimination with those rows placed in their final order from the start: the record of multipliers for each equation must move with that equation. In particular, a late exchange swaps the two rows of the <strong>already filled columns</strong> of <span class="math inline">\(L\)</span>. The result is <span class="math display">\[
+PA=LU,\qquad Ly=Pb,\qquad Ux=y.
+\]</span> We use this convention throughout. A source writing <span class="math inline">\(A=\widetilde P LU\)</span> uses <span class="math inline">\(\widetilde P=P^{-1}=P^T\)</span>. One swap is its own inverse, but a sequence of swaps need not be. <strong>Complete pivoting</strong> searches the whole active submatrix and may swap columns as well. A column permutation reorders unknowns and must be undone when reporting the solution.</p>
+<p><strong>A small nonzero pivot.</strong> Consider <span class="math display">\[
+A_\varepsilon=\begin{pmatrix}\varepsilon&amp;1\\1&amp;1\end{pmatrix},
+\qquad 0&lt;\varepsilon\ll1 .
+\]</span> Without a swap, <span class="math inline">\(m_{21}=1/\varepsilon\)</span> and <span class="math inline">\(u_{22}=1-1/\varepsilon\)</span>. The updated right-hand side <span class="math inline">\(b_2-b_1/\varepsilon\)</span> may also be large. Back substitution reconstructs <span class="math inline">\(x_1=(b_1-\widehat x_2)/\varepsilon\)</span>: even a tiny absolute error in <span class="math inline">\(\widehat x_2\)</span> is divided by <span class="math inline">\(\varepsilon\)</span>. When <span class="math inline">\(b_1\)</span> and <span class="math inline">\(\widehat x_2\)</span> are nearly equal, cancellation exposes the error already in these operands. With a swap, <span class="math inline">\(m_{21}=\varepsilon\)</span>, <span class="math inline">\(u_{22}=1-\varepsilon\)</span>, and the final division for <span class="math inline">\(x_1\)</span> uses the pivot <span class="math inline">\(1\)</span>.</p>
+<p>The <strong>growth factor</strong> compares the largest absolute entry seen in the coefficient matrices during elimination with the largest in the original matrix. Exclude stored multipliers and the augmented right-hand side. For this family unpivoted growth is of order <span class="math inline">\(1/\varepsilon\)</span>, while partial pivoting gives growth factor one. Large entries increase the scale of local rounding errors, which may survive even when the entries later cancel. Partial pivoting controls each multiplier, but repeated updates can still cause large growth on exceptional matrices. Its generally good practical accuracy depends in part on the growth actually encountered.</p>
+<section id="experiment-hold-conditioning-nearly-fixed-and-change-the-pivot" class="level3">
+<h3 class="anchored" data-anchor-id="experiment-hold-conditioning-nearly-fixed-and-change-the-pivot">Experiment: hold conditioning nearly fixed and change the pivot</h3>
+<p>Take <span class="math inline">\(x=(1,7/4)^T\)</span> and <span class="math inline">\(\varepsilon=3\cdot 2^{-k}\)</span>. For the exponents below, <span class="math inline">\(b=(\varepsilon+7/4,11/4)^T\)</span> is exactly representable in binary64, as are <span class="math inline">\(A_\varepsilon\)</span> and <span class="math inline">\(x\)</span>. Thus we know the exact solution of the <em>stored</em> data. As <span class="math inline">\(\varepsilon\to0\)</span>, the limiting symmetric matrix has eigenvalues <span class="math inline">\((1\pm\sqrt5)/2\)</span>. Its singular values are their absolute values, so <span class="math inline">\(\kappa_2\)</span> tends to <span class="math inline">\((3+\sqrt5)/2\approx2.618\)</span>. Predict which solver’s error can increase while this condition number stays nearly fixed.</p>
+<div id="direct-methods-pivot-experiment" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> solve_two_by_two(A, b, pivot):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""One elimination step and back substitution in binary64."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> np.array(A, dtype<span class="op">=</span>np.float64, copy<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    y <span class="op">=</span> np.array(b, dtype<span class="op">=</span>np.float64, copy<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> U.shape <span class="op">!=</span> (<span class="dv">2</span>, <span class="dv">2</span>) <span class="kw">or</span> y.shape <span class="op">!=</span> (<span class="dv">2</span>,):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Expected a 2-by-2 matrix and a length-2 vector"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pivot <span class="kw">and</span> <span class="bu">abs</span>(U[<span class="dv">1</span>, <span class="dv">0</span>]) <span class="op">&gt;</span> <span class="bu">abs</span>(U[<span class="dv">0</span>, <span class="dv">0</span>]):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        U <span class="op">=</span> U[[<span class="dv">1</span>, <span class="dv">0</span>], :]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> y[[<span class="dv">1</span>, <span class="dv">0</span>]]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> U[<span class="dv">0</span>, <span class="dv">0</span>] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Zero first pivot"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    multiplier <span class="op">=</span> U[<span class="dv">1</span>, <span class="dv">0</span>] <span class="op">/</span> U[<span class="dv">0</span>, <span class="dv">0</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    U[<span class="dv">1</span>, <span class="dv">1</span>] <span class="op">-=</span> multiplier <span class="op">*</span> U[<span class="dv">0</span>, <span class="dv">1</span>]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    y[<span class="dv">1</span>] <span class="op">-=</span> multiplier <span class="op">*</span> y[<span class="dv">0</span>]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> U[<span class="dv">1</span>, <span class="dv">1</span>] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Zero second pivot"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    x2 <span class="op">=</span> y[<span class="dv">1</span>] <span class="op">/</span> U[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    x1 <span class="op">=</span> (y[<span class="dv">0</span>] <span class="op">-</span> U[<span class="dv">0</span>, <span class="dv">1</span>] <span class="op">*</span> x2) <span class="op">/</span> U[<span class="dv">0</span>, <span class="dv">0</span>]</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array([x1, x2])</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>exact <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">1.75</span>])</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" k  cond2  method       rel.res.  rel.error"</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="dv">10</span>, <span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">50</span>):</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> <span class="fl">3.0</span> <span class="op">*</span> <span class="fl">2.0</span><span class="op">**</span>(<span class="op">-</span>k)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.array([[eps, <span class="fl">1.0</span>], [<span class="fl">1.0</span>, <span class="fl">1.0</span>]])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    b <span class="op">=</span> A <span class="op">@</span> exact</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    answers <span class="op">=</span> [</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"no swap"</span>, solve_two_by_two(A, b, <span class="va">False</span>)),</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"partial"</span>, solve_two_by_two(A, b, <span class="va">True</span>)),</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"library"</span>, np.linalg.solve(A, b)),</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> method, computed <span class="kw">in</span> answers:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        residual <span class="op">=</span> np.linalg.norm(b <span class="op">-</span> A <span class="op">@</span> computed) <span class="op">/</span> np.linalg.norm(b)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        error <span class="op">=</span> np.linalg.norm(computed <span class="op">-</span> exact) <span class="op">/</span> np.linalg.norm(exact)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>k<span class="sc">:2}</span><span class="ss">  </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>cond(A)<span class="sc">:5.3f}</span><span class="ss">  </span><span class="sc">{</span>method<span class="sc">:8}</span><span class="ss">"</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f"  </span><span class="sc">{</span>residual<span class="sc">:9.2e}</span><span class="ss">  </span><span class="sc">{</span>error<span class="sc">:9.2e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> k  cond2  method       rel.res.  rel.error
+10  2.628  no swap    2.31e-14   3.76e-14
+10  2.628  partial    0.00e+00   0.00e+00
+10  2.628  library    0.00e+00   0.00e+00
+25  2.618  no swap    7.62e-10   1.23e-09
+25  2.618  partial    0.00e+00   0.00e+00
+25  2.618  library    0.00e+00   0.00e+00
+40  2.618  no swap    2.50e-05   4.04e-05
+40  2.618  partial    0.00e+00   0.00e+00
+40  2.618  library    0.00e+00   0.00e+00
+50  2.618  no swap    2.56e-02   4.13e-02
+50  2.618  partial    0.00e+00   0.00e+00
+50  2.618  library    0.00e+00   0.00e+00</code></pre>
+</div>
+</div>
+<p>Read across methods at fixed <span class="math inline">\(k\)</span> first. They receive identical data; the library solve provides a practical reference, while the known <span class="math inline">\(x\)</span> provides the forward-error measurement. At <span class="math inline">\(k=50\)</span> the unpivoted first component loses about <span class="math inline">\(0.083\)</span> in absolute value. The condition number is still about <span class="math inline">\(2.62\)</span>. A displayed zero residual is a zero in the arithmetic used for the check. Re-evaluating a residual at higher precision can distinguish small errors hidden by that rounding.</p>
+</section>
+</section>
+<section id="cholesky-uses-positive-definiteness" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="cholesky-uses-positive-definiteness"><span class="header-section-number">8.5</span> Cholesky uses positive definiteness</h2>
+<p>Session 5 characterized a <strong>Hermitian positive-definite</strong> (HPD) matrix by <span class="math inline">\(A=A^*\)</span> and <span class="math inline">\(z^*Az&gt;0\)</span> for all <span class="math inline">\(z\ne0\)</span>, equivalently by Hermitian symmetry and strictly positive eigenvalues. The real case is symmetric positive definite (SPD).</p>
+<p><strong>Cholesky theorem.</strong> Every HPD matrix admits a unique factorization <span class="math inline">\(A=LL^*\)</span> with <span class="math inline">\(L\)</span> lower triangular and strictly positive real diagonal. For real SPD matrices, <span class="math inline">\(A=LL^T\)</span>. Conversely, any such product is Hermitian and <span class="math inline">\(z^*LL^*z=\|L^*z\|_2^2&gt;0\)</span> for <span class="math inline">\(z\ne0\)</span>, since <span class="math inline">\(L^*\)</span> is invertible.</p>
+<p><strong>Why no pivot search is necessary.</strong> Partition the first column from the rest: <span class="math display">\[
+A=\begin{pmatrix}a&amp;w^*\\w&amp;B\end{pmatrix},
+\qquad S=B-ww^*/a .
+\]</span> Testing on <span class="math inline">\(e_1\)</span> gives <span class="math inline">\(a&gt;0\)</span>. For any <span class="math inline">\(z\ne0\)</span>, test the quadratic form on <span class="math inline">\(v=\binom{-w^*z/a}{z}\)</span>, interpreted as a stacked scalar and column. Direct multiplication gives <span class="math inline">\(v^*Av=z^*Sz&gt;0\)</span>. Thus the trailing matrix <span class="math inline">\(S\)</span> after eliminating column one is again HPD. Cholesky takes <span class="math inline">\(\sqrt a\)</span> as its first diagonal entry, <span class="math inline">\(w/\sqrt a\)</span> below it, and factors <span class="math inline">\(S\)</span> recursively. This is symmetric Gaussian elimination: the trailing update preserves Hermitian symmetry, so only one triangle needs to be updated. General LU would maintain two factors without using this relationship.</p>
+<p><strong>How to compute the entries.</strong> Expand <span class="math inline">\(a_{ij}=\sum_{s\le j}\ell_{is}\overline{\ell_{js}}\)</span> for <span class="math inline">\(i\ge j\)</span>, and process columns in increasing order: <span class="math display">\[
+\begin{aligned}
+\ell_{jj}&amp;=\sqrt{a_{jj}-\sum_{s&lt;j}|\ell_{js}|^2},\\
+\ell_{ij}&amp;=\frac{a_{ij}-\sum_{s&lt;j}\ell_{is}\overline{\ell_{js}}}
+                  {\ell_{jj}},\qquad i&gt;j.
+\end{aligned}
+\]</span> Each radicand is the leading entry of an HPD trailing matrix, hence real and positive. Taking its positive square root fixes the only sign or phase ambiguity. The column formulas then determine every subsequent entry uniquely.</p>
+<p><strong>Worked example.</strong> Solve with <span class="math display">\[
+A=\begin{pmatrix}4&amp;2&amp;0\\2&amp;5&amp;-2\\0&amp;-2&amp;2\end{pmatrix},
+\qquad b=(4,4,-2)^T.
+\]</span> The first column of <span class="math inline">\(L\)</span> is <span class="math inline">\((2,1,0)^T\)</span>. In column two, <span class="math inline">\(\ell_{22}=\sqrt{5-1}=2\)</span> and <span class="math inline">\(\ell_{32}=(-2-0)/2=-1\)</span>. Finally <span class="math inline">\(\ell_{33}=\sqrt{2-0^2-(-1)^2}=1\)</span>. Multiplication verifies both the factorization and positive definiteness: <span class="math display">\[
+\begin{pmatrix}2&amp;0&amp;0\\1&amp;2&amp;0\\0&amp;-1&amp;1\end{pmatrix}
+\begin{pmatrix}2&amp;1&amp;0\\0&amp;2&amp;-1\\0&amp;0&amp;1\end{pmatrix}
+=\begin{pmatrix}4&amp;2&amp;0\\2&amp;5&amp;-2\\0&amp;-2&amp;2\end{pmatrix}.
+\]</span> Forward substitution in <span class="math inline">\(Ly=b\)</span> gives <span class="math inline">\(y_1=2\)</span>, <span class="math inline">\(y_2=(4-2)/2=1\)</span>, <span class="math inline">\(y_3=-2+1=-1\)</span>. In <span class="math inline">\(L^*x=y\)</span>, the last row gives <span class="math inline">\(x_3=-1\)</span>, then <span class="math inline">\(2x_2-x_3=1\)</span> gives <span class="math inline">\(x_2=0\)</span>, and <span class="math inline">\(2x_1+x_2=2\)</span> gives <span class="math inline">\(x_1=1\)</span>.</p>
+<p><strong>Where the hypotheses matter.</strong> A positive semidefinite Hermitian matrix has <span class="math inline">\(z^*Az\ge0\)</span>; if singular, it cannot have a Cholesky factor with strictly positive diagonal (try <span class="math inline">\(\operatorname{diag}(1,0)\)</span>). An indefinite Hermitian matrix has directions of both signs. For <span class="math inline">\(\left(\begin{smallmatrix}1&amp;2\\2&amp;1\end{smallmatrix}\right)\)</span> both diagonal entries are positive, yet the second radicand is <span class="math inline">\(1-2^2=-3\)</span>. A non-Hermitian matrix cannot equal <span class="math inline">\(LL^*\)</span> because every such product is Hermitian. In floating point a very small positive radicand can be lost in subtraction. An implementation checks for breakdown; a failure near the boundary of positive definiteness needs interpretation in light of input accuracy and rounding.</p>
+</section>
+<section id="choosing-and-assessing-a-solver" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="choosing-and-assessing-a-solver"><span class="header-section-number">8.6</span> Choosing and assessing a solver</h2>
+<p>Classical leading work below assumes a dense, real, nonsingular square matrix. QR uses Householder reflectors stored implicitly. Each method takes <span class="math inline">\(O(n^2)\)</span> additional work per right-hand side.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">When to use it</th>
+<th style="text-align: left;">Factorization work</th>
+<th style="text-align: left;">Reliability</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">LU, no swaps</td>
+<td style="text-align: left;">Leading minors nonzero and pivot behavior understood</td>
+<td style="text-align: left;"><span class="math inline">\(2n^3/3\)</span></td>
+<td style="text-align: left;">Small relative pivots can give large growth.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LU, partial pivoting</td>
+<td style="text-align: left;">General square solve</td>
+<td style="text-align: left;"><span class="math inline">\(2n^3/3\)</span></td>
+<td style="text-align: left;">Bounded multipliers; accuracy still depends on growth.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cholesky</td>
+<td style="text-align: left;">Hermitian positive definite</td>
+<td style="text-align: left;"><span class="math inline">\(n^3/3\)</span></td>
+<td style="text-align: left;">Positive exact pivots; backward stable on successful completion under standard rounding assumptions.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Householder QR</td>
+<td style="text-align: left;">General square solve; also useful for least squares</td>
+<td style="text-align: left;"><span class="math inline">\(4n^3/3\)</span></td>
+<td style="text-align: left;">Unitary transformations preserve the 2-norm; normwise backward stable.</td>
+</tr>
+</tbody>
+</table>
+<p>Cholesky roughly halves the leading LU factorization cost by updating one triangle. Session 4’s QR solve applies the reflectors to form <span class="math inline">\(Q^*b\)</span>, then solves <span class="math inline">\(Rx=Q^*b\)</span>. In all four methods the factors act directly on any new right-hand side. Explicitly constructing <span class="math inline">\(A^{-1}\)</span> adds work even if many right-hand sides are expected.</p>
+<p><strong>Residual, backward error and forward error.</strong> Given a computed <span class="math inline">\(\widehat x\)</span>, set <span class="math inline">\(r=b-A\widehat x\)</span>. The residual answers how far the computed vector misses the equations. Since <span class="math inline">\(A\widehat x=b-r\)</span>, it is also an explicit backward perturbation to the right-hand side. With perturbations allowed in both <span class="math inline">\(A\)</span> and <span class="math inline">\(b\)</span>, a common normwise backward-error measure is <span class="math display">\[
+\eta=\frac{\|r\|_2}{\|A\|_2\|\widehat x\|_2+\|b\|_2}.
+\]</span> It is the smallest common relative bound on <span class="math inline">\(\|\Delta A\|_2/\|A\|_2\)</span> and <span class="math inline">\(\|\Delta b\|_2/\|b\|_2\)</span> needed for <span class="math inline">\((A+\Delta A)\widehat x=b+\Delta b\)</span>, assuming <span class="math inline">\(b\ne0\)</span>. A backward-stable solve delivers a solution to data perturbed on the scale of rounding, up to dimension-dependent factors. A measured small backward error describes this particular result; a stability analysis concerns the algorithm over its class of inputs.</p>
+<p>For nonsingular <span class="math inline">\(A\)</span> and <span class="math inline">\(b\ne0\)</span>, Session 6 gives <span class="math display">\[
+x-\widehat x=A^{-1}r,\qquad
+\frac{\|x-\widehat x\|_2}{\|x\|_2}
+\le \kappa_2(A)\frac{\|r\|_2}{\|b\|_2}.
+\]</span> A small relative residual and moderate condition number certify small forward error. A large condition number weakens that certificate: an error pointing along a small-singular-value direction can have a very small image under <span class="math inline">\(A\)</span>. Even a backward-stable solver can then lose forward accuracy.</p>
+</section>
+<section id="where-the-factors-reappear" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="where-the-factors-reappear"><span class="header-section-number">8.7</span> Where the factors reappear</h2>
+<p><strong>Sparse systems and Session 8.</strong> Discretizing a differential operator often couples each unknown only to a few neighbors. During elimination two neighbors of the eliminated unknown can become coupled to one another. A newly nonzero factor entry in a previously zero position is <em>fill-in</em>. Its extent depends on ordering and can dominate storage and work. Dense costs can therefore be prohibitive, and the cost of a sparse factorization depends on more than the initial number of nonzeros. A direct method follows a finite elimination and substitution schedule in exact arithmetic. An iterative method produces successive approximations and stops using an accuracy criterion. A factorization of a simpler approximation to <span class="math inline">\(A\)</span> can also supply an inexpensive solve inside an iterative method as a preconditioner.</p>
+<p><strong>Eigenvalue methods and the seminar.</strong> At a fixed shift <span class="math inline">\(\sigma\)</span> outside the spectrum, inverse iteration repeatedly solves <span class="math inline">\((A-\sigma I)y=x\)</span> with changing <span class="math inline">\(x\)</span>. One pivoted LU of the shifted matrix can serve every step. An eigencomponent with eigenvalue <span class="math inline">\(\lambda\)</span> is scaled by <span class="math inline">\(1/(\lambda-\sigma)\)</span>. In Chebyshev-filtered subspace iteration the corresponding weight is <span class="math inline">\(p(\lambda)\)</span>: a polynomial recurrence applies <span class="math inline">\(A\)</span> repeatedly to vectors or blocks, avoiding a shifted factorization and its possible fill-in. QR orthonormalization still has a role after filtering. Sessions 9–11 return to these choices.</p>
+</section>
+<section id="central-synthesis-from-elimination-to-reliable-numerical-solvers" class="level2" data-number="8.8">
+<h2 data-number="8.8" class="anchored" data-anchor-id="central-synthesis-from-elimination-to-reliable-numerical-solvers"><span class="header-section-number">8.8</span> Central Synthesis — From Elimination to Reliable Numerical Solvers</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Question</th>
+<th style="text-align: left;">What the factorization tells us</th>
+<th style="text-align: left;">What to check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Mathematical equivalence</td>
+<td style="text-align: left;">Each invertible row operation acts on both sides. Elimination ends with triangular equations having the same solution.</td>
+<td style="text-align: left;">Track the right-hand side and the row order.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Computational efficiency</td>
+<td style="text-align: left;"><span class="math inline">\(LU\)</span> records all elimination steps; substitutions reuse them. HPD structure makes the second Cholesky factor the adjoint of the first.</td>
+<td style="text-align: left;">Match the structure and number of right-hand sides to the factorization.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Numerical stability</td>
+<td style="text-align: left;">Pivot choices determine multipliers and affect element growth. An algebraically valid elimination can produce poor factors after rounding.</td>
+<td style="text-align: left;">Inspect a scaled residual or backward error, then use conditioning to assess forward accuracy.</td>
+</tr>
+</tbody>
+</table>
+<p>The two pivot examples separate two diagnoses. The exchange matrix forces a row swap even in exact arithmetic. The small-pivot family permits both algorithms in exact arithmetic, yet choosing the smaller pivot can lose accuracy. In either case <span class="math inline">\(\kappa_2(A)\)</span> is a property of the input shared by both algorithms. Conversely, selecting a stable solver leaves the sensitivity of an ill-conditioned problem in place.</p>
+<p><strong>Course reading.</strong> The revision plan and seminar connection are in §§1.3–1.4 of the course notes book. For elimination, pivoting and Cholesky, see Scheichl and Zech, <em>Num0 notes</em>, §§3.4–3.7, and Bastian, <em>num0</em>, §§7–10. For the orthogonal alternative, see Kanschat and Scheichl, <em>Numerical Linear Algebra</em>, Chapter 2.</p>
+</section>
+<section id="exercises" class="level2" data-number="8.9">
+<h2 data-number="8.9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">8.9</span> Exercises</h2>
+<ol type="1">
+<li><strong>Recover a triangular system (3 min).</strong> Eliminate below the first pivot of <span class="math inline">\(A=\left(\begin{smallmatrix}2&amp;-1\\6&amp;1\end{smallmatrix}\right)\)</span> with <span class="math inline">\(b=(1,11)^T\)</span>. Record the multiplier, <span class="math inline">\(L\)</span> and <span class="math inline">\(U\)</span>. Solve via <span class="math inline">\(Ly=b\)</span> and <span class="math inline">\(Ux=y\)</span>.</li>
+<li><strong>Undo two stages (3 min).</strong> Suppose <span class="math inline">\(E_1=I-2e_2e_1^T+e_3e_1^T\)</span>, <span class="math inline">\(E_2=I-3e_3e_2^T\)</span>, and <span class="math inline">\(E_2E_1A=U\)</span>. Derive <span class="math inline">\(L\)</span> in <span class="math inline">\(A=LU\)</span>. Show by multiplication what goes wrong if you reverse the two inverse factors.</li>
+<li><strong>Choose a Cholesky solve (4 min).</strong> For <span class="math inline">\(C=\left(\begin{smallmatrix}9&amp;3\\3&amp;5\end{smallmatrix}\right)\)</span> construct a Cholesky factor, certify positive definiteness and solve <span class="math inline">\(Cx=(6,-2)^T\)</span>. Classify <span class="math inline">\(\left(\begin{smallmatrix}1&amp;1\\1&amp;1\end{smallmatrix}\right)\)</span>, <span class="math inline">\(\operatorname{diag}(2,-1)\)</span> and <span class="math inline">\(\left(\begin{smallmatrix}2&amp;1\\0&amp;2\end{smallmatrix}\right)\)</span> with respect to the same algorithm.</li>
+<li><strong>Diagnose a pivot (3 min).</strong> Let <span class="math inline">\(J=\left(\begin{smallmatrix}0&amp;1\\1&amp;0\end{smallmatrix}\right)\)</span>. Determine its first unpivoted pivot, determinant and <span class="math inline">\(\kappa_2\)</span>. Repeat for <span class="math inline">\(tJ\)</span>, <span class="math inline">\(t&gt;0\)</span>. For the experiment’s <span class="math inline">\(A_\varepsilon\)</span>, identify which intermediate quantity grows and why swapping helps. Which of these observations concerns the problem’s sensitivity?</li>
+<li><strong>A late row exchange (6 min).</strong> Take <span class="math display">\[
+A=\begin{pmatrix}4&amp;4&amp;0\\2&amp;2&amp;1\\1&amp;3&amp;2\end{pmatrix},
+\qquad b=(4,4,3)^T .
+\]</span> Decide whether unpivoted elimination succeeds. Construct <span class="math inline">\(P,L,U\)</span> using partial pivoting, verify <span class="math inline">\(PA=LU\)</span> by multiplication, and solve the two triangular systems. Check the residual. Distinguish an exact zero residual from a small residual evaluated in floating point.</li>
+<li><strong>A good residual for a poor answer (4 min).</strong> Take <span class="math inline">\(D=\operatorname{diag}(1,10^{-8})\)</span>, <span class="math inline">\(b=(1,0)^T\)</span> and <span class="math inline">\(\widehat x=(1,1)^T\)</span>. Compute the relative residual, relative forward error and <span class="math inline">\(\kappa_2(D)\)</span>. Give a right-hand-side perturbation making <span class="math inline">\(\widehat x\)</span> exact. Can these data alone establish that a particular solver is unstable?</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="8.10">
+<h2 data-number="8.10" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">8.10</span> Worked solutions</h2>
+<p><strong>1.</strong> The multiplier is <span class="math inline">\(6/2=3\)</span>. Subtracting three times the first equation from the second gives <span class="math inline">\(4x_2=8\)</span>. Thus <span class="math display">\[
+L=\begin{pmatrix}1&amp;0\\3&amp;1\end{pmatrix},\qquad
+U=\begin{pmatrix}2&amp;-1\\0&amp;4\end{pmatrix}.
+\]</span> Forward substitution gives <span class="math inline">\(y=(1,11-3)^T=(1,8)^T\)</span>. Back substitution gives <span class="math inline">\(x_2=2\)</span> and <span class="math inline">\(x_1=(1+2)/2=3/2\)</span>.</p>
+<p><strong>2.</strong> Multiplying <span class="math inline">\(E_2E_1A=U\)</span> first by <span class="math inline">\(E_2^{-1}\)</span> and then by <span class="math inline">\(E_1^{-1}\)</span> gives <span class="math display">\[
+L=\begin{pmatrix}1&amp;0&amp;0\\2&amp;1&amp;0\\-1&amp;0&amp;1\end{pmatrix}
+  \begin{pmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\\0&amp;3&amp;1\end{pmatrix}
+=\begin{pmatrix}1&amp;0&amp;0\\2&amp;1&amp;0\\-1&amp;3&amp;1\end{pmatrix}.
+\]</span> In reversed order row 3 of the product becomes <span class="math inline">\(3(2,1,0)+(-1,0,1)=(5,3,1)\)</span>. The spurious <span class="math inline">\(6\)</span> in column one records an operation on a row already modified at the wrong stage.</p>
+<p><strong>3.</strong> The first column is <span class="math inline">\((3,1)^T\)</span> and the remaining diagonal is <span class="math inline">\(\sqrt{5-1}=2\)</span>. With <span class="math inline">\(L=\left(\begin{smallmatrix}3&amp;0\\1&amp;2\end{smallmatrix}\right)\)</span>, multiplication gives <span class="math inline">\(LL^T=C\)</span>. Invertibility of <span class="math inline">\(L\)</span> implies <span class="math inline">\(z^TCz=\|L^Tz\|_2^2&gt;0\)</span> for every nonzero real <span class="math inline">\(z\)</span>. Forward substitution gives <span class="math inline">\(y=(2,-2)^T\)</span> and backward substitution gives <span class="math inline">\(x=(1,-1)^T\)</span>. The all-ones matrix has quadratic form <span class="math inline">\((z_1+z_2)^2\)</span> on real vectors and is singular positive semidefinite. The diagonal matrix is indefinite. The final matrix is nonsymmetric. None admits a real Cholesky factor with strictly positive diagonal.</p>
+<p><strong>4.</strong> The first pivot is zero in both cases. The determinants are <span class="math inline">\(-1\)</span> and <span class="math inline">\(-t^2\)</span>, respectively. Since <span class="math inline">\((tJ)^T(tJ)=t^2 I\)</span>, both singular values are <span class="math inline">\(t\)</span>, giving <span class="math inline">\(\kappa_2=1\)</span> for every <span class="math inline">\(t&gt;0\)</span>, including <span class="math inline">\(t=1\)</span>. In <span class="math inline">\(A_\varepsilon\)</span> the multiplier <span class="math inline">\(1/\varepsilon\)</span> and updated entry <span class="math inline">\(1-1/\varepsilon\)</span> grow in magnitude. Exchanging the rows gives a multiplier <span class="math inline">\(\varepsilon\)</span> and updated entry <span class="math inline">\(1-\varepsilon\)</span>. The singular-value ratio measures relative worst-case sensitivity. The intermediate quantities describe a particular elimination order.</p>
+<p><strong>5.</strong> The first pivot is <span class="math inline">\(4\)</span>, with multipliers <span class="math inline">\(1/2,1/4\)</span>. The remaining rows become <span class="math inline">\((0,0,1)\)</span> and <span class="math inline">\((0,2,2)\)</span>, so the second unpivoted pivot vanishes. Swap rows two and three, including their stored first-column multipliers. The final multiplier is zero. Then <span class="math display">\[
+P=\begin{pmatrix}1&amp;0&amp;0\\0&amp;0&amp;1\\0&amp;1&amp;0\end{pmatrix},\quad
+L=\begin{pmatrix}1&amp;0&amp;0\\1/4&amp;1&amp;0\\1/2&amp;0&amp;1\end{pmatrix},\quad
+U=\begin{pmatrix}4&amp;4&amp;0\\0&amp;2&amp;2\\0&amp;0&amp;1\end{pmatrix}.
+\]</span> The rows of <span class="math inline">\(LU\)</span> are <span class="math inline">\((4,4,0)\)</span>, <span class="math inline">\((1,1,0)+(0,2,2)=(1,3,2)\)</span> and <span class="math inline">\((2,2,0)+(0,0,1)=(2,2,1)\)</span>, exactly those of <span class="math inline">\(PA\)</span>. Here <span class="math inline">\(Pb=(4,3,4)^T\)</span>. Forward substitution gives <span class="math inline">\(y=(4,3-1,4-2)^T=(4,2,2)^T\)</span>. From the bottom, <span class="math inline">\(x_3=2\)</span>, <span class="math inline">\(x_2=(2-4)/2=-1\)</span>, <span class="math inline">\(x_1=(4+4)/4=2\)</span>. Direct multiplication gives <span class="math inline">\(Ax=(4,4,3)^T\)</span> and <span class="math inline">\(r=0\)</span>. With nonsingular <span class="math inline">\(A\)</span>, an exact zero proves <span class="math inline">\(\widehat x=x\)</span>. For a numerical residual one must allow for rounding in its evaluation and use conditioning to turn a relative residual into a forward-error bound.</p>
+<p><strong>6.</strong> The exact solution is <span class="math inline">\((1,0)^T\)</span> and <span class="math inline">\(r=(0,-10^{-8})^T\)</span>. The relative residual is <span class="math inline">\(10^{-8}\)</span>, the relative forward error is <span class="math inline">\(1\)</span>, and <span class="math inline">\(\kappa_2(D)=10^8\)</span>. The residual bound is attained. Perturbing <span class="math inline">\(b\)</span> by <span class="math inline">\(-r=(0,10^{-8})^T\)</span> makes <span class="math inline">\(\widehat x\)</span> exact. This example shows how the poorly scaled direction weakens the residual certificate. Judging the stability of an algorithm would also require its precision, the backward-error scale expected at that precision, and information about the procedure that produced the result.</p>
+<section id="end-of-session-mastery-checklist" class="level3">
+<h3 class="anchored" data-anchor-id="end-of-session-mastery-checklist">End-of-session mastery checklist</h3>
+<p>Before Session 8, <strong>Basic Iterative Methods</strong>, check that you can independently:</p>
+<ul>
+<li>Prove that simultaneous elementary operations on <span class="math inline">\(A\)</span> and <span class="math inline">\(b\)</span> preserve the solution set.</li>
+<li>Eliminate by hand, identify pivots and multipliers, and derive <span class="math inline">\(A=LU\)</span> by undoing the stages.</li>
+<li>Explain what each factor stores, perform both substitutions and reuse factors for new loads.</li>
+<li>Construct <span class="math inline">\(PA=LU\)</span>, including a late exchange, and apply the same permutation to <span class="math inline">\(b\)</span>.</li>
+<li>Distinguish pivot breakdown, singularity, poor conditioning and numerical instability with examples.</li>
+<li>State and justify the HPD hypothesis, compute a Cholesky factor and explain the saving in work.</li>
+<li>Choose among pivoted LU, Cholesky and Householder QR using structure, cost and accuracy.</li>
+<li>Interpret a computed residual using backward error and conditioning.</li>
+<li>Explain how triangular solves enter iterative and shifted eigenvalue methods, and identify the main operation in a polynomial filter.</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review/06_matrix_norms_conditioning.html" class="pagination-link" aria-label="Session 6 — Matrix Norms and Conditioning">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review/08_basic_iterative_methods.html" class="pagination-link" aria-label="Session 8 — Basic Iterative Methods">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

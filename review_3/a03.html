@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>18&nbsp; Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review_3/b03.html" rel="next">
+<link href="../review_2/e.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_3/a03.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#session-1-when-can-a-list-of-numbers-describe-a-polynomial" id="toc-session-1-when-can-a-list-of-numbers-describe-a-polynomial" class="nav-link active" data-scroll-target="#session-1-when-can-a-list-of-numbers-describe-a-polynomial"><span class="header-section-number">18.1</span> Session 1 — When can a list of numbers describe a polynomial?</a>
+  <ul class="collapse">
+  <li><a href="#from-linear-combinations-to-coordinates" id="toc-from-linear-combinations-to-coordinates" class="nav-link" data-scroll-target="#from-linear-combinations-to-coordinates">From linear combinations to coordinates</a></li>
+  <li><a href="#why-do-all-bases-have-the-same-size" id="toc-why-do-all-bases-have-the-same-size" class="nav-link" data-scroll-target="#why-do-all-bases-have-the-same-size">Why do all bases have the same size?</a></li>
+  </ul></li>
+  <li><a href="#session-2-how-do-we-transport-a-calculation-between-bases" id="toc-session-2-how-do-we-transport-a-calculation-between-bases" class="nav-link" data-scroll-target="#session-2-how-do-we-transport-a-calculation-between-bases"><span class="header-section-number">18.2</span> Session 2 — How do we transport a calculation between bases?</a>
+  <ul class="collapse">
+  <li><a href="#change-the-encoding-then-differentiate" id="toc-change-the-encoding-then-differentiate" class="nav-link" data-scroll-target="#change-the-encoding-then-differentiate">Change the encoding, then differentiate</a></li>
+  </ul></li>
+  <li><a href="#session-3-what-can-one-reading-determine" id="toc-session-3-what-can-one-reading-determine" class="nav-link" data-scroll-target="#session-3-what-can-one-reading-determine"><span class="header-section-number">18.3</span> Session 3 — What can one reading determine?</a></li>
+  <li><a href="#session-4-what-does-elimination-preserve" id="toc-session-4-what-does-elimination-preserve" class="nav-link" data-scroll-target="#session-4-what-does-elimination-preserve"><span class="header-section-number">18.4</span> Session 4 — What does elimination preserve?</a>
+  <ul class="collapse">
+  <li><a href="#recovering-the-kernel-and-the-embedded-image" id="toc-recovering-the-kernel-and-the-embedded-image" class="nav-link" data-scroll-target="#recovering-the-kernel-and-the-embedded-image">Recovering the kernel and the embedded image</a></li>
+  </ul></li>
+  <li><a href="#session-5-when-is-a-decomposition-a-coordinate-system" id="toc-session-5-when-is-a-decomposition-a-coordinate-system" class="nav-link" data-scroll-target="#session-5-when-is-a-decomposition-a-coordinate-system"><span class="header-section-number">18.5</span> Session 5 — When is a decomposition a coordinate system?</a>
+  <ul class="collapse">
+  <li><a href="#a-complement-chooses-one-point-per-fiber" id="toc-a-complement-chooses-one-point-per-fiber" class="nav-link" data-scroll-target="#a-complement-chooses-one-point-per-fiber">A complement chooses one point per fiber</a></li>
+  </ul></li>
+  <li><a href="#session-6-can-we-recover-exactly-what-a-measurement-knows" id="toc-session-6-can-we-recover-exactly-what-a-measurement-knows" class="nav-link" data-scroll-target="#session-6-can-we-recover-exactly-what-a-measurement-knows"><span class="header-section-number">18.6</span> Session 6 — Can we recover exactly what a measurement knows?</a></li>
+  <li><a href="#session-7-which-maps-survive-a-quotient-and-which-maps-split-it" id="toc-session-7-which-maps-survive-a-quotient-and-which-maps-split-it" class="nav-link" data-scroll-target="#session-7-which-maps-survive-a-quotient-and-which-maps-split-it"><span class="header-section-number">18.7</span> Session 7 — Which maps survive a quotient, and which maps split it?</a>
+  <ul class="collapse">
+  <li><a href="#what-specifies-a-map-into-or-out-of-a-direct-sum" id="toc-what-specifies-a-map-into-or-out-of-a-direct-sum" class="nav-link" data-scroll-target="#what-specifies-a-map-into-or-out-of-a-direct-sum">What specifies a map into or out of a direct sum?</a></li>
+  <li><a href="#exactness-and-splitting" id="toc-exactness-and-splitting" class="nav-link" data-scroll-target="#exactness-and-splitting">Exactness and splitting</a></li>
+  </ul></li>
+  <li><a href="#session-8-which-part-of-a-physical-or-numerical-solution-is-identifiable" id="toc-session-8-which-part-of-a-physical-or-numerical-solution-is-identifiable" class="nav-link" data-scroll-target="#session-8-which-part-of-a-physical-or-numerical-solution-is-identifiable"><span class="header-section-number">18.8</span> Session 8 — Which part of a physical or numerical solution is identifiable?</a>
+  <ul class="collapse">
+  <li><a href="#compatible-readings-inconsistent-data-and-an-inverse-on-classes" id="toc-compatible-readings-inconsistent-data-and-an-inverse-on-classes" class="nav-link" data-scroll-target="#compatible-readings-inconsistent-data-and-an-inverse-on-classes">Compatible readings, inconsistent data, and an inverse on classes</a></li>
+  <li><a href="#edge-differences-cycles-and-conservation" id="toc-edge-differences-cycles-and-conservation" class="nav-link" data-scroll-target="#edge-differences-cycles-and-conservation">Edge differences, cycles and conservation</a></li>
+  <li><a href="#which-boundary-condition-removes-an-integration-constant" id="toc-which-boundary-condition-removes-an-integration-constant" class="nav-link" data-scroll-target="#which-boundary-condition-removes-an-integration-constant">Which boundary condition removes an integration constant?</a></li>
+  <li><a href="#what-does-a-subspace-algorithm-actually-carry-between-iterations" id="toc-what-does-a-subspace-algorithm-actually-carry-between-iterations" class="nav-link" data-scroll-target="#what-does-a-subspace-algorithm-actually-carry-between-iterations">What does a subspace algorithm actually carry between iterations?</a></li>
+  </ul></li>
+  <li><a href="#computational-laboratory-from-an-inverse-problem-to-a-factorization" id="toc-computational-laboratory-from-an-inverse-problem-to-a-factorization" class="nav-link" data-scroll-target="#computational-laboratory-from-an-inverse-problem-to-a-factorization"><span class="header-section-number">18.9</span> Computational laboratory — From an inverse problem to a factorization</a>
+  <ul class="collapse">
+  <li><a href="#a.-what-can-row-reduction-certify" id="toc-a.-what-can-row-reduction-certify" class="nav-link" data-scroll-target="#a.-what-can-row-reduction-certify">A. What can row reduction certify?</a></li>
+  <li><a href="#b.-which-two-components-sum-to-the-input" id="toc-b.-which-two-components-sum-to-the-input" class="nav-link" data-scroll-target="#b.-which-two-components-sum-to-the-input">B. Which two components sum to the input?</a></li>
+  <li><a href="#c.-can-a-new-representative-alter-the-quotient-coordinates" id="toc-c.-can-a-new-representative-alter-the-quotient-coordinates" class="nav-link" data-scroll-target="#c.-can-a-new-representative-alter-the-quotient-coordinates">C. Can a new representative alter the quotient coordinates?</a></li>
+  <li><a href="#d.-where-is-the-invertible-part-of-a-singular-problem" id="toc-d.-where-is-the-invertible-part-of-a-singular-problem" class="nav-link" data-scroll-target="#d.-where-is-the-invertible-part-of-a-singular-problem">D. Where is the invertible part of a singular problem?</a></li>
+  <li><a href="#e.-which-edge-readings-come-from-potentials" id="toc-e.-which-edge-readings-come-from-potentials" class="nav-link" data-scroll-target="#e.-which-edge-readings-come-from-potentials">E. Which edge readings come from potentials?</a></li>
+  <li><a href="#f.-which-basis-represents-the-trial-plane" id="toc-f.-which-basis-represents-the-trial-plane" class="nav-link" data-scroll-target="#f.-which-basis-represents-the-trial-plane">F. Which basis represents the trial plane?</a></li>
+  </ul></li>
+  <li><a href="#exercises-reconstruct-the-arguments" id="toc-exercises-reconstruct-the-arguments" class="nav-link" data-scroll-target="#exercises-reconstruct-the-arguments"><span class="header-section-number">18.10</span> Exercises — Reconstruct the arguments</a>
+  <ul class="collapse">
+  <li><a href="#build-an-encoding" id="toc-build-an-encoding" class="nav-link" data-scroll-target="#build-an-encoding">Build an encoding</a></li>
+  <li><a href="#diagnose-solvability-and-decomposition" id="toc-diagnose-solvability-and-decomposition" class="nav-link" data-scroll-target="#diagnose-solvability-and-decomposition">Diagnose solvability and decomposition</a></li>
+  <li><a href="#descend-factor-and-split" id="toc-descend-factor-and-split" class="nav-link" data-scroll-target="#descend-factor-and-split">Descend, factor, and split</a></li>
+  <li><a href="#apply-the-structure" id="toc-apply-the-structure" class="nav-link" data-scroll-target="#apply-the-structure">Apply the structure</a></li>
+  </ul></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">18.11</span> Worked solutions</a></li>
+  <li><a href="#session-9-which-information-survives-a-boundary-condition" id="toc-session-9-which-information-survives-a-boundary-condition" class="nav-link" data-scroll-target="#session-9-which-information-survives-a-boundary-condition"><span class="header-section-number">18.12</span> Session 9 — Which information survives a boundary condition?</a>
+  <ul class="collapse">
+  <li><a href="#integrated-mastery-problem" id="toc-integrated-mastery-problem" class="nav-link" data-scroll-target="#integrated-mastery-problem">Integrated mastery problem</a></li>
+  <li><a href="#worked-reconstruction" id="toc-worked-reconstruction" class="nav-link" data-scroll-target="#worked-reconstruction">Worked reconstruction</a></li>
+  <li><a href="#how-the-constructions-fit-together" id="toc-how-the-constructions-fit-together" class="nav-link" data-scroll-target="#how-the-constructions-fit-together">How the constructions fit together</a></li>
+  <li><a href="#mastery-checklist" id="toc-mastery-checklist" class="nav-link" data-scroll-target="#mastery-checklist">Mastery checklist</a></li>
+  <li><a href="#transition-to-module-b-what-can-be-measured" id="toc-transition-to-module-b-what-can-be-measured" class="nav-link" data-scroll-target="#transition-to-module-b-what-can-be-measured">Transition to Module B — What can be measured?</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_3/a03.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-module-a" class="quarto-section-identifier"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Three sensors report three numbers. The third always reports the sum of the first two. Four input settings control the sensors. Given a reading, can you tell whether it is possible? If it is possible, what exactly can you recover about the settings? These are different questions. The first concerns a subspace of the <strong>output</strong> space. The second concerns whole families of points in the <strong>input</strong> space. We will calculate both and discover a linear bijection between the possible readings and the families of indistinguishable settings.</p>
+<p>Work over a field <span class="math inline">\(F\)</span> (usually <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>). Vectors in matrices are columns. Write <span class="math inline">\(\mathcal P_n\)</span> for polynomials of degree at most <span class="math inline">\(n\)</span>, including zero. Finite dimension is assumed for dimension counts unless stated otherwise. The arguments about fibers, quotients and factorization will work without that assumption.</p>
+<section id="session-1-when-can-a-list-of-numbers-describe-a-polynomial" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="session-1-when-can-a-list-of-numbers-describe-a-polynomial"><span class="header-section-number">18.1</span> Session 1 — When can a list of numbers describe a polynomial?</h2>
+<p>A quadratic can be stored by its three coefficients or by its values at three distinct points. Why can either representation work, and why would four arbitrary readings be too many? To answer independently of any particular encoding, begin with the operations the encoding should respect.</p>
+<section id="from-linear-combinations-to-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="from-linear-combinations-to-coordinates">From linear combinations to coordinates</h3>
+<p>A <strong>vector space</strong> is an abelian group <span class="math inline">\((V,+)\)</span> with scalar multiplication <span class="math inline">\(F\times V\to V\)</span> satisfying <span class="math inline">\(1v=v\)</span>, <span class="math inline">\((ab)v=a(bv)\)</span>, <span class="math inline">\((a+b)v=av+bv\)</span>, and <span class="math inline">\(a(v+w)=av+aw\)</span>. Thus finite sums <span class="math inline">\(\sum_i a_iv_i\)</span> make sense, including the empty sum <span class="math inline">\(0\)</span>. Examples include matrices of fixed shape with entrywise operations, functions <span class="math inline">\(X\to F\)</span> with pointwise operations, and polynomials with formal addition and scalar multiplication. A matrix unit <span class="math inline">\(E_{ij}\)</span> has one entry equal to <span class="math inline">\(1\)</span> and all others zero. The matrix units form a basis of <span class="math inline">\(F^{m\times n}\)</span> because <span class="math inline">\(M=\sum_{ij}M_{ij}E_{ij}\)</span> and comparison of entries forces every coefficient.</p>
+<p>A subset <span class="math inline">\(U\subseteq V\)</span> is a <strong>subspace</strong> if it contains <span class="math inline">\(0\)</span> and contains <span class="math inline">\(au+bv\)</span> for every <span class="math inline">\(u,v\in U\)</span> and <span class="math inline">\(a,b\in F\)</span>. Necessity follows from the operations within <span class="math inline">\(U\)</span>. For sufficiency take <span class="math inline">\((a,b)=(1,1),(-1,0),(c,0)\)</span> to obtain closure under addition, inverses and scaling. The identities between operations are inherited from <span class="math inline">\(V\)</span>. For instance the functions vanishing at a specified point form a subspace. Functions taking value <span class="math inline">\(1\)</span> there fail the zero test.</p>
+<p>Given an ordered list <span class="math inline">\(B=(v_1,\ldots,v_n)\)</span>, consider its <strong>synthesis map</strong> <span class="math display">\[
+S_B:F^n\to V,\qquad a\longmapsto\sum_{i=1}^n a_i v_i.
+\]</span> Its range, the <strong>span</strong>, is a subspace by distributivity. Every subspace containing the list contains the entire span. The list is <strong>linearly independent</strong> if <span class="math inline">\(S_B(a)=0\)</span> forces <span class="math inline">\(a=0\)</span>. Subtract two representations of the same vector. Their difference synthesizes zero, so independence is precisely uniqueness wherever representations exist. A <strong>basis</strong> is an independent spanning list. Thus a basis makes <span class="math inline">\(S_B\)</span> bijective, and the coordinate column <span class="math inline">\([v]_B=S_B^{-1}(v)\)</span> is defined for every <span class="math inline">\(v\)</span>. Independence concerns the list, including repetitions. A space admitting a finite spanning list is finite-dimensional.</p>
+</section>
+<section id="why-do-all-bases-have-the-same-size" class="level3">
+<h3 class="anchored" data-anchor-id="why-do-all-bases-have-the-same-size">Why do all bases have the same size?</h3>
+<div id="thm-struct-exchange" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 18.1</strong></span> <strong>Finite exchange.</strong> Let <span class="math inline">\(s_1,\ldots,s_n\)</span> span <span class="math inline">\(V\)</span> and let <span class="math inline">\(u_1,\ldots,u_k\)</span> be independent. Then <span class="math inline">\(k\le n\)</span>, and <span class="math inline">\(k\)</span> of the spanning vectors can be replaced by the <span class="math inline">\(u_i\)</span> while preserving the span.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Suppose <span class="math inline">\(u_1,\ldots,u_j\)</span> have been inserted and the other entries are surviving generators. Expand <span class="math inline">\(u_{j+1}\)</span> in this spanning list. Some surviving <span class="math inline">\(s\)</span> has a nonzero coefficient, since otherwise <span class="math inline">\(u_{j+1}\)</span> is a combination of its predecessors. Solve the expansion for that <span class="math inline">\(s\)</span> by dividing by its coefficient. Replacing <span class="math inline">\(s\)</span> by <span class="math inline">\(u_{j+1}\)</span> therefore preserves the span. Starting with <span class="math inline">\(j=0\)</span>, the process takes one surviving entry at each step. If all <span class="math inline">\(n\)</span> entries have been replaced, their span is <span class="math inline">\(V\)</span> and an additional independent <span class="math inline">\(u\)</span> is impossible.</p>
+</div>
+<p>Delete any redundant vector from a finite spanning list until independence holds. This produces a basis, including the empty basis for the zero space. Applying exchange to two bases in both orders shows their lengths agree. This integer is <span class="math inline">\(\dim V\)</span>. To <strong>extend</strong> an independent list, scan a spanning list for <span class="math inline">\(V\)</span>, adjoining each vector outside the span accumulated so far. Each addition preserves independence (a dependence with nonzero new coefficient would solve for the new vector). The final list spans because it contains or generates each scanned entry. A subspace of an <span class="math inline">\(n\)</span>-dimensional space has a basis as well. Repeatedly choose a vector outside the span within that subspace. Exchange bounds the number of choices by <span class="math inline">\(n\)</span>.</p>
+<p>In <span class="math inline">\(\mathcal P_2(\mathbb R)\)</span>, the bases <span class="math inline">\((1,t,t^2)\)</span> and <span class="math inline">\((1,t-1,(t-1)^2)\)</span> give <span class="math inline">\(t^2\)</span> the coordinates <span class="math inline">\((0,0,1)^T\)</span> and <span class="math inline">\((1,2,1)^T\)</span>. Expanding in powers of <span class="math inline">\(t\)</span> proves the second list independent by successively comparing leading terms, and the same triangular calculation expresses the monomials in its span. There is no coordinate triple until the encoding is specified.</p>
+<p><strong>Checkpoint.</strong> Evaluation at three distinct real points is injective on <span class="math inline">\(\mathcal P_2\)</span> because a nonzero quadratic has at most two distinct roots. Can you construct the polynomial for arbitrary readings? For points <span class="math inline">\(s_i\)</span>, form <span class="math inline">\(\ell_i(t)=\prod_{j\ne i}(t-s_j)/(s_i-s_j)\)</span>. Evaluate <span class="math inline">\(\sum_i y_i\ell_i\)</span> at each point. A fourth reading must equal the value of this already determined polynomial.</p>
+</section>
+</section>
+<section id="session-2-how-do-we-transport-a-calculation-between-bases" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="session-2-how-do-we-transport-a-calculation-between-bases"><span class="header-section-number">18.2</span> Session 2 — How do we transport a calculation between bases?</h2>
+<p>A <strong>linear map</strong> <span class="math inline">\(T:V\to W\)</span> obeys <span class="math inline">\(T(av+bw)=aT(v)+bT(w)\)</span>. It sends zero to zero, preserves differences, and by induction preserves every finite linear combination. The domain tells us which combinations may be formed. The codomain specifies the target in which attainable outputs are compared.</p>
+<p><strong>Prescribing images.</strong> Choose a basis <span class="math inline">\(B=(b_j)\)</span> of <span class="math inline">\(V\)</span> and any <span class="math inline">\(w_j\in W\)</span>. There is exactly one linear map with <span class="math inline">\(Tb_j=w_j\)</span>. Indeed, define <span class="math inline">\(T(\sum_j a_j b_j)=\sum_j a_jw_j\)</span>. Uniqueness of coordinates makes this a function, addition and scaling of coordinates give linearity, and linearity forces this formula for any proposed map. A redundant generating family does not allow arbitrary assignments. Every relation among generators must also hold among their proposed images.</p>
+<p>With an ordered target basis <span class="math inline">\(C\)</span>, put <span class="math inline">\(A=S_C^{-1}TS_B\)</span>. This map between coordinate spaces has columns <span class="math inline">\([Tb_j]_C\)</span>, since <span class="math inline">\(S_B e_j=b_j\)</span>. Thus <span class="math inline">\([Tv]_C=A[v]_B\)</span>. For <span class="math inline">\(L:W\to Z\)</span> with target basis <span class="math inline">\(H\)</span>, inserting <span class="math inline">\(S_CS_C^{-1}\)</span> gives <span class="math display">\[
+[LT]_{H\leftarrow B}=[L]_{H\leftarrow C}[T]_{C\leftarrow B}.
+\]</span> Matrix multiplication composes descriptions whose middle coordinates agree. A bijective linear map is an <strong>isomorphism</strong>. Its inverse is linear since <span class="math inline">\(T(au+bv)=aTu+bTv\)</span> gives the unique preimage of the right-hand side. Two finite-dimensional spaces are isomorphic exactly when their dimensions agree. An isomorphism carries bases to bases, and matching two bases defines a bijection by the preceding construction.</p>
+<section id="change-the-encoding-then-differentiate" class="level3">
+<h3 class="anchored" data-anchor-id="change-the-encoding-then-differentiate">Change the encoding, then differentiate</h3>
+<p>Let <span class="math inline">\(P=S_B^{-1}S_{B'}\)</span> and <span class="math inline">\(Q=S_C^{-1}S_{C'}\)</span>. Their columns express new basis vectors in old coordinates. The direction matters. Starting with new coordinates, convert the input, apply the old matrix, and convert the result back: <span class="math display">\[
+[T]_{C'\leftarrow B'}=Q^{-1}AP.
+\]</span> For an endomorphism <span class="math inline">\(V\to V\)</span> with the same basis on both sides, <span class="math inline">\(Q=P\)</span>, giving <strong>similarity</strong>. A rectangular map allows independent source and target changes. Rank survives both changes because the coordinate maps are bijective. For an endomorphism the eigenvalue equation also survives similarity, since <span class="math inline">\(Ax=\lambda x\)</span> becomes <span class="math inline">\((P^{-1}AP)(P^{-1}x)=\lambda P^{-1}x\)</span>.</p>
+<p>Consider <span class="math inline">\(D:\mathcal P_2(\mathbb R)\to\mathcal P_1(\mathbb R)\)</span>, <span class="math inline">\(Dp=p'\)</span>. In monomial bases, <span class="math display">\[
+A=\begin{pmatrix}0&amp;1&amp;0\\0&amp;0&amp;2\end{pmatrix}.
+\]</span> Take <span class="math inline">\(B'=(1,t-1,(t-1)^2)\)</span> and keep the monomial target. Differentiating the new basis gives columns <span class="math inline">\((0,0)^T,(1,0)^T,(-2,2)^T\)</span>. Alternatively multiply <span class="math display">\[
+A\begin{pmatrix}1&amp;-1&amp;1\\0&amp;1&amp;-2\\0&amp;0&amp;1\end{pmatrix}
+=\begin{pmatrix}0&amp;1&amp;-2\\0&amp;0&amp;2\end{pmatrix}.
+\]</span> Applying this to <span class="math inline">\((1,2,1)^T\)</span> gives <span class="math inline">\((0,2)^T\)</span>, precisely <span class="math inline">\(D(t^2)=2t\)</span>. If the target is shifted as well, the last column becomes <span class="math inline">\((0,2)^T\)</span> in <span class="math inline">\((1,t-1)\)</span>. The output polynomial is the same in either encoding.</p>
+<p><strong>Checkpoint.</strong> For the ordinary matrix <span class="math inline">\(\operatorname{diag}(2,3)\)</span> use the new basis <span class="math inline">\((e_2,e_1)\)</span> on both sides. Its matrix becomes <span class="math inline">\(\operatorname{diag}(3,2)\)</span>. Swapping only the input basis would instead give columns <span class="math inline">\((0,3)^T,(2,0)^T\)</span>. Which represents similarity?</p>
+</section>
+</section>
+<section id="session-3-what-can-one-reading-determine" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="session-3-what-can-one-reading-determine"><span class="header-section-number">18.3</span> Session 3 — What can one reading determine?</h2>
+<p>Define <span class="math inline">\(K=\ker T=\{x:Tx=0\}\)</span> and <span class="math inline">\(I=\operatorname{im}T=\{Tx:x\in V\}\)</span>. Both are subspaces. For <span class="math inline">\(K\)</span>, applying <span class="math inline">\(T\)</span> to any linear combination of its members gives zero. For <span class="math inline">\(I\)</span>, combine preimages before applying <span class="math inline">\(T\)</span>. Now subtract two candidate inputs: <span class="math display">\[
+Tx=Ty\quad\Longleftrightarrow\quad T(x-y)=0\quad\Longleftrightarrow\quad x-y\in K.
+\]</span> Hence <span class="math inline">\(T\)</span> is injective exactly when <span class="math inline">\(K=\{0\}\)</span> (compare each kernel vector with zero). It is surjective exactly when <span class="math inline">\(I=W\)</span>, by the meaning of surjectivity. For <span class="math inline">\(b\in I\)</span> choose <span class="math inline">\(Tx_p=b\)</span>. The displayed equivalence proves in both directions that <span class="math display">\[
+T^{-1}(\{b\})=x_p+K.
+\]</span> This <strong>fiber</strong> is an affine space, a translate with direction space <span class="math inline">\(K\)</span>. Translating the origin to a different solution does not change the fiber. For <span class="math inline">\(b\ne0\)</span> the fiber excludes the zero vector. For <span class="math inline">\(b\notin I\)</span> it is empty.</p>
+<p>The inclusion <span class="math inline">\((u,v)\mapsto(u,v,0)\)</span> into <span class="math inline">\(F^3\)</span> is injective and misses <span class="math inline">\(e_3\)</span>. The map <span class="math inline">\((u,v,w)\mapsto(u,v)\)</span> onto <span class="math inline">\(F^2\)</span> is surjective and loses an entire coordinate. The map <span class="math inline">\((u,v,w)\mapsto(u,0)\)</span> into <span class="math inline">\(F^2\)</span> has both a nontrivial kernel and an unattainable output. Restricting its codomain to its image changes its surjectivity.</p>
+<div id="thm-struct-rank" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 18.2</strong></span> <strong>Rank–nullity.</strong> If <span class="math inline">\(\dim V&lt;\infty\)</span>, then <span class="math inline">\(\dim V=\dim K+\dim I\)</span>. These last two dimensions are the nullity and the rank, respectively.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Extend a kernel basis <span class="math inline">\(k_1,\ldots,k_s\)</span> to a domain basis by adjoining <span class="math inline">\(h_1,\ldots,h_r\)</span>. Expand any input in this basis and apply <span class="math inline">\(T\)</span>. Only the <span class="math inline">\(Th_i\)</span> survive, so they span <span class="math inline">\(I\)</span>. If <span class="math inline">\(\sum_i c_iTh_i=0\)</span>, then <span class="math inline">\(\sum_i c_i h_i\)</span> belongs to <span class="math inline">\(K\)</span>. Expressing that vector in the <span class="math inline">\(k\)</span>’s gives a relation in the full basis. All <span class="math inline">\(c_i\)</span> vanish. Thus the <span class="math inline">\(Th_i\)</span> form an image basis, and the domain basis has <span class="math inline">\(s+r\)</span> members.</p>
+</div>
+<p>The proof also constructs a smaller inverse problem. On <span class="math inline">\(H=\operatorname{span}(h_i)\)</span> the restriction <span class="math inline">\(T|_H:H\to I\)</span> is bijective. Each reading has exactly one representative in <span class="math inline">\(H\)</span>. We chose the <span class="math inline">\(h_i\)</span>; soon we will recover the information in a reading without choosing any representative.</p>
+<p><strong>Checkpoint.</strong> A linear map <span class="math inline">\(F^4\to F^3\)</span> loses at least one dimension, since its rank is at most three. When the rank is two, how many parameters describe a compatible fiber? How many independent linear constraints describe its image? The two answers are <span class="math inline">\(4-2\)</span> and <span class="math inline">\(3-2\)</span>.</p>
+</section>
+<section id="session-4-what-does-elimination-preserve" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="session-4-what-does-elimination-preserve"><span class="header-section-number">18.4</span> Session 4 — What does elimination preserve?</h2>
+<p>Return to the four settings and three sensors. Keep the matrix used again in Modules B and C: <span class="math display">\[
+A=\begin{pmatrix}1&amp;2&amp;-1&amp;3\\2&amp;4&amp;1&amp;9\\3&amp;6&amp;0&amp;12\end{pmatrix}.
+\]</span> The last row is the sum of the first two. Thus <span class="math inline">\(b_3=b_1+b_2\)</span> is necessary. Is it sufficient? Carry the right-hand side through exactly the same row operations. First subtract rows 1 and 2 from row 3, then subtract twice row 1 from row 2. Divide row 2 by three and add it to row 1. The augmented system becomes <span class="math display">\[
+\left(\begin{array}{cccc|c}
+1&amp;2&amp;0&amp;4&amp;\alpha\\
+0&amp;0&amp;1&amp;1&amp;\beta\\
+0&amp;0&amp;0&amp;0&amp;b_3-b_1-b_2
+\end{array}\right),\qquad
+\beta=(b_2-2b_1)/3,\quad\alpha=b_1+\beta .
+\]</span> Each elementary row operation is invertible (undo a swap, use the reciprocal scaling, or subtract the added multiple). Their product on the left is an invertible matrix <span class="math inline">\(E\)</span>. We solved <span class="math inline">\(EAx=Eb\)</span>, which is equivalent to <span class="math inline">\(Ax=b\)</span>. A zero coefficient row with nonzero right-hand side is the complete obstruction here. For a compatible reading, all solutions are <span class="math display">\[
+x=(\alpha,0,\beta,0)^T+s(-2,1,0,0)^T+t(-4,0,-1,1)^T .
+\]</span> In particular put <span class="math inline">\(k_1=(-2,1,0,0)^T\)</span>, <span class="math inline">\(k_2=(-4,0,-1,1)^T\)</span>. These span the kernel, and reading coordinates 2 and 4 of a relation proves independence. For <span class="math inline">\(b=(1,2,3)^T\)</span>, the fiber passes through <span class="math inline">\(e_1\)</span>; for <span class="math inline">\((1,2,4)^T\)</span>, there is no solution.</p>
+<section id="recovering-the-kernel-and-the-embedded-image" class="level3">
+<h3 class="anchored" data-anchor-id="recovering-the-kernel-and-the-embedded-image">Recovering the kernel and the embedded image</h3>
+<p>In <strong>reduced row echelon form</strong> (RREF) zero rows come last, each leading entry is <span class="math inline">\(1\)</span>, leading positions move right down successive nonzero rows, and each pivot is alone in its column. Elimination constructs this form by finding the leftmost available nonzero column, moving a nonzero entry into pivot position, normalizing it, clearing its column, and continuing on the remaining rows and columns. In the reduced matrix <span class="math inline">\(R=EA\)</span> the pivot columns here are <span class="math inline">\(e_1,e_2\)</span> in <span class="math inline">\(F^3\)</span>. Rearrange <strong>variables</strong> temporarily so pivots come first. The general reduced system has the shape <span class="math display">\[
+\begin{pmatrix}I_r&amp;G\\0&amp;0\end{pmatrix}
+\binom{x_p}{x_f}=\binom{d}{h}.
+\]</span> It is consistent exactly when <span class="math inline">\(h=0\)</span>. Free coordinates <span class="math inline">\(z\)</span> parametrize the homogeneous solutions by <span class="math inline">\(z\mapsto(-Gz,z)\)</span>, with inverse extraction of free coordinates. Undo the column permutation when reporting vectors. Applying this isomorphism to the standard basis gives the null-space basis, including the empty list for a trivial kernel.</p>
+<p>Left multiplication gives <span class="math inline">\(\ker R=\ker A\)</span> because <span class="math inline">\(E\)</span> is injective, but <span class="math inline">\(\operatorname{im}R=E(\operatorname{im}A)\)</span>. Here the reduced columns span the plane <span class="math inline">\(y_3=0\)</span>; the original columns span the different plane <span class="math inline">\(y_3=y_1+y_2\)</span>. What transports back is <strong>every relation among columns</strong>: <span class="math inline">\(Rc=0\)</span> iff <span class="math inline">\(Ac=0\)</span>. Consequently the pivot <strong>indices</strong> select an independent spanning family in the original matrix. Explicitly put <span class="math display">\[
+C=(a_1\ a_3)=\begin{pmatrix}1&amp;-1\\2&amp;1\\3&amp;0\end{pmatrix},\qquad
+J=\begin{pmatrix}1&amp;2&amp;0&amp;4\\0&amp;0&amp;1&amp;1\end{pmatrix}.
+\]</span> Then <span class="math inline">\(a_2=2a_1\)</span> and <span class="math inline">\(a_4=4a_1+a_3\)</span>, hence <span class="math inline">\(A=CJ\)</span>. The two numbers <span class="math inline">\(Jx\)</span> measure all the input information visible to the sensors. The three numbers <span class="math inline">\(C(Jx)\)</span> express that reading in the original output coordinates. The matrix sizes already record an exact rank factorization through <span class="math inline">\(F^2\)</span> (here and for this example <span class="math inline">\(F=\mathbb R\)</span>).</p>
+<p><strong>When is a tiny pivot significant?</strong> For <span class="math inline">\(A_\epsilon=\operatorname{diag}(1,\epsilon)\)</span>, <span class="math inline">\(\epsilon&gt;0\)</span>, the algebraic rank is two, but an error <span class="math inline">\(\delta\)</span> in the second reading becomes <span class="math inline">\(\delta/\epsilon\)</span> in the recovered input. The stretching factors (singular values) are <span class="math inline">\(1\)</span> and <span class="math inline">\(\epsilon\)</span> for <span class="math inline">\(0&lt;\epsilon\le1\)</span>. A numerical rank with absolute threshold <span class="math inline">\(\tau\)</span> counts stretches greater than <span class="math inline">\(\tau\)</span> and gives one if <span class="math inline">\(\epsilon\le\tau&lt;1\)</span>. Rescaling the data changes the interpretation of an absolute threshold. Modules D and E develop this distinction for arbitrary matrices.</p>
+<p><strong>Checkpoint.</strong> Without elimination, explain why the first two rows of <span class="math inline">\(J\)</span> give two independent measurements and why <span class="math inline">\(C\)</span> loses neither. Use <span class="math inline">\(Je_1\)</span> and <span class="math inline">\(Je_3\)</span> and the independence of <span class="math inline">\(a_1,a_3\)</span>.</p>
+</section>
+</section>
+<section id="session-5-when-is-a-decomposition-a-coordinate-system" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="session-5-when-is-a-decomposition-a-coordinate-system"><span class="header-section-number">18.5</span> Session 5 — When is a decomposition a coordinate system?</h2>
+<p>Suppose two mechanisms contribute unknown vectors from subspaces <span class="math inline">\(U\)</span> and <span class="math inline">\(H\)</span> of <span class="math inline">\(V\)</span>. Which totals can occur? When can the contributions be recovered from their sum? Form the <strong>external direct sum</strong> <span class="math inline">\(U\oplus_{\mathrm{ext}}H\)</span> of ordered pairs with componentwise operations and the addition map <span class="math inline">\(\sigma(u,h)=u+h\)</span>. Its image <span class="math inline">\(U+H\)</span> contains both spaces and is contained in every subspace containing both. Unlike the union, the sum includes mixed combinations. The union of the two coordinate axes misses <span class="math inline">\((1,1)\)</span>.</p>
+<p>The kernel of <span class="math inline">\(\sigma\)</span> consists of <span class="math inline">\((z,-z)\)</span> with <span class="math inline">\(z\in U\cap H\)</span>. Thus the overlap measures the entire ambiguity. Rank–nullity on the pair space (concatenate the bases <span class="math inline">\((u_i,0),(0,h_j)\)</span>) gives <span class="math display">\[
+\dim(U+H)=\dim U+\dim H-\dim(U\cap H).
+\]</span> A sum is <strong>internally direct</strong>, written <span class="math inline">\(U\oplus H\)</span>, if <span class="math inline">\(\sigma\)</span> is injective. Equivalently each element of the sum has a unique decomposition, or <span class="math inline">\(U\cap H=0\)</span>. To assert <span class="math inline">\(V=U\oplus H\)</span> one must also establish spanning.</p>
+<p>For a finite family <span class="math inline">\(U_i\)</span>, the same addition map on tuples has trivial kernel exactly when <span class="math inline">\(\sum u_i=0\)</span> forces every <span class="math inline">\(u_i=0\)</span>. Equivalently <span class="math inline">\(U_i\cap\sum_{j\ne i}U_j=0\)</span> for each <span class="math inline">\(i\)</span>: in a relation isolate <span class="math inline">\(u_i\)</span>, and conversely any nonzero member of such an intersection supplies a relation. The lines spanned by <span class="math inline">\((1,0),(0,1),(1,1)\)</span> intersect pairwise only at zero. Yet <span class="math inline">\((1,0)+(0,1)-(1,1)=0\)</span>. The third line lies in the <strong>sum</strong> of the first two.</p>
+<section id="a-complement-chooses-one-point-per-fiber" class="level3">
+<h3 class="anchored" data-anchor-id="a-complement-chooses-one-point-per-fiber">A complement chooses one point per fiber</h3>
+<p>A complement <span class="math inline">\(H\)</span> of <span class="math inline">\(K\)</span> satisfies <span class="math inline">\(V=K\oplus H\)</span>. Extending a basis of <span class="math inline">\(K\)</span> produces one. For the sensor matrix use <span class="math inline">\(H=\operatorname{span}(e_1,e_3)\)</span> and define <span class="math inline">\(S(u,v)=(u,0,v,0)^T\)</span>. Since <span class="math inline">\(JS=I_2\)</span> and <span class="math inline">\(\ker J=K\)</span>, every input splits as <span class="math display">\[
+x=\underbrace{x-SJx}_{\in K}+\underbrace{SJx}_{\in H}.
+\]</span> If <span class="math inline">\(Sz\in K\)</span> then <span class="math inline">\(0=JSz=z\)</span>, proving uniqueness. One could equally replace <span class="math inline">\(e_1\)</span> by <span class="math inline">\(e_1+k_1\)</span>. Its reading is unchanged and the new span with <span class="math inline">\(e_3\)</span> is another complement. For example <span class="math inline">\(e_1\)</span> and <span class="math inline">\(e_1+k_1\)</span> are different representatives of the very same reading.</p>
+<div id="thm-struct-projection" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 18.3</strong></span> <strong>Projections and decompositions.</strong> An endomorphism <span class="math inline">\(P\)</span> satisfies <span class="math inline">\(P^2=P\)</span> exactly when it is the projection onto one summand along another. Its summands are <span class="math inline">\(\operatorname{im}P\)</span> and <span class="math inline">\(\ker P\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For an idempotent <span class="math inline">\(P\)</span>, write <span class="math inline">\(x=Px+(x-Px)\)</span>. The second term has image zero under <span class="math inline">\(P\)</span>, while <span class="math inline">\(P\)</span> fixes every <span class="math inline">\(Py\)</span> because <span class="math inline">\(P(Py)=Py\)</span>. A vector both fixed and killed must vanish. Conversely if <span class="math inline">\(x=u+h\)</span> uniquely, put <span class="math inline">\(P(x)=u\)</span>. Adding or scaling the components proves linearity. Applying <span class="math inline">\(P\)</span> again to <span class="math inline">\(u+0\)</span> returns <span class="math inline">\(u\)</span>. Its image and kernel are exactly the two prescribed summands.</p>
+</div>
+<p>For the sensors <span class="math inline">\(SJ\)</span> projects onto <span class="math inline">\(H\)</span> along <span class="math inline">\(K\)</span>; <span class="math inline">\(I_4-SJ\)</span> projects onto <span class="math inline">\(K\)</span> along <span class="math inline">\(H\)</span>. An algebraic projection specifies a direction along which to project. Orthogonality requires an inner product and a perpendicular direction.</p>
+<p>In <a href="#fig-struct-fibers" class="quarto-xref">Figure&nbsp;<span>18.1</span></a> the measurement is <span class="math inline">\(m(x,y)=y\)</span>. A horizontal line is a whole fiber. Both transversals meet every fiber once, but the representative selected at height two depends on the transversal. The drawing models the choice <span class="math inline">\(S\)</span> above in two dimensions.</p>
+<div id="cell-fig-struct-fibers" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-struct-fibers" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-struct-fibers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="a03_files/figure-html/fig-struct-fibers-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-struct-fibers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18.1: Two complements select different representatives for each height measurement. The dashed arrows lie in the kernel direction.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In three dimensions take <span class="math inline">\(U=\{z=0\}\)</span> and <span class="math inline">\(H=\operatorname{span}(1,0,1)\)</span>. Every <span class="math inline">\((x,y,z)\)</span> splits into <span class="math inline">\((x-z,y,0)+z(1,0,1)\)</span>. The height determines the line component. In <a href="#fig-struct-plane" class="quarto-xref">Figure&nbsp;<span>18.2</span></a> the dashed segment is parallel to <span class="math inline">\(H\)</span>; projecting vertically would select a different point of the plane. Perspective alone cannot prove uniqueness. The height equation does.</p>
+<div id="cell-fig-struct-plane" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-struct-plane" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-struct-plane-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="a03_files/figure-html/fig-struct-plane-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-struct-plane-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18.2: Projection of v onto the horizontal plane along the sloping line H.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Checkpoint.</strong> If you know only <span class="math inline">\(\operatorname{im}P\)</span>, can you reconstruct <span class="math inline">\(P\)</span>? Use <span class="math inline">\(P(x,y,z)=(x-z,y,0)\)</span> and the vertical projection onto the same plane.</p>
+</section>
+</section>
+<section id="session-6-can-we-recover-exactly-what-a-measurement-knows" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="session-6-can-we-recover-exactly-what-a-measurement-knows"><span class="header-section-number">18.6</span> Session 6 — Can we recover exactly what a measurement knows?</h2>
+<p>For <span class="math inline">\(U\subseteq V\)</span> a subspace, declare <span class="math inline">\(x\sim y\)</span> if <span class="math inline">\(x-y\in U\)</span>. This is reflexive since <span class="math inline">\(0\in U\)</span>, symmetric since <span class="math inline">\(U\)</span> contains negatives, and transitive since differences add. The class <span class="math inline">\([x]=x+U\)</span> is the entire coset. Two cosets coincide exactly when their representatives differ by an element of <span class="math inline">\(U\)</span>; otherwise they are disjoint, since a common point would imply that difference belongs to <span class="math inline">\(U\)</span>.</p>
+<p>The <strong>quotient space</strong> <span class="math inline">\(V/U\)</span> consists of these classes with <span class="math display">\[
+[x]+[y]=[x+y],\qquad c[x]=[cx].
+\]</span> To check well-definedness replace <span class="math inline">\(x,y\)</span> by <span class="math inline">\(x+u,y+v\)</span>. The resulting differences <span class="math inline">\(u+v\)</span> and <span class="math inline">\(cu\)</span> belong to <span class="math inline">\(U\)</span>. The vector-space identities descend from those in <span class="math inline">\(V\)</span>, the zero class is <span class="math inline">\(U\)</span>, and <span class="math inline">\(-[x]=[-x]\)</span>. The quotient map <span class="math inline">\(q:x\mapsto[x]\)</span> is linear, onto, and has kernel <span class="math inline">\(U\)</span>. In finite dimension rank–nullity gives <span class="math inline">\(\dim(V/U)=\dim V-\dim U\)</span>. More concretely, extend a basis of <span class="math inline">\(U\)</span> by <span class="math inline">\(h_1,\ldots,h_r\)</span>. The classes <span class="math inline">\([h_i]\)</span> span since all <span class="math inline">\(U\)</span>-components vanish. Independence follows because <span class="math inline">\(\sum c_ih_i\in U\)</span> forces every <span class="math inline">\(c_i=0\)</span>.</p>
+<p>Each horizontal line in <a href="#fig-struct-fibers" class="quarto-xref">Figure&nbsp;<span>18.1</span></a> is <strong>one vector</strong> of the quotient by the horizontal axis. Adding two lines as classes means adding their heights. A chosen transversal draws a representative for each class. Intrinsically the zero of the quotient is the whole horizontal axis. This interpretation continues to work in dimension four, where picturing all the classes at once is harder than computing with them.</p>
+<div id="thm-struct-first" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 18.4</strong></span> <strong>First isomorphism theorem.</strong> Every linear <span class="math inline">\(T:V\to W\)</span> gives an isomorphism <span class="math display">\[
+\overline T:V/\ker T\longrightarrow\operatorname{im}T,\qquad [x]\longmapsto Tx.
+\]</span> Writing <span class="math inline">\(i:\operatorname{im}T\hookrightarrow W\)</span> for inclusion gives <span class="math inline">\(T=i\overline Tq\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Two representatives of a class have difference in <span class="math inline">\(\ker T\)</span>, so their outputs agree. The formulas for quotient operations and linearity of <span class="math inline">\(T\)</span> now give linearity of <span class="math inline">\(\overline T\)</span>. If <span class="math inline">\(\overline T[x]=0\)</span>, then <span class="math inline">\(x\in\ker T\)</span> and <span class="math inline">\([x]=[0]\)</span>, proving injectivity. Every element of the target is <span class="math inline">\(Tx\)</span> for some <span class="math inline">\(x\)</span>, proving surjectivity. Evaluate the composite on <span class="math inline">\(x\)</span> to get <span class="math inline">\(Tx\)</span>. Any candidate for the middle arrow must take <span class="math inline">\([x]\)</span> to <span class="math inline">\(Tx\)</span> because <span class="math inline">\(q\)</span> hits every class and <span class="math inline">\(i\)</span> is injective. This proves uniqueness.</p>
+</div>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+  V["Domain V"] --&gt;|T| W["Codomain W"]
+  V --&gt;|quotient| Q["V / ker T"]
+  Q --&gt;|induced isomorphism| I["Image of T"]
+  I --&gt;|inclusion| W
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The two paths send each input to the same output. Passing to a class removes precisely the ambiguity; restricting the target removes unattainable readings. The middle arrow is <strong>canonical given <span class="math inline">\(T\)</span></strong> because its action is forced on every class. No inverse from <span class="math inline">\(\operatorname{im}T\)</span> to <span class="math inline">\(V\)</span> was chosen. Its canonical inverse takes <span class="math inline">\(b\)</span> to its <em>entire fiber</em>, viewed as a single class.</p>
+<p>For <span class="math inline">\(A=CJ\)</span>, use <span class="math inline">\(([e_1],[e_3])\)</span> in the quotient. The coordinates of <span class="math inline">\([x]\)</span> are <span class="math inline">\((x_1+2x_2+4x_4,x_3+x_4)^T=Jx\)</span> since <span class="math inline">\(x-SJx\in K\)</span>. With image basis <span class="math inline">\((a_1,a_3)\)</span>, <span class="math inline">\(\overline A\)</span> has matrix <span class="math inline">\(I_2\)</span>. With image coordinates <span class="math inline">\((b_1,b_2)\)</span> (the third entry is their sum), it has matrix <span class="math display">\[
+M=\begin{pmatrix}1&amp;-1\\2&amp;1\end{pmatrix},\qquad \det M=3.
+\]</span> Both matrices represent the same induced isomorphism. The second recovers <span class="math inline">\(\alpha,\beta\)</span> from Session 4 by solving a genuine two-by-two invertible system. The quotient description explains why this reduced inverse exists; elimination supplies its coordinates.</p>
+<p><strong>Checkpoint.</strong> If <span class="math inline">\(U\subsetneq\ker T\)</span>, the rule <span class="math inline">\([x]\mapsto Tx\)</span> still makes sense, but a nonzero class represented by <span class="math inline">\(k\in\ker T\setminus U\)</span> maps to zero. If <span class="math inline">\(U\)</span> contains a vector outside <span class="math inline">\(\ker T\)</span>, even well-definedness fails. Locate the exact step of the proof affected in each case.</p>
+</section>
+<section id="session-7-which-maps-survive-a-quotient-and-which-maps-split-it" class="level2" data-number="18.7">
+<h2 data-number="18.7" class="anchored" data-anchor-id="session-7-which-maps-survive-a-quotient-and-which-maps-split-it"><span class="header-section-number">18.7</span> Session 7 — Which maps survive a quotient, and which maps split it?</h2>
+<p>Suppose the stored datum is a class <span class="math inline">\([x]\)</span>. A later calculation requests <span class="math inline">\(f(x)\)</span>. Can one honor that request without recovering the lost part of <span class="math inline">\(x\)</span>?</p>
+<p><strong>Universal property of the quotient.</strong> For a linear <span class="math inline">\(f:V\to Z\)</span> there exists a linear <span class="math inline">\(g:V/U\to Z\)</span> with <span class="math inline">\(gq=f\)</span> if and only if <span class="math inline">\(U\subseteq\ker f\)</span>. When it exists it is unique. Necessity follows by evaluating <span class="math inline">\(gq\)</span> on <span class="math inline">\(U\)</span>. For sufficiency set <span class="math inline">\(g([x])=f(x)\)</span>. Replacing <span class="math inline">\(x\)</span> by <span class="math inline">\(x+u\)</span> changes <span class="math inline">\(f(x)\)</span> by <span class="math inline">\(f(u)=0\)</span>. The class operations give linearity, and surjectivity of <span class="math inline">\(q\)</span> forces uniqueness. This is also a test for whether a proposed measurement of a class is meaningful.</p>
+<p>Why call this a characterization? Suppose a surjection <span class="math inline">\(q':V\to Q'\)</span> kills <span class="math inline">\(U\)</span> and has the same factorization property. Applying the properties to <span class="math inline">\(q'\)</span> and <span class="math inline">\(q\)</span> gives arrows <span class="math inline">\(a:V/U\to Q'\)</span> and <span class="math inline">\(b:Q'\to V/U\)</span> with <span class="math inline">\(aq=q'\)</span> and <span class="math inline">\(bq'=q\)</span>. Now <span class="math inline">\(baq=q\)</span> and <span class="math inline">\(abq'=q'\)</span>. Surjectivity shows <span class="math inline">\(ba\)</span> and <span class="math inline">\(ab\)</span> are identities. Thus the two answers to the same mapping problem are related by a unique isomorphism respecting the quotient arrows.</p>
+<p>There is a corresponding property on the input side. If <span class="math inline">\(h:X\to V\)</span> satisfies <span class="math inline">\(Th=0\)</span>, its values belong to <span class="math inline">\(K\)</span>. Restricting the target gives a unique <span class="math inline">\(\tilde h:X\to K\)</span> with <span class="math inline">\(h=j\tilde h\)</span>, where <span class="math inline">\(j:K\hookrightarrow V\)</span>. Uniqueness follows from injectivity of <span class="math inline">\(j\)</span>. Dually the quotient <span class="math inline">\(W/\operatorname{im}T\)</span> records the obstruction to solvability: the class of <span class="math inline">\(b\)</span> is zero exactly when <span class="math inline">\(Tx=b\)</span> can be solved. This quotient is the <strong>cokernel</strong>. Any linear map out of <span class="math inline">\(W\)</span> killing <span class="math inline">\(\operatorname{im}T\)</span> factors uniquely through it.</p>
+<section id="what-specifies-a-map-into-or-out-of-a-direct-sum" class="level3">
+<h3 class="anchored" data-anchor-id="what-specifies-a-map-into-or-out-of-a-direct-sum">What specifies a map into or out of a direct sum?</h3>
+<p>For maps <span class="math inline">\(f:U\to Z\)</span> and <span class="math inline">\(g:H\to Z\)</span> define <span class="math inline">\(L(u,h)=f(u)+g(h)\)</span>. It is linear and restricts to the prescribed maps on <span class="math inline">\((u,0)\)</span> and <span class="math inline">\((0,h)\)</span>. Conversely linearity forces this formula since <span class="math inline">\((u,h)=(u,0)+(0,h)\)</span>. This is the <strong>coproduct</strong> property. In the reverse direction maps <span class="math inline">\(f:X\to U\)</span> and <span class="math inline">\(g:X\to H\)</span> give the unique <span class="math inline">\(L(x)=(f(x),g(x))\)</span> with those two projected components, the <strong>product</strong> property. For an internal sum with overlap, prescribing maps on the summands requires agreement on their intersection. The relation <span class="math inline">\((z,-z)\)</span> from Session 5 explains exactly why.</p>
+</section>
+<section id="exactness-and-splitting" class="level3">
+<h3 class="anchored" data-anchor-id="exactness-and-splitting">Exactness and splitting</h3>
+<p>A sequence <span class="math inline">\(X\xrightarrow{a}Y\xrightarrow{b}Z\)</span> is <strong>exact at <span class="math inline">\(Y\)</span></strong> if <span class="math inline">\(\operatorname{im}a=\ker b\)</span>. This implies <span class="math inline">\(ba=0\)</span>. Zero composition alone gives only the inclusion. For instance <span class="math inline">\(F\to F^2\to F\)</span> with both arrows zero has zero composition but fails exactness at <span class="math inline">\(F^2\)</span>.</p>
+<p>The <strong>short exact sequence</strong> <span class="math display">\[
+0\longrightarrow K\xrightarrow{j} V\xrightarrow{p} I\longrightarrow0,\qquad p(x)=Tx,
+\]</span> encodes three facts. At <span class="math inline">\(K\)</span> it asserts that <span class="math inline">\(j\)</span> is injective, at <span class="math inline">\(V\)</span> that the invisible inputs are exactly <span class="math inline">\(j(K)\)</span>, and at <span class="math inline">\(I\)</span> that <span class="math inline">\(p\)</span> is onto. Exactness here uses the restricted target <span class="math inline">\(I\)</span>. For the original map one can continue instead by <span class="math inline">\(W\to W/I\to0\)</span>.</p>
+<p>A <strong>section</strong> of <span class="math inline">\(p\)</span> is a linear <span class="math inline">\(s:I\to V\)</span> with <span class="math inline">\(ps=\mathrm{id}_I\)</span>. Choose a basis of <span class="math inline">\(I\)</span>, lift each basis vector to an input, and extend the assignments linearly. This proves existence in finite dimension; in arbitrary dimension the same proof uses the usual basis theorem with choice. Write <span class="math display">\[
+x=(x-spx)+s(px).
+\]</span> The first term belongs to <span class="math inline">\(K\)</span>, and <span class="math inline">\(s(I)\cap K=0\)</span> since <span class="math inline">\(p(sy)=y\)</span>. Thus a section determines a complement. Conversely a complement <span class="math inline">\(H\)</span> makes <span class="math inline">\(p|_H\)</span> bijective, whose inverse is a section. The map <span class="math inline">\((k,y)\mapsto j(k)+s(y)\)</span> is a <strong>splitting</strong> isomorphism <span class="math inline">\(K\oplus_{\mathrm{ext}}I\to V\)</span>. Every short exact sequence of vector spaces has this form after identifying the first space with its injected image. For two sections <span class="math inline">\(s,s'\)</span> one has <span class="math inline">\(p(s'-s)=0\)</span>; adding any linear map <span class="math inline">\(I\to K\)</span> to <span class="math inline">\(s\)</span> gives another section. This describes all choices, including when there is only one.</p>
+<p>Over a ring a surjection need not split. In abelian groups (modules over <span class="math inline">\(\mathbb Z\)</span>), <span class="math inline">\(\mathbb Z\to\mathbb Z/2\mathbb Z\)</span> has kernel <span class="math inline">\(2\mathbb Z\)</span>. A section would send <span class="math inline">\([1]\)</span> to an odd integer <span class="math inline">\(m\)</span> with <span class="math inline">\(2m=0\)</span>, which is impossible. The proof by lifting a basis fails because the target has a relation <span class="math inline">\(2[1]=0\)</span> that a lift must respect. Module F2 takes up this distinction.</p>
+<p><strong>Checkpoint.</strong> In the sensor problem find a section using <span class="math inline">\(S\)</span> and <span class="math inline">\(M^{-1}\)</span>. For compatible <span class="math inline">\(b\)</span>, it is <span class="math inline">\(s(b)=SM^{-1}(b_1,b_2)^T\)</span>. Show that replacing <span class="math inline">\(s(b)\)</span> by <span class="math inline">\(s(b)+b_1k_1\)</span> leaves <span class="math inline">\(As(b)\)</span> unchanged.</p>
+</section>
+</section>
+<section id="session-8-which-part-of-a-physical-or-numerical-solution-is-identifiable" class="level2" data-number="18.8">
+<h2 data-number="18.8" class="anchored" data-anchor-id="session-8-which-part-of-a-physical-or-numerical-solution-is-identifiable"><span class="header-section-number">18.8</span> Session 8 — Which part of a physical or numerical solution is identifiable?</h2>
+<section id="compatible-readings-inconsistent-data-and-an-inverse-on-classes" class="level3">
+<h3 class="anchored" data-anchor-id="compatible-readings-inconsistent-data-and-an-inverse-on-classes">Compatible readings, inconsistent data, and an inverse on classes</h3>
+<p>The linear functional <span class="math inline">\(\ell(b)=b_3-b_1-b_2\)</span> detects the complete obstruction for <span class="math inline">\(A\)</span>. Its vanishing is sufficient because <span class="math inline">\(M\)</span> is invertible. In fact <span class="math inline">\(W/I\)</span> is identified with <span class="math inline">\(\mathbb R\)</span> by <span class="math inline">\([b]\mapsto\ell(b)\)</span>, another first isomorphism theorem. Thus two <em>different</em> quotients arise. <span class="math inline">\(V/K\)</span> records the part of the input visible in the data. <span class="math inline">\(W/I\)</span> records the part of the data no input can explain.</p>
+<p>For a noisy reading <span class="math inline">\((1,2,4)\)</span>, the obstruction is <span class="math inline">\(1\)</span>. Algebra alone assigns no size to a correction. With the Euclidean inner product, <span class="math inline">\(n=(-1,-1,1)^T\)</span> is perpendicular to <span class="math inline">\(I\)</span>, and the corrected reading is <span class="math inline">\(b'=b-n/3\)</span>. Indeed <span class="math inline">\(n^Tb'=0\)</span>, and for every <span class="math inline">\(y\in I\)</span>, <span class="math inline">\(\|b-y\|^2=\|b-b'\|^2+\|b'-y\|^2\)</span>. This proves that <span class="math inline">\(b'\)</span> is the unique closest reading. All inputs attaining it minimize the residual. Among those, choosing the unique representative perpendicular to <span class="math inline">\(K\)</span> minimizes input norm by the same squared-length identity. The map taking <span class="math inline">\(b\)</span> to that representative is the Moore–Penrose pseudoinverse in Euclidean coordinates. Modules C and D derive the general construction.</p>
+</section>
+<section id="edge-differences-cycles-and-conservation" class="level3">
+<h3 class="anchored" data-anchor-id="edge-differences-cycles-and-conservation">Edge differences, cycles and conservation</h3>
+<p>Orient a path <span class="math inline">\(1\to2\to3\)</span>. Its discrete gradient sends vertex potentials to edge differences: <span class="math display">\[
+G_0p=\begin{pmatrix}-1&amp;1&amp;0\\0&amp;-1&amp;1\end{pmatrix}p .
+\]</span> Every pair of readings is attainable: choose <span class="math inline">\(p_1=0\)</span>, then add the readings successively along the path. Every constant shift is invisible. Add a closing edge <span class="math inline">\(3\to1\)</span> to obtain <span class="math inline">\(G\)</span> by adjoining row <span class="math inline">\((1,0,-1)\)</span>. Now the edge data <span class="math inline">\(d\)</span> must satisfy <span class="math inline">\(d_1+d_2+d_3=0\)</span> by telescoping. This condition is sufficient because the path construction produces the first two differences, forcing the third. Thus <span class="math inline">\(\mathbb R^3/\operatorname{span}(\mathbf1)\)</span> is canonically isomorphic via <span class="math inline">\(G\)</span> to the zero-sum <strong>edge</strong> plane. A reference potential <span class="math inline">\(p_1=0\)</span> selects one solution; the zero-mean convention selects another. On any graph, equal potentials across every edge are constant on each connected component, so the gradient nullity counts the components.</p>
+<p>For an oriented edge flow <span class="math inline">\(f\)</span>, <span class="math inline">\((G^Tf)_i\)</span> is inflow minus outflow at vertex <span class="math inline">\(i\)</span>. On the triangle <span class="math inline">\(G^T(1,1,1)^T=0\)</span>: circulation around a cycle has no net source. A gradient has zero signed sum around every cycle. Conversely on a connected graph those zero sums allow potential recovery by integrating differences along any path from a fixed vertex. Two paths differ by a closed walk, which decomposes into cycles after cancellations, hence give the same potential.</p>
+<p>The path Laplacian is <span class="math display">\[
+L=G_0^TG_0=\begin{pmatrix}1&amp;-1&amp;0\\-1&amp;2&amp;-1\\0&amp;-1&amp;1\end{pmatrix}.
+\]</span> The identity <span class="math inline">\(p^TLp=\|G_0p\|^2\)</span> proves <span class="math inline">\(\ker L=\ker G_0\)</span>. Since its column sums vanish and its rank is two, its image is the zero-sum <strong>vertex</strong> plane. In <span class="math inline">\(Lp=b\)</span> the compatibility condition expresses total source balance. The gradient and Laplacian thus share a kernel while their outputs encode different quantities.</p>
+</section>
+<section id="which-boundary-condition-removes-an-integration-constant" class="level3">
+<h3 class="anchored" data-anchor-id="which-boundary-condition-removes-an-integration-constant">Which boundary condition removes an integration constant?</h3>
+<p>For <span class="math inline">\(n\ge1\)</span> over <span class="math inline">\(\mathbb R\)</span>, <span class="math inline">\(D:\mathcal P_n\to\mathcal P_{n-1}\)</span> kills constants. Comparing coefficients of <span class="math inline">\(p'=\sum_{j=1}^n j a_jt^{j-1}\)</span> proves these are its entire kernel. Termwise integration <span class="math inline">\(t^j\mapsto t^{j+1}/(j+1)\)</span> supplies a section, proving surjectivity. Thus <span class="math inline">\(\mathcal P_n/\mathcal P_0\cong\mathcal P_{n-1}\)</span>. The section chooses an antiderivative vanishing at zero. Integration from a different basepoint changes this choice. Over a field of characteristic <span class="math inline">\(p&gt;0\)</span> the derivative of <span class="math inline">\(t^p\)</span> vanishes, which shows precisely why the scalar assumption matters.</p>
+<p>For <span class="math inline">\(D:C^1([0,1])\to C([0,1])\)</span> the fundamental theorem of calculus supplies the section <span class="math inline">\(g\mapsto(t\mapsto\int_0^t g(s)\,ds)\)</span>; the mean value theorem implies the same constant kernel. Restrict the domain to <span class="math inline">\(u(0)=u(1)=0\)</span>. Now injectivity holds, but the image consists precisely of <span class="math inline">\(g\)</span> with <span class="math inline">\(\int_0^1g=0\)</span>. One endpoint fixed the representative; the second introduced a compatibility condition. In infinite dimensions an algebraic isomorphism alone gives no norm estimate. In the sup norm differentiation can amplify oscillations: <span class="math inline">\(\sin(nt)/n\)</span> tends uniformly to zero while its derivative has supremum norm one. In the <span class="math inline">\(C^1\)</span> norm <span class="math inline">\(\|u\|_\infty+\|u'\|_\infty\)</span> differentiation is bounded. Module F1 additionally asks whether images are closed and whether quotients are complete. A closed subspace of a Banach space yields a Banach quotient; for a nonclosed subspace the distance to it can vanish even for a distinct coset.</p>
+</section>
+<section id="what-does-a-subspace-algorithm-actually-carry-between-iterations" class="level3">
+<h3 class="anchored" data-anchor-id="what-does-a-subspace-algorithm-actually-carry-between-iterations">What does a subspace algorithm actually carry between iterations?</h3>
+<p>Store a trial space as columns of a full-rank matrix <span class="math inline">\(B\)</span>. For invertible <span class="math inline">\(R\)</span>, <span class="math inline">\(\operatorname{im}(BR)=\operatorname{im}B\)</span> because <span class="math inline">\(R\)</span> runs through all coefficient columns. In a thin QR factorization <span class="math inline">\(B=QR\)</span>, <span class="math inline">\(Q\)</span> has orthonormal columns and <span class="math inline">\(R\)</span> is invertible for full column rank. Hence <span class="math inline">\(Q\)</span> stores the same space, and <span class="math inline">\(\|Qc\|_2=\|c\|_2\)</span>. Replacing a basis can improve the behavior of coordinates without changing any candidate solution.</p>
+<p>For a square operator <span class="math inline">\(H\)</span>, a subspace <span class="math inline">\(U\)</span> is <strong>invariant</strong> when <span class="math inline">\(H(U)\subseteq U\)</span>. Begin a basis with a basis of <span class="math inline">\(U\)</span>. Its first columns under <span class="math inline">\(H\)</span> have no component in the remaining coordinates, giving block form <span class="math inline">\(\left(\begin{smallmatrix}H_{11}&amp;H_{12}\\0&amp;H_{22}\end{smallmatrix}\right)\)</span>. If the complement is also invariant then <span class="math inline">\(H_{12}=0\)</span>. One invariant summand alone gives no reason for that second zero. The induced action on the quotient <span class="math inline">\(V/U\)</span> has matrix <span class="math inline">\(H_{22}\)</span> because the upper components disappear on taking classes.</p>
+<p>Take the symmetric matrix recurring in the spectral and numerical modules, <span class="math display">\[
+H=\begin{pmatrix}2&amp;1&amp;0\\1&amp;2&amp;0\\0&amp;0&amp;9\end{pmatrix}.
+\]</span> The horizontal plane and vertical axis are invariant. Within the plane, <span class="math inline">\((1,-1,0)^T\)</span> and <span class="math inline">\((1,1,0)^T\)</span> span eigenlines of eigenvalues <span class="math inline">\(1,3\)</span>; the axis has eigenvalue <span class="math inline">\(9\)</span>. These three independent directions give a direct sum. If <span class="math inline">\(Hv=\lambda v\)</span>, induction gives <span class="math inline">\(H^jv=\lambda^jv\)</span>, hence <span class="math inline">\(f(H)v=f(\lambda)v\)</span> for a polynomial <span class="math inline">\(f\)</span>. For this example <span class="math inline">\(f(t)=(t-1)(t-3)/48\)</span> gives the projection onto the vertical axis along the horizontal plane. This exact filter requires known eigenvalues. Chebyshev filtering in Module E uses spectral bounds to achieve approximate separation.</p>
+<p>Starting with <span class="math inline">\(v\)</span>, the <strong>Krylov space</strong> <span class="math inline">\(\mathcal K_m(H,v)=\operatorname{span}(v,Hv,\ldots,H^{m-1}v)\)</span> contains every <span class="math inline">\(f(H)v\)</span> for <span class="math inline">\(\deg f&lt;m\)</span>. If the next power already lies in this span, applying <span class="math inline">\(H\)</span> to its generators proves invariance. Block subspace iteration instead propagates a trial basis <span class="math inline">\(Q\)</span> to a basis of <span class="math inline">\(\operatorname{im}(HQ)\)</span> (assuming rank is maintained). With orthonormal <span class="math inline">\(Q\)</span>, <span class="math inline">\(Q^*HQ\)</span> represents the projected operator <span class="math inline">\(QQ^*H\)</span> restricted to the trial space. A reduced eigenpair <span class="math inline">\(Q^*HQz=\theta z\)</span> yields <span class="math inline">\(Q^*(HQz-\theta Qz)=0\)</span>. The residual is perpendicular to the trial space and may still be nonzero. This is the algebra behind Rayleigh–Ritz and a reason Module E asks for explicit residual checks.</p>
+<p><strong>Checkpoint.</strong> Start with <span class="math inline">\(v=e_1\)</span> in this example. Then <span class="math inline">\(Hv=(2,1,0)^T\)</span> and <span class="math inline">\(\mathcal K_2\)</span> is the horizontal plane. Why can no polynomial in <span class="math inline">\(H\)</span> applied to this <span class="math inline">\(v\)</span> recover a nonzero vertical component, even though the vertical eigenvalue has greatest magnitude?</p>
+</section>
+</section>
+<section id="computational-laboratory-from-an-inverse-problem-to-a-factorization" class="level2" data-number="18.9">
+<h2 data-number="18.9" class="anchored" data-anchor-id="computational-laboratory-from-an-inverse-problem-to-a-factorization"><span class="header-section-number">18.9</span> Computational laboratory — From an inverse problem to a factorization</h2>
+<p>Run the cells in document order with Python 3, SymPy, NumPy and Matplotlib in the Jupyter environment used by Quarto. SymPy performs the algebra over exact integers and rationals. NumPy supplies plotting coordinates. Predict each printed result before running the corresponding cell.</p>
+<section id="a.-what-can-row-reduction-certify" class="level3">
+<h3 class="anchored" data-anchor-id="a.-what-can-row-reduction-certify">A. What can row reduction certify?</h3>
+<div id="6bcdfd63" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy <span class="im">as</span> sp</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>], [<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">9</span>], [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">0</span>, <span class="dv">12</span>]])</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>reduced, pivots <span class="op">=</span> A.rref()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> sp.Matrix.hstack(<span class="op">*</span>A.nullspace())</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> A[:, <span class="bu">list</span>(pivots)]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>J <span class="op">=</span> reduced[:<span class="bu">len</span>(pivots), :]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> A<span class="op">*</span>K <span class="op">==</span> sp.zeros(<span class="dv">3</span>, <span class="dv">2</span>) <span class="kw">and</span> K.rank() <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> C.rank() <span class="op">==</span> A.rank() <span class="kw">and</span> A.rank() <span class="op">+</span> K.cols <span class="op">==</span> A.cols</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> C<span class="op">*</span>J <span class="op">==</span> A</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RREF:"</span>, reduced.tolist())</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Pivot indices (one-based):"</span>, [i<span class="op">+</span><span class="dv">1</span> <span class="cf">for</span> i <span class="kw">in</span> pivots])</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Kernel basis:"</span>, [<span class="bu">list</span>(v) <span class="cf">for</span> v <span class="kw">in</span> K.columnspace()])</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Image basis:"</span>, [<span class="bu">list</span>(v) <span class="cf">for</span> v <span class="kw">in</span> C.columnspace()])</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Rank and nullity:"</span>, A.rank(), K.cols)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RREF: [[1, 2, 0, 4], [0, 0, 1, 1], [0, 0, 0, 0]]
+Pivot indices (one-based): [1, 3]
+Kernel basis: [[-2, 1, 0, 0], [-4, 0, -1, 1]]
+Image basis: [[1, 2, 3], [-1, 1, 0]]
+Rank and nullity: 2 2</code></pre>
+</div>
+</div>
+<p>The two free coordinates give two independent kernel vectors. The output basis lives in three-dimensional sensor space. Multiplying <span class="math inline">\(CJ\)</span> recovers every original column, a certificate that the two selected columns span the image.</p>
+</section>
+<section id="b.-which-two-components-sum-to-the-input" class="level3">
+<h3 class="anchored" data-anchor-id="b.-which-two-components-sum-to-the-input">B. Which two components sum to the input?</h3>
+<div id="ae63d3c5" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> sp.eye(<span class="dv">4</span>)[:, <span class="bu">list</span>(pivots)]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>P <span class="op">=</span> S<span class="op">*</span>J</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> sp.Matrix([<span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">7</span>, <span class="dv">3</span>])</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>visible, invisible <span class="op">=</span> P<span class="op">*</span>x, (sp.eye(<span class="dv">4</span>)<span class="op">-</span>P)<span class="op">*</span>x</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> visible <span class="op">+</span> invisible <span class="op">==</span> x <span class="kw">and</span> A<span class="op">*</span>invisible <span class="op">==</span> sp.zeros(<span class="dv">3</span>, <span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> J<span class="op">*</span>S <span class="op">==</span> sp.eye(<span class="dv">2</span>) <span class="kw">and</span> P<span class="op">*</span>P <span class="op">==</span> P</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> sp.Matrix.hstack(K, S).det() <span class="op">!=</span> <span class="dv">0</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Kernel component:"</span>, <span class="bu">list</span>(invisible))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Complement component:"</span>, <span class="bu">list</span>(visible))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kernel component: [-16, 2, -3, 3]
+Complement component: [21, 0, 10, 0]</code></pre>
+</div>
+</div>
+<p>The output is <span class="math inline">\((-16,2,-3,3)^T+(21,0,10,0)^T\)</span>. The nonzero determinant checks uniqueness <strong>for every input</strong>: the two kernel vectors and the two complement vectors form a basis together.</p>
+</section>
+<section id="c.-can-a-new-representative-alter-the-quotient-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="c.-can-a-new-representative-alter-the-quotient-coordinates">C. Can a new representative alter the quotient coordinates?</h3>
+<div id="fa235dc1" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> sp.symbols(<span class="st">"a b"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>shifted <span class="op">=</span> x <span class="op">+</span> K<span class="op">*</span>sp.Matrix([a, b])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (J<span class="op">*</span>shifted<span class="op">-</span>J<span class="op">*</span>x).expand() <span class="op">==</span> sp.zeros(<span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Class coordinates:"</span>, <span class="bu">list</span>(J<span class="op">*</span>x))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Chosen representative:"</span>, <span class="bu">list</span>(S<span class="op">*</span>J<span class="op">*</span>x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Class coordinates: [21, 10]
+Chosen representative: [21, 0, 10, 0]</code></pre>
+</div>
+</div>
+<p>The two parameters range over the whole fiber. The first output describes its class; the second embeds one representative back in the original domain. Multiplication by <span class="math inline">\(S\)</span> performs the latter choice.</p>
+</section>
+<section id="d.-where-is-the-invertible-part-of-a-singular-problem" class="level3">
+<h3 class="anchored" data-anchor-id="d.-where-is-the-invertible-part-of-a-singular-problem">D. Where is the invertible part of a singular problem?</h3>
+<div id="472ad4ff" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> C[:<span class="dv">2</span>, :]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>inclusion <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> inclusion<span class="op">*</span>M<span class="op">*</span>J <span class="op">==</span> A</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> M.det() <span class="op">!=</span> <span class="dv">0</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>reading <span class="op">=</span> A<span class="op">*</span>x</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> M.inv()<span class="op">*</span>reading[:<span class="dv">2</span>, :] <span class="op">==</span> J<span class="op">*</span>x</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Induced matrix:"</span>, M.tolist(), <span class="st">"determinant:"</span>, M.det())</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reading:"</span>, <span class="bu">list</span>(reading), <span class="st">"recovered coordinates:"</span>, <span class="bu">list</span>(J<span class="op">*</span>x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Induced matrix: [[1, -1], [2, 1]] determinant: 3
+Reading: [11, 52, 63] recovered coordinates: [21, 10]</code></pre>
+</div>
+</div>
+<p>Here the inclusion matrix converts plane coordinates <span class="math inline">\((u,v)\)</span> to <span class="math inline">\((u,v,u+v)\)</span>. The determinant belongs to the induced two-dimensional map. The original rectangular matrix has no determinant.</p>
+</section>
+<section id="e.-which-edge-readings-come-from-potentials" class="level3">
+<h3 class="anchored" data-anchor-id="e.-which-edge-readings-come-from-potentials">E. Which edge readings come from potentials?</h3>
+<div id="d9ee9683" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> sp.Matrix([[<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>]])</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> sp.Matrix([<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">4</span>])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ones <span class="op">=</span> sp.ones(<span class="dv">3</span>, <span class="dv">1</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> G.rank() <span class="op">==</span> <span class="dv">2</span> <span class="kw">and</span> G.nullspace() <span class="op">==</span> [ones]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> G<span class="op">*</span>(p<span class="op">+</span>a<span class="op">*</span>ones) <span class="op">==</span> G<span class="op">*</span>p</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> ones.T<span class="op">*</span>G <span class="op">==</span> sp.zeros(<span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Gradient:"</span>, <span class="bu">list</span>(G<span class="op">*</span>p), <span class="st">"kernel basis:"</span>, <span class="bu">list</span>(G.nullspace()[<span class="dv">0</span>]))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cycle sum:"</span>, <span class="bu">sum</span>(G<span class="op">*</span>p), <span class="st">"rank:"</span>, G.rank())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Gradient: [3, -1, -2] kernel basis: [1, 1, 1]
+Cycle sum: 0 rank: 2</code></pre>
+</div>
+</div>
+<p>Differences <span class="math inline">\((3,-1,-2)\)</span> close around the cycle. The right kernel records a potential ambiguity; the left kernel imposes a compatibility condition on edge data. That both are spanned by all-ones columns in this example reflects the chosen triangle orientation.</p>
+</section>
+<section id="f.-which-basis-represents-the-trial-plane" class="level3">
+<h3 class="anchored" data-anchor-id="f.-which-basis-represents-the-trial-plane">F. Which basis represents the trial plane?</h3>
+<div id="22cf89a4" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>R <span class="op">=</span> sp.Matrix([[<span class="dv">2</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>new_basis <span class="op">=</span> C<span class="op">*</span>R</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> R.det() <span class="op">!=</span> <span class="dv">0</span> <span class="kw">and</span> new_basis<span class="op">*</span>R.inv() <span class="op">==</span> C</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> sp.Matrix.hstack(C, new_basis).rank() <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>old_coordinates <span class="op">=</span> sp.Matrix([<span class="dv">3</span>, <span class="op">-</span><span class="dv">2</span>])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>new_coordinates <span class="op">=</span> R.inv()<span class="op">*</span>old_coordinates</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> C<span class="op">*</span>old_coordinates <span class="op">==</span> new_basis<span class="op">*</span>new_coordinates</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"New basis:"</span>, new_basis.tolist())</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Old and new coordinates:"</span>, <span class="bu">list</span>(old_coordinates), <span class="bu">list</span>(new_coordinates))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>New basis: [[1, 0], [5, 3], [6, 3]]
+Old and new coordinates: [3, -2] [5, -7]</code></pre>
+</div>
+</div>
+<p>One multiplication proves containment of the new span in the old; the inverse multiplication proves the reverse containment. Replacing <span class="math inline">\(R\)</span> by a singular matrix could discard a direction. This is the span-preservation test behind the QR step in subspace iteration.</p>
+</section>
+</section>
+<section id="exercises-reconstruct-the-arguments" class="level2" data-number="18.10">
+<h2 data-number="18.10" class="anchored" data-anchor-id="exercises-reconstruct-the-arguments"><span class="header-section-number">18.10</span> Exercises — Reconstruct the arguments</h2>
+<section id="build-an-encoding" class="level3">
+<h3 class="anchored" data-anchor-id="build-an-encoding">Build an encoding</h3>
+<ol type="1">
+<li><strong>Interpolation with missing information.</strong> On <span class="math inline">\(\mathcal P_2(\mathbb R)\)</span> take <span class="math inline">\(E(p)=(p(0),p(1))\)</span>. Construct a basis adapted to this measurement. Compute its matrix and all polynomials yielding <span class="math inline">\((2,5)\)</span>. Which part of your construction can be changed without changing <span class="math inline">\(E\)</span>?</li>
+<li><strong>When can prescriptions extend?</strong> In <span class="math inline">\(F^2\)</span> assign <span class="math inline">\(e_1,e_2,e_1+e_2\)</span> the images <span class="math inline">\(a,b,c\)</span> in a space <span class="math inline">\(W\)</span>. Prove the exact condition for a linear extension. Generalize to an arbitrary spanning family using its synthesis map.</li>
+<li><strong>Dimension from measurements.</strong> For a linear <span class="math inline">\(T\)</span>, lift an image basis to <span class="math inline">\(V\)</span> and append a kernel basis. Prove directly that the result is a basis and deduce rank–nullity. Where is finiteness used?</li>
+</ol>
+</section>
+<section id="diagnose-solvability-and-decomposition" class="level3">
+<h3 class="anchored" data-anchor-id="diagnose-solvability-and-decomposition">Diagnose solvability and decomposition</h3>
+<ol start="4" type="1">
+<li><strong>Audit an elimination.</strong> For the sensor matrix solve <span class="math inline">\(Ax=(2,1,3)^T\)</span>, list bases of kernel and image, and test what happens if the last reading becomes <span class="math inline">\(4\)</span>. Explain why using pivot columns from the RREF could give a wrong consistency decision.</li>
+<li><strong>Sum, union, and pairwise tests.</strong> Use three distinct lines in the plane to exhibit both failures. Construct instead three lines in <span class="math inline">\(F^3\)</span> whose sum is direct and a plane and line in <span class="math inline">\(F^3\)</span> whose sum is the whole space but has no preferred perpendicularity.</li>
+<li><strong>Count an overlap two ways.</strong> Give a proof of the sum dimension formula using an adapted basis instead of the addition map. Apply both approaches to the planes <span class="math inline">\(x=0\)</span> and <span class="math inline">\(y=0\)</span> in <span class="math inline">\(\mathbb R^3\)</span>.</li>
+<li><strong>Recover the splitting.</strong> For <span class="math inline">\(P(x,y)=(x+2y,0)\)</span> find its kernel, image and complementary projector. Give another projector with the same image, and find a vector where the two projections disagree.</li>
+</ol>
+</section>
+<section id="descend-factor-and-split" class="level3">
+<h3 class="anchored" data-anchor-id="descend-factor-and-split">Descend, factor, and split</h3>
+<ol start="8" type="1">
+<li><strong>A quotient test.</strong> Let <span class="math inline">\(U=\operatorname{span}(1,1,0)\)</span> in <span class="math inline">\(\mathbb R^3\)</span>. Does <span class="math inline">\(f(x,y,z)=x-y+2z\)</span> descend to <span class="math inline">\(\mathbb R^3/U\)</span>? Does <span class="math inline">\(g(x,y,z)=x+y\)</span>? Give coordinates for the quotient, prove the first isomorphism theorem for your coordinate map, and determine the induced <span class="math inline">\(f\)</span>.</li>
+<li><strong>Two quotients in succession.</strong> For <span class="math inline">\(U\subseteq H\subseteq V\)</span>, construct a canonical isomorphism <span class="math inline">\((V/U)/(H/U)\to V/H\)</span>. For arbitrary subspaces <span class="math inline">\(U,H\)</span> identify <span class="math inline">\((U+H)/H\)</span> with a quotient of <span class="math inline">\(U\)</span>. In each case exhibit the underlying map and compute its kernel.</li>
+<li><strong>Sections under a change of coordinates.</strong> For <span class="math inline">\(p(x,y)=y\)</span>, classify all linear sections. Find a linear automorphism of the plane preserving <span class="math inline">\(p\)</span> and the kernel pointwise that moves a chosen section. Explain why the induced quotient isomorphism survives this symmetry.</li>
+<li><strong>Exactness from measurements.</strong> Given a short exact sequence <span class="math inline">\(0\to U\xrightarrow{j}V\xrightarrow{p}W\to0\)</span>, show that every scalar measurement on <span class="math inline">\(V\)</span> vanishing on <span class="math inline">\(j(U)\)</span> is uniquely a measurement on <span class="math inline">\(W\)</span> after <span class="math inline">\(p\)</span>. Give a counterexample when exactness in the middle fails.</li>
+</ol>
+</section>
+<section id="apply-the-structure" class="level3">
+<h3 class="anchored" data-anchor-id="apply-the-structure">Apply the structure</h3>
+<ol start="12" type="1">
+<li><strong>Balanced sources.</strong> For the path Laplacian solve <span class="math inline">\(Lp=(1,-2,1)^T\)</span>. Identify the solution with zero mean and the one with <span class="math inline">\(p_1=0\)</span>. Explain solvability for arbitrary source data.</li>
+<li><strong>Boundary data.</strong> Analyze <span class="math inline">\(u\mapsto u''\)</span> from <span class="math inline">\(C^2([0,1])\)</span> to <span class="math inline">\(C([0,1])\)</span>. Construct a linear right inverse. Which homogeneous freedoms survive <span class="math inline">\(u(0)=u(1)=0\)</span>? What compatibility condition arises for <span class="math inline">\(u'(0)=u'(1)=0\)</span>?</li>
+<li><strong>Invariant or merely projected?</strong> Let <span class="math inline">\(H\)</span> be the symmetric matrix in Session 8. Compare its compressions to the lines through <span class="math inline">\(e_1\)</span> and <span class="math inline">\((1,1,0)^T\)</span>. Determine the residual in each case for a unit trial vector and explain the difference.</li>
+</ol>
+</section>
+</section>
+<section id="worked-solutions" class="level2" data-number="18.11">
+<h2 data-number="18.11" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">18.11</span> Worked solutions</h2>
+<p><strong>1.</strong> The polynomials <span class="math inline">\(1-t,t\)</span> give the readings <span class="math inline">\((1,0),(0,1)\)</span>. Vanishing at both points means divisibility by <span class="math inline">\(t(t-1)\)</span>, so the kernel is its span. Subtract from <span class="math inline">\(p\)</span> the polynomial <span class="math inline">\(p(0)(1-t)+p(1)t\)</span>. The remainder belongs to the kernel. This proves spanning, and evaluation of a zero combination followed by comparison of quadratic coefficients proves independence. In basis <span class="math inline">\((1-t,t,t(t-1))\)</span> the matrix is <span class="math inline">\((I_2\ \ 0)\)</span>. The fiber is <span class="math inline">\(2+3t+c\,t(t-1)\)</span>. Either lift can be altered by a kernel polynomial. The readings and the quotient classes of the lifts are fixed.</p>
+<p><strong>2.</strong> Linearity forces <span class="math inline">\(c=a+b\)</span>. Conversely <span class="math inline">\((x,y)\mapsto xa+yb\)</span> realizes the prescriptions if that equality holds. For a spanning family let <span class="math inline">\(S:F^m\to V\)</span> synthesize the generators and <span class="math inline">\(Y:F^m\to W\)</span> synthesize their prescribed images. Necessarily <span class="math inline">\(Y=TS\)</span> implies <span class="math inline">\(\ker S\subseteq\ker Y\)</span>. Conversely define <span class="math inline">\(T(Sc)=Yc\)</span>. Every input has this form, and any second representation differs by a vector killed by <span class="math inline">\(Y\)</span>. Adding and scaling coefficient vectors proves linearity. Since <span class="math inline">\(S\)</span> is onto this extension is unique.</p>
+<p><strong>3.</strong> Lift an image basis <span class="math inline">\(w_i\)</span> to <span class="math inline">\(h_i\)</span>. For any <span class="math inline">\(v\)</span>, expand <span class="math inline">\(Tv=\sum a_iw_i\)</span>. Then <span class="math inline">\(v-\sum a_i h_i\)</span> is in the kernel and can be expanded there. In a dependence among the lifted and kernel vectors, applying <span class="math inline">\(T\)</span> forces all lift coefficients to vanish, then kernel independence forces the others to vanish. This constructs a basis. Counting a finite basis gives the integer formula. The basis argument itself uses finite combinations and also works with infinite algebraic bases if they are available.</p>
+<p><strong>4.</strong> The reduced right side has <span class="math inline">\(\beta=-1\)</span>, <span class="math inline">\(\alpha=1\)</span> and last entry zero. All solutions are <span class="math inline">\((1,0,-1,0)^T+s k_1+t k_2\)</span>. The kernel basis is <span class="math inline">\((-2,1,0,0)^T,(-4,0,-1,1)^T\)</span> and the image basis is <span class="math inline">\((1,2,3)^T,(-1,1,0)^T\)</span>. The changed reading violates <span class="math inline">\(b_3=b_1+b_2\)</span>. Testing the original compatible reading against the column space of the RREF would wrongly reject it since its third entry is nonzero. One must transform the reading along with the equations.</p>
+<p><strong>5.</strong> Take the lines through <span class="math inline">\(e_1,e_2,e_1+e_2\)</span>. The sum of the first two generators lies outside their union and equals the third generator, exhibiting a nontrivial three-way relation. In <span class="math inline">\(F^3\)</span> the three coordinate lines sum directly because each coordinate in a zero sum vanishes separately. The plane <span class="math inline">\(z=0\)</span> and the line through <span class="math inline">\((1,0,1)\)</span> sum directly by the height argument in Session 5. In the usual real Euclidean geometry the latter line is oblique. Dotting its generator with <span class="math inline">\(e_1\)</span> gives <span class="math inline">\(1\)</span>.</p>
+<p><strong>6.</strong> Extend a basis <span class="math inline">\(d\)</span> of <span class="math inline">\(U\cap H\)</span> separately to <span class="math inline">\((d,u)\)</span> in <span class="math inline">\(U\)</span> and <span class="math inline">\((d,h)\)</span> in <span class="math inline">\(H\)</span>. The concatenation <span class="math inline">\((d,u,h)\)</span> spans the sum. In any zero combination the combination of the <span class="math inline">\(h\)</span>’s is in both spaces, so it is a combination of <span class="math inline">\(d\)</span>. Independence of <span class="math inline">\((d,h)\)</span> now kills all <span class="math inline">\(h\)</span> coefficients, and independence of <span class="math inline">\((d,u)\)</span> kills the rest. Counting includes the common list once. For the planes use <span class="math inline">\(d=e_3\)</span>, <span class="math inline">\(u=e_2\)</span>, <span class="math inline">\(h=e_1\)</span>. The addition map on pairs instead starts with four dimensions and has one-dimensional kernel spanned by <span class="math inline">\((e_3,-e_3)\)</span>. Both counts give three.</p>
+<p><strong>7.</strong> The image is the <span class="math inline">\(x\)</span>-axis; the kernel is the line through <span class="math inline">\((-2,1)\)</span>. The map fixes its image, so <span class="math inline">\(P^2=P\)</span>. Its complementary projector sends <span class="math inline">\((x,y)\)</span> to <span class="math inline">\((-2y,y)\)</span>. Projection <span class="math inline">\((x,y)\mapsto(x,0)\)</span> onto the same axis sends <span class="math inline">\(e_2\)</span> to zero, while <span class="math inline">\(Pe_2=(2,0)\)</span>. The different outputs reveal different directions along which the projection acts.</p>
+<p><strong>8.</strong> Put <span class="math inline">\(J_0(x,y,z)=(x-y,z)\)</span>. Its kernel is exactly <span class="math inline">\(U\)</span>, and it hits <span class="math inline">\((u,v)\)</span> at <span class="math inline">\((u,0,v)\)</span>. Thus <span class="math inline">\([x,y,z]\mapsto(x-y,z)\)</span> is independent of representative, has zero kernel and is onto; it is linear by its formula. This proves the required isomorphism. The descended measurement is <span class="math inline">\((u,v)\mapsto u+2v\)</span>, forced by surjectivity. For <span class="math inline">\(g\)</span>, the equivalent representatives <span class="math inline">\(0\)</span> and <span class="math inline">\((1,1,0)\)</span> would give <span class="math inline">\(0\)</span> and <span class="math inline">\(2\)</span>, so no function on classes has those values.</p>
+<p><strong>9.</strong> Define <span class="math inline">\([x]_U\mapsto[x]_H\)</span>. Changing <span class="math inline">\(x\)</span> by an element of <span class="math inline">\(U\)</span> preserves its <span class="math inline">\(H\)</span>-class. The map is onto, linear, and its kernel consists of the <span class="math inline">\(U\)</span>-classes of members of <span class="math inline">\(H\)</span>, exactly <span class="math inline">\(H/U\)</span>. Apply the first isomorphism theorem. For the second claim send <span class="math inline">\(u\in U\)</span> to <span class="math inline">\([u]_H\)</span> in <span class="math inline">\((U+H)/H\)</span>. Every <span class="math inline">\([u+h]_H=[u]_H\)</span>, and a vector of <span class="math inline">\(U\)</span> maps to zero exactly in <span class="math inline">\(U\cap H\)</span>. Hence <span class="math inline">\(U/(U\cap H)\cong(U+H)/H\)</span>. Both isomorphisms are forced by the original quotient maps.</p>
+<p><strong>10.</strong> A section is determined by the image of <span class="math inline">\(1\)</span>, which must be <span class="math inline">\((c,1)\)</span>, giving <span class="math inline">\(s_c(y)=(cy,y)\)</span>. The shear <span class="math inline">\(L(x,y)=(x+y,y)\)</span> is invertible, fixes the axis pointwise, satisfies <span class="math inline">\(pL=p\)</span>, and carries <span class="math inline">\(s_c\)</span> to <span class="math inline">\(s_{c+1}\)</span>. Thus the given data cannot distinguish a preferred section. On classes the shear induces the identity because <span class="math inline">\(L(x,y)-(x,y)=(y,0)\)</span> lies in the kernel. The canonical identification of a class with its height therefore commutes with this symmetry.</p>
+<p><strong>11.</strong> For a functional <span class="math inline">\(\lambda\)</span> set <span class="math inline">\(\mu(w)=\lambda(v)\)</span> using any <span class="math inline">\(pv=w\)</span>. Surjectivity gives a lift, and two lifts differ in <span class="math inline">\(\ker p=j(U)\)</span>, where <span class="math inline">\(\lambda\)</span> vanishes. Using sums of lifts shows linearity and surjectivity forces uniqueness. For a failure take <span class="math inline">\(U=0\)</span>, <span class="math inline">\(V=F^2\)</span>, <span class="math inline">\(p(x,y)=x\)</span>, <span class="math inline">\(W=F\)</span>. The functional <span class="math inline">\(y\)</span> vanishes on <span class="math inline">\(j(U)\)</span> but distinguishes <span class="math inline">\((0,0)\)</span> and <span class="math inline">\((0,1)\)</span> which have equal <span class="math inline">\(p\)</span>-images.</p>
+<p><strong>12.</strong> The first and third equations give <span class="math inline">\(p_1=p_2+1\)</span> and <span class="math inline">\(p_3=p_2+1\)</span>. The middle equation follows. Thus <span class="math inline">\(p=(1,0,1)^T+c\mathbf1\)</span>. Zero mean gives <span class="math inline">\(c=-2/3\)</span> and grounding vertex 1 gives <span class="math inline">\(c=-1\)</span>. For any <span class="math inline">\(b\)</span> the column sums require <span class="math inline">\(\sum b_i=0\)</span>. Conversely take <span class="math inline">\(p_2=0\)</span>, <span class="math inline">\(p_1=b_1\)</span>, <span class="math inline">\(p_3=b_3\)</span>. The middle reading is <span class="math inline">\(-b_1-b_3=b_2\)</span>. The two normalizations change no differences.</p>
+<p><strong>13.</strong> A section is <span class="math inline">\(Sg(t)=\int_0^t(t-s)g(s)\,ds\)</span>. Differentiation gives <span class="math inline">\((Sg)'(t)=\int_0^t g(s)\,ds\)</span> and <span class="math inline">\((Sg)''=g\)</span>. The general solution is <span class="math inline">\(Sg+a+bt\)</span> since a zero second derivative gives a constant first derivative. For fixed zero endpoint values take <span class="math inline">\(a=0\)</span> and <span class="math inline">\(b=-Sg(1)\)</span>, leaving no freedom and no compatibility condition. For zero endpoint derivatives take <span class="math inline">\(b=0\)</span> and require <span class="math inline">\(\int_0^1g=0\)</span>, leaving <span class="math inline">\(a\)</span> arbitrary. The same differential expression thus defines different operators with different domains.</p>
+<p><strong>14.</strong> For <span class="math inline">\(q=e_1\)</span> the compression is the scalar <span class="math inline">\(q^THq=2\)</span> and <span class="math inline">\(Hq-2q=e_2\)</span>. The residual is perpendicular to the trial line. For <span class="math inline">\(q=(1,1,0)^T/\sqrt2\)</span>, the compression is <span class="math inline">\(3\)</span> and the residual vanishes. Only the second line is invariant. Diagonalizing a compression solves an exact problem on the trial space, while exactness of the lifted eigenpair is tested in the full space.</p>
+</section>
+<section id="session-9-which-information-survives-a-boundary-condition" class="level2" data-number="18.12">
+<h2 data-number="18.12" class="anchored" data-anchor-id="session-9-which-information-survives-a-boundary-condition"><span class="header-section-number">18.12</span> Session 9 — Which information survives a boundary condition?</h2>
+<section id="integrated-mastery-problem" class="level3">
+<h3 class="anchored" data-anchor-id="integrated-mastery-problem">Integrated mastery problem</h3>
+<p>A bending measurement on cubic polynomials returns <span class="math inline">\(Tp=(p''(0),p''(1),p''(2))\)</span>. Work over <span class="math inline">\(\mathbb R\)</span>. Before calculating a matrix, predict the number of independent readings. Then construct the matrix, its kernel, image, compatibility equation and all inputs for a compatible reading. Choose a complement and construct its projection. Identify the canonical quotient isomorphism and a short exact sequence. Finally suppose the experiment also requires <span class="math inline">\(p(0)=p'(0)=p'(1)=0\)</span>. Determine the new kernel and image. Decide which linear measurements on a cubic can be recovered from the original three readings.</p>
+</section>
+<section id="worked-reconstruction" class="level3">
+<h3 class="anchored" data-anchor-id="worked-reconstruction">Worked reconstruction</h3>
+<p>A cubic has an affine second derivative. Its first two values determine that function, and every affine function is a second derivative. Thus exactly two readings are independent. For <span class="math inline">\(p=a+bt+ct^2+dt^3\)</span>, the standard-coordinate matrix is <span class="math display">\[
+[T]=\begin{pmatrix}0&amp;0&amp;2&amp;0\\0&amp;0&amp;2&amp;6\\0&amp;0&amp;2&amp;12\end{pmatrix}.
+\]</span> The kernel is <span class="math inline">\(\mathcal P_1\)</span>. If the readings are <span class="math inline">\((u,v,w)\)</span>, then <span class="math inline">\(w=2v-u\)</span>. Conversely this relation suffices: choose <span class="math inline">\(c=u/2\)</span> and <span class="math inline">\(d=(v-u)/6\)</span>. The full fiber is <span class="math display">\[
+p(t)=a+bt+\tfrac{u}{2}t^2+\tfrac{v-u}{6}t^3,\qquad a,b\in\mathbb R.
+\]</span> The rank–nullity count <span class="math inline">\(4=2+2\)</span> describes a two-dimensional ambiguity and a two-dimensional attainable plane. On the complement <span class="math inline">\(\operatorname{span}(t^2,t^3)\)</span> choose <span class="math inline">\(a=b=0\)</span>. The associated projection is <span class="math inline">\(Pp=p-p(0)-p'(0)t\)</span>. It fixes the complement, annihilates <span class="math inline">\(\mathcal P_1\)</span> and therefore squares to itself. Using expansion about <span class="math inline">\(1\)</span> would instead choose the complement of polynomials with <span class="math inline">\(p(1)=p'(1)=0\)</span>.</p>
+<p>The canonical arrow <span class="math inline">\([p]\mapsto Tp\)</span> takes <span class="math inline">\(\mathcal P_3/\mathcal P_1\)</span> bijectively to the plane <span class="math inline">\(I=\{(u,v,2v-u)\}\)</span>. Its inverse sends the reading to the class of the displayed cubic, independent of <span class="math inline">\(a,b\)</span>. This realizes the exact sequence <span class="math inline">\(0\to\mathcal P_1\to\mathcal P_3\to I\to0\)</span>. Surjectivity supplies a preimage, and exactness at the domain identifies precisely which preimages belong to the same class.</p>
+<p>The first two boundary conditions choose <span class="math inline">\(a=b=0\)</span>. The third requires <span class="math inline">\(2c+3d=(u+v)/2=0\)</span>. Thus the new domain is one-dimensional, its kernel is zero and its image is the line <span class="math inline">\((u,-u,-3u)\)</span>. For instance <span class="math inline">\(p=t^2/2-t^3/3\)</span> gives <span class="math inline">\((1,-1,-3)\)</span>. An extra condition imposed after uniqueness was already achieved has excluded previously attainable readings.</p>
+<p>Finally, a linear measurement <span class="math inline">\(f\)</span> on cubics is recoverable exactly when it vanishes on <span class="math inline">\(1\)</span> and <span class="math inline">\(t\)</span>. Necessity comes from the zero reading being shared by every affine polynomial. Sufficiency follows from the universal property and <span class="math inline">\(\overline T^{-1}\)</span>. Explicitly <span class="math inline">\(f(p)=u f(t^2)/2+(v-u)f(t^3)/6\)</span>. A functional on the attainable plane is determined uniquely. Its extension to all three-component readings can be changed by any multiple of <span class="math inline">\(u-2v+w\)</span>.</p>
+</section>
+<section id="how-the-constructions-fit-together" class="level3">
+<h3 class="anchored" data-anchor-id="how-the-constructions-fit-together">How the constructions fit together</h3>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+  T["Linear map"] --&gt; K["Kernel in the domain"]
+  T --&gt; I["Image in the codomain"]
+  K --&gt; Q["Domain modulo kernel"]
+  Q --&gt;|canonical isomorphism| I
+  K --&gt; H["Choice of complement"]
+  H --&gt;|unique representative| Q
+  I --&gt; O["Codomain modulo image"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>In the last diagram the complement represents classes via restriction of the quotient map. The codomain quotient records the remaining obstruction. Returning to the sensors, <span class="math inline">\(Jx\)</span> encodes a class, <span class="math inline">\(SJx\)</span> is one lift of it, and <span class="math inline">\(\ell(b)\)</span> encodes the output obstruction. Each expression answers a different inverse question.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Construction or result</th>
+<th>What to reconstruct</th>
+<th>Hypotheses or choices</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Synthesis and coordinates</td>
+<td><span class="math inline">\(S_B\)</span> is onto for a spanning family and one-to-one for an independent family</td>
+<td>Ordered list for a coordinate map</td>
+</tr>
+<tr class="even">
+<td>Exchange and dimension</td>
+<td>Replace one surviving generator per independent vector</td>
+<td>Finite spanning list over a field</td>
+</tr>
+<tr class="odd">
+<td>Matrix transport</td>
+<td><span class="math inline">\(A'=Q^{-1}AP\)</span></td>
+<td>Specified bases of source and target</td>
+</tr>
+<tr class="even">
+<td>Solvability and fibers</td>
+<td><span class="math inline">\(b\in I\)</span> and <span class="math inline">\(T^{-1}(\{b\})=x_p+K\)</span></td>
+<td>Compatible <span class="math inline">\(b\)</span> for the fiber formula</td>
+</tr>
+<tr class="odd">
+<td>Rank–nullity</td>
+<td>Lift an image basis, append a kernel basis</td>
+<td>Finite domain for integer counts</td>
+</tr>
+<tr class="even">
+<td>Direct sum and projection</td>
+<td>Unique components correspond to <span class="math inline">\(P^2=P\)</span></td>
+<td>Algebraic; orthogonality needs more structure</td>
+</tr>
+<tr class="odd">
+<td>Quotient and factorization</td>
+<td><span class="math inline">\(f\)</span> descends exactly when <span class="math inline">\(U\subseteq\ker f\)</span></td>
+<td><span class="math inline">\(U\)</span> a subspace, no dimension bound</td>
+</tr>
+<tr class="even">
+<td>First isomorphism</td>
+<td><span class="math inline">\([x]\mapsto Tx\)</span></td>
+<td>Any linear map, target restricted to its image</td>
+</tr>
+<tr class="odd">
+<td>Splitting</td>
+<td><span class="math inline">\(s\)</span> right-inverse to <span class="math inline">\(p\)</span> gives <span class="math inline">\(V=\ker p\oplus s(I)\)</span></td>
+<td>Section chosen; basis theorem over a field</td>
+</tr>
+<tr class="even">
+<td>Numerical rank</td>
+<td>Count stretches above a tolerance</td>
+<td>Inner products, scale, error model and threshold</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What is canonical?</strong> Given <span class="math inline">\(T\)</span>, its kernel, image, fibers, quotient and induced isomorphism are determined. Given subspaces in a common ambient space, their sum and intersection are determined. Given a decomposition, its component projections are determined. A kernel alone generally specifies neither a complement nor a projection. Coordinates, bases of the image, choices of representatives and matrix entries require further data. The distinction always refers to what has already been supplied.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Common error</th>
+<th>Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Calling every fiber a subspace</td>
+<td>Does the proposed fiber contain the zero input?</td>
+</tr>
+<tr class="even">
+<td>Reading image vectors from the RREF</td>
+<td>Which output coordinates did the row operations change?</td>
+</tr>
+<tr class="odd">
+<td>Treating pairwise intersections as sufficient</td>
+<td>Try isolating one summand against the sum of <strong>all</strong> the others.</td>
+</tr>
+<tr class="even">
+<td>Applying a rule to a quotient representative</td>
+<td>Replace <span class="math inline">\(x\)</span> by <span class="math inline">\(x+u\)</span> and check for every <span class="math inline">\(u\in U\)</span>.</td>
+</tr>
+<tr class="odd">
+<td>Inferring exactness from zero composition</td>
+<td>Can every vector killed by the next map be lifted through the preceding map?</td>
+</tr>
+<tr class="even">
+<td>Calling an algebraic projection orthogonal</td>
+<td>Which inner product and which kernel determine its direction?</td>
+</tr>
+<tr class="odd">
+<td>Equating an exact rank with a reliable numerical rank</td>
+<td>What input perturbation would erase the smallest resolved stretch?</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mastery-checklist" class="level3">
+<h3 class="anchored" data-anchor-id="mastery-checklist">Mastery checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox">Rebuild the exchange proof and use it to justify dimension and basis extension.</label></li>
+<li><label><input type="checkbox">Represent differentiation in two different ordered bases and track the direction of each coordinate conversion.</label></li>
+<li><label><input type="checkbox">Use elimination on a new rectangular system to produce kernel and original-image bases, a compatibility equation and the full affine fiber.</label></li>
+<li><label><input type="checkbox">Prove rank–nullity by both extending a kernel basis and lifting an image basis.</label></li>
+<li><label><input type="checkbox">Detect a failed direct sum and construct two projections with the same kernel.</label></li>
+<li><label><input type="checkbox">Define quotient operations, check representatives, and prove the induced isomorphism in both directions.</label></li>
+<li><label><input type="checkbox">Reconstruct the universal properties of kernel, quotient and finite direct sum from their mapping problems.</label></li>
+<li><label><input type="checkbox">Check an exact sequence term by term, construct a section and say which parts depend on choices.</label></li>
+<li><label><input type="checkbox">Interpret a lost direction and an unattainable output for a graph, a differential operator and a numerical trial space.</label></li>
+<li><label><input type="checkbox">Solve the cubic measurement problem from a blank page, then change the boundary condition and predict the new image.</label></li>
+</ul>
+</section>
+<section id="transition-to-module-b-what-can-be-measured" class="level3">
+<h3 class="anchored" data-anchor-id="transition-to-module-b-what-can-be-measured">Transition to Module B — What can be measured?</h3>
+<p>A linear measurement on <span class="math inline">\(W\)</span> is a functional <span class="math inline">\(\lambda:W\to F\)</span>. Measuring an output gives a functional on the input, <span class="math inline">\((T^\vee\lambda)(x)=\lambda(Tx)\)</span>. Thus <span class="math inline">\(T^\vee:W^\vee\to V^\vee\)</span> reverses direction. Which output measurements become invisible? Exactly those vanishing on <span class="math inline">\(I\)</span>, the <strong>annihilator</strong> <span class="math inline">\(I^\circ\)</span>. Which input measurements can come from outputs? They must vanish on <span class="math inline">\(K\)</span>. Conversely such a measurement descends to <span class="math inline">\(V/K\)</span>, transfers across <span class="math inline">\(\overline T\)</span> to <span class="math inline">\(I\)</span>, and in finite dimension extends to <span class="math inline">\(W\)</span> by completing an image basis. Consequently <span class="math inline">\(\ker T^\vee=I^\circ\)</span> and <span class="math inline">\(\operatorname{im}T^\vee=K^\circ\)</span>. In the sensor problem this says that every recoverable scalar quantity is a combination of the two rows of <span class="math inline">\(J\)</span>, while <span class="math inline">\(\ell\)</span> is the redundant output measurement. Module B begins at that distinction.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review_2/e.html" class="pagination-link" aria-label="Module E — Numerical Eigenvalue Methods, Conditioning, and Stability">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review_3/b03.html" class="pagination-link" aria-label="Module B — Duality and Linear Measurements: From Covectors to Universal Structure">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

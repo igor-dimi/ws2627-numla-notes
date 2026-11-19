@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>20&nbsp; Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review_3/d03.html" rel="next">
+<link href="../review_3/b03.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_3/c03.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#session-1-how-much-change-is-one-unit" id="toc-session-1-how-much-change-is-one-unit" class="nav-link active" data-scroll-target="#session-1-how-much-change-is-one-unit"><span class="header-section-number">20.1</span> Session 1 — How much change is one unit?</a>
+  <ul class="collapse">
+  <li><a href="#change-the-measuring-instrument" id="toc-change-the-measuring-instrument" class="nav-link" data-scroll-target="#change-the-measuring-instrument">Change the measuring instrument</a></li>
+  </ul></li>
+  <li><a href="#session-2-how-do-coordinates-remember-the-geometry" id="toc-session-2-how-do-coordinates-remember-the-geometry" class="nav-link" data-scroll-target="#session-2-how-do-coordinates-remember-the-geometry"><span class="header-section-number">20.2</span> Session 2 — How do coordinates remember the geometry?</a>
+  <ul class="collapse">
+  <li><a href="#constructing-coordinates-in-which-lengths-are-simple" id="toc-constructing-coordinates-in-which-lengths-are-simple" class="nav-link" data-scroll-target="#constructing-coordinates-in-which-lengths-are-simple">Constructing coordinates in which lengths are simple</a></li>
+  </ul></li>
+  <li><a href="#session-3-which-vector-represents-a-fixed-functional" id="toc-session-3-which-vector-represents-a-fixed-functional" class="nav-link" data-scroll-target="#session-3-which-vector-represents-a-fixed-functional"><span class="header-section-number">20.3</span> Session 3 — Which vector represents a fixed functional?</a></li>
+  <li><a href="#session-4-how-should-an-output-direction-be-pulled-back" id="toc-session-4-how-should-an-output-direction-be-pulled-back" class="nav-link" data-scroll-target="#session-4-how-should-an-output-direction-be-pulled-back"><span class="header-section-number">20.4</span> Session 4 — How should an output direction be pulled back?</a></li>
+  <li><a href="#session-5-what-makes-one-point-in-a-subspace-the-closest" id="toc-session-5-what-makes-one-point-in-a-subspace-the-closest" class="nav-link" data-scroll-target="#session-5-what-makes-one-point-in-a-subspace-the-closest"><span class="header-section-number">20.5</span> Session 5 — What makes one point in a subspace the closest?</a>
+  <ul class="collapse">
+  <li><a href="#compute-the-projection-without-first-orthogonalizing" id="toc-compute-the-projection-without-first-orthogonalizing" class="nav-link" data-scroll-target="#compute-the-projection-without-first-orthogonalizing">Compute the projection without first orthogonalizing</a></li>
+  <li><a href="#four-subspaces-and-one-closure" id="toc-four-subspaces-and-one-closure" class="nav-link" data-scroll-target="#four-subspaces-and-one-closure">Four subspaces and one closure</a></li>
+  </ul></li>
+  <li><a href="#session-6-which-transformations-respect-the-geometry" id="toc-session-6-which-transformations-respect-the-geometry" class="nav-link" data-scroll-target="#session-6-which-transformations-respect-the-geometry"><span class="header-section-number">20.6</span> Session 6 — Which transformations respect the geometry?</a>
+  <ul class="collapse">
+  <li><a href="#two-sources-of-positive-matrices" id="toc-two-sources-of-positive-matrices" class="nav-link" data-scroll-target="#two-sources-of-positive-matrices">Two sources of positive matrices</a></li>
+  </ul></li>
+  <li><a href="#session-7-when-the-equations-disagree-what-exactly-should-be-minimized" id="toc-session-7-when-the-equations-disagree-what-exactly-should-be-minimized" class="nav-link" data-scroll-target="#session-7-when-the-equations-disagree-what-exactly-should-be-minimized"><span class="header-section-number">20.7</span> Session 7 — When the equations disagree, what exactly should be minimized?</a>
+  <ul class="collapse">
+  <li><a href="#a-complete-inverse-problem-with-two-projections" id="toc-a-complete-inverse-problem-with-two-projections" class="nav-link" data-scroll-target="#a-complete-inverse-problem-with-two-projections">A complete inverse problem with two projections</a></li>
+  <li><a href="#why-the-equations-we-derive-can-differ-from-the-algorithm-we-run" id="toc-why-the-equations-we-derive-can-differ-from-the-algorithm-we-run" class="nav-link" data-scroll-target="#why-the-equations-we-derive-can-differ-from-the-algorithm-we-run">Why the equations we derive can differ from the algorithm we run</a></li>
+  <li><a href="#what-if-different-sensors-have-different-costs" id="toc-what-if-different-sensors-have-different-costs" class="nav-link" data-scroll-target="#what-if-different-sensors-have-different-costs">What if different sensors have different costs?</a></li>
+  </ul></li>
+  <li><a href="#session-8-how-can-a-differential-equation-ask-for-a-closest-point" id="toc-session-8-how-can-a-differential-equation-ask-for-a-closest-point" class="nav-link" data-scroll-target="#session-8-how-can-a-differential-equation-ask-for-a-closest-point"><span class="header-section-number">20.8</span> Session 8 — How can a differential equation ask for a closest point?</a>
+  <ul class="collapse">
+  <li><a href="#a-mesh-with-two-unknowns" id="toc-a-mesh-with-two-unknowns" class="nav-link" data-scroll-target="#a-mesh-with-two-unknowns">A mesh with two unknowns</a></li>
+  </ul></li>
+  <li><a href="#session-9-how-does-a-mass-matrix-enter-an-eigenvalue-problem" id="toc-session-9-how-does-a-mass-matrix-enter-an-eigenvalue-problem" class="nav-link" data-scroll-target="#session-9-how-does-a-mass-matrix-enter-an-eigenvalue-problem"><span class="header-section-number">20.9</span> Session 9 — How does a mass matrix enter an eigenvalue problem?</a>
+  <ul class="collapse">
+  <li><a href="#a-self-adjoint-operator-behind-a-hermitian-pair" id="toc-a-self-adjoint-operator-behind-a-hermitian-pair" class="nav-link" data-scroll-target="#a-self-adjoint-operator-behind-a-hermitian-pair">A self-adjoint operator behind a Hermitian pair</a></li>
+  <li><a href="#rayleighritz-asks-fewer-questions-than-the-full-eigenproblem" id="toc-rayleighritz-asks-fewer-questions-than-the-full-eigenproblem" class="nav-link" data-scroll-target="#rayleighritz-asks-fewer-questions-than-the-full-eigenproblem">Rayleigh–Ritz asks fewer questions than the full eigenproblem</a></li>
+  </ul></li>
+  <li><a href="#computational-laboratory-check-the-geometry-as-well-as-the-equations" id="toc-computational-laboratory-check-the-geometry-as-well-as-the-equations" class="nav-link" data-scroll-target="#computational-laboratory-check-the-geometry-as-well-as-the-equations"><span class="header-section-number">20.10</span> Computational laboratory — Check the geometry as well as the equations</a>
+  <ul class="collapse">
+  <li><a href="#a.-weighted-unit-directions" id="toc-a.-weighted-unit-directions" class="nav-link" data-scroll-target="#a.-weighted-unit-directions">A. Weighted unit directions</a></li>
+  <li><a href="#b.-re-encode-the-same-geometry" id="toc-b.-re-encode-the-same-geometry" class="nav-link" data-scroll-target="#b.-re-encode-the-same-geometry">B. Re-encode the same geometry</a></li>
+  <li><a href="#c.-represent-one-complex-measurement-in-two-metrics" id="toc-c.-represent-one-complex-measurement-in-two-metrics" class="nav-link" data-scroll-target="#c.-represent-one-complex-measurement-in-two-metrics">C. Represent one complex measurement in two metrics</a></li>
+  <li><a href="#d.-pull-back-through-different-domain-and-codomain-geometries" id="toc-d.-pull-back-through-different-domain-and-codomain-geometries" class="nav-link" data-scroll-target="#d.-pull-back-through-different-domain-and-codomain-geometries">D. Pull back through different domain and codomain geometries</a></li>
+  <li><a href="#e.-two-projections-onto-the-same-plane" id="toc-e.-two-projections-onto-the-same-plane" class="nav-link" data-scroll-target="#e.-two-projections-onto-the-same-plane">E. Two projections onto the same plane</a></li>
+  <li><a href="#f.-compare-normal-equations-qr-and-svd" id="toc-f.-compare-normal-equations-qr-and-svd" class="nav-link" data-scroll-target="#f.-compare-normal-equations-qr-and-svd">F. Compare normal equations, QR and SVD</a></li>
+  <li><a href="#g.-select-the-minimum-norm-input-for-incompatible-data" id="toc-g.-select-the-minimum-norm-input-for-incompatible-data" class="nav-link" data-scroll-target="#g.-select-the-minimum-norm-input-for-incompatible-data">G. Select the minimum-norm input for incompatible data</a></li>
+  <li><a href="#h.-assemble-the-poisson-equation-and-measure-the-slope-error" id="toc-h.-assemble-the-poisson-equation-and-measure-the-slope-error" class="nav-link" data-scroll-target="#h.-assemble-the-poisson-equation-and-measure-the-slope-error">H. Assemble the Poisson equation and measure the slope error</a></li>
+  <li><a href="#i.-compute-generalized-eigenpairs-and-test-a-proper-trial-subspace" id="toc-i.-compute-generalized-eigenpairs-and-test-a-proper-trial-subspace" class="nav-link" data-scroll-target="#i.-compute-generalized-eigenpairs-and-test-a-proper-trial-subspace">I. Compute generalized eigenpairs and test a proper trial subspace</a></li>
+  </ul></li>
+  <li><a href="#exercises-reconstruct-calculate-transfer" id="toc-exercises-reconstruct-calculate-transfer" class="nav-link" data-scroll-target="#exercises-reconstruct-calculate-transfer"><span class="header-section-number">20.11</span> Exercises — Reconstruct, calculate, transfer</a>
+  <ul class="collapse">
+  <li><a href="#geometry-from-measurements" id="toc-geometry-from-measurements" class="nav-link" data-scroll-target="#geometry-from-measurements">Geometry from measurements</a></li>
+  <li><a href="#approximation-and-operator-structure" id="toc-approximation-and-operator-structure" class="nav-link" data-scroll-target="#approximation-and-operator-structure">Approximation and operator structure</a></li>
+  <li><a href="#from-tests-to-modes" id="toc-from-tests-to-modes" class="nav-link" data-scroll-target="#from-tests-to-modes">From tests to modes</a></li>
+  </ul></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">20.12</span> Worked solutions</a></li>
+  <li><a href="#integrated-mastery-problem-one-instrument-two-geometries-one-reduced-model" id="toc-integrated-mastery-problem-one-instrument-two-geometries-one-reduced-model" class="nav-link" data-scroll-target="#integrated-mastery-problem-one-instrument-two-geometries-one-reduced-model"><span class="header-section-number">20.13</span> Integrated mastery problem — One instrument, two geometries, one reduced model</a>
+  <ul class="collapse">
+  <li><a href="#worked-reconstruction" id="toc-worked-reconstruction" class="nav-link" data-scroll-target="#worked-reconstruction">Worked reconstruction</a></li>
+  </ul></li>
+  <li><a href="#synthesis-which-structure-made-each-conclusion-possible" id="toc-synthesis-which-structure-made-each-conclusion-possible" class="nav-link" data-scroll-target="#synthesis-which-structure-made-each-conclusion-possible"><span class="header-section-number">20.14</span> Synthesis — Which structure made each conclusion possible?</a>
+  <ul class="collapse">
+  <li><a href="#mastery-checklist" id="toc-mastery-checklist" class="nav-link" data-scroll-target="#mastery-checklist">Mastery checklist</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_3/c03.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-module-c" class="quarto-section-identifier"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A sensor reports <span class="math inline">\((1,2,4)\)</span> although every noise-free reading satisfies <span class="math inline">\(b_3=b_1+b_2\)</span>. Algebra detects the inconsistency: the functional <span class="math inline">\(b\mapsto b_3-b_1-b_2\)</span> returns <span class="math inline">\(1\)</span>. What is the smallest correction that makes the data possible? A second question arises after we correct the readings: if many inputs explain them, which input has the smallest size? To answer the first question we need a geometry on <strong>outputs</strong>. To answer the second we need a geometry on <strong>inputs</strong>. There is no reason these geometries should have the same units, dimension or weights.</p>
+<p>A second experiment replaces the sensors by a finite-element mesh. There we will have two genuinely different ways of measuring the same function: its mean-square size and the energy in its derivative. Understanding why a single discretization needs both is the route from duality to the generalized eigenproblem <span class="math inline">\(Kx=\lambda Mx\)</span>.</p>
+<p><strong>Conventions and starting point.</strong> Work over <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span>. As in the regenerated Module B, <span class="math inline">\(\langle x,y\rangle\)</span> is linear in <span class="math inline">\(x\)</span> and conjugate-linear in <span class="math inline">\(y\)</span>. In coordinates <span class="math inline">\(\langle x,y\rangle_G=y^HGx\)</span>, where <span class="math inline">\(H\)</span> denotes conjugate transpose. In texts linear in the second argument the same scalar is written <span class="math inline">\(\langle y,x\rangle_G\)</span>. Write <span class="math inline">\(T^\vee g=g\circ T\)</span> for algebraic pullback, <span class="math inline">\(T^*\)</span> for the adjoint between specified inner-product spaces and <span class="math inline">\(A^H\)</span> for an operation on an array. All dimension-dependent assertions below refer to finite dimension unless a function space is specified. We use the algebraic fact that <span class="math inline">\(Tx=b\)</span> is solvable precisely for <span class="math inline">\(b\in\operatorname{im}T\)</span> and then its solutions are <span class="math inline">\(x_0+\ker T\)</span>, since equal outputs mean that the difference of inputs is killed.</p>
+<section id="session-1-how-much-change-is-one-unit" class="level2" data-number="20.1">
+<h2 data-number="20.1" class="anchored" data-anchor-id="session-1-how-much-change-is-one-unit"><span class="header-section-number">20.1</span> Session 1 — How much change is one unit?</h2>
+<p>An <strong>inner product</strong> is linear in its first argument, satisfies <span class="math inline">\(\langle x,y\rangle=\overline{\langle y,x\rangle}\)</span>, and obeys <span class="math inline">\(\langle x,x\rangle&gt;0\)</span> for every <span class="math inline">\(x\ne0\)</span>. These axioms imply <span class="math inline">\(\langle x,x\rangle\)</span> is real, <span class="math inline">\(\langle 0,y\rangle=0\)</span>, and <span class="math inline">\(\langle x,ay+bz\rangle=\bar a\langle x,y\rangle+\bar b\langle x,z\rangle\)</span>. Over the reals the form is symmetric and bilinear. Over the complex numbers a bilinear form cannot be positive on all nonzero vectors: replacing <span class="math inline">\(x\)</span> by <span class="math inline">\(ix\)</span> would change the sign of its diagonal value.</p>
+<p>Write <span class="math inline">\(\|x\|=\sqrt{\langle x,x\rangle}\)</span> and say <span class="math inline">\(x\perp y\)</span> when <span class="math inline">\(\langle x,y\rangle=0\)</span>. Expanding the square gives <span class="math display">\[
+\|x+y\|^2=\|x\|^2+2\operatorname{Re}\langle x,y\rangle+\|y\|^2 .
+\]</span> This gives Pythagoras for perpendicular vectors. Over <span class="math inline">\(\mathbb C\)</span> a single Pythagorean equality only forces the real part to vanish. Testing also with <span class="math inline">\(iy\)</span> detects the imaginary part.</p>
+<div id="thm-ip-cs" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 20.1</strong></span> <strong>Cauchy–Schwarz.</strong> <span class="math inline">\(|\langle x,y\rangle|\le\|x\|\|y\|\)</span>, with equality exactly when <span class="math inline">\(x,y\)</span> are linearly dependent.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The case <span class="math inline">\(y=0\)</span> satisfies both assertions. Otherwise write <span class="math inline">\(x=\alpha y+z\)</span> with <span class="math inline">\(\alpha=\langle x,y\rangle/\|y\|^2\)</span>. The choice kills <span class="math inline">\(\langle z,y\rangle\)</span>. Pythagoras then gives <span class="math inline">\(\|x\|^2=|\langle x,y\rangle|^2/\|y\|^2+\|z\|^2\)</span>. Dropping the last term proves the bound; equality requires <span class="math inline">\(z=0\)</span>. This also finds the multiple of <span class="math inline">\(y\)</span> closest to <span class="math inline">\(x\)</span>: any other coefficient adds the squared length of a component along <span class="math inline">\(y\)</span>.</p>
+</div>
+<p>Positivity gives definiteness of the norm, and sesquilinearity gives <span class="math inline">\(\|ax\|=|a|\|x\|\)</span>. Applying Cauchy–Schwarz to the cross term bounds <span class="math inline">\(\|x+y\|^2\)</span> by <span class="math inline">\((\|x\|+\|y\|)^2\)</span>, proving the triangle inequality. Thus <span class="math inline">\(d(x,y)=\|x-y\|\)</span> is a distance. For nonzero real vectors the bound permits the definition <span class="math inline">\(\cos\theta=\langle x,y\rangle/(\|x\|\|y\|)\)</span> with <span class="math inline">\(0\le\theta\le\pi\)</span>.</p>
+<p><strong>Can a given norm come from an inner product?</strong> Adding the expansions for <span class="math inline">\(x+y\)</span> and <span class="math inline">\(x-y\)</span> cancels the cross terms: <span class="math display">\[
+\|x+y\|^2+\|x-y\|^2=2\|x\|^2+2\|y\|^2 .
+\]</span> The parallelogram law characterizes inner-product norms. Here is why the converse works. On the underlying real space put <span class="math inline">\(q(x)=\|x\|^2\)</span> and <span class="math inline">\(B(x,y)=(q(x+y)-q(x-y))/4\)</span>. It is symmetric and <span class="math inline">\(B(0,y)=0\)</span>. Applying the parallelogram law to <span class="math inline">\((x+y,z)\)</span> and <span class="math inline">\((x-y,z)\)</span> and subtracting gives <span class="math inline">\(B(x+z,y)+B(x-z,y)=2B(x,y)\)</span>. Taking <span class="math inline">\(z=x\)</span> gives doubling. Taking <span class="math inline">\(x=(u+v)/2\)</span>, <span class="math inline">\(z=(u-v)/2\)</span> then gives additivity. Rational homogeneity follows by addition and division; continuity of the norm extends it to real scalars. Finally <span class="math inline">\(B(x,x)=q(x)\)</span>. In a complex space <span class="math inline">\(B(ix,iy)=B(x,y)\)</span> since <span class="math inline">\(\|iw\|=\|w\|\)</span>, hence <span class="math inline">\(B(ix,y)=-B(x,iy)\)</span>. Then <span class="math inline">\(B(x,y)-iB(ix,y)\)</span> is linear in the first slot, conjugate symmetric, and has diagonal <span class="math inline">\(q(x)\)</span>. Over <span class="math inline">\(\mathbb R^2\)</span>, the <span class="math inline">\(1\)</span>-norm fails the law on <span class="math inline">\(e_1,e_2\)</span> (left side <span class="math inline">\(8\)</span>, right side <span class="math inline">\(4\)</span>).</p>
+<section id="change-the-measuring-instrument" class="level3">
+<h3 class="anchored" data-anchor-id="change-the-measuring-instrument">Change the measuring instrument</h3>
+<p>For Hermitian <span class="math inline">\(G=G^H\)</span>, <span class="math inline">\(y^HGx\)</span> is conjugate symmetric. It defines an inner product precisely when <span class="math inline">\(x^HGx&gt;0\)</span> for <span class="math inline">\(x\ne0\)</span>, i.e.&nbsp;<span class="math inline">\(G\)</span> is <strong>Hermitian positive definite</strong> (HPD; SPD in the real symmetric case). A semidefinite weight can assign zero size to a nonzero direction. Our recurring metric is <span class="math display">\[
+G=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix},\qquad x^TGx=x_1^2+x_2^2+(x_1+x_2)^2.
+\]</span> The coordinate axes are perpendicular in Euclidean geometry. Here they have length <span class="math inline">\(\sqrt2\)</span> and make angle <span class="math inline">\(\pi/3\)</span>. The vectors <span class="math inline">\((1,1)\)</span> and <span class="math inline">\((1,-1)\)</span> are eigenvectors of <span class="math inline">\(G\)</span> of eigenvalues <span class="math inline">\(3,1\)</span>. Measuring along the corresponding Euclidean unit directions gives ellipse semiaxes <span class="math inline">\(1/\sqrt3,1\)</span>. Thus a highly weighted direction displaces less far on paper before using up one unit of length.</p>
+<p><strong>Checkpoint.</strong> Is <span class="math inline">\((1,-2)\)</span> perpendicular to <span class="math inline">\(e_1\)</span> in this metric? Its first weighted component is <span class="math inline">\(2-2=0\)</span>. Its ordinary first component is <span class="math inline">\(1\)</span>. The meaning of a right angle changes with the metric.</p>
+</section>
+</section>
+<section id="session-2-how-do-coordinates-remember-the-geometry" class="level2" data-number="20.2">
+<h2 data-number="20.2" class="anchored" data-anchor-id="session-2-how-do-coordinates-remember-the-geometry"><span class="header-section-number">20.2</span> Session 2 — How do coordinates remember the geometry?</h2>
+<p>Suppose software stores coefficients in a basis <span class="math inline">\(B=(b_1,\dots,b_n)\)</span>. Multiplying coordinate columns entry by entry measures lengths correctly only in a particular kind of basis. Expand <span class="math inline">\(u=\sum_j x_jb_j\)</span>, <span class="math inline">\(v=\sum_i y_i b_i\)</span>. Sesquilinearity gives <span class="math display">\[
+\langle u,v\rangle=\sum_{ij}\bar y_i\,\langle b_j,b_i\rangle x_j=y^HG_Bx,\qquad (G_B)_{ij}=\langle b_j,b_i\rangle.
+\]</span> The order of the indices follows our convention. This <strong>Gram matrix</strong> is Hermitian. For any list of vectors, <span class="math inline">\(x^HG_Bx=\|\sum_j x_j b_j\|^2\ge0\)</span>, with equality precisely when the combination vanishes. Thus its Gram matrix is positive definite exactly when the list is independent. An orthogonal basis gives a positive diagonal Gram matrix, an orthonormal basis gives the identity. For an orthogonal basis the coordinates are <span class="math inline">\(\langle u,b_j\rangle/\|b_j\|^2\)</span>, as pairing the expansion with <span class="math inline">\(b_j\)</span> shows.</p>
+<p>Let the columns of <span class="math inline">\(B'=BP\)</span> specify a new basis relative to the old, so <span class="math inline">\(x=Px'\)</span>. Substitution gives <span class="math display">\[
+G_{B'}=P^HG_BP .
+\]</span> This <strong>congruence</strong> changes the description of the same geometry. Replacing <span class="math inline">\(G_B\)</span> by a new metric while keeping the same basis instead changes which vectors are perpendicular. Neither operation is the similarity <span class="math inline">\(P^{-1}AP\)</span> for an endomorphism.</p>
+<p>For the oblique basis <span class="math inline">\(b_1=(1,0)^T,b_2=(1,1)^T\)</span> of Module B in Euclidean space, <span class="math display">\[
+G_B=B^TB=\begin{pmatrix}1&amp;1\\1&amp;2\end{pmatrix}.
+\]</span> The vector <span class="math inline">\((3,2)^T\)</span> has coefficients <span class="math inline">\((1,2)^T\)</span>, and the Gram formula gives <span class="math inline">\(13\)</span>, its squared length. Ordinary coordinate squaring in this basis would give <span class="math inline">\(5\)</span>. If the physical geometry is instead the metric <span class="math inline">\(G\)</span> of Session 1, the same basis has <span class="math inline">\(B^TGB=\left(\begin{smallmatrix}2&amp;3\\3&amp;6\end{smallmatrix}\right)\)</span> and the squared length becomes <span class="math inline">\(38\)</span>. The vector and its coordinates did not move.</p>
+<section id="constructing-coordinates-in-which-lengths-are-simple" class="level3">
+<h3 class="anchored" data-anchor-id="constructing-coordinates-in-which-lengths-are-simple">Constructing coordinates in which lengths are simple</h3>
+<p>Given independent <span class="math inline">\(b_1,\ldots,b_n\)</span>, define successively <span class="math display">\[
+w_j=b_j-\sum_{i&lt;j}\langle b_j,q_i\rangle q_i,\qquad q_j=w_j/\|w_j\|.
+\]</span> If the preceding <span class="math inline">\(q_i\)</span> are orthonormal, pairing with each proves <span class="math inline">\(w_j\)</span> is perpendicular to their span. It is nonzero because the preceding <span class="math inline">\(q_i\)</span> span exactly the preceding <span class="math inline">\(b_i\)</span> and <span class="math inline">\(b_j\)</span> is independent of them. Induction proves that <strong>Gram–Schmidt</strong> produces an orthonormal basis preserving every initial span. In Euclidean matrix coordinates this is thin <span class="math inline">\(B=QR\)</span>, where <span class="math inline">\(r_{ij}=q_i^Hb_j\)</span> for <span class="math inline">\(i\le j\)</span>, and the positive diagonal of <span class="math inline">\(R\)</span> consists of the norms of the remainders. The triangular <span class="math inline">\(R\)</span> converts trial coefficients to orthonormal coefficients. In exact arithmetic <span class="math inline">\(B^HB=R^HR\)</span>. Numerical QR implementations can use orthogonal Householder transformations to avoid the loss of orthogonality that direct subtraction can suffer with nearly dependent input columns.</p>
+<p><strong>Checkpoint.</strong> For an independent list of functions <span class="math inline">\(\phi_i\)</span> on <span class="math inline">\([0,1]\)</span>, in the <span class="math inline">\(L^2\)</span> inner product the same expansion gives entries <span class="math inline">\(\int\phi_j\bar\phi_i\)</span>. This Gram matrix will reappear as the mass matrix. Which geometry would give entries involving derivatives instead?</p>
+</section>
+</section>
+<section id="session-3-which-vector-represents-a-fixed-functional" class="level2" data-number="20.3">
+<h2 data-number="20.3" class="anchored" data-anchor-id="session-3-which-vector-represents-a-fixed-functional"><span class="header-section-number">20.3</span> Session 3 — Which vector represents a fixed functional?</h2>
+<p>A functional <span class="math inline">\(f\in V^\vee\)</span> already assigns a number to every vector. We now want a vector <span class="math inline">\(a_f\)</span> with <span class="math inline">\(f(x)=\langle x,a_f\rangle\)</span>. Define the <strong>Riesz map</strong> <span class="math inline">\(R_V(a)=\langle\,\cdot\,,a\rangle\)</span>. Over <span class="math inline">\(\mathbb C\)</span>, <span class="math inline">\(R_V(\alpha a)=\bar\alpha R_V(a)\)</span>. Over <span class="math inline">\(\mathbb R\)</span> it is linear.</p>
+<div id="thm-ip-riesz" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 20.2</strong></span> <strong>Finite-dimensional Riesz representation.</strong> Every linear functional has exactly one such representative. The dual norm <span class="math inline">\(\|f\|_{\mathrm{dual}}=\sup_{\|x\|\le1}|f(x)|\)</span> equals <span class="math inline">\(\|a_f\|\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Choose an orthonormal basis <span class="math inline">\(q_i\)</span> and set <span class="math inline">\(a_f=\sum_i\overline{f(q_i)}q_i\)</span>. For <span class="math inline">\(x=\sum_i x_iq_i\)</span>, pairing with <span class="math inline">\(a_f\)</span> gives <span class="math inline">\(\sum_i x_i f(q_i)=f(x)\)</span>. Two representatives would have a difference orthogonal to every <span class="math inline">\(x\)</span>, hence to itself, so coincide. Cauchy–Schwarz gives the norm upper bound. For <span class="math inline">\(a_f\ne0\)</span> take <span class="math inline">\(x=a_f/\|a_f\|\)</span> to attain it; for <span class="math inline">\(a_f=0\)</span> both norms vanish.</p>
+</div>
+<p>In arbitrary coordinates let the algebraic row be <span class="math inline">\(c^T\)</span>, exactly as in Module B. Equating <span class="math inline">\(a_f^HGx=c^Tx\)</span> for all <span class="math inline">\(x\)</span> gives <span class="math display">\[
+Ga_f=\bar c,\qquad \|f\|_{\mathrm{dual}}^2=c^TG^{-1}\bar c.
+\]</span> Thus a positive definite solve changes a <strong>functional’s coefficients</strong> into a <strong>vector’s coordinates</strong>. If the functional is instead given as <span class="math inline">\(d^Hx\)</span>, the right side of the solve is <span class="math inline">\(d\)</span>. For the <span class="math inline">\(i\)</span>th coordinate functional in a basis, take <span class="math inline">\(c=e_i\)</span>. The representatives have coordinate columns <span class="math inline">\(G_B^{-1}e_i\)</span> and satisfy <span class="math inline">\(\langle b_j,a_i\rangle=\delta_{ij}\)</span>. Only for an orthonormal basis is each <span class="math inline">\(b_i\)</span> its own coordinate functional’s representative.</p>
+<p>Consider <span class="math inline">\(f(x_1,x_2)=x_1\)</span> over the reals. Its Euclidean representative is <span class="math inline">\(e_1\)</span>. In the metric of Session 1 its representative is <span class="math inline">\((2,-1)^T/3\)</span> and its norm is <span class="math inline">\(\sqrt{2/3}\)</span>. It gives the same reading on every input. Its kernel is still the vertical axis, and <span class="math inline">\(\langle s,a_f\rangle_G=0\)</span> for every vertical <span class="math inline">\(s\)</span>. The vector <span class="math inline">\(a_f/\|a_f\|_G\)</span> points in the direction of largest increase per <em>weighted</em> unit displacement. For a differentiable real scalar field this construction applied to <span class="math inline">\(df_x\)</span> defines its gradient in that metric. In real coordinates <span class="math inline">\(dF_x(h)=(\nabla F)^Th=(\nabla_G F)^TGh\)</span> for every <span class="math inline">\(h\)</span>, so <span class="math inline">\(\nabla_G F=G^{-1}\nabla F\)</span>. An optimization method that changes metric can change its search direction even at the very same point.</p>
+<p><a href="#fig-ip-ellipse" class="quarto-xref">Figure&nbsp;<span>20.1</span></a> shows both unit boundaries and their supporting lines for <span class="math inline">\(f\)</span>. Each marked point maximizes the first coordinate on its own boundary. The tangent there is vertical in both drawings. The slanted radius is perpendicular to that tangent in the weighted metric.</p>
+<div id="cell-fig-ip-ellipse" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div id="fig-ip-ellipse" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ip-ellipse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="c03_files/figure-html/fig-ip-ellipse-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ip-ellipse-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.1: Unit boundaries and maximizers of the same coordinate functional under two metrics.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Checkpoint.</strong> With <span class="math inline">\(G=I\)</span> over <span class="math inline">\(\mathbb C\)</span> and <span class="math inline">\(f(z_1,z_2)=iz_1+z_2\)</span>, the representative is <span class="math inline">\((-i,1)^T\)</span>. Check at <span class="math inline">\((i,0)\)</span> that the conjugation is essential. Both the measurement and inner product give <span class="math inline">\(-1\)</span>.</p>
+</section>
+<section id="session-4-how-should-an-output-direction-be-pulled-back" class="level2" data-number="20.4">
+<h2 data-number="20.4" class="anchored" data-anchor-id="session-4-how-should-an-output-direction-be-pulled-back"><span class="header-section-number">20.4</span> Session 4 — How should an output direction be pulled back?</h2>
+<p>Let <span class="math inline">\(T:V\to W\)</span> be linear. Module B pulled back an output <em>measurement</em> <span class="math inline">\(g\)</span> by composing it with <span class="math inline">\(T\)</span>. Given an output <em>vector</em> <span class="math inline">\(y\)</span>, first decide what it measures: <span class="math inline">\(R_Wy\)</span> acts by <span class="math inline">\(w\mapsto\langle w,y\rangle_W\)</span>. Pull that measurement back to <span class="math inline">\(V\)</span> and find its input representative.</p>
+<div id="thm-ip-adjoint" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 20.3</strong></span> <strong>Adjoint.</strong> In finite-dimensional inner-product spaces there is a unique linear <span class="math inline">\(T^*:W\to V\)</span> such that <span class="math display">\[
+\langle Tx,y\rangle_W=\langle x,T^*y\rangle_V,\qquad
+T^*=R_V^{-1}T^\vee R_W .
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>For fixed <span class="math inline">\(y\)</span>, the left side is a linear functional of <span class="math inline">\(x\)</span>. By <a href="#thm-ip-riesz" class="quarto-xref">Theorem&nbsp;<span>20.2</span></a> its representing vector exists and is unique. This gives the displayed composition, since the functional is <span class="math inline">\((R_Wy)\circ T\)</span>. Its dependence on <span class="math inline">\(y\)</span> is linear: over <span class="math inline">\(\mathbb C\)</span> the two Riesz factors are conjugate-linear and the middle factor is linear. Equality of pairings with every <span class="math inline">\(x\)</span> forces equality of the representing vectors, hence uniqueness of the operator.</p>
+</div>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+  W["Output vectors"] --&gt;|adjoint| V["Input vectors"]
+  W --&gt;|output Riesz map| WD["Output measurements"]
+  V --&gt;|input Riesz map| VD["Input measurements"]
+  WD --&gt;|algebraic pullback| VD
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Composition on the lower path depends only on <span class="math inline">\(T\)</span>. Both vertical maps depend on geometry. In coordinates equate <span class="math inline">\(y^HG_WAx\)</span> and <span class="math inline">\(([T^*]y)^HG_Vx\)</span>: <span class="math display">\[
+[T^*]=G_V^{-1}A^HG_W .
+\]</span> Ordinary orthonormal coordinates on both spaces give <span class="math inline">\(A^H\)</span>, and over <span class="math inline">\(\mathbb R\)</span> this becomes <span class="math inline">\(A^T\)</span>. In corresponding <strong>dual</strong> bases <span class="math inline">\(T^\vee\)</span> always has matrix <span class="math inline">\(A^T\)</span>, including when <span class="math inline">\(A\)</span> is complex. Even orthonormal coordinates do not identify the two complex operations: multiplication by <span class="math inline">\(i\)</span> has algebraic pullback matrix <span class="math inline">\([i]\)</span> and adjoint matrix <span class="math inline">\([-i]\)</span>.</p>
+<p>Consider <span class="math inline">\(T(x,y)=x\)</span> with the weighted input geometry <span class="math inline">\(G\)</span> and the usual scalar output. Then <span class="math inline">\(T^*t=t(2,-1)^T/3\)</span> while <span class="math inline">\(T^\vee\)</span> sends an output coefficient <span class="math inline">\(t\)</span> to the functional with row <span class="math inline">\((t,0)\)</span> over <span class="math inline">\(\mathbb R\)</span>. The weighted result is familiar: pulling back the identity measurement gives precisely the representer in Session 3. Changing <strong>only the output metric</strong> to <span class="math inline">\(\langle s,t\rangle=4\bar t s\)</span> multiplies the adjoint by four. The primal map and all attainable readings stay fixed.</p>
+<p><strong>Adjoint identities.</strong> Conjugating the defining relation and interchanging arguments gives <span class="math inline">\(\langle T^*y,x\rangle_V=\langle y,Tx\rangle_W\)</span>. Uniqueness implies <span class="math inline">\((T^*)^*=T\)</span>. For <span class="math inline">\(S:W\to Z\)</span> pair <span class="math inline">\(STx\)</span> with <span class="math inline">\(z\)</span> and pass first <span class="math inline">\(S\)</span>, then <span class="math inline">\(T\)</span>, across the pairing to obtain <span class="math inline">\((ST)^*=T^*S^*\)</span>. The identity is its own adjoint. Applying the composition rule to both inverse identities gives <span class="math inline">\((T^{-1})^*=(T^*)^{-1}\)</span> for an isomorphism. Scalar factors conjugate: <span class="math inline">\((\alpha T)^*=\bar\alpha T^*\)</span>. Each middle space here carries the same inner product in both occurrences.</p>
+<p><strong>Checkpoint.</strong> If only the coordinates change and <span class="math inline">\(A'=Q^{-1}AP\)</span>, show that the new adjoint matrix is <span class="math inline">\(P^{-1}[T^*]Q\)</span>. Substitute <span class="math inline">\(P^HG_VP,Q^HG_WQ\)</span> into the weighted formula and cancel the inverse factors. The Gram matrices repair exactly the coordinate dependence of raw conjugate transposition.</p>
+</section>
+<section id="session-5-what-makes-one-point-in-a-subspace-the-closest" class="level2" data-number="20.5">
+<h2 data-number="20.5" class="anchored" data-anchor-id="session-5-what-makes-one-point-in-a-subspace-the-closest"><span class="header-section-number">20.5</span> Session 5 — What makes one point in a subspace the closest?</h2>
+<p>Let <span class="math inline">\(S\)</span> be a subspace of <span class="math inline">\(V\)</span>. Define <span class="math inline">\(S^\perp=\{z:\langle s,z\rangle=0\ \forall s\in S\}\)</span>. By conjugate symmetry either order tests orthogonality. By definition <span class="math inline">\(R_V(S^\perp)=S^0\)</span> in finite dimension, where <span class="math inline">\(S^0\)</span> consists of functionals vanishing on <span class="math inline">\(S\)</span>. The annihilator is fixed by <span class="math inline">\(S\)</span>. Its representing vectors move when we change the inner product.</p>
+<div id="thm-ip-projection" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 20.4</strong></span> <strong>Orthogonal decomposition and best approximation.</strong> In finite dimension every <span class="math inline">\(x\)</span> has a unique expression <span class="math inline">\(x=p+r\)</span> with <span class="math inline">\(p\in S\)</span> and <span class="math inline">\(r\in S^\perp\)</span>. The point <span class="math inline">\(p=P_Sx\)</span> is the unique minimizer of <span class="math inline">\(\|x-s\|\)</span> over <span class="math inline">\(s\in S\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Choose an orthonormal basis <span class="math inline">\(q_1,\ldots,q_k\)</span> of <span class="math inline">\(S\)</span> and set <span class="math inline">\(p=\sum_i\langle x,q_i\rangle q_i\)</span>. Direct testing against the basis gives <span class="math inline">\(x-p\perp S\)</span>. For uniqueness subtract two decompositions: their difference in <span class="math inline">\(S\)</span> belongs to <span class="math inline">\(S^\perp\)</span>, so its squared norm is zero. For any <span class="math inline">\(s\in S\)</span> the two terms of <span class="math inline">\(x-s=(x-p)+(p-s)\)</span> are perpendicular. Consequently <span class="math display">\[
+\|x-s\|^2=\|x-p\|^2+\|p-s\|^2 .
+\]</span> This identifies the minimum and its unique point of attainment, even for <span class="math inline">\(S=0\)</span> or <span class="math inline">\(S=V\)</span>.</p>
+</div>
+<p>The formula proves linearity of <span class="math inline">\(P_S\)</span>. It fixes <span class="math inline">\(S\)</span>, kills <span class="math inline">\(S^\perp\)</span>, and hence <span class="math inline">\(P_S^2=P_S\)</span>. Decompose both arguments to see <span class="math inline">\(\langle P_Sx,y\rangle=\langle P_Sx,P_Sy\rangle=\langle x,P_Sy\rangle\)</span>. Conversely, any idempotent <span class="math inline">\(P\)</span> splits <span class="math inline">\(V\)</span> into image and kernel by <span class="math inline">\(x=Px+(x-Px)\)</span>. If also <span class="math inline">\(P=P^*\)</span> then <span class="math inline">\(\langle Pu,k\rangle=\langle u,Pk\rangle=0\)</span> for every kernel vector, so this is the orthogonal decomposition. Other complementary directions give <strong>oblique projectors</strong>. Also <span class="math inline">\((S^\perp)^\perp=S\)</span>: decompose <span class="math inline">\(x=s+r\)</span>, and if <span class="math inline">\(x\perp S^\perp\)</span>, testing against <span class="math inline">\(r\)</span> gives <span class="math inline">\(\|r\|^2=0\)</span>.</p>
+<section id="compute-the-projection-without-first-orthogonalizing" class="level3">
+<h3 class="anchored" data-anchor-id="compute-the-projection-without-first-orthogonalizing">Compute the projection without first orthogonalizing</h3>
+<p>Let <span class="math inline">\(B\)</span> have independent columns spanning <span class="math inline">\(S\)</span>. The condition on <span class="math inline">\(p=Bc\)</span> in coordinates is <span class="math inline">\(B^HG(x-Bc)=0\)</span>. The Gram matrix is HPD, so <span class="math display">\[
+P_S=B(B^HGB)^{-1}B^HG .
+\]</span> In an orthonormal trial basis <span class="math inline">\(Q\)</span> this becomes <span class="math inline">\(QQ^HG\)</span>, since <span class="math inline">\(Q^HGQ=I\)</span>. The inverse in the formula denotes a solve. Geometrically <span class="math inline">\(S^\perp\)</span> selects the minimum-length representative in every class <span class="math inline">\([x]\in V/S\)</span>: write <span class="math inline">\(x=p+r\)</span>, then <span class="math inline">\(x+S=r+S\)</span> and <span class="math inline">\(\|r+s\|^2=\|r\|^2+\|s\|^2\)</span>.</p>
+<p>For the array from A and B, with Euclidean input geometry, a kernel basis matrix is <span class="math display">\[
+N=\begin{pmatrix}-2&amp;-4\\1&amp;0\\0&amp;-1\\0&amp;1\end{pmatrix},\qquad
+N^TN=\begin{pmatrix}5&amp;8\\8&amp;18\end{pmatrix}.
+\]</span> For <span class="math inline">\(x=e_1\)</span>, solve <span class="math inline">\((N^TN)c=N^Te_1=(-2,-4)^T\)</span> to get <span class="math inline">\(c=(-2,-2)^T/13\)</span>. The orthogonal kernel component is <span class="math inline">\((12,-2,2,-2)^T/13\)</span>. Subtracting it gives <span class="math inline">\((1,2,-2,2)^T/13\)</span>, the minimum-length input with the same data as <span class="math inline">\(e_1\)</span>. The RREF complement <span class="math inline">\(\operatorname{span}(e_1,e_3)\)</span> instead selects <span class="math inline">\(e_1\)</span> itself. Both choices explain the reading; only the perpendicular one minimizes Euclidean input norm.</p>
+</section>
+<section id="four-subspaces-and-one-closure" class="level3">
+<h3 class="anchored" data-anchor-id="four-subspaces-and-one-closure">Four subspaces and one closure</h3>
+<p>Test <span class="math inline">\(y\)</span> on all <span class="math inline">\(Tx\)</span>. Then <span class="math inline">\(T^*y=0\)</span> iff <span class="math inline">\(y\perp\operatorname{im}T\)</span>. Apply the same argument to <span class="math inline">\(T^*\)</span> and use <span class="math inline">\((T^*)^*=T\)</span>. Taking double perpendiculars in finite dimension gives all four identities: <span class="math display">\[
+\begin{aligned}
+\ker T^*&amp;=(\operatorname{im}T)^\perp,&amp;
+\ker T&amp;=(\operatorname{im}T^*)^\perp,\\
+\operatorname{im}T^*&amp;=(\ker T)^\perp,&amp;
+\operatorname{im}T&amp;=(\ker T^*)^\perp .
+\end{aligned}
+\]</span> For example <span class="math inline">\(R_V(\operatorname{im}T^*)=\operatorname{im}T^\vee=(\ker T)^0\)</span> by the Riesz square. This recovers Module B’s input measurement criterion in geometric form.</p>
+<p>For a bounded operator between Hilbert spaces the first line remains exact; the images on the left of the second line acquire closures. The projection theorem in a Hilbert space applies to <strong>closed</strong> subspaces and yields <span class="math inline">\(S^{\perp\perp}=\overline S\)</span>. For example <span class="math inline">\((Tx)_j=x_j/j\)</span> on real <span class="math inline">\(\ell^2\)</span> has trivial kernel, is self-adjoint by termwise pairing, and its range contains every finite sequence. Yet <span class="math inline">\((1/j)_{j\ge1}\)</span> has no square-summable preimage. Its distance to the image is zero by truncation without a closest image point. Completeness of the ambient space alone cannot make this range closed.</p>
+<p><strong>Checkpoint.</strong> The projection <span class="math inline">\(P(x,y)=(x-y,0)\)</span> fixes the horizontal axis. Its kernel is the diagonal line. Can it minimize Euclidean distance to the axis for all inputs? Test <span class="math inline">\(e_2\)</span>. Then identify an inner product in which this decomposition <em>is</em> orthogonal by declaring its two spanning directions orthonormal.</p>
+</section>
+</section>
+<section id="session-6-which-transformations-respect-the-geometry" class="level2" data-number="20.6">
+<h2 data-number="20.6" class="anchored" data-anchor-id="session-6-which-transformations-respect-the-geometry"><span class="header-section-number">20.6</span> Session 6 — Which transformations respect the geometry?</h2>
+<p>For an endomorphism <span class="math inline">\(H\)</span>, the following definitions refer to the selected inner product.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>Defining identity</th>
+<th>Geometric consequence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Self-adjoint</td>
+<td><span class="math inline">\(H^*=H\)</span></td>
+<td>The operator may pass between arguments without changing the pairing</td>
+</tr>
+<tr class="even">
+<td>Skew-adjoint</td>
+<td><span class="math inline">\(H^*=-H\)</span></td>
+<td><span class="math inline">\(\operatorname{Re}\langle Hx,x\rangle=0\)</span></td>
+</tr>
+<tr class="odd">
+<td>Normal</td>
+<td><span class="math inline">\(H^*H=HH^*\)</span></td>
+<td><span class="math inline">\(\|Hx\|=\|H^*x\|\)</span> for all <span class="math inline">\(x\)</span></td>
+</tr>
+<tr class="even">
+<td>Unitary (orthogonal over <span class="math inline">\(\mathbb R\)</span>)</td>
+<td><span class="math inline">\(H^*H=HH^*=I\)</span></td>
+<td>Pairings, hence lengths and distances, are preserved</td>
+</tr>
+<tr class="odd">
+<td>Positive semidefinite</td>
+<td>Self-adjoint and <span class="math inline">\(\langle Hx,x\rangle\ge0\)</span></td>
+<td>Quadratic energy may vanish on nonzero directions</td>
+</tr>
+<tr class="even">
+<td>Positive definite</td>
+<td>Self-adjoint and <span class="math inline">\(\langle Hx,x\rangle&gt;0\)</span> for <span class="math inline">\(x\ne0\)</span></td>
+<td><span class="math inline">\(\langle Hx,y\rangle\)</span> defines a new inner product</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why does self-adjointness constrain eigenvectors?</strong> If <span class="math inline">\(Hv=\lambda v\)</span> with <span class="math inline">\(v\ne0\)</span>, <span class="math inline">\(\lambda\|v\|^2=\langle Hv,v\rangle=\langle v,Hv\rangle=\bar\lambda\|v\|^2\)</span>, so <span class="math inline">\(\lambda\)</span> is real. For <span class="math inline">\(Hw=\mu w\)</span>, the same calculation yields <span class="math inline">\((\lambda-\bar\mu)\langle v,w\rangle=0\)</span>. Distinct eigenvalues force perpendicular eigenvectors. If <span class="math inline">\(U\)</span> is invariant and <span class="math inline">\(z\perp U\)</span>, then <span class="math inline">\(\langle Hz,u\rangle=\langle z,Hu\rangle=0\)</span> for <span class="math inline">\(u\in U\)</span>, hence <span class="math inline">\(U^\perp\)</span> is invariant too. An invariant subspace and its orthogonal complement therefore give a block diagonal decomposition.</p>
+<p><strong>Why is there an entire orthonormal eigenbasis?</strong> On a nonzero finite-dimensional real or complex space the real function <span class="math inline">\(\langle Hx,x\rangle\)</span> attains a maximum <span class="math inline">\(\lambda\)</span> on the compact unit sphere. At a maximizer <span class="math inline">\(v\)</span> consider the quotient <span class="math inline">\(\rho(v+tw)=\langle H(v+tw),v+tw\rangle/\|v+tw\|^2\)</span> for real <span class="math inline">\(t\)</span>. Its derivative at zero is <span class="math inline">\(2\operatorname{Re}\langle Hv-\lambda v,w\rangle\)</span>. This must vanish for every <span class="math inline">\(w\)</span>; in particular take <span class="math inline">\(w=Hv-\lambda v\)</span> to obtain an eigenvector equation. Restrict to <span class="math inline">\(v^\perp\)</span>, which is invariant and whose restriction is again self-adjoint. Induction on dimension yields the finite-dimensional spectral theorem. This proof links spectral decomposition to optimization; Module D develops the consequences.</p>
+<p>In that basis, if <span class="math inline">\(x=\sum c_i v_i\ne0\)</span>, <span class="math display">\[
+\rho_H(x)=\frac{\sum_i\lambda_i|c_i|^2}{\sum_i|c_i|^2}
+\in[\lambda_{\min},\lambda_{\max}].
+\]</span> The Rayleigh quotient is the coefficient of the best approximation to <span class="math inline">\(Hx\)</span> along <span class="math inline">\(x\)</span>. It measures directional energy per squared unit length. The weighted-average identity proves that a Hermitian matrix is positive definite precisely when all eigenvalues are positive, and semidefinite when all are nonnegative. Invertibility alone only excludes zero. For instance <span class="math inline">\(\operatorname{diag}(1,-1)\)</span> is invertible and indefinite.</p>
+<section id="two-sources-of-positive-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="two-sources-of-positive-matrices">Two sources of positive matrices</h3>
+<p>For a linear <span class="math inline">\(T\)</span> between possibly different spaces, <span class="math inline">\(T^*T\)</span> is self-adjoint by the composition rule and <span class="math inline">\(\langle T^*Tx,x\rangle=\|Tx\|^2\ge0\)</span>. This proves <span class="math inline">\(\ker(T^*T)=\ker T\)</span>: one inclusion follows by applying <span class="math inline">\(T^*\)</span> to zero, the reverse by testing the quadratic form. It is positive definite precisely when <span class="math inline">\(T\)</span> is injective. Likewise <span class="math inline">\(TT^*\)</span> is positive definite precisely when <span class="math inline">\(T\)</span> is onto in finite dimension. These facts determine whether normal equations have a unique solution.</p>
+<p>A Hermitian positive definite matrix admits a <strong>Cholesky factorization</strong> <span class="math inline">\(G=LL^H\)</span> with lower triangular <span class="math inline">\(L\)</span> of positive real diagonal. For existence take the positive square root from an orthonormal eigenbasis and factor <span class="math inline">\(G^{1/2}=QR\)</span> by QR with positive diagonal. Then <span class="math inline">\(G=R^HR\)</span>, so <span class="math inline">\(L=R^H\)</span>. Computational Cholesky obtains the triangular factor directly by matching columns, without an eigensolve. In Session 1, <span class="math display">\[
+G=\begin{pmatrix}\sqrt2&amp;0\\1/\sqrt2&amp;\sqrt{3/2}\end{pmatrix}
+\begin{pmatrix}\sqrt2&amp;1/\sqrt2\\0&amp;\sqrt{3/2}\end{pmatrix}.
+\]</span> Thus <span class="math inline">\(\|x\|_G=\|L^Hx\|_2\)</span>, and a solve with <span class="math inline">\(G\)</span> reduces to two triangular solves. The transformation <span class="math inline">\(x\mapsto L^Hx\)</span> sends the weighted ellipse to a Euclidean circle.</p>
+<p>Finally take <span class="math inline">\(M=\operatorname{diag}(2,1)\)</span> and <span class="math inline">\(K=\left(\begin{smallmatrix}2&amp;1\\1&amp;2\end{smallmatrix}\right)\)</span>. The operator <span class="math inline">\(H=M^{-1}K=\left(\begin{smallmatrix}1&amp;1/2\\1&amp;2\end{smallmatrix}\right)\)</span> satisfies <span class="math inline">\(MH=K=H^HM\)</span>. It is self-adjoint in <span class="math inline">\(M\)</span> even though its standard-coordinate matrix is nonsymmetric. Its quadratic energy there is <span class="math inline">\(x^HKx\)</span>. Changing the geometry can reveal a symmetry obscured by looking only at the entries of <span class="math inline">\(H\)</span>.</p>
+<p><strong>Checkpoint.</strong> For the last example, which object is an operator and which records a form on two vectors? Under a basis change <span class="math inline">\(P\)</span>, <span class="math inline">\(H\)</span> changes by similarity and <span class="math inline">\(K\)</span> by congruence. Verify that the identity <span class="math inline">\(MH=K\)</span> is preserved.</p>
+</section>
+</section>
+<section id="session-7-when-the-equations-disagree-what-exactly-should-be-minimized" class="level2" data-number="20.7">
+<h2 data-number="20.7" class="anchored" data-anchor-id="session-7-when-the-equations-disagree-what-exactly-should-be-minimized"><span class="header-section-number">20.7</span> Session 7 — When the equations disagree, what exactly should be minimized?</h2>
+<p>Return to the sensors. The possible outputs form a subspace <span class="math inline">\(I=\operatorname{im}A\)</span>. In Euclidean output geometry, the unique closest reading is <span class="math inline">\(\hat b=P_I b\)</span>. Every input satisfying <span class="math inline">\(Ax=\hat b\)</span> is a least-squares minimizer. Thus an answer always exists in finite dimensions, but a unique <strong>fitted output</strong> need not come from a unique <strong>input</strong>.</p>
+<div id="thm-ip-ls" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 20.5</strong></span> <strong>Normal equations and the minimum-norm solution.</strong> The minimizers of <span class="math inline">\(\|Ax-b\|_2\)</span> are exactly the solutions of <span class="math inline">\(A^HAx=A^Hb\)</span>. They form <span class="math inline">\(x_0+\ker A\)</span>. Exactly one lies in <span class="math inline">\((\ker A)^\perp\)</span>, and it is the unique minimizer of input norm among all least-squares minimizers.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>By orthogonal projection the fitted output is characterized by <span class="math inline">\(b-Ax\perp\operatorname{im}A\)</span>, equivalently <span class="math inline">\(A^H(b-Ax)=0\)</span>. Conversely this condition gives a global minimum by Pythagoras. Fix one preimage of the projection; all others differ by a kernel vector. Resolve this preimage into its perpendicular and kernel components. Dropping the kernel component leaves its fitted data unchanged. Any kernel addition to the perpendicular representative increases its squared norm by the squared norm of that addition.</p>
+</div>
+<p>For a calculus derivation let <span class="math inline">\(J(x)=\|Ax-b\|^2\)</span> and perturb by <span class="math inline">\(th\)</span> for real <span class="math inline">\(t\)</span>. Expansion gives <span class="math display">\[
+J(x+th)-J(x)=2t\operatorname{Re}\big(h^HA^H(Ax-b)\big)+t^2\|Ah\|^2 .
+\]</span> Stationarity for every <span class="math inline">\(h\)</span>, in particular <span class="math inline">\(h=A^H(Ax-b)\)</span>, gives the normal equations even for complex variables. Conversely at a stationary point the remaining term is nonnegative in every direction. Full column rank makes the minimizer unique, including for inconsistent data. A small residual alone need not imply small input error: for <span class="math inline">\(A=\operatorname{diag}(1,\epsilon)\)</span> an error of one in the second setting changes the residual by only <span class="math inline">\(|\epsilon|\)</span>.</p>
+<section id="a-complete-inverse-problem-with-two-projections" class="level3">
+<h3 class="anchored" data-anchor-id="a-complete-inverse-problem-with-two-projections">A complete inverse problem with two projections</h3>
+<p>Use the original sensor array <span class="math display">\[
+A=\begin{pmatrix}1&amp;2&amp;-1&amp;3\\2&amp;4&amp;1&amp;9\\3&amp;6&amp;0&amp;12\end{pmatrix},\quad
+n=(-1,-1,1)^T,\quad b=(1,2,4)^T .
+\]</span> Its columns span the plane <span class="math inline">\(n^Ty=0\)</span> (the first and third are independent). Since <span class="math inline">\(n^Tb=1\)</span>, projection gives <span class="math inline">\(\hat b=b-n/3=(4,7,11)^T/3\)</span>, with residual <span class="math inline">\(n/3\)</span>. Now seek a preimage supported in coordinates 1 and 3. Those columns are <span class="math inline">\((1,2,3)^T\)</span> and <span class="math inline">\((-1,1,0)^T\)</span>; matching the third and first readings gives <span class="math inline">\(x_0=(11,0,-1,0)^T/9\)</span>. The entire family is <span class="math inline">\(x_0+Nz\)</span>, with <span class="math inline">\(N\)</span> from Session 5. Its minimum-norm member is <span class="math display">\[
+x^\dagger=(I-P_{\ker A})x_0,\qquad
+P_{\ker A}=N(N^TN)^{-1}N^T .
+\]</span> The output residual lies in <span class="math inline">\(\ker A^T\)</span>; the selected input lies in <span class="math inline">\(\operatorname{im}A^T\)</span>. These perpendicularity conditions live in different spaces. With compatible <span class="math inline">\(b=(1,2,3)^T\)</span> the first projection is the identity on <span class="math inline">\(b\)</span> and the second still changes <span class="math inline">\(e_1\)</span> to the shorter representative from Session 5. Experiment G computes both the singular-case family and the exact minimum-norm answer.</p>
+<p>The resulting map <span class="math inline">\(b\mapsto x^\dagger\)</span> is the <strong>Moore–Penrose pseudoinverse</strong> <span class="math inline">\(A^\dagger\)</span>: project onto the image and invert <span class="math inline">\(A\)</span> restricted to <span class="math inline">\((\ker A)^\perp\)</span>. This restriction is bijective onto the image by the decomposition theorem. Hence <span class="math inline">\(AA^\dagger=P_{\operatorname{im}A}\)</span> and <span class="math inline">\(A^\dagger A=P_{(\ker A)^\perp}\)</span>. Their self-adjointness and their action on the two subspaces also give <span class="math inline">\(AA^\dagger A=A\)</span> and <span class="math inline">\(A^\dagger AA^\dagger=A^\dagger\)</span>. With a compact singular value decomposition <span class="math inline">\(A=U_r\Sigma_r V_r^H\)</span> (orthonormal columns, positive singular values), <span class="math inline">\(A^\dagger=V_r\Sigma_r^{-1}U_r^H\)</span>: read the attainable components, undo their stretch and reconstruct with no kernel component.</p>
+</section>
+<section id="why-the-equations-we-derive-can-differ-from-the-algorithm-we-run" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-equations-we-derive-can-differ-from-the-algorithm-we-run">Why the equations we derive can differ from the algorithm we run</h3>
+<p>For full column rank thin QR, <span class="math inline">\(A=QR\)</span> gives <span class="math inline">\(R x=Q^Hb\)</span>, since <span class="math inline">\(QQ^Hb\)</span> is the fitted output. For example take columns <span class="math inline">\((1,1,0)^T\)</span> and <span class="math inline">\((0,0,1)^T\)</span> and <span class="math inline">\(b=(1,3,2)^T\)</span>. Normalizing the columns gives <span class="math inline">\(R=\operatorname{diag}(\sqrt2,1)\)</span>, <span class="math inline">\(Q^Hb=(4/\sqrt2,2)^T\)</span>, hence <span class="math inline">\(x=(2,2)^T\)</span>. The fitted output <span class="math inline">\((2,2,2)^T\)</span> and residual <span class="math inline">\((-1,1,0)^T\)</span> are perpendicular; both measurements on the residual vanish. The same matrix with <span class="math inline">\(b=(1,1,2)^T\)</span> fits exactly.</p>
+<p>For full column rank the extreme eigenvalues of <span class="math inline">\(A^HA\)</span> are <span class="math inline">\(\sigma_{\max}^2,\sigma_{\min}^2\)</span>, so <span class="math inline">\(\kappa_2(A^HA)=\kappa_2(A)^2\)</span>. Forming the Gram matrix can lose information about nearly parallel columns; explicitly inverting it introduces unnecessary work. Solving normal equations with Cholesky can be efficient for a well-conditioned tall matrix. QR avoids forming the Gram matrix. SVD exposes small stretches and permits a numerical rank decision for nearly singular problems. Thresholding singular values changes which directions count as resolved. In Experiment F we compare <em>coefficient error</em> as well as residual size, which can conceal the difference.</p>
+</section>
+<section id="what-if-different-sensors-have-different-costs" class="level3">
+<h3 class="anchored" data-anchor-id="what-if-different-sensors-have-different-costs">What if different sensors have different costs?</h3>
+<p>For HPD output weight <span class="math inline">\(W\)</span>, minimize <span class="math inline">\((Ax-b)^HW(Ax-b)\)</span>. Repeating the perpendicularity argument in that geometry gives <span class="math inline">\(A^HWAx=A^HWb\)</span>. Equivalently solve ordinary least squares for <span class="math inline">\(L^HAx\approx L^Hb\)</span> where <span class="math inline">\(W=LL^H\)</span>. An input weight <span class="math inline">\(G\)</span> changes the adjoint to <span class="math inline">\(G^{-1}A^HW\)</span>. It cancels from the stationarity equations but changes minimum-input-norm selection when there is a kernel. For the sensor plane, the residual now runs along the Riesz representative <span class="math inline">\(W^{-1}n\)</span>, and <span class="math display">\[
+\hat b_W=b-W^{-1}n\,\frac{n^Tb}{n^TW^{-1}n}.
+\]</span> For <span class="math inline">\(W=\operatorname{diag}(1,1,4)\)</span> this gives residual <span class="math inline">\((-4,-4,1)^T/9\)</span>; the expensive third reading is adjusted by <span class="math inline">\(1/9\)</span> instead of <span class="math inline">\(1/3\)</span>. The original compatibility functional <span class="math inline">\(n^T\)</span> is exactly the same.</p>
+<p><strong>Checkpoint.</strong> For which <span class="math inline">\(b\)</span> does changing <span class="math inline">\(W\)</span> leave the optimal residual exactly zero? Precisely the attainable <span class="math inline">\(b\)</span>: every positive definite norm vanishes only on the zero residual.</p>
+</section>
+</section>
+<section id="session-8-how-can-a-differential-equation-ask-for-a-closest-point" class="level2" data-number="20.8">
+<h2 data-number="20.8" class="anchored" data-anchor-id="session-8-how-can-a-differential-equation-ask-for-a-closest-point"><span class="header-section-number">20.8</span> Session 8 — How can a differential equation ask for a closest point?</h2>
+<p>Consider the real boundary-value problem <span class="math inline">\(-u''=f\)</span> on <span class="math inline">\((0,1)\)</span> with <span class="math inline">\(u(0)=u(1)=0\)</span>. A piecewise linear trial function has jumps in slope and generally no classical second derivative at the mesh nodes. Can we still test whether it approximately solves the equation? Multiply a smooth solution’s equation by a test function <span class="math inline">\(v\)</span> vanishing at both endpoints and integrate by parts: <span class="math display">\[
+\int_0^1 -u''v=-[u'v]_0^1+\int_0^1u'v'=\int_0^1 f v .
+\]</span> After this step only first derivatives occur. Let <span class="math inline">\(V=H_0^1(0,1)\)</span>. On this interval its elements have absolutely continuous representatives, endpoint values zero and square-integrable first derivative. Equivalently it is the completion of smooth compactly supported tests in the norm <span class="math inline">\((\|v\|_{L^2}^2+\|v'\|_{L^2}^2)^{1/2}\)</span>. A weak derivative <span class="math inline">\(g\)</span> satisfies <span class="math inline">\(\int v\varphi'=-\int g\varphi\)</span> for all smooth compactly supported <span class="math inline">\(\varphi\)</span>. Continuous piecewise linear hats have the piecewise constant slopes as weak derivatives because interior endpoint terms cancel.</p>
+<p>Set <span class="math inline">\(a(u,v)=\int u'v'\)</span>, <span class="math inline">\(m(u,v)=\int uv\)</span> and <span class="math inline">\(F(v)=\int fv\)</span>, with all integrals over <span class="math inline">\([0,1]\)</span>. The mass product <span class="math inline">\(m\)</span> measures amplitudes; the energy form <span class="math inline">\(a\)</span> measures slopes. If <span class="math inline">\(a(v,v)=0\)</span>, then <span class="math inline">\(v\)</span> is constant and its zero boundary value forces zero. More quantitatively, <span class="math display">\[
+|v(t)|=\left|\int_0^t v'(s)\,ds\right|\le\sqrt t\,\|v'\|_{L^2},
+\qquad \|v\|_{L^2}\le \|v'\|_{L^2}/\sqrt2.
+\]</span> This Poincaré bound (sharpness is unnecessary) makes <span class="math inline">\(\|v\|_a=\|v'\|_{L^2}\)</span> equivalent to the complete <span class="math inline">\(H^1\)</span> norm on <span class="math inline">\(V\)</span>. Thus <span class="math inline">\(V\)</span> is Hilbert in the energy geometry. For <span class="math inline">\(f\in L^2\)</span>, Cauchy–Schwarz and Poincaré give <span class="math inline">\(|F(v)|\le\|f\|_{L^2}\|v\|_a/\sqrt2\)</span>. Hilbert-space Riesz representation of this <strong>continuous</strong> functional provides a unique <span class="math inline">\(u\in V\)</span> with <span class="math inline">\(a(u,v)=F(v)\)</span> for every <span class="math inline">\(v\)</span>. This is the weak solution; smoothness sufficient to recover the classical differential equation is a separate question. Lax–Milgram extends the existence argument to bounded coercive forms, including nonsymmetric real forms for which exact orthogonal projection need not hold.</p>
+<section id="a-mesh-with-two-unknowns" class="level3">
+<h3 class="anchored" data-anchor-id="a-mesh-with-two-unknowns">A mesh with two unknowns</h3>
+<p>On nodes <span class="math inline">\(0,1/3,2/3,1\)</span> use the two interior hats <span class="math inline">\(\phi_i\)</span> with value one at node <span class="math inline">\(i\)</span>, zero at the other nodes and linear on each element. The trial space <span class="math inline">\(V_h\)</span> is their span; the test space is also <span class="math inline">\(V_h\)</span>. Seek <span class="math inline">\(u_h=\sum_j c_j\phi_j\)</span> satisfying <span class="math inline">\(a(u_h,\phi_i)=F(\phi_i)\)</span> for every test index. Thus <span class="math inline">\(K_{ij}=a(\phi_j,\phi_i)\)</span> and <span class="math inline">\(b_i=F(\phi_i)\)</span>. On an element of length <span class="math inline">\(h\)</span>, the two slopes are <span class="math inline">\(-1/h,1/h\)</span>, so the local stiffness is <span class="math inline">\(\frac1h\left(\begin{smallmatrix}1&amp;-1\\-1&amp;1\end{smallmatrix}\right)\)</span>. For <span class="math inline">\(f=1\)</span> each adjacent half-hat contributes <span class="math inline">\(h/2\)</span> to the load. Adding adjacent contributions, with endpoint unknowns removed, gives <span class="math display">\[
+K=3\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix},\qquad
+b=\tfrac13\binom11,\qquad c=\tfrac19\binom11 .
+\]</span> This is a Gram matrix in the energy product: <span class="math inline">\(c^TKc=\|\sum_j c_j\phi_j\|_a^2&gt;0\)</span> for nonzero <span class="math inline">\(c\)</span> by linear independence. The exact solution <span class="math inline">\(u(t)=t(1-t)/2\)</span> happens to match the nodal values. Its nonzero curvature between nodes ensures that the approximate function still has nonzero energy error.</p>
+<p><strong>Galerkin orthogonality.</strong> Subtract the discrete and continuous equations for an arbitrary <span class="math inline">\(v_h\in V_h\)</span>. The common right side cancels, giving <span class="math inline">\(a(u-u_h,v_h)=0\)</span>. For any <span class="math inline">\(w_h\in V_h\)</span>, split <span class="math inline">\(u-w_h=(u-u_h)+(u_h-w_h)\)</span> to obtain <span class="math display">\[
+\|u-w_h\|_a^2=\|u-u_h\|_a^2+\|u_h-w_h\|_a^2 .
+\]</span> Thus <span class="math inline">\(u_h\)</span> is exactly the energy-orthogonal projection of <span class="math inline">\(u\)</span>. It can be computed without knowing <span class="math inline">\(u\)</span> because the equation supplies its readings on tests. This reasoning uses a conforming trial space, the same test space and an energy inner product. Orthogonality in <span class="math inline">\(L^2\)</span> would solve a different minimization problem.</p>
+<p>On a mesh element the interpolant’s slope equals the average of <span class="math inline">\(u'\)</span> on that element. Since <span class="math inline">\(u'\)</span> is affine of slope <span class="math inline">\(-1\)</span>, the integrated squared slope error is <span class="math inline">\(h^3/12\)</span>. Moreover the slope error integrates to zero against every constant trial slope, so the interpolant satisfies Galerkin orthogonality and is indeed <span class="math inline">\(u_h\)</span>. On a uniform mesh the total energy error is <span class="math inline">\(h/\sqrt{12}\)</span> even though the nodal error vanishes. This gives a check on the refinement experiment independent of the matrix solver.</p>
+<p><strong>What happens with Neumann data?</strong> For zero imposed endpoint derivatives, tests need not vanish at the endpoints. Constants now lie in the kernel of <span class="math inline">\(a\)</span>. Testing with <span class="math inline">\(v=1\)</span> forces <span class="math inline">\(\int f=0\)</span>. Conversely in one dimension, integrating <span class="math inline">\(u'(t)=-\int_0^t f(s)\,ds\)</span> gives both endpoint derivative conditions precisely when the integral is zero. Integrating again leaves a free constant. On <span class="math inline">\(H^1/\mathbb R\)</span> the derivative form is positive definite and the load descends exactly when it kills constants. Choosing the zero-mean representative fixes a normalization. The null direction from Module A, the compatibility test from B and the geometry from C are three aspects of the same boundary condition.</p>
+<p><strong>Checkpoint.</strong> Can solving <span class="math inline">\(Kc=b\)</span> more accurately remove the between-node slope error? Even an exact solve gives <span class="math inline">\(h/\sqrt{12}\)</span> on this mesh. Enlarging the trial space changes the approximation itself.</p>
+</section>
+</section>
+<section id="session-9-how-does-a-mass-matrix-enter-an-eigenvalue-problem" class="level2" data-number="20.9">
+<h2 data-number="20.9" class="anchored" data-anchor-id="session-9-how-does-a-mass-matrix-enter-an-eigenvalue-problem"><span class="header-section-number">20.9</span> Session 9 — How does a mass matrix enter an eigenvalue problem?</h2>
+<p>A vibration mode must balance restoring energy against mass. In the real weak problem <span class="math inline">\(a(u,v)=\lambda m(u,v)\)</span> for every test <span class="math inline">\(v\)</span>, scale cancels from the ratio <span class="math inline">\(a(u,u)/m(u,u)\)</span>. Testing a finite trial expansion against basis vectors gives <span class="math inline">\(Kx=\lambda Mx\)</span>, with <span class="math inline">\(K_{ij}=a(\phi_j,\phi_i)\)</span> and <span class="math inline">\(M_{ij}=m(\phi_j,\phi_i)\)</span>. Integration of the products of the two linear shape functions gives the local mass matrix <span class="math inline">\(\frac{h}{6}\left(\begin{smallmatrix}2&amp;1\\1&amp;2\end{smallmatrix}\right)\)</span>: the diagonal integrals are <span class="math inline">\(h/3\)</span>, the cross integral <span class="math inline">\(h/6\)</span>. For the previous two-hat mesh, <span class="math display">\[
+M=\tfrac1{18}\begin{pmatrix}4&amp;1\\1&amp;4\end{pmatrix}.
+\]</span> The same shapes therefore produce <strong>two</strong> Gram matrices. The vector <span class="math inline">\((1,1)^T\)</span> has <span class="math inline">\(Kx=3x\)</span> and <span class="math inline">\(Mx=(5/18)x\)</span>, so its vibration eigenvalue is <span class="math inline">\(54/5\)</span>, not the stiffness eigenvalue <span class="math inline">\(3\)</span>. The antisymmetric vector <span class="math inline">\((1,-1)^T\)</span> gives <span class="math inline">\(54\)</span>. Their mass pairing vanishes. The first value approximates <span class="math inline">\(\pi^2\)</span>, the lowest Dirichlet eigenvalue of <span class="math inline">\(-u''\)</span> on the unit interval.</p>
+<section id="a-self-adjoint-operator-behind-a-hermitian-pair" class="level3">
+<h3 class="anchored" data-anchor-id="a-self-adjoint-operator-behind-a-hermitian-pair">A self-adjoint operator behind a Hermitian pair</h3>
+<p>For Hermitian <span class="math inline">\(K\)</span> and HPD <span class="math inline">\(M\)</span>, the operator <span class="math inline">\(T=M^{-1}K\)</span> is <span class="math inline">\(M\)</span>-self-adjoint since <span class="math inline">\(T^HM=MT=K\)</span>. Its Rayleigh quotient is <span class="math display">\[
+\rho_{K,M}(x)=\frac{\langle Tx,x\rangle_M}{\langle x,x\rangle_M}
+=\frac{x^HKx}{x^HMx}.
+\]</span> The spectral theorem in the <span class="math inline">\(M\)</span>-geometry supplies an <span class="math inline">\(M\)</span>-orthonormal eigenbasis and real eigenvalues, even for indefinite <span class="math inline">\(K\)</span>. Alternatively factor <span class="math inline">\(M=LL^H\)</span> and substitute <span class="math inline">\(z=L^Hx\)</span>: <span class="math display">\[
+(L^{-1}KL^{-H})z=\lambda z.
+\]</span> The transformed matrix is Hermitian. Orthonormal <span class="math inline">\(z_i\)</span> map back to <span class="math inline">\(x_i=L^{-H}z_i\)</span> with <span class="math inline">\(x_i^HMx_j=\delta_{ij}\)</span>. Distinct modes obey this orthogonality directly by subtracting the two paired eigenvalue equations. Implement the transformations with triangular solves.</p>
+</section>
+<section id="rayleighritz-asks-fewer-questions-than-the-full-eigenproblem" class="level3">
+<h3 class="anchored" data-anchor-id="rayleighritz-asks-fewer-questions-than-the-full-eigenproblem">Rayleigh–Ritz asks fewer questions than the full eigenproblem</h3>
+<p>If columns of <span class="math inline">\(Q\)</span> form an independent trial basis, choose <span class="math inline">\(x=Qy\ne0\)</span> and require the residual of <span class="math inline">\(Tx-\theta x\)</span> to be <span class="math inline">\(M\)</span>-orthogonal to the trial space. For any test <span class="math inline">\(Qz\)</span> this reads <span class="math display">\[
+0=(Qz)^HM(TQy-\theta Qy)=z^HQ^H(KQy-\theta MQy).
+\]</span> Arbitrary <span class="math inline">\(z\)</span> gives the reduced generalized eigenproblem <span class="math display">\[
+Q^HKQy=\theta Q^HMQy.
+\]</span> The reduced mass is HPD by independence. If <span class="math inline">\(Q^HMQ=I\)</span>, it drops from the right side. With <span class="math inline">\(M=I\)</span> we obtain ordinary Rayleigh–Ritz, or <span class="math inline">\(Q^HKQy=\theta y\)</span> for Euclidean orthonormal <span class="math inline">\(Q\)</span>. Two residuals have distinct coordinate types: <span class="math inline">\(r=Kx-\theta Mx\)</span> is a residual in test readings with <span class="math inline">\(Q^Hr=0\)</span>; <span class="math inline">\(M^{-1}r=Tx-\theta x\)</span> is its vector representative, perpendicular in <span class="math inline">\(M\)</span>. A zero <em>projected</em> residual only says the selected tests cannot detect the remaining defect.</p>
+<p>For one trial column <span class="math inline">\(q=e_1\)</span> on the two-hat mesh the Ritz value is <span class="math inline">\(6/(4/18)=27\)</span>. The residual is <span class="math inline">\((0,-9/2)^T\)</span>: testing the first hat succeeds exactly but testing the other fails. In an <span class="math inline">\(M\)</span>-orthonormal eigenbasis the quotient is a weighted average of the true eigenvalues, so even the single trial value lies in the spectral interval. The smallest Ritz value minimizes the quotient over the trial subspace; enlarging that subspace can only reduce this minimum. The derivative argument in Session 6 restricted to trial perturbations recovers the same reduced equation.</p>
+<p><strong>Bridge to the seminar.</strong> In subspace iteration or a Krylov method a basis can change while the trial space is fixed. Replacing <span class="math inline">\(Q\)</span> by <span class="math inline">\(QP\)</span> with <span class="math inline">\(P\)</span> invertible changes the reduced pair by congruence and gives exactly the same Ritz vectors in the original space after converting coefficients. Filtering by <span class="math inline">\(p(T)\)</span> generally changes the space: each mode’s amplitude is multiplied by <span class="math inline">\(p(\lambda_i)\)</span>, as follows by applying powers of <span class="math inline">\(T\)</span> to an eigenvector. A Chebyshev polynomial can be scaled to stay small on an unwanted spectral interval while growing on a separated target region. After filtering, orthonormalization restores a usable basis and Rayleigh–Ritz reads out approximate eigenpairs. In computation the Gram product, orthogonalization, and independent residual checks cost differently and can lose different amounts of accuracy. Modules D and E build the spectral and numerical arguments on this geometry.</p>
+<p><strong>Checkpoint.</strong> For a full-rank trial basis, a Ritz pair makes <span class="math inline">\(Q^Hr=0\)</span>. When does that force <span class="math inline">\(r=0\)</span>? Certainly when <span class="math inline">\(Q\)</span> spans the entire space; also for the corresponding Ritz vectors when the trial space is invariant under <span class="math inline">\(M^{-1}K\)</span>. Invariance puts the vector residual in the trial space as well as its perpendicular.</p>
+</section>
+</section>
+<section id="computational-laboratory-check-the-geometry-as-well-as-the-equations" class="level2" data-number="20.10">
+<h2 data-number="20.10" class="anchored" data-anchor-id="computational-laboratory-check-the-geometry-as-well-as-the-equations"><span class="header-section-number">20.10</span> Computational laboratory — Check the geometry as well as the equations</h2>
+<p>Use a Python 3 Jupyter kernel with NumPy, SymPy and Matplotlib. Run the cells in document order. Experiments B–E and G use exact arithmetic to check identities. The floating-point experiments report residuals, condition numbers or errors with their mathematical interpretation.</p>
+<section id="a.-weighted-unit-directions" class="level3">
+<h3 class="anchored" data-anchor-id="a.-weighted-unit-directions">A. Weighted unit directions</h3>
+<p><a href="#fig-ip-ellipse" class="quarto-xref">Figure&nbsp;<span>20.1</span></a> was generated by mapping the Euclidean circle through <span class="math inline">\(L^{-H}\)</span>. Check the unit lengths, and predict the largest Euclidean radius by minimizing the quadratic form on the Euclidean unit circle.</p>
+<div id="6dd7f089" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>stretches <span class="op">=</span> np.linalg.eigvalsh(G)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>weighted_lengths_sq <span class="op">=</span> np.<span class="bu">sum</span>(ellipse <span class="op">*</span> (G <span class="op">@</span> ellipse), axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(weighted_lengths_sq, <span class="fl">1.</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Metric eigenvalues:"</span>, stretches)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Euclidean semiaxis lengths:"</span>, <span class="dv">1</span><span class="op">/</span>np.sqrt(stretches))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Pairing of coordinate axes in G:"</span>, G[<span class="dv">0</span>, <span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Metric eigenvalues: [1. 3.]
+Euclidean semiaxis lengths: [1.         0.57735027]
+Pairing of coordinate axes in G: 1.0</code></pre>
+</div>
+</div>
+<p>The eigenvalues are <span class="math inline">\(1,3\)</span> and their reciprocals’ square roots give the radii. The off-diagonal entry is a measured angle term, distinct from either stretch.</p>
+</section>
+<section id="b.-re-encode-the-same-geometry" class="level3">
+<h3 class="anchored" data-anchor-id="b.-re-encode-the-same-geometry">B. Re-encode the same geometry</h3>
+<div id="7ff9aba8" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sympy <span class="im">as</span> sp</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>metric <span class="op">=</span> sp.Matrix([[<span class="dv">2</span>, <span class="dv">1</span>], [<span class="dv">1</span>, <span class="dv">2</span>]])</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>basis <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">1</span>], [<span class="dv">0</span>, <span class="dv">1</span>]])</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>gram <span class="op">=</span> basis.T<span class="op">*</span>metric<span class="op">*</span>basis</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> sp.Matrix([<span class="dv">3</span>, <span class="dv">2</span>])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> basis.inv()<span class="op">*</span>v</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (coords.T<span class="op">*</span>gram<span class="op">*</span>coords)[<span class="dv">0</span>] <span class="op">==</span> (v.T<span class="op">*</span>metric<span class="op">*</span>v)[<span class="dv">0</span>]</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"New Gram matrix:"</span>, gram.tolist(), <span class="st">"coordinates:"</span>, <span class="bu">list</span>(coords))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Squared physical length:"</span>, (v.T<span class="op">*</span>metric<span class="op">*</span>v)[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>New Gram matrix: [[2, 3], [3, 6]] coordinates: [1, 2]
+Squared physical length: 38</code></pre>
+</div>
+</div>
+<p>Congruence preserves the quadratic value on the same physical vector. Reusing the old matrix with new coordinates would compute a different value.</p>
+</section>
+<section id="c.-represent-one-complex-measurement-in-two-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="c.-represent-one-complex-measurement-in-two-metrics">C. Represent one complex measurement in two metrics</h3>
+<div id="91387d29" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> sp.Matrix([<span class="dv">1</span>, sp.I])</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>complex_metric <span class="op">=</span> sp.Matrix([[<span class="dv">2</span>, sp.I], [<span class="op">-</span>sp.I, <span class="dv">2</span>]])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> weight <span class="kw">in</span> [sp.eye(<span class="dv">2</span>), complex_metric]:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    representative <span class="op">=</span> weight.inv()<span class="op">*</span>c.conjugate()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> representative.H<span class="op">*</span>weight <span class="op">==</span> c.T</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Representative:"</span>, <span class="bu">list</span>(representative),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>          <span class="st">"squared dual norm:"</span>, (representative.H<span class="op">*</span>weight<span class="op">*</span>representative)[<span class="dv">0</span>].simplify())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Representative: [1, -I] squared dual norm: 2
+Representative: [1/3, -I/3] squared dual norm: 2/3</code></pre>
+</div>
+</div>
+<p>The second matrix is HPD (leading minors <span class="math inline">\(2,3\)</span>). Equality of rows proves equality on all inputs. Compare each reported norm with the supremum on that metric’s unit ball.</p>
+</section>
+<section id="d.-pull-back-through-different-domain-and-codomain-geometries" class="level3">
+<h3 class="anchored" data-anchor-id="d.-pull-back-through-different-domain-and-codomain-geometries">D. Pull back through different domain and codomain geometries</h3>
+<div id="ae153f38" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>domain <span class="op">=</span> sp.diag(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> metric</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>adj <span class="op">=</span> domain.inv()<span class="op">*</span>A.T<span class="op">*</span>target</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> adj.T<span class="op">*</span>domain <span class="op">==</span> target<span class="op">*</span>A</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> u, y <span class="kw">in</span> [(sp.Matrix([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]), sp.Matrix([<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>])),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>             (sp.Matrix([<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>]), sp.Matrix([<span class="dv">3</span>, <span class="dv">0</span>]))]:</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> (y.T<span class="op">*</span>target<span class="op">*</span>A<span class="op">*</span>u)[<span class="dv">0</span>] <span class="op">==</span> ((adj<span class="op">*</span>y).T<span class="op">*</span>domain<span class="op">*</span>u)[<span class="dv">0</span>]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Weighted adjoint:"</span>, adj.tolist())</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Transpose:"</span>, A.T.tolist())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Weighted adjoint: [[2, 1], [5/2, 2], [1/3, 2/3]]
+Transpose: [[1, 0], [2, 1], [0, 1]]</code></pre>
+</div>
+</div>
+<p>The first assertion checks the identity for all inputs and output directions. The two numerical substitutions also illustrate the order of applications for a rectangular map.</p>
+</section>
+<section id="e.-two-projections-onto-the-same-plane" class="level3">
+<h3 class="anchored" data-anchor-id="e.-two-projections-onto-the-same-plane">E. Two projections onto the same plane</h3>
+<div id="fb3a17aa" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plane <span class="op">=</span> sp.eye(<span class="dv">3</span>)[:, :<span class="dv">2</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>Porth <span class="op">=</span> plane<span class="op">*</span>(plane.T<span class="op">*</span>plane).inv()<span class="op">*</span>plane.T</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>Poblique <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>v3 <span class="op">=</span> sp.Matrix([<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> projector <span class="kw">in</span> [Porth, Poblique]:</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> projector<span class="op">**</span><span class="dv">2</span> <span class="op">==</span> projector <span class="kw">and</span> projector<span class="op">*</span>plane <span class="op">==</span> plane</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    residual <span class="op">=</span> v3<span class="op">-</span>projector<span class="op">*</span>v3</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Point:"</span>, <span class="bu">list</span>(projector<span class="op">*</span>v3), <span class="st">"squared distance:"</span>, residual.dot(residual),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>          <span class="st">"residual readings on plane:"</span>, <span class="bu">list</span>(plane.T<span class="op">*</span>residual))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Point: [2, 1, 0] squared distance: 4 residual readings on plane: [0, 0]
+Point: [0, 1, 0] squared distance: 8 residual readings on plane: [2, 0]</code></pre>
+</div>
+</div>
+<p>Both maps fix the plane. At this input the squared distances are <span class="math inline">\(4\)</span> and <span class="math inline">\(8\)</span>. The second rule discards direction <span class="math inline">\((1,0,1)^T\)</span>; only the first residual has zero pairing with both plane basis vectors.</p>
+<p>In <a href="#fig-ip-foot" class="quarto-xref">Figure&nbsp;<span>20.2</span></a> we intersect the plane with the slice <span class="math inline">\(y=1\)</span> through the input. The plane appears edge-on. Its perpendicular direction is vertical in this slice; the discarded oblique direction has equal horizontal and vertical components. The extra squared distance is the squared separation of the two feet.</p>
+<div id="cell-fig-ip-foot" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div id="fig-ip-foot" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ip-foot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="c03_files/figure-html/fig-ip-foot-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ip-foot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.2: Cross-section of the two projections at y = 1. Distances are drawn at equal scale.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="f.-compare-normal-equations-qr-and-svd" class="level3">
+<h3 class="anchored" data-anchor-id="f.-compare-normal-equations-qr-and-svd">F. Compare normal equations, QR and SVD</h3>
+<div id="210da6f3" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compare_solvers(design, rhs, reference):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    Q, R <span class="op">=</span> np.linalg.qr(design, mode<span class="op">=</span><span class="st">"reduced"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    estimates <span class="op">=</span> {<span class="st">"QR"</span>: np.linalg.solve(R, Q.T <span class="op">@</span> rhs),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"SVD"</span>: np.linalg.pinv(design) <span class="op">@</span> rhs}</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        estimates[<span class="st">"normal"</span>] <span class="op">=</span> np.linalg.solve(design.T <span class="op">@</span> design, design.T <span class="op">@</span> rhs)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> np.linalg.LinAlgError:</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Rounded normal matrix is singular."</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"cond(A) = </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>cond(design)<span class="sc">:.3e}</span><span class="ss">"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> method, estimate <span class="kw">in</span> estimates.items():</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        err <span class="op">=</span> np.linalg.norm(estimate<span class="op">-</span>reference)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> np.linalg.norm(design <span class="op">@</span> estimate<span class="op">-</span>rhs)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>method<span class="sc">:6s}</span><span class="ss">  coefficient error </span><span class="sc">{</span>err<span class="sc">:.3e}</span><span class="ss">   residual </span><span class="sc">{</span>res<span class="sc">:.3e}</span><span class="ss">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>design <span class="op">=</span> np.array([[<span class="fl">1.</span>, <span class="fl">0.</span>], [<span class="fl">1.</span>, <span class="fl">0.</span>], [<span class="fl">0.</span>, <span class="fl">1.</span>]])</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>compare_solvers(design, np.array([<span class="fl">1.</span>, <span class="fl">3.</span>, <span class="fl">2.</span>]), np.array([<span class="fl">2.</span>, <span class="fl">2.</span>]))</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>, <span class="dv">40</span>)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>near <span class="op">=</span> np.column_stack((np.ones_like(t), <span class="fl">1.</span><span class="op">+</span><span class="fl">1e-6</span><span class="op">*</span>t))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>reference <span class="op">=</span> np.array([<span class="fl">1.</span>, <span class="op">-</span><span class="fl">1.</span>])</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>compare_solvers(near, near <span class="op">@</span> reference, reference)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>cond(A) = 1.414e+00
+QR      coefficient error 2.220e-16   residual 1.414e+00
+SVD     coefficient error 6.661e-16   residual 1.414e+00
+normal  coefficient error 0.000e+00   residual 1.414e+00
+cond(A) = 3.379e+06
+QR      coefficient error 3.366e-11   residual 0.000e+00
+SVD     coefficient error 3.366e-11   residual 4.965e-16
+normal  coefficient error 9.094e-04   residual 2.408e-09</code></pre>
+</div>
+</div>
+<p>For the first problem all three methods should attain residual <span class="math inline">\(\sqrt2\)</span>, which is forced by the data. The second problem uses nearly parallel columns and consistent constructed data. The response along <span class="math inline">\((1,-1)^T\)</span> is tiny. Compare the absolute coefficient errors even if all residuals appear small. Last digits can vary by platform; the predicted vulnerability is squaring the singular-value ratio in the normal system.</p>
+</section>
+<section id="g.-select-the-minimum-norm-input-for-incompatible-data" class="level3">
+<h3 class="anchored" data-anchor-id="g.-select-the-minimum-norm-input-for-incompatible-data">G. Select the minimum-norm input for incompatible data</h3>
+<div id="5c91c46a" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sensor <span class="op">=</span> sp.Matrix([[<span class="dv">1</span>, <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">3</span>], [<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">9</span>], [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">0</span>, <span class="dv">12</span>]])</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> sp.Matrix.hstack(<span class="op">*</span>sensor.nullspace())</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>bad <span class="op">=</span> sp.Matrix([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> sp.Matrix([<span class="dv">11</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>])<span class="op">/</span><span class="dv">9</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>Pk <span class="op">=</span> N<span class="op">*</span>(N.T<span class="op">*</span>N).inv()<span class="op">*</span>N.T</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>xmin <span class="op">=</span> sensor.pinv()<span class="op">*</span>bad</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> xmin <span class="op">==</span> (sp.eye(<span class="dv">4</span>)<span class="op">-</span>Pk)<span class="op">*</span>x0</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> N.T<span class="op">*</span>xmin <span class="op">==</span> sp.zeros(<span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> sensor.T<span class="op">*</span>(bad<span class="op">-</span>sensor<span class="op">*</span>xmin) <span class="op">==</span> sp.zeros(<span class="dv">4</span>, <span class="dv">1</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> sp.Matrix(sp.symbols(<span class="st">"s t"</span>))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (sensor<span class="op">*</span>(xmin<span class="op">+</span>N<span class="op">*</span>z)<span class="op">-</span>sensor<span class="op">*</span>xmin).applyfunc(sp.simplify) <span class="op">==</span> sp.zeros(<span class="dv">3</span>, <span class="dv">1</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Minimum-norm input:"</span>, <span class="bu">list</span>(xmin))</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Fitted data:"</span>, <span class="bu">list</span>(sensor<span class="op">*</span>xmin), <span class="st">"residual:"</span>, <span class="bu">list</span>(bad<span class="op">-</span>sensor<span class="op">*</span>xmin))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Minimum-norm input: [1/9, 2/9, -5/18, 1/6]
+Fitted data: [4/3, 7/3, 11/3] residual: [-1/3, -1/3, 1/3]</code></pre>
+</div>
+</div>
+<p>The normal equations alone accept the whole two-parameter family <span class="math inline">\(x^\dagger+Nz\)</span>. The additional two independent conditions <span class="math inline">\(N^Tx^\dagger=0\)</span> select a single input. They characterize the pseudoinverse solution independently of the algorithm used to compute it.</p>
+</section>
+<section id="h.-assemble-the-poisson-equation-and-measure-the-slope-error" class="level3">
+<h3 class="anchored" data-anchor-id="h.-assemble-the-poisson-equation-and-measure-the-slope-error">H. Assemble the Poisson equation and measure the slope error</h3>
+<div id="929bf741" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_matrices(elements):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="dv">1</span><span class="op">/</span>elements</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> elements<span class="op">+</span><span class="dv">1</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    stiffness <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    mass <span class="op">=</span> np.zeros((n, n))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    load <span class="op">=</span> np.zeros(n)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(elements):</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        element <span class="op">=</span> <span class="bu">slice</span>(j, j<span class="op">+</span><span class="dv">2</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        stiffness[element, element] <span class="op">+=</span> np.array([[<span class="fl">1.</span>, <span class="op">-</span><span class="fl">1.</span>], [<span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>]])<span class="op">/</span>h</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        mass[element, element] <span class="op">+=</span> h<span class="op">*</span>np.array([[<span class="fl">2.</span>, <span class="fl">1.</span>], [<span class="fl">1.</span>, <span class="fl">2.</span>]])<span class="op">/</span><span class="dv">6</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        load[element] <span class="op">+=</span> h<span class="op">/</span><span class="dv">2</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stiffness[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>], mass[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>], load[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> poisson_solution(elements):</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    K, M, load <span class="op">=</span> poisson_matrices(elements)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    values <span class="op">=</span> np.r_[<span class="fl">0.</span>, np.linalg.solve(K, load), <span class="fl">0.</span>]</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linspace(<span class="fl">0.</span>, <span class="fl">1.</span>, elements<span class="op">+</span><span class="dv">1</span>), values</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> count <span class="kw">in</span> [<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">12</span>]:</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    nodes, vals <span class="op">=</span> poisson_solution(count)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> <span class="dv">1</span><span class="op">/</span>count</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    mids <span class="op">=</span> (nodes[<span class="dv">1</span>:]<span class="op">+</span>nodes[:<span class="op">-</span><span class="dv">1</span>])<span class="op">/</span><span class="dv">2</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    slopes <span class="op">=</span> np.diff(vals)<span class="op">/</span>h</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Two-point Gauss integrates the squared affine slope error exactly.</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    offsets <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.</span>, <span class="fl">1.</span>])<span class="op">*</span>h<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>np.sqrt(<span class="dv">3</span>))</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    diff <span class="op">=</span> <span class="fl">.5</span><span class="op">-</span>(mids[:, <span class="va">None</span>]<span class="op">+</span>offsets)<span class="op">-</span>slopes[:, <span class="va">None</span>]</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    energy_error <span class="op">=</span> np.sqrt(h<span class="op">/</span><span class="dv">2</span><span class="op">*</span>np.<span class="bu">sum</span>(diff<span class="op">**</span><span class="dv">2</span>))</span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> np.isclose(energy_error, h<span class="op">/</span>np.sqrt(<span class="dv">12</span>))</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(count, <span class="st">"elements; energy error"</span>, <span class="bu">round</span>(energy_error, <span class="dv">7</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3 elements; energy error 0.096225
+6 elements; energy error 0.0481125
+12 elements; energy error 0.0240563</code></pre>
+</div>
+</div>
+<div id="cell-fig-ip-fem" class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display">
+<div id="fig-ip-fem" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ip-fem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="c03_files/figure-html/fig-ip-fem-output-1.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ip-fem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.3: Poisson solution and its piecewise linear Galerkin approximations. The right panel shows the slope error, which persists between exact nodal values.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Each segment of the slope-error graph in <a href="#fig-ip-fem" class="quarto-xref">Figure&nbsp;<span>20.3</span></a> integrates to zero. Halving the mesh length halves the energy error, even though nodal-value comparisons alone would already report machine-level accuracy.</p>
+</section>
+<section id="i.-compute-generalized-eigenpairs-and-test-a-proper-trial-subspace" class="level3">
+<h3 class="anchored" data-anchor-id="i.-compute-generalized-eigenpairs-and-test-a-proper-trial-subspace">I. Compute generalized eigenpairs and test a proper trial subspace</h3>
+<div id="a0c8d0b5" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hermitian_pair(K, M):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> np.linalg.cholesky(M)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    left <span class="op">=</span> np.linalg.solve(L, K)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    transformed <span class="op">=</span> np.linalg.solve(L, left.T).T</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    vals, Z <span class="op">=</span> np.linalg.eigh(transformed)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> vals, np.linalg.solve(L.T, Z)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>K, M, load <span class="op">=</span> poisson_matrices(<span class="dv">3</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>vals, modes <span class="op">=</span> hermitian_pair(K, M)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(modes.T <span class="op">@</span> M <span class="op">@</span> modes, np.eye(<span class="dv">2</span>))</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(K <span class="op">@</span> modes, (M <span class="op">@</span> modes)<span class="op">*</span>vals)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>Q <span class="op">=</span> np.array([[<span class="fl">1.</span>], [<span class="fl">0.</span>]])</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>ritz, small_modes <span class="op">=</span> hermitian_pair(Q.T <span class="op">@</span> K <span class="op">@</span> Q, Q.T <span class="op">@</span> M <span class="op">@</span> Q)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>xr <span class="op">=</span> Q <span class="op">@</span> small_modes[:, <span class="dv">0</span>]</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>rr <span class="op">=</span> K <span class="op">@</span> xr<span class="op">-</span>ritz[<span class="dv">0</span>]<span class="op">*</span>(M <span class="op">@</span> xr)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> np.allclose(Q.T <span class="op">@</span> rr, <span class="fl">0.</span>) <span class="kw">and</span> np.linalg.norm(rr) <span class="op">&gt;</span> <span class="fl">1.</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Generalized eigenvalues:"</span>, vals, <span class="st">"one-dimensional Ritz value:"</span>, ritz)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Residual per unit first coefficient:"</span>, rr<span class="op">/</span>xr[<span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized eigenvalues: [10.8 54. ] one-dimensional Ritz value: [27.]
+Residual per unit first coefficient: [ 8.37382645e-16 -4.50000000e+00]</code></pre>
+</div>
+</div>
+<p>This routine uses real symmetric matrices, so transposes in the implementation are ordinary transposes. The returned vectors are normalized in <span class="math inline">\(M\)</span>. Dividing the residual by the first coefficient recovers the hand calculation for the unnormalized <span class="math inline">\(e_1\)</span>. Neither normalization alters the Ritz value.</p>
+</section>
+</section>
+<section id="exercises-reconstruct-calculate-transfer" class="level2" data-number="20.11">
+<h2 data-number="20.11" class="anchored" data-anchor-id="exercises-reconstruct-calculate-transfer"><span class="header-section-number">20.11</span> Exercises — Reconstruct, calculate, transfer</h2>
+<section id="geometry-from-measurements" class="level3">
+<h3 class="anchored" data-anchor-id="geometry-from-measurements">Geometry from measurements</h3>
+<ol type="1">
+<li><strong>Identify an inner product.</strong> On <span class="math inline">\(\mathbb R^2\)</span> let <span class="math inline">\(g_t(x,y)=y^T\left(\begin{smallmatrix}1&amp;t\\t&amp;1\end{smallmatrix}\right)x\)</span>. For which real <span class="math inline">\(t\)</span> is this an inner product? Determine when the coordinate axes are perpendicular. Give a nonzero null direction at each endpoint of the admissible interval.</li>
+<li><strong>Rebuild the inequalities.</strong> Minimize <span class="math inline">\(\|x-\alpha y\|^2\)</span> over complex <span class="math inline">\(\alpha\)</span> and deduce Cauchy–Schwarz, its equality case and the triangle inequality. Use the parallelogram law to test <span class="math inline">\(\|\cdot\|_\infty\)</span> on <span class="math inline">\(\mathbb R^2\)</span>.</li>
+<li><strong>A dual basis in an oblique grid.</strong> In Euclidean <span class="math inline">\(\mathbb R^2\)</span> take <span class="math inline">\(b_1=(1,0),b_2=(1,1)\)</span>. Find both Riesz representatives of the dual basis in physical coordinates and in basis coordinates. Explain why just normalizing the original axes cannot solve the problem.</li>
+<li><strong>A weighted complex measurement.</strong> For <span class="math inline">\(f(x)=ix_1+2x_2\)</span> and <span class="math inline">\(G=\operatorname{diag}(4,1)\)</span> find the Riesz representative, the dual norm and a maximizing unit input. Prove the existence and uniqueness statement for an arbitrary finite-dimensional functional.</li>
+<li><strong>Adjoints without orthonormal coordinates.</strong> Let <span class="math inline">\(T\)</span> have standard real matrix <span class="math inline">\(\operatorname{diag}(2,3)\)</span> with Euclidean physical geometry. Use the oblique basis of problem 3 on both sides. Compute its coordinate matrix and its adjoint matrix there. Derive the general formula from the Riesz square.</li>
+</ol>
+</section>
+<section id="approximation-and-operator-structure" class="level3">
+<h3 class="anchored" data-anchor-id="approximation-and-operator-structure">Approximation and operator structure</h3>
+<ol start="6" type="1">
+<li><strong>Detect a closest point.</strong> Project <span class="math inline">\((2,1)\)</span> onto the horizontal axis first in the Euclidean metric and then in <span class="math inline">\(G=\left(\begin{smallmatrix}2&amp;1\\1&amp;2\end{smallmatrix}\right)\)</span>. Give an oblique projector that returns a third answer. Prove the best-approximation criterion for any subspace in finite dimension.</li>
+<li><strong>Reconstruct the four subspaces.</strong> For <span class="math inline">\(T(x,y,z)=(x+y,z)\)</span> with Euclidean metrics compute the four spaces in the orthogonality theorem. Reprove the result in general. Identify exactly the step that gives only a closure in Hilbert space.</li>
+<li><strong>Positive versus invertible.</strong> For the <span class="math inline">\(M,K\)</span> pair at the end of Session 6, verify weighted self-adjointness and find the two eigenvalues and the range of the generalized Rayleigh quotient. Give an invertible self-adjoint matrix with a nonzero vector of zero quadratic energy.</li>
+<li><strong>Inconsistent but unique.</strong> For <span class="math inline">\(A=(1,1)^T\)</span> and <span class="math inline">\(b=(0,3)^T\)</span> compute the minimizer in output weight <span class="math inline">\(W=\operatorname{diag}(1,w)\)</span>, <span class="math inline">\(w&gt;0\)</span>. Derive the weighted normal equations and explain what happens as <span class="math inline">\(w\)</span> increases.</li>
+<li><strong>A second source of nonuniqueness.</strong> For <span class="math inline">\(A=\left(\begin{smallmatrix}1&amp;1\\2&amp;2\\0&amp;0\end{smallmatrix}\right)\)</span>, <span class="math inline">\(b=(1,2,3)^T\)</span>, find every least-squares minimizer. Select the shortest in Euclidean input geometry, then the shortest in <span class="math inline">\(\operatorname{diag}(4,1)\)</span>. Explain why the fitted reading does not change.</li>
+<li><strong>A vanished normal-equation pivot.</strong> For columns <span class="math inline">\((1,0,0)^T\)</span> and <span class="math inline">\((1,\epsilon,0)^T\)</span>, compute the Gram determinant in exact arithmetic. Explain what can happen if <span class="math inline">\(1+\epsilon^2\)</span> rounds to one. What quantity is still present in the input available to QR?</li>
+</ol>
+</section>
+<section id="from-tests-to-modes" class="level3">
+<h3 class="anchored" data-anchor-id="from-tests-to-modes">From tests to modes</h3>
+<ol start="12" type="1">
+<li><strong>Two variational geometries.</strong> Assemble the one-interior-hat stiffness, mass and load for <span class="math inline">\(-u''=1\)</span> with homogeneous Dirichlet data on the mesh <span class="math inline">\(0,1/2,1\)</span>. Find the Galerkin coefficient and its generalized Rayleigh quotient. Prove the energy best-approximation property for any conforming space.</li>
+<li><strong>The missing boundary condition.</strong> For homogeneous Neumann data determine which of <span class="math inline">\(f=1\)</span>, <span class="math inline">\(f=2t-1\)</span> admit weak solutions. For the compatible case construct the solution family, describe the quotient and give the zero-mean representative.</li>
+<li><strong>A Ritz value invisible to one test.</strong> For the two-hat <span class="math inline">\(K,M\)</span> from Session 9 choose trial vector <span class="math inline">\(q=(1,2)^T\)</span>. Find <span class="math inline">\(\theta\)</span>, the full residual <span class="math inline">\(r\)</span>, and verify its test equation. Decide whether <span class="math inline">\(q\)</span> is a full eigenvector.</li>
+<li><strong>The price of a nonclosed range.</strong> For the diagonal operator <span class="math inline">\((Tx)_j=x_j/j\)</span> on <span class="math inline">\(\ell^2\)</span>, produce data for which the least-squares infimum is zero but there is no minimizer. Explain which orthogonality criterion still holds and what fails.</li>
+</ol>
+</section>
+</section>
+<section id="worked-solutions" class="level2" data-number="20.12">
+<h2 data-number="20.12" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">20.12</span> Worked solutions</h2>
+<p><strong>1.</strong> The eigenvectors <span class="math inline">\((1,1)\)</span> and <span class="math inline">\((1,-1)\)</span> have eigenvalues <span class="math inline">\(1+t\)</span> and <span class="math inline">\(1-t\)</span>. Decomposition along these perpendicular directions proves positivity precisely for <span class="math inline">\(-1&lt;t&lt;1\)</span>. Bilinearity and symmetry hold for every <span class="math inline">\(t\)</span>. The coordinate pairing is <span class="math inline">\(t\)</span>, so the axes are perpendicular exactly at <span class="math inline">\(t=0\)</span>. At <span class="math inline">\(t=1\)</span> the difference direction is null; at <span class="math inline">\(t=-1\)</span> the sum direction is null.</p>
+<p><strong>2.</strong> For <span class="math inline">\(y\ne0\)</span> choose <span class="math inline">\(\alpha_0=\langle x,y\rangle/\|y\|^2\)</span>. Then <span class="math inline">\(z=x-\alpha_0 y\perp y\)</span>, and <span class="math inline">\(\|x-\alpha y\|^2=\|z\|^2+|\alpha_0-\alpha|^2\|y\|^2\)</span>, proving the minimizing claim. At <span class="math inline">\(\alpha=0\)</span> this yields <span class="math inline">\(|\langle x,y\rangle|^2\le\|x\|^2\|y\|^2\)</span>, equality iff <span class="math inline">\(z=0\)</span>. If <span class="math inline">\(y=0\)</span> equality always holds. Expanding <span class="math inline">\(\|x+y\|^2\)</span> and bounding twice the real part gives the triangle inequality. For <span class="math inline">\(e_1,e_2\)</span> in the max norm the parallelogram left side is <span class="math inline">\(2\)</span>, while the right side is <span class="math inline">\(4\)</span>. This norm cannot be an inner-product norm.</p>
+<p><strong>3.</strong> The dual basis rows in physical coordinates are <span class="math inline">\((1,-1),(0,1)\)</span>, the rows of <span class="math inline">\(B^{-1}\)</span>. In Euclidean geometry the representing columns are their transposes. Applying <span class="math inline">\(B^{-1}\)</span> to them gives <span class="math inline">\((2,-1)^T,(-1,1)^T\)</span>, the columns of <span class="math inline">\((B^TB)^{-1}\)</span>. The first representative must kill <span class="math inline">\(b_2\)</span> and the second must kill <span class="math inline">\(b_1\)</span>. Rescaling a basis vector can set its own length, but cannot turn its nonzero pairing with the other axis into zero.</p>
+<p><strong>4.</strong> <span class="math inline">\(Ga_f=(-i,2)^T\)</span> gives <span class="math inline">\(a_f=(-i/4,2)^T\)</span>. The squared norm is <span class="math inline">\(1/4+4=17/4\)</span>, so <span class="math inline">\(2a_f/\sqrt{17}\)</span> is a maximizing input of unit length. For existence expand in an orthonormal basis and use conjugated coefficients <span class="math inline">\(\overline{f(q_i)}\)</span> for the representative; pairing with each <span class="math inline">\(q_i\)</span> returns <span class="math inline">\(f(q_i)\)</span>, hence the two functionals agree by linearity everywhere. The difference of two possible representatives pairs to zero with itself, proving uniqueness.</p>
+<p><strong>5.</strong> Directly <span class="math inline">\(A=B^{-1}\operatorname{diag}(2,3)B=\left(\begin{smallmatrix}2&amp;-1\\0&amp;3\end{smallmatrix}\right)\)</span>. From <span class="math inline">\(T^*=R_V^{-1}T^\vee R_W\)</span>, its output on <span class="math inline">\(y\)</span> represents the functional <span class="math inline">\(x\mapsto y^HG_WAx\)</span>. Therefore <span class="math inline">\(G_V[T^*]y=A^HG_Wy\)</span>. Here <span class="math inline">\(G_V=G_W=B^TB\)</span> and <span class="math inline">\(G_V^{-1}A^TG_V=A\)</span>. This agrees with physical self-adjointness while <span class="math inline">\(A^T\ne A\)</span>. Using an ordinary transpose in this basis would represent the wrong operator.</p>
+<p><strong>6.</strong> The Euclidean foot is <span class="math inline">\((2,0)\)</span>. In <span class="math inline">\(G\)</span>, orthogonality to <span class="math inline">\(e_1\)</span> means <span class="math inline">\(2(2-c)+1=0\)</span>, giving <span class="math inline">\((5/2,0)\)</span>. The idempotent <span class="math inline">\((x,y)\mapsto(x-y,0)\)</span> gives <span class="math inline">\((1,0)\)</span>; its discarded direction is <span class="math inline">\((1,1)\)</span>. Generally construct <span class="math inline">\(p\)</span> by summing the components of <span class="math inline">\(x\)</span> on an orthonormal basis of the target. Then <span class="math inline">\(x-p\perp S\)</span>, and the squared distance to any other <span class="math inline">\(s\)</span> increases by <span class="math inline">\(\|p-s\|^2\)</span>. Conversely any minimizer must equal <span class="math inline">\(p\)</span> by this strict increase. This proves both necessity and sufficiency.</p>
+<p><strong>7.</strong> The kernel is spanned by <span class="math inline">\((1,-1,0)\)</span>, and the image is <span class="math inline">\(\mathbb R^2\)</span>. The adjoint sends <span class="math inline">\((a,b)\)</span> to <span class="math inline">\((a,a,b)\)</span>, so its kernel is zero and its image is the plane <span class="math inline">\(x=y\)</span>. In general <span class="math inline">\(z\in\ker T^*\)</span> iff <span class="math inline">\(\langle v,T^*z\rangle=0\)</span> for all <span class="math inline">\(v\)</span> iff <span class="math inline">\(z\perp\operatorname{im}T\)</span>. Apply this to <span class="math inline">\(T^*\)</span> for the second kernel identity; taking perpendiculars gives the image identities because finite-dimensional subspaces equal their double perpendiculars. In a Hilbert space the double perpendicular recovers the closure. Problem 15 shows how this changes solvability.</p>
+<p><strong>8.</strong> <span class="math inline">\(T=M^{-1}K\)</span> has <span class="math inline">\(MT=K=K^H=T^HM\)</span>. The characteristic equation for the pair is <span class="math inline">\((2-2\lambda)(2-\lambda)-1=0\)</span>, giving <span class="math inline">\(\lambda_\pm=(3\pm\sqrt3)/2\)</span>. The quotient ranges over the closed interval between these values, since in an <span class="math inline">\(M\)</span>-orthonormal eigenbasis it is a convex combination with weights <span class="math inline">\(|c_i|^2/\sum|c_i|^2\)</span>; varying the two coefficients attains every weight. The Euclidean matrix <span class="math inline">\(\operatorname{diag}(1,-1)\)</span> has nonzero determinant and zero energy on <span class="math inline">\((1,1)^T\)</span>.</p>
+<p><strong>9.</strong> The minimized expression is <span class="math inline">\(|x|^2+w|x-3|^2\)</span>. Vanishing derivative (or weighted perpendicularity) gives <span class="math inline">\(x=3w/(1+w)\)</span>. More generally, the fitted residual is <span class="math inline">\(W\)</span>-perpendicular to every <span class="math inline">\(Ah\)</span> iff <span class="math inline">\(h^HA^HW(Ax-b)=0\)</span> for every <span class="math inline">\(h\)</span>. This is equivalent to the weighted normal equations. The column is independent, giving uniqueness despite incompatibility. As <span class="math inline">\(w\)</span> increases the fit approaches the second reading.</p>
+<p><strong>10.</strong> The first two rows are compatible when <span class="math inline">\(x_1+x_2=1\)</span>; the unavoidable third residual is <span class="math inline">\(3\)</span>. Hence the full line is minimizing. Its Euclidean shortest point is <span class="math inline">\((1/2,1/2)\)</span> by perpendicularity to <span class="math inline">\((1,-1)\)</span>. In the weighted input norm the condition is <span class="math inline">\(4x_1-x_2=0\)</span>. Solving with the sum condition gives <span class="math inline">\((1/5,4/5)\)</span>. Both map to <span class="math inline">\((1,2,0)\)</span> because changing the representative along the kernel cannot change a fitted reading.</p>
+<p><strong>11.</strong> The Gram matrix has rows <span class="math inline">\((1,1),(1,1+\epsilon^2)\)</span>, so the determinant is <span class="math inline">\(\epsilon^2\)</span>. If the last diagonal rounds to one, the explicitly formed matrix is singular even for <span class="math inline">\(\epsilon\ne0\)</span>. This is consistent with squaring the condition number. QR applied to the original columns has the independent second-row entry <span class="math inline">\(\epsilon\)</span> available: subtracting the first column from the second leaves <span class="math inline">\((0,\epsilon,0)^T\)</span> in exact arithmetic. This advantage does not remove the original input sensitivity when <span class="math inline">\(\epsilon\)</span> is tiny.</p>
+<p><strong>12.</strong> The hat slopes are <span class="math inline">\(2,-2\)</span>, giving <span class="math inline">\(K=4\)</span>. The integrated squared hat is <span class="math inline">\(1/3\)</span>, so <span class="math inline">\(M=1/3\)</span>; the area gives load <span class="math inline">\(1/2\)</span>. The Galerkin coefficient is <span class="math inline">\(1/8\)</span> and the generalized quotient is <span class="math inline">\(12\)</span>. For any conforming subspace, subtract the test equations to obtain <span class="math inline">\(a(u-u_h,v_h)=0\)</span> for all tests there. Testing against <span class="math inline">\(u_h-w_h\)</span> kills the cross term in the energy expansion. The squared error for <span class="math inline">\(w_h\)</span> exceeds that for <span class="math inline">\(u_h\)</span> by <span class="math inline">\(\|u_h-w_h\|_a^2\)</span>. Positivity gives uniqueness.</p>
+<p><strong>13.</strong> Testing with the constant <span class="math inline">\(1\)</span> excludes <span class="math inline">\(f=1\)</span>. For <span class="math inline">\(2t-1\)</span> the integral vanishes. Integration gives <span class="math inline">\(u'(t)=t-t^2\)</span>, zero at both endpoints, and <span class="math inline">\(u(t)=t^2/2-t^3/3+C\)</span>. The integral of the nonconstant part is <span class="math inline">\(1/6-1/12=1/12\)</span>, hence zero mean fixes <span class="math inline">\(C=-1/12\)</span>. Adding any constant gives the same weak equation. The energy norm is definite on classes modulo constants.</p>
+<p><strong>14.</strong> We have <span class="math inline">\(Kq=(0,9)^T\)</span> and <span class="math inline">\(Mq=(6,9)^T/18\)</span>. Hence <span class="math inline">\(\theta=18/(24/18)=27/2\)</span>. The residual is <span class="math inline">\((-9/2,9/4)^T\)</span>, whose pairing with <span class="math inline">\((1,2)\)</span> is zero. Its second component is nonzero, so this is a Ritz vector only. An exact eigenvector would pass every test in the full two-dimensional space.</p>
+<p><strong>15.</strong> Set <span class="math inline">\(b_j=1/j\)</span>. Truncation to the first <span class="math inline">\(n\)</span> entries produces <span class="math inline">\(b^{(n)}=Tx^{(n)}\)</span> for an input with <span class="math inline">\(n\)</span> entries equal to one and the rest zero. Then <span class="math inline">\(\|b-b^{(n)}\|^2=\sum_{j&gt;n}j^{-2}\to0\)</span>, while no <span class="math inline">\(\ell^2\)</span> input with every entry equal to one exists. The range has zero perpendicular and the adjoint has zero kernel, so the kernel identity holds. Double perpendicular gives the whole space, the closure of the range. If a minimizer existed it would have zero residual and yield the excluded preimage.</p>
+</section>
+<section id="integrated-mastery-problem-one-instrument-two-geometries-one-reduced-model" class="level2" data-number="20.13">
+<h2 data-number="20.13" class="anchored" data-anchor-id="integrated-mastery-problem-one-instrument-two-geometries-one-reduced-model"><span class="header-section-number">20.13</span> Integrated mastery problem — One instrument, two geometries, one reduced model</h2>
+<p>On the two-interior-hat mesh, an instrument reads the displacement at the first interior node: <span class="math inline">\(F(v)=v(1/3)\)</span>. In nodal coordinates its row is <span class="math inline">\((1,0)\)</span>. Compare the following operations.</p>
+<ol type="1">
+<li>Construct its Riesz representatives and dual norms in mass and energy geometry. Interpret the adjoint of the instrument in both metrics with ordinary scalar output.</li>
+<li>Apply this point load and solve the energy equation. Restrict the calculation to the one-dimensional trial space spanned by <span class="math inline">\(q=(1,1)^T\)</span>. Derive the reduced displacement, its error and the residual load. Distinguish a residual <strong>functional</strong> from its energy <strong>representative</strong>.</li>
+<li>Compute the generalized Ritz value for the same trial space. Explain why this trial space gives an exact vibration mode although it only approximates the static response. Decide which conclusions change under rescaling of <span class="math inline">\(q\)</span>.</li>
+</ol>
+<section id="worked-reconstruction" class="level3">
+<h3 class="anchored" data-anchor-id="worked-reconstruction">Worked reconstruction</h3>
+<p>From Session 9 take <span class="math inline">\(K=\left(\begin{smallmatrix}6&amp;-3\\-3&amp;6\end{smallmatrix}\right)\)</span> and <span class="math inline">\(M=\frac1{18}\left(\begin{smallmatrix}4&amp;1\\1&amp;4\end{smallmatrix}\right)\)</span>. Put <span class="math inline">\(d=e_1\)</span>. On the finite element space, the Riesz vectors are <span class="math display">\[
+a_K=K^{-1}d=(2,1)^T/9,\qquad
+a_M=M^{-1}d=(24,-6)^T/5 .
+\]</span> Their own squared norms equal their first components, since <span class="math inline">\(a^HGa=d^Ha\)</span>. The dual norms are therefore <span class="math inline">\(\sqrt2/3\)</span> and <span class="math inline">\(\sqrt{24/5}\)</span>. In either geometry the adjoint of the scalar instrument sends <span class="math inline">\(t\)</span> to <span class="math inline">\(t a_G\)</span>. These are finite-dimensional mass and energy representatives. On the full <span class="math inline">\(L^2\)</span> space point evaluation is not even well-defined on equivalence classes modulo changes on sets of measure zero. On the one-dimensional endpoint-zero energy space it is continuous by the estimate in Session 8.</p>
+<p>The static response solves <span class="math inline">\(Ku=d\)</span>, so <span class="math inline">\(u=a_K\)</span>. The reduced response is <span class="math inline">\(u_Q=cq\)</span>, where <span class="math inline">\((q^TKq)c=q^Td\)</span>. Here <span class="math inline">\(Kq=3q\)</span>, giving <span class="math inline">\(c=1/6\)</span>. Hence <span class="math display">\[
+u-u_Q=(1,-1)^T/18,\qquad d-Ku_Q=(1,-1)^T/2 .
+\]</span> The residual row represented in algebraic coefficient coordinates by <span class="math inline">\(d-Ku_Q\)</span> vanishes on <span class="math inline">\(q\)</span>. Solving with <span class="math inline">\(K\)</span> maps that functional to the error vector. Its energy dual norm equals the error’s energy norm, since this solve is Riesz representation. In fact <span class="math inline">\(\|u-u_Q\|_K^2=(u-u_Q)^T(d-Ku_Q)=1/18\)</span>. Every other displacement on the trial line has greater energy error by the projection theorem.</p>
+<p>For vibration, <span class="math inline">\(Mq=(5/18)q\)</span>, so <span class="math inline">\(Kq=(54/5)Mq\)</span>. The Ritz residual vanishes on <em>every</em> test. The one-dimensional trial space contains this exact mode, but the load also excites the antisymmetric mode: the load has <span class="math inline">\(F((1,-1)^T)=1\)</span>. This missing direction accounts for the static error. Replacing <span class="math inline">\(q\)</span> by <span class="math inline">\(\alpha q\)</span>, <span class="math inline">\(\alpha\ne0\)</span>, rescales <span class="math inline">\(c\)</span> by <span class="math inline">\(1/\alpha\)</span> and both reduced Gram entries by <span class="math inline">\(|\alpha|^2\)</span>. It changes neither displacement, eigenvalue nor either residual in the original space.</p>
+</section>
+</section>
+<section id="synthesis-which-structure-made-each-conclusion-possible" class="level2" data-number="20.14">
+<h2 data-number="20.14" class="anchored" data-anchor-id="synthesis-which-structure-made-each-conclusion-possible"><span class="header-section-number">20.14</span> Synthesis — Which structure made each conclusion possible?</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+  D["Linear functional and pullback"] --&gt; R["Riesz representation"]
+  G["Chosen inner products"] --&gt; R
+  R --&gt; A["Adjoint operator"]
+  G --&gt; P["Orthogonal projection"]
+  A --&gt; N["Residual tests and normal equations"]
+  P --&gt; N
+  P --&gt; E["Galerkin energy approximation"]
+  E --&gt; M["Stiffness and mass pair"]
+  M --&gt; Q["Rayleigh–Ritz modes"]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Projection occurs more than once, with different ambient spaces. Least squares projects noisy <strong>data</strong> onto attainable outputs. Minimum norm projects an <strong>input representative</strong> off the kernel. Galerkin projects an unknown <strong>function</strong> in the energy geometry using only load measurements. Rayleigh–Ritz projects an <strong>operator action</strong> and tests an eigenpair residual. Specifying what is being projected and which pairing tests the residual determines the appropriate equation in each case.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Construction</th>
+<th>Conclusion</th>
+<th>Data or assumptions required</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Algebraic complement <span class="math inline">\(H\)</span> of <span class="math inline">\(S\)</span></td>
+<td>Unique decomposition into <span class="math inline">\(S\)</span> and <span class="math inline">\(H\)</span></td>
+<td>A choice with <span class="math inline">\(V=S\oplus H\)</span></td>
+</tr>
+<tr class="even">
+<td>Annihilator <span class="math inline">\(S^0\)</span></td>
+<td>All functionals insensitive to <span class="math inline">\(S\)</span></td>
+<td><span class="math inline">\(S\)</span> inside <span class="math inline">\(V\)</span>, no metric</td>
+</tr>
+<tr class="odd">
+<td>Orthogonal complement <span class="math inline">\(S^\perp\)</span></td>
+<td>Minimum-length representatives modulo <span class="math inline">\(S\)</span></td>
+<td>Inner product; finite dimension or closed <span class="math inline">\(S\)</span> in Hilbert space</td>
+</tr>
+<tr class="even">
+<td>Algebraic dual <span class="math inline">\(T^\vee\)</span></td>
+<td>Composition <span class="math inline">\(g\mapsto gT\)</span>, represented by <span class="math inline">\(A^T\)</span></td>
+<td>Linear map and corresponding dual bases for coordinates</td>
+</tr>
+<tr class="odd">
+<td>Adjoint <span class="math inline">\(T^*\)</span></td>
+<td>Pullback represented on vectors</td>
+<td>Inner products on both spaces; bounded operator in Hilbert setting</td>
+</tr>
+<tr class="even">
+<td>Cauchy–Schwarz and Riesz</td>
+<td>Norm of a measurement equals length of its representative</td>
+<td>Positive definite product; continuous dual and completeness in Hilbert Riesz</td>
+</tr>
+<tr class="odd">
+<td>Gram change</td>
+<td><span class="math inline">\(G'=P^HGP\)</span></td>
+<td>Invertible change of basis for the same geometry</td>
+</tr>
+<tr class="even">
+<td>Orthogonal projection</td>
+<td>Unique best approximation, idempotent and self-adjoint</td>
+<td>Subspace in finite dimension; closed subspace in Hilbert space</td>
+</tr>
+<tr class="odd">
+<td>Spectral theorem used here</td>
+<td>Orthonormal eigenbasis and real spectrum</td>
+<td>Finite-dimensional self-adjoint operator</td>
+</tr>
+<tr class="even">
+<td>Least squares and pseudoinverse</td>
+<td>Unique fitted data, unique shortest minimizing input</td>
+<td>Finite dimensions; unique minimizer without tie-break iff injective</td>
+</tr>
+<tr class="odd">
+<td>Galerkin energy projection</td>
+<td>Error is energy-perpendicular to conforming trial space</td>
+<td>Positive symmetric energy form, same trial and test space</td>
+</tr>
+<tr class="even">
+<td>Generalized Rayleigh–Ritz</td>
+<td>Reduced Hermitian pair and residual test <span class="math inline">\(Q^Hr=0\)</span></td>
+<td><span class="math inline">\(K=K^H\)</span>, <span class="math inline">\(M\)</span> HPD, independent trial columns</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What is determined?</strong> A functional and its kernel are determined by the linear rule. Its representative and its norm are determined after choosing geometry. The same dependence holds for adjoints, perpendicular complements and closest points. Once the geometry and subspace are fixed, the orthogonal projection requires no further basis choice. Bases, matrix entries and Cholesky factors are coordinate descriptions. Module F2’s natural evaluation <span class="math inline">\(V\to V^{\vee\vee}\)</span> uses no metric; the Riesz identification with the single dual instead respects maps preserving the chosen geometry.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Common error</th>
+<th>A calculation that detects it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Treating a Gram change as a change of physical length</td>
+<td>Transform coordinates as well and compare <span class="math inline">\(x^HGx\)</span></td>
+</tr>
+<tr class="even">
+<td>Identifying covector coefficients and vector coordinates</td>
+<td>Solve <span class="math inline">\(Ga=\bar c\)</span> and test <span class="math inline">\(a^HGx=c^Tx\)</span></td>
+</tr>
+<tr class="odd">
+<td>Calling every idempotent orthogonal</td>
+<td>Test <span class="math inline">\(P^HG=GP\)</span> in the specified metric</td>
+</tr>
+<tr class="even">
+<td>Inferring a small solution error from a small residual</td>
+<td>Check the smallest resolved stretch and any kernel component</td>
+</tr>
+<tr class="odd">
+<td>Inferring zero PDE error from exact nodal values</td>
+<td>Measure slopes or the energy integral between nodes</td>
+</tr>
+<tr class="even">
+<td>Interpreting a Ritz residual with the wrong metric</td>
+<td>Distinguish <span class="math inline">\(Q^Hr=0\)</span> from <span class="math inline">\(Q^HMr=0\)</span>; identify whether <span class="math inline">\(r\)</span> is a load or a vector</td>
+</tr>
+<tr class="odd">
+<td>Claiming existence of a closest point from an infimum</td>
+<td>In infinite dimensions check closedness of the approximating subspace</td>
+</tr>
+</tbody>
+</table>
+<section id="mastery-checklist" class="level3">
+<h3 class="anchored" data-anchor-id="mastery-checklist">Mastery checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox">Reconstruct Cauchy–Schwarz and the triangle inequality from a one-dimensional projection.</label></li>
+<li><label><input type="checkbox">Compute a Gram matrix, transform it under a basis change and distinguish this from changing the metric.</label></li>
+<li><label><input type="checkbox">Prove Riesz representation and calculate a weighted gradient and dual norm, including complex conjugation.</label></li>
+<li><label><input type="checkbox">Derive an adjoint from algebraic pullback and verify its defining identity between different metrics.</label></li>
+<li><label><input type="checkbox">Rebuild the four fundamental subspace identities and identify where closure enters.</label></li>
+<li><label><input type="checkbox">Construct an orthogonal projector, characterize it algebraically and prove its best-approximation property.</label></li>
+<li><label><input type="checkbox">Recognize weighted self-adjointness and positivity, and explain the existence of perpendicular eigenmodes.</label></li>
+<li><label><input type="checkbox">Derive both normal-equation proofs, describe every minimizer and select the minimum-norm one.</label></li>
+<li><label><input type="checkbox">Explain the difference in conditioning between QR and explicitly forming a Gram matrix.</label></li>
+<li><label><input type="checkbox">Derive the weak Poisson equation, assemble the stiffness and mass matrices, and prove Galerkin orthogonality.</label></li>
+<li><label><input type="checkbox">Derive generalized Rayleigh–Ritz and distinguish residual orthogonality from an exact eigenpair.</label></li>
+</ul>
+<p><strong>Transition to Module D.</strong> In Euclidean orthonormal eigen-coordinates a Hermitian operator has <span class="math inline">\(A=U\Lambda U^H\)</span>, hence <span class="math inline">\(p(A)=\sum_i p(\lambda_i)u_i u_i^H\)</span>. The matrices <span class="math inline">\(u_i u_i^H\)</span> project onto perpendicular modes. Summing over a repeated eigenvalue gives the projector onto its entire eigenspace, independent of which orthonormal basis spans it. Module D asks how much of that subspace can be identified from approximate data and how a polynomial filter can amplify it before Rayleigh–Ritz extraction.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review_3/b03.html" class="pagination-link" aria-label="Module B — Duality and Linear Measurements: From Covectors to Universal Structure">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review_3/d03.html" class="pagination-link" aria-label="Module D — Spectral Theory">
+        <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

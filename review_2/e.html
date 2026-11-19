@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Module E — Numerical Eigenvalue Methods, Conditioning, and Stability – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review_3/a03.html" rel="next">
+<link href="../review_2/d.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_2/a02.html">Review II</a></li><li class="breadcrumb-item"><a href="../review_2/e.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-a-spectral-decomposition-to-a-numerical-claim" id="toc-from-a-spectral-decomposition-to-a-numerical-claim" class="nav-link active" data-scroll-target="#from-a-spectral-decomposition-to-a-numerical-claim"><span class="header-section-number">17.1</span> From a spectral decomposition to a numerical claim</a></li>
+  <li><a href="#session-1-floating-point-arithmetic-conditioning-and-stability" id="toc-session-1-floating-point-arithmetic-conditioning-and-stability" class="nav-link" data-scroll-target="#session-1-floating-point-arithmetic-conditioning-and-stability"><span class="header-section-number">17.2</span> Session 1 — Floating-point arithmetic, conditioning, and stability</a>
+  <ul class="collapse">
+  <li><a href="#what-one-rounding-step-changes" id="toc-what-one-rounding-step-changes" class="nav-link" data-scroll-target="#what-one-rounding-step-changes">What one rounding step changes</a></li>
+  <li><a href="#from-dot-products-to-a-matrix-product" id="toc-from-dot-products-to-a-matrix-product" class="nav-link" data-scroll-target="#from-dot-products-to-a-matrix-product">From dot products to a matrix product</a></li>
+  <li><a href="#problem-sensitivity-versus-the-error-of-a-method" id="toc-problem-sensitivity-versus-the-error-of-a-method" class="nav-link" data-scroll-target="#problem-sensitivity-versus-the-error-of-a-method">Problem sensitivity versus the error of a method</a></li>
+  </ul></li>
+  <li><a href="#session-2-eigenpair-residuals-and-perturbations" id="toc-session-2-eigenpair-residuals-and-perturbations" class="nav-link" data-scroll-target="#session-2-eigenpair-residuals-and-perturbations"><span class="header-section-number">17.3</span> Session 2 — Eigenpair residuals and perturbations</a>
+  <ul class="collapse">
+  <li><a href="#a-residual-as-the-price-of-exactness" id="toc-a-residual-as-the-price-of-exactness" class="nav-link" data-scroll-target="#a-residual-as-the-price-of-exactness">A residual as the price of exactness</a></li>
+  <li><a href="#locating-an-eigenvalue-and-locating-a-direction" id="toc-locating-an-eigenvalue-and-locating-a-direction" class="nav-link" data-scroll-target="#locating-an-eigenvalue-and-locating-a-direction">Locating an eigenvalue and locating a direction</a></li>
+  <li><a href="#weyl-and-subspace-separation" id="toc-weyl-and-subspace-separation" class="nav-link" data-scroll-target="#weyl-and-subspace-separation">Weyl and subspace separation</a></li>
+  <li><a href="#why-nonnormality-changes-the-certificate" id="toc-why-nonnormality-changes-the-certificate" class="nav-link" data-scroll-target="#why-nonnormality-changes-the-certificate">Why nonnormality changes the certificate</a></li>
+  </ul></li>
+  <li><a href="#session-3-vector-iterations-as-spectral-transformations" id="toc-session-3-vector-iterations-as-spectral-transformations" class="nav-link" data-scroll-target="#session-3-vector-iterations-as-spectral-transformations"><span class="header-section-number">17.4</span> Session 3 — Vector iterations as spectral transformations</a>
+  <ul class="collapse">
+  <li><a href="#power-iteration-and-its-rate" id="toc-power-iteration-and-its-rate" class="nav-link" data-scroll-target="#power-iteration-and-its-rate">Power iteration and its rate</a></li>
+  <li><a href="#inverse-iteration-and-rayleigh-quotient-iteration" id="toc-inverse-iteration-and-rayleigh-quotient-iteration" class="nav-link" data-scroll-target="#inverse-iteration-and-rayleigh-quotient-iteration">Inverse iteration and Rayleigh quotient iteration</a></li>
+  </ul></li>
+  <li><a href="#session-4-block-iteration-principal-angles-and-extraction" id="toc-session-4-block-iteration-principal-angles-and-extraction" class="nav-link" data-scroll-target="#session-4-block-iteration-principal-angles-and-extraction"><span class="header-section-number">17.5</span> Session 4 — Block iteration, principal angles, and extraction</a>
+  <ul class="collapse">
+  <li><a href="#why-a-basis-needs-attention" id="toc-why-a-basis-needs-attention" class="nav-link" data-scroll-target="#why-a-basis-needs-attention">Why a basis needs attention</a></li>
+  <li><a href="#rayleighritz-and-finite-precision" id="toc-rayleighritz-and-finite-precision" class="nav-link" data-scroll-target="#rayleighritz-and-finite-precision">Rayleigh–Ritz and finite precision</a></li>
+  </ul></li>
+  <li><a href="#session-5-krylov-spaces-and-projected-eigenproblems" id="toc-session-5-krylov-spaces-and-projected-eigenproblems" class="nav-link" data-scroll-target="#session-5-krylov-spaces-and-projected-eigenproblems"><span class="header-section-number">17.6</span> Session 5 — Krylov spaces and projected eigenproblems</a>
+  <ul class="collapse">
+  <li><a href="#keeping-the-history" id="toc-keeping-the-history" class="nav-link" data-scroll-target="#keeping-the-history">Keeping the history</a></li>
+  <li><a href="#arnoldi-lanczos-and-the-residual-shortcut" id="toc-arnoldi-lanczos-and-the-residual-shortcut" class="nav-link" data-scroll-target="#arnoldi-lanczos-and-the-residual-shortcut">Arnoldi, Lanczos, and the residual shortcut</a></li>
+  </ul></li>
+  <li><a href="#session-6-designing-and-evaluating-a-chebyshev-filter" id="toc-session-6-designing-and-evaluating-a-chebyshev-filter" class="nav-link" data-scroll-target="#session-6-designing-and-evaluating-a-chebyshev-filter"><span class="header-section-number">17.7</span> Session 6 — Designing and evaluating a Chebyshev filter</a>
+  <ul class="collapse">
+  <li><a href="#the-design-problem" id="toc-the-design-problem" class="nav-link" data-scroll-target="#the-design-problem">The design problem</a></li>
+  <li><a href="#subspace-convergence-and-degree-choice" id="toc-subspace-convergence-and-degree-choice" class="nav-link" data-scroll-target="#subspace-convergence-and-degree-choice">Subspace convergence and degree choice</a></li>
+  <li><a href="#evaluating-a-polynomial-without-forming-powers" id="toc-evaluating-a-polynomial-without-forming-powers" class="nav-link" data-scroll-target="#evaluating-a-polynomial-without-forming-powers">Evaluating a polynomial without forming powers</a></li>
+  <li><a href="#what-a-local-error-becomes" id="toc-what-a-local-error-becomes" class="nav-link" data-scroll-target="#what-a-local-error-becomes">What a local error becomes</a></li>
+  <li><a href="#turning-application-error-into-angle-error" id="toc-turning-application-error-into-angle-error" class="nav-link" data-scroll-target="#turning-application-error-into-angle-error">Turning application error into angle error</a></li>
+  <li><a href="#bounds-that-miss-part-of-the-spectrum" id="toc-bounds-that-miss-part-of-the-spectrum" class="nav-link" data-scroll-target="#bounds-that-miss-part-of-the-spectrum">Bounds that miss part of the spectrum</a></li>
+  </ul></li>
+  <li><a href="#session-7-mixed-precision-and-hardware-aware-computation" id="toc-session-7-mixed-precision-and-hardware-aware-computation" class="nav-link" data-scroll-target="#session-7-mixed-precision-and-hardware-aware-computation"><span class="header-section-number">17.8</span> Session 7 — Mixed precision and hardware-aware computation</a>
+  <ul class="collapse">
+  <li><a href="#an-error-budget-by-operation" id="toc-an-error-budget-by-operation" class="nav-link" data-scroll-target="#an-error-budget-by-operation">An error budget by operation</a></li>
+  <li><a href="#cost-of-reaching-an-accuracy-target" id="toc-cost-of-reaching-an-accuracy-target" class="nav-link" data-scroll-target="#cost-of-reaching-an-accuracy-target">Cost of reaching an accuracy target</a></li>
+  </ul></li>
+  <li><a href="#session-8-a-controlled-experiment-from-prediction-to-verification" id="toc-session-8-a-controlled-experiment-from-prediction-to-verification" class="nav-link" data-scroll-target="#session-8-a-controlled-experiment-from-prediction-to-verification"><span class="header-section-number">17.9</span> Session 8 — A controlled experiment from prediction to verification</a>
+  <ul class="collapse">
+  <li><a href="#construct-a-problem-with-known-answers" id="toc-construct-a-problem-with-known-answers" class="nav-link" data-scroll-target="#construct-a-problem-with-known-answers">Construct a problem with known answers</a></li>
+  <li><a href="#a-measured-history" id="toc-a-measured-history" class="nav-link" data-scroll-target="#a-measured-history">A measured history</a></li>
+  <li><a href="#transfer-to-a-variational-pde-problem" id="toc-transfer-to-a-variational-pde-problem" class="nav-link" data-scroll-target="#transfer-to-a-variational-pde-problem">Transfer to a variational PDE problem</a></li>
+  </ul></li>
+  <li><a href="#exercises-and-worked-solutions" id="toc-exercises-and-worked-solutions" class="nav-link" data-scroll-target="#exercises-and-worked-solutions"><span class="header-section-number">17.10</span> Exercises and worked solutions</a>
+  <ul class="collapse">
+  <li><a href="#which-data-are-allowed-to-move" id="toc-which-data-are-allowed-to-move" class="nav-link" data-scroll-target="#which-data-are-allowed-to-move">1. Which data are allowed to move?</a></li>
+  <li><a href="#a-rayleigh-quotient-can-conceal-an-inaccurate-vector" id="toc-a-rayleigh-quotient-can-conceal-an-inaccurate-vector" class="nav-link" data-scroll-target="#a-rayleigh-quotient-can-conceal-an-inaccurate-vector">2. A Rayleigh quotient can conceal an inaccurate vector</a></li>
+  <li><a href="#a-backward-error-with-symmetry" id="toc-a-backward-error-with-symmetry" class="nav-link" data-scroll-target="#a-backward-error-with-symmetry">3. A backward error with symmetry</a></li>
+  <li><a href="#fixed-versus-adaptive-inverse-iteration" id="toc-fixed-versus-adaptive-inverse-iteration" class="nav-link" data-scroll-target="#fixed-versus-adaptive-inverse-iteration">4. Fixed versus adaptive inverse iteration</a></li>
+  <li><a href="#a-block-that-cannot-recover-its-target" id="toc-a-block-that-cannot-recover-its-target" class="nav-link" data-scroll-target="#a-block-that-cannot-recover-its-target">5. A block that cannot recover its target</a></li>
+  <li><a href="#from-an-approximate-arnoldi-relation-to-a-trustworthy-residual" id="toc-from-an-approximate-arnoldi-relation-to-a-trustworthy-residual" class="nav-link" data-scroll-target="#from-an-approximate-arnoldi-relation-to-a-trustworthy-residual">6. From an approximate Arnoldi relation to a trustworthy residual</a></li>
+  <li><a href="#designing-a-degree" id="toc-designing-a-degree" class="nav-link" data-scroll-target="#designing-a-degree">7. Designing a degree</a></li>
+  <li><a href="#endpoint-accumulation" id="toc-endpoint-accumulation" class="nav-link" data-scroll-target="#endpoint-accumulation">8. Endpoint accumulation</a></li>
+  <li><a href="#verification-with-a-mass-matrix" id="toc-verification-with-a-mass-matrix" class="nav-link" data-scroll-target="#verification-with-a-mass-matrix">9. Verification with a mass matrix</a></li>
+  <li><a href="#distinguishing-a-measured-floor-from-a-theorem" id="toc-distinguishing-a-measured-floor-from-a-theorem" class="nav-link" data-scroll-target="#distinguishing-a-measured-floor-from-a-theorem">10. Distinguishing a measured floor from a theorem</a></li>
+  <li><a href="#a-filter-written-in-terms-of-its-residual" id="toc-a-filter-written-in-terms-of-its-residual" class="nav-link" data-scroll-target="#a-filter-written-in-terms-of-its-residual">11. A filter written in terms of its residual</a></li>
+  <li><a href="#design-an-equal-work-comparison" id="toc-design-an-equal-work-comparison" class="nav-link" data-scroll-target="#design-an-equal-work-comparison">12. Design an equal-work comparison</a></li>
+  </ul></li>
+  <li><a href="#computational-laboratory-matlab" id="toc-computational-laboratory-matlab" class="nav-link" data-scroll-target="#computational-laboratory-matlab"><span class="header-section-number">17.11</span> Computational laboratory — MATLAB</a></li>
+  <li><a href="#synthesis-what-makes-the-computation-reliable" id="toc-synthesis-what-makes-the-computation-reliable" class="nav-link" data-scroll-target="#synthesis-what-makes-the-computation-reliable"><span class="header-section-number">17.12</span> Synthesis — What makes the computation reliable?</a>
+  <ul class="collapse">
+  <li><a href="#mastery-questions" id="toc-mastery-questions" class="nav-link" data-scroll-target="#mastery-questions">Mastery questions</a></li>
+  <li><a href="#where-to-go-next" id="toc-where-to-go-next" class="nav-link" data-scroll-target="#where-to-go-next">Where to go next</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_2/a02.html">Review II</a></li><li class="breadcrumb-item"><a href="../review_2/e.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-module-e" class="quarto-section-identifier"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="from-a-spectral-decomposition-to-a-numerical-claim" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="from-a-spectral-decomposition-to-a-numerical-claim"><span class="header-section-number">17.1</span> From a spectral decomposition to a numerical claim</h2>
+<p>Suppose a program returns a unit vector <span class="math inline">\(x\)</span> and a number <span class="math inline">\(\theta\)</span>. You can multiply by <span class="math inline">\(A\)</span>, but you do not know any of its eigenvectors. What calculation would justify the statement “this is an accurate approximation to the second eigenvector”? Computing <span class="math inline">\(\|Ax-\theta x\|\)</span> is a first step. You still need to identify the eigenvalue, establish separation from competing directions, and know how accurately you evaluated the residual itself. Each of the eight sessions develops one part of that argument.</p>
+<p><strong>Starting point in Review II.</strong> Module A (§4.11) supplied invariant subspaces and direct sums. Module B (§5.7) explained how a functional pulls back through a map. Module C (§§6.7, 6.11) supplied orthogonal projections and the mass-matrix inner product. Module D (§§7.5–7.10) established the spectral theorem, principal angles, Rayleigh–Ritz, and polynomial filtering. Its §7.18 asks what accuracy and cost survive implementation. Here a spectral theorem becomes both a way to design an algorithm and a way to audit its output.</p>
+<p><strong>Running example and conventions.</strong> Work over a finite-dimensional real or complex inner-product space, using orthonormal coordinates unless specified. A star denotes conjugate transpose. Write <span class="math inline">\(\|\cdot\|\)</span> for the Euclidean or induced spectral norm, <span class="math inline">\(\|\cdot\|_F\)</span> for the Frobenius norm. The Rayleigh quotient is <span class="math inline">\(\rho_A(x)=x^*Ax/(x^*x)\)</span>. Reuse the matrix from §7.5.5,</p>
+<p><span class="math display">\[
+A_0=\begin{pmatrix}2&amp;1&amp;0\\1&amp;2&amp;0\\0&amp;0&amp;9\end{pmatrix},
+\quad q_1=(1,-1,0)^T/\sqrt2,\quad q_2=(1,1,0)^T/\sqrt2,\quad q_3=e_3 .
+\]</span></p>
+<p>The corresponding eigenvalues are <span class="math inline">\(1,3,9\)</span>. These subscripts stay attached to these vectors. For general results we state the ordering separately, since largest magnitude, largest algebraic value and closest to a shift are three different targets.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session</th>
+<th>Question to reconstruct at the board</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1. Arithmetic</td>
+<td>Which nearby problem explains a computed answer?</td>
+</tr>
+<tr class="even">
+<td>2. Perturbations</td>
+<td>What can a small residual certify?</td>
+</tr>
+<tr class="odd">
+<td>3. Vector iteration</td>
+<td>Which component survives repeated application?</td>
+</tr>
+<tr class="even">
+<td>4. Block iteration</td>
+<td>What contracts when individual columns can rotate?</td>
+</tr>
+<tr class="odd">
+<td>5. Krylov projection</td>
+<td>What do we gain by keeping earlier powers?</td>
+</tr>
+<tr class="even">
+<td>6. Polynomial filters</td>
+<td>How do spectral separation and recurrence errors interact?</td>
+</tr>
+<tr class="odd">
+<td>7. Mixed precision</td>
+<td>Which operation limits the verified accuracy?</td>
+</tr>
+<tr class="even">
+<td>8. Case study</td>
+<td>Do the measured histories agree with the prediction?</td>
+</tr>
+</tbody>
+</table>
+<p>Read Sessions 1–2 together, derive Sessions 3–4 first for <span class="math inline">\(A_0\)</span>, and work through Session 6 once with scalars before interpreting a matrix experiment. The laboratory is a single MATLAB script collected after the exercises.</p>
+</section>
+<section id="session-1-floating-point-arithmetic-conditioning-and-stability" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="session-1-floating-point-arithmetic-conditioning-and-stability"><span class="header-section-number">17.2</span> Session 1 — Floating-point arithmetic, conditioning, and stability</h2>
+<section id="what-one-rounding-step-changes" class="level3">
+<h3 class="anchored" data-anchor-id="what-one-rounding-step-changes">What one rounding step changes</h3>
+<p>In binary precision <span class="math inline">\(p\)</span> a normalized positive number has form <span class="math inline">\((1.b_2\ldots b_p)_2 2^e\)</span> with a bounded exponent. Adjacent numbers in <span class="math inline">\([1,2)\)</span> are <span class="math inline">\(2^{1-p}\)</span> apart. Rounding to nearest therefore gives unit roundoff <span class="math inline">\(u=2^{-p}\)</span>. In binary32, <span class="math inline">\(p=24\)</span>; in binary64, <span class="math inline">\(p=53\)</span>. MATLAB’s spacing at one is <span class="math inline">\(2u\)</span>. The exponent controls range independently of the precision. For a correctly rounded real operation with exact result in the normal range and no overflow,</p>
+<p><span class="math display">\[
+\operatorname{fl}(a\mathbin{\circ}b)=(a\mathbin{\circ}b)(1+\delta),\quad |\delta|\le u .
+\]</span></p>
+<p>Indeed half an ulp in the binade starting at <span class="math inline">\(2^e\)</span> is <span class="math inline">\(2^eu\)</span>, while the result has magnitude at least <span class="math inline">\(2^e\)</span>. Zero is exact. Near underflow one needs an absolute-error term. A fused multiply-add rounds the combined expression once. Complex arithmetic implemented with real operations has different operation counts.</p>
+<p><strong>Hand experiment.</strong> With <span class="math inline">\(p=3\)</span> and ties to even, <span class="math inline">\(1+1/8\)</span> rounds to <span class="math inline">\(1\)</span>. Thus <span class="math inline">\((1+1/8)-1\)</span> evaluates to zero while <span class="math inline">\((1-1)+1/8\)</span> evaluates exactly. The final subtraction in the first expression is itself exact. It exposes the loss in the preceding sum. This is the same difficulty that arises when subtracting two large nearly equal terms in an eigenpair residual.</p>
+</section>
+<section id="from-dot-products-to-a-matrix-product" class="level3">
+<h3 class="anchored" data-anchor-id="from-dot-products-to-a-matrix-product">From dot products to a matrix product</h3>
+<p>For <span class="math inline">\(ku&lt;1\)</span> write <span class="math inline">\(\gamma_k=ku/(1-ku)\)</span>. A product of at most <span class="math inline">\(k\)</span> factors <span class="math inline">\(1+\delta_j\)</span> differs from one by at most <span class="math inline">\(\gamma_k\)</span>: its upper bound is <span class="math inline">\((1+u)^k\le 1/(1-ku)\)</span> by binomial expansion and the geometric series, and its lower bound is at least <span class="math inline">\(1-ku\)</span>. Unroll a sequential real dot product. Each exact summand <span class="math inline">\(a_jx_j\)</span> is multiplied by the rounding factor from its product and factors from subsequent additions, at most <span class="math inline">\(n\)</span> in total when the first product initializes the sum. Thus</p>
+<p><span class="math display">\[
+|\operatorname{fl}(a^Tx)-a^Tx|\le\gamma_n\sum_j|a_jx_j|,
+\qquad |\operatorname{fl}(Ax)-Ax|\le\gamma_n|A|\,|x|.
+\]</span></p>
+<p>Absolute values and the second inequality are entrywise. Equivalently, for this multiply there exists <span class="math inline">\(\Delta A\)</span> with <span class="math inline">\(|\Delta A|\le\gamma_n|A|\)</span> giving the computed result exactly as <span class="math inline">\((A+\Delta A)x\)</span>. The perturbation can change with the input and with each multiply. For sparse rows one can replace <span class="math inline">\(n\)</span> by their maximum number of summed products under the same arithmetic model. Cancellation can make the <em>relative output error</em> large even when the componentwise backward error is small.</p>
+</section>
+<section id="problem-sensitivity-versus-the-error-of-a-method" class="level3">
+<h3 class="anchored" data-anchor-id="problem-sensitivity-versus-the-error-of-a-method">Problem sensitivity versus the error of a method</h3>
+<p>For differentiable <span class="math inline">\(f\)</span> the local absolute condition number in specified norms is <span class="math inline">\(\|Df(d)\|\)</span>. For <span class="math inline">\(d,f(d)\ne0\)</span>, the relative one is <span class="math inline">\(\|Df(d)\|\|d\|/\|f(d)\|\)</span>. This follows by maximizing the first-order change <span class="math inline">\(Df(d)h\)</span> over a ball of input perturbations. Specifying which data may change is part of defining the problem.</p>
+<p>A forward error measures distance from the exact output. A backward error is the least size of a permitted perturbation for which the computed output is exact. Backward stability means this size is small on the scale of arithmetic error under stated hypotheses. For <span class="math inline">\(Ax=b\)</span> with nonsingular <span class="math inline">\(A\)</span>, fixed <span class="math inline">\(A\)</span>, and <span class="math inline">\(r=b-A\hat x\)</span>, the exact perturbed right side is <span class="math inline">\(b-r\)</span>. Hence</p>
+<p><span class="math display">\[
+x-\hat x=A^{-1}r,\qquad
+\frac{\|x-\hat x\|}{\|x\|}\le\kappa_2(A)\frac{\|r\|}{\|b\|},
+\quad \kappa_2(A)=\|A\|\|A^{-1}\|=\sigma_{\max}/\sigma_{\min}.
+\]</span></p>
+<p>Here <span class="math inline">\(\|b\|\le\|A\|\|x\|\)</span> supplies the last factor. For <span class="math inline">\(A=\operatorname{diag}(1,\varepsilon)\)</span>, <span class="math inline">\(b=e_1\)</span> and <span class="math inline">\(\hat x=(1,1)^T\)</span>, the relative residual is <span class="math inline">\(\varepsilon\)</span> and the relative forward error is one. The SVD from Module D explains this amplification by the long axis of the inverse image ellipsoid. In iterative refinement a more accurate residual helps recover the correction. The eigenvalue analogue requires spectral separation, developed next.</p>
+<p><strong>Checkpoint.</strong> For <span class="math inline">\(a=(1,-1)\)</span>, <span class="math inline">\(x=(1,1+\varepsilon)^T\)</span>, explain why the dot-product bound divided by <span class="math inline">\(|a^Tx|\)</span> grows like <span class="math inline">\(2\gamma_2/|\varepsilon|\)</span>. Which two terms cancel?</p>
+</section>
+</section>
+<section id="session-2-eigenpair-residuals-and-perturbations" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="session-2-eigenpair-residuals-and-perturbations"><span class="header-section-number">17.3</span> Session 2 — Eigenpair residuals and perturbations</h2>
+<section id="a-residual-as-the-price-of-exactness" class="level3">
+<h3 class="anchored" data-anchor-id="a-residual-as-the-price-of-exactness">A residual as the price of exactness</h3>
+<p>For a unit vector <span class="math inline">\(x\)</span>, set <span class="math inline">\(r=Ax-\theta x\)</span>. A matrix <span class="math inline">\(E\)</span> makes <span class="math inline">\((\theta,x)\)</span> exact for <span class="math inline">\(A+E\)</span> precisely when <span class="math inline">\(Ex=-r\)</span>. Consequently <span class="math inline">\(\|E\|\ge\|r\|\)</span>, with equality for <span class="math inline">\(E=-rx^*\)</span>. This is an exact, normwise, absolute backward error allowing arbitrary matrix perturbations. For a nonzero unnormalized vector divide the residual norm by <span class="math inline">\(\|x\|\)</span>. Normalizing further by <span class="math inline">\(\|A\|\)</span> gives a relative perturbation in <span class="math inline">\(A\)</span> when <span class="math inline">\(\|A\|&gt;0\)</span>.</p>
+<p>If <span class="math inline">\(A=A^*\)</span> and <span class="math inline">\(\theta=\rho_A(x)\)</span>, then <span class="math inline">\(x^*r=0\)</span>. Now <span class="math inline">\(E=-rx^*-xr^*\)</span> is Hermitian and has the same optimal norm. On the orthonormal pair <span class="math inline">\(x,r/\|r\|\)</span> its matrix has zero diagonal and off-diagonals <span class="math inline">\(-\|r\|\)</span>, and it vanishes on their orthogonal complement. The case <span class="math inline">\(r=0\)</span> takes <span class="math inline">\(E=0\)</span>. This construction preserves self-adjointness. Additional requirements such as a fixed sparsity pattern change the backward-error problem.</p>
+</section>
+<section id="locating-an-eigenvalue-and-locating-a-direction" class="level3">
+<h3 class="anchored" data-anchor-id="locating-an-eigenvalue-and-locating-a-direction">Locating an eigenvalue and locating a direction</h3>
+<p>Let <span class="math inline">\(A=A^*=U\Lambda U^*\)</span>, <span class="math inline">\(x=\sum_i c_i u_i\)</span>, <span class="math inline">\(\|x\|=1\)</span>. Pythagoras gives the identity</p>
+<p><span class="math display">\[
+\|r\|^2=\sum_i|\lambda_i-\theta|^2|c_i|^2 .
+\]</span></p>
+<p>Since <span class="math inline">\(\sum_i|c_i|^2=1\)</span>, some eigenvalue lies within <span class="math inline">\(\|r\|\)</span> of <span class="math inline">\(\theta\)</span>. To identify a target set <span class="math inline">\(I\)</span>, let <span class="math inline">\(P_I=\sum_{i\in I}u_i u_i^*\)</span> and <span class="math inline">\(\delta=\min_{i\notin I}|\lambda_i-\theta|&gt;0\)</span>. Discarding the target terms gives</p>
+<p><span class="math display">\[
+\sin\angle(x,\operatorname{ran}P_I)=\|(I-P_I)x\|\le\|r\|/\delta .
+\]</span></p>
+<p>Knowing which eigenvalues are excluded is substantive information. An exact eigenvector of the wrong eigenvalue has zero residual. Eigenvectors inside a multiple eigenspace are interchangeable, so a particular basis there cannot be certified from the equation.</p>
+<p>For a simple target <span class="math inline">\(\lambda_j\)</span>, expansion of the Rayleigh quotient gives <span class="math inline">\(\rho_A(x)-\lambda_j=\sum_{i\ne j}(\lambda_i-\lambda_j)|c_i|^2\)</span>. Its absolute value is bounded by <span class="math inline">\(\max_i|\lambda_i-\lambda_j|\sin^2\angle(x,u_j)\)</span>. Thus the value can settle to many digits while its direction still moves appreciably. For <span class="math inline">\(x=\cos t\,q_2+\sin t\,q_3\)</span>, the value is <span class="math inline">\(3+6\sin^2 t\)</span> and the residual norm is <span class="math inline">\(6|\sin t\cos t|\)</span>.</p>
+</section>
+<section id="weyl-and-subspace-separation" class="level3">
+<h3 class="anchored" data-anchor-id="weyl-and-subspace-separation">Weyl and subspace separation</h3>
+<p>For two Hermitian matrices <span class="math inline">\(A\)</span> and <span class="math inline">\(A+E\)</span>, their eigenvalues in increasing order satisfy <span class="math inline">\(|\lambda_i(A+E)-\lambda_i(A)|\le\|E\|\)</span>. <strong>Proof.</strong> For every unit vector the Rayleigh quotients differ by at most <span class="math inline">\(\|E\|\)</span>. Taking the maximum over vectors in an <span class="math inline">\(i\)</span>-dimensional subspace and then the minimum over such subspaces preserves both inequalities. Apply Module D’s min–max theorem. This is an absolute bound. Relative sensitivity may be large near zero.</p>
+<p>Here is a residual version of the subspace separation argument behind Davis–Kahan. Let <span class="math inline">\(X^*X=I\)</span>, <span class="math inline">\(H=X^*AX\)</span>, and <span class="math inline">\(R=AX-XH\)</span>. Rotate <span class="math inline">\(X\)</span> by a unitary matrix to diagonalize <span class="math inline">\(H=\operatorname{diag}(\theta_j)\)</span> in its new basis. If <span class="math inline">\(U_2\)</span> spans the exact unwanted eigenvectors with diagonal matrix <span class="math inline">\(\Lambda_2\)</span>, then <span class="math inline">\(S=U_2^*X\)</span> satisfies</p>
+<p><span class="math display">\[
+\Lambda_2 S-SH=U_2^*R .
+\]</span></p>
+<p>If every <span class="math inline">\(|\lambda_i(\Lambda_2)-\theta_j|\ge\delta&gt;0\)</span>, division entry by entry and summation of squares gives <span class="math inline">\(\|S\|_F\le\|R\|_F/\delta\)</span>. The singular values of <span class="math inline">\(S\)</span> are the sines of the principal angles when the target and trial dimensions agree. This proves a Frobenius sin-theta bound and therefore also bounds the largest sine. Entrywise division alone does not prove the same constant for a spectral-norm right side. For a perturbed invariant subspace of <span class="math inline">\(A+E\)</span>, <span class="math inline">\(R=-(I-XX^*)EX\)</span>; the denominator must still separate the perturbed Ritz spectrum from the unwanted spectrum of <span class="math inline">\(A\)</span>.</p>
+<p><strong>Small-gap example.</strong> For <span class="math inline">\(\operatorname{diag}(1,1+g)\)</span> add a real symmetric off-diagonal <span class="math inline">\(\varepsilon\)</span>. The diagonalizing rotation has <span class="math inline">\(|\tan(2t)|=2|\varepsilon|/g\)</span>. Taking <span class="math inline">\(\varepsilon=g/2\)</span> rotates the axes by <span class="math inline">\(\pi/8\)</span> even as <span class="math inline">\(g\to0\)</span>. Appending a third eigenvalue <span class="math inline">\(9\)</span> leaves the first two coordinates as an exact invariant plane. A well-determined plane may contain poorly determined individual directions.</p>
+</section>
+<section id="why-nonnormality-changes-the-certificate" class="level3">
+<h3 class="anchored" data-anchor-id="why-nonnormality-changes-the-certificate">Why nonnormality changes the certificate</h3>
+<p>If <span class="math inline">\(A=V\Lambda V^{-1}\)</span> and <span class="math inline">\(\mu\)</span> is an eigenvalue of <span class="math inline">\(A+E\)</span>, then <span class="math inline">\(\min_i|\mu-\lambda_i|\le\kappa_2(V)\|E\|\)</span> (Bauer–Fike). For <span class="math inline">\(\mu\)</span> outside the spectrum, apply <span class="math inline">\((\mu I-A)^{-1}\)</span> to <span class="math inline">\(Ex\)</span> for a unit perturbed eigenvector <span class="math inline">\(x\)</span>. The resolvent has norm at most <span class="math inline">\(\kappa_2(V)/\min_i|\mu-\lambda_i|\)</span>, giving the claim. A normal matrix admits unitary <span class="math inline">\(V\)</span>. For a simple eigenvalue, differentiating <span class="math inline">\(Ax=\lambda x\)</span> and testing with a left eigenvector <span class="math inline">\(y^*\)</span> gives <span class="math inline">\(\dot\lambda=y^*\dot A x/(y^*x)\)</span>. This is Module B’s dual measurement in action. Nearly orthogonal left and right eigenvectors amplify perturbations.</p>
+<p>For the Jordan block <span class="math inline">\(J=\left(\begin{smallmatrix}0&amp;1\\0&amp;0\end{smallmatrix}\right)\)</span>, adding <span class="math inline">\(\varepsilon\)</span> in position <span class="math inline">\((2,1)\)</span> produces eigenvalues <span class="math inline">\(\pm\sqrt{\varepsilon}\)</span>. Even the order of the displacement changes at a defective eigenvalue. More generally the <span class="math inline">\(\varepsilon\)</span>-pseudospectrum consists of the possible eigenvalues under <span class="math inline">\(\|E\|\le\varepsilon\)</span>. The rank-one construction identifies it exactly with those <span class="math inline">\(\theta\)</span> admitting a unit vector of residual at most <span class="math inline">\(\varepsilon\)</span>.</p>
+<p><strong>Checkpoint.</strong> If a normalized Hermitian Ritz vector has residual <span class="math inline">\(10^{-8}\)</span> and every unwanted eigenvalue is at least <span class="math inline">\(10^{-3}\)</span> away from its Ritz value, what is certified? Some eigenvalue is within <span class="math inline">\(10^{-8}\)</span> and the sine to the identified target space is at most <span class="math inline">\(10^{-5}\)</span>.</p>
+</section>
+</section>
+<section id="session-3-vector-iterations-as-spectral-transformations" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="session-3-vector-iterations-as-spectral-transformations"><span class="header-section-number">17.4</span> Session 3 — Vector iterations as spectral transformations</h2>
+<section id="power-iteration-and-its-rate" class="level3">
+<h3 class="anchored" data-anchor-id="power-iteration-and-its-rate">Power iteration and its rate</h3>
+<p>Given a unit <span class="math inline">\(x_0\)</span>, form <span class="math inline">\(y=Ax_k\)</span>, <span class="math inline">\(x_{k+1}=y/\|y\|\)</span> whenever <span class="math inline">\(y\ne0\)</span>. Normalization controls the scale and preserves the line generated by <span class="math inline">\(A^{k+1}x_0\)</span>. For Hermitian <span class="math inline">\(A\)</span>, order <span class="math inline">\(|\lambda_1|&gt;|\lambda_2|\ge\cdots\)</span> and write <span class="math inline">\(x_0=\sum c_i u_i\)</span> with <span class="math inline">\(c_1\ne0\)</span>. Divide the squared norm of the unwanted components by that of the desired component:</p>
+<p><span class="math display">\[
+\tan^2\angle(x_k,u_1)=
+\sum_{i&gt;1}\left|\frac{c_i}{c_1}\right|^2
+             \left|\frac{\lambda_i}{\lambda_1}\right|^{2k}.
+\]</span></p>
+<p>Consequently the tangent decreases at least as fast as the bound <span class="math inline">\((|\lambda_2/\lambda_1|)^k\tan\angle(x_0,u_1)\)</span>. Equality holds if all active unwanted components have modulus <span class="math inline">\(|\lambda_2|\)</span>. The Rayleigh quotient error is quadratic in the sine by Session 2. A negative dominant eigenvalue reverses sign each iteration. Monitor the line or its residual. A zero starting coefficient stays zero in exact arithmetic. Equal dominant moduli can prevent convergence to a line, as <span class="math inline">\(\operatorname{diag}(1,-1)\)</span> shows.</p>
+<p>For <span class="math inline">\(A_0\)</span>, start at <span class="math inline">\((q_2+q_3)/\sqrt2\)</span>. After two multiplications the tangent to <span class="math inline">\(q_3\)</span> is <span class="math inline">\(1/9\)</span>, and the Rayleigh quotient is <span class="math inline">\((3+9\cdot81)/82\)</span>. Compare the error <span class="math inline">\(6/82\)</span> with the angle <span class="math inline">\(\arctan(1/9)\)</span>. In an optimization interpretation, <span class="math inline">\(\rho_A\)</span> on the unit sphere has tangential gradient <span class="math inline">\(2(Ax-\rho_A(x)x)\)</span> in real coordinates. A stationary point is an eigenvector. Power iteration selects by modulus, so on an indefinite matrix it need not maximize the quotient.</p>
+</section>
+<section id="inverse-iteration-and-rayleigh-quotient-iteration" class="level3">
+<h3 class="anchored" data-anchor-id="inverse-iteration-and-rayleigh-quotient-iteration">Inverse iteration and Rayleigh quotient iteration</h3>
+<p>Choose a real shift <span class="math inline">\(\sigma\)</span> outside the spectrum. Solve <span class="math inline">\((A-\sigma I)y=x_k\)</span> and normalize <span class="math inline">\(y\)</span>. In the eigenbasis the component multiplier is <span class="math inline">\(1/(\lambda_i-\sigma)\)</span>. For a unique closest eigenvalue <span class="math inline">\(\lambda_t\)</span>, nonzero starting overlap, and second-closest distance <span class="math inline">\(d_2\)</span>, the tangent bound contracts per step by <span class="math inline">\(|\lambda_t-\sigma|/d_2\)</span>. A fixed shift permits reuse of a factorization. For <span class="math inline">\(A_0\)</span>, <span class="math inline">\(\sigma=2.8\)</span> gives distances <span class="math inline">\(1.8,0.2,6.2\)</span>. The target is <span class="math inline">\(q_2\)</span> and the worst-case factor is <span class="math inline">\(1/9\)</span>. Near-singularity is the source of selectivity. It also calls for stable shifted solves and residual checks on the original eigenproblem. A solve residual <span class="math inline">\(s=x_k-(A-\sigma I)\hat y\)</span> changes the inverse application by <span class="math inline">\(-(A-\sigma I)^{-1}s\)</span>.</p>
+<p>Rayleigh quotient iteration (RQI) recomputes <span class="math inline">\(\sigma=\rho_A(x_k)\)</span> each time. Assume <span class="math inline">\(A\)</span> Hermitian, <span class="math inline">\(\lambda_t\)</span> simple, gap <span class="math inline">\(g&gt;0\)</span>, and <span class="math inline">\(x_k\)</span> close enough that <span class="math inline">\(|\rho_A(x_k)-\lambda_t|&lt;g/2\)</span>. Put <span class="math inline">\(t=\angle(x_k,u_t)\)</span> and <span class="math inline">\(D=\max_i|\lambda_i-\lambda_t|\)</span>. When the shifted solve exists, the same component calculation gives</p>
+<p><span class="math display">\[
+\tan t_{\mathrm{new}}\le
+\frac{|\lambda_t-\rho_A(x_k)|}{\min_{i\ne t}|\lambda_i-\rho_A(x_k)|}\tan t
+\le (2D/g)\sin^2 t\,\tan t .
+\]</span></p>
+<p>This proves local cubic convergence of the direction. Each changing shift can require a new factorization. Check convergence before solving: at an eigenvector the shifted matrix is singular. At an interior eigenvalue cancellation can also give a singular shift away from an eigenvector. For <span class="math inline">\(\operatorname{diag}(-1,0,1)\)</span>, the equal mixture of the outer directions has quotient zero. A practical safeguard detects a failed solve and selects a perturbed shift. The cubic estimate makes no global claim about which eigenpair a distant start selects.</p>
+<p><strong>Checkpoint.</strong> Explain why a smaller shift distance helps inverse iteration in exact arithmetic and simultaneously increases the potential amplification of a linear-solve residual.</p>
+</section>
+</section>
+<section id="session-4-block-iteration-principal-angles-and-extraction" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="session-4-block-iteration-principal-angles-and-extraction"><span class="header-section-number">17.5</span> Session 4 — Block iteration, principal angles, and extraction</h2>
+<section id="why-a-basis-needs-attention" class="level3">
+<h3 class="anchored" data-anchor-id="why-a-basis-needs-attention">Why a basis needs attention</h3>
+<p>To find a <span class="math inline">\(p\)</span>-dimensional invariant space, start with <span class="math inline">\(X_0^*X_0=I_p\)</span>, form <span class="math inline">\(Y=AX_k\)</span>, and take <span class="math inline">\(X_{k+1}\)</span> as the thin <span class="math inline">\(Q\)</span> in <span class="math inline">\(Y=QR\)</span>. Provided <span class="math inline">\(Y\)</span> has full column rank, <span class="math inline">\(R\)</span> is invertible and the range is unchanged by this operation. Independent power iterations tend to align all columns with the strongest direction. A QR step restores a basis with which the weaker directions can still be represented. A unitary change of basis <span class="math inline">\(X\mapsto XW\)</span> leaves the orthogonal projector <span class="math inline">\(XX^*\)</span> unchanged.</p>
+<p>Write <span class="math inline">\(A=[U_1,U_2]\operatorname{diag}(\Lambda_1,\Lambda_2)[U_1,U_2]^*\)</span> for Hermitian <span class="math inline">\(A\)</span>, with <span class="math inline">\(p\)</span> target columns in <span class="math inline">\(U_1\)</span>. Put <span class="math inline">\(C=U_1^*X_0\)</span>, <span class="math inline">\(D=U_2^*X_0\)</span>. Assume <span class="math inline">\(C\)</span> invertible and every target eigenvalue nonzero. In eigen-coordinates a basis of the iterated space can be written <span class="math display">\[
+\begin{pmatrix}\Lambda_1^k C\\\Lambda_2^k D\end{pmatrix}
+(\Lambda_1^k C)^{-1}=\begin{pmatrix}I\\Z_k\end{pmatrix},
+\qquad Z_k=\Lambda_2^k DC^{-1}\Lambda_1^{-k}.
+\]</span> This is the graph of a map from the target to its orthogonal complement. A vector on it has tangent <span class="math inline">\(\|Z_k v\|/\|v\|\)</span> to the target. Maximization therefore gives <span class="math inline">\(\tan\theta_{\max}=\|Z_k\|\)</span>. In particular <span class="math display">\[
+\tan\theta_{\max,k}\le
+\left(\frac{\max_{\mathrm{out}}|\lambda|}{\min_{\mathrm{in}}|\lambda|}\right)^k\|DC^{-1}\| .
+\]</span> Separation is needed across the boundary of the target. Multiplicities wholly inside it cause no difficulty. Taking a block larger than the requested number can move that boundary beyond a cluster; then interpret the bound for the enlarged space and extract the requested Ritz pairs.</p>
+</section>
+<section id="rayleighritz-and-finite-precision" class="level3">
+<h3 class="anchored" data-anchor-id="rayleighritz-and-finite-precision">Rayleigh–Ritz and finite precision</h3>
+<p>With orthonormal <span class="math inline">\(X\)</span>, compress to <span class="math inline">\(H=X^*AX\)</span>. Solve <span class="math inline">\(Hw_j=\theta_jw_j\)</span> with orthonormal <span class="math inline">\(w_j\)</span>, form <span class="math inline">\(v_j=Xw_j\)</span>. Then <span class="math inline">\(r_j=Av_j-\theta_j v_j\)</span> satisfies <span class="math inline">\(X^*r_j=0\)</span> by substitution. Conversely this orthogonality for <span class="math inline">\(v=Xw\)</span> is precisely the projected eigenproblem. Thus the defect annihilates every trial-space test direction (Module B), or equivalently has zero orthogonal projection there (Module C). For nonorthonormal full-rank <span class="math inline">\(Y\)</span> the corresponding problem is <span class="math inline">\(Y^*AYw=\theta Y^*Yw\)</span>. An ill-conditioned Gram matrix squares the basis condition number. Orthogonalize first.</p>
+<p>For <span class="math inline">\(A_0\)</span>, use <span class="math inline">\(X=[q_2,(q_1+q_3)/\sqrt2]\)</span>. The compression is <span class="math inline">\(\operatorname{diag}(3,5)\)</span>, yet <span class="math inline">\(5\)</span> is not an eigenvalue of <span class="math inline">\(A_0\)</span>. Its residual is <span class="math inline">\(4(q_3-q_1)/\sqrt2\)</span>, perpendicular to both columns. One exact Ritz pair can coexist with a poor second pair. Sorted Ritz values alone do not verify a block.</p>
+<p>Householder QR uses unitary reflections <span class="math inline">\(I-2vv^*/(v^*v)\)</span> to zero entries below a pivot without changing exact lengths. In floating point it is a standard stable choice for a dense block. Gram–Schmidt subtracts projections onto earlier columns. If this leaves a tiny vector, errors made in subtracting large components are magnified upon normalization. A second orthogonalization pass often repairs the defect. If the input block has lost numerical rank, reorthogonalization cannot recover information already lost. Monitor <span class="math inline">\(\|I-X^*X\|\)</span>, the size and conditioning of the small triangular factor, and the direct residual. Computing small angles through <span class="math inline">\(\arccos(\sigma_{\min}(U_1^*X))\)</span> loses digits near one. Prefer <span class="math inline">\(\|(I-U_1U_1^*)X\|\)</span> or <span class="math inline">\(\|U_2^*X\|\)</span> for the largest sine.</p>
+<p><strong>Checkpoint.</strong> For trial columns <span class="math inline">\(q_3,(q_2+q_1)/\sqrt2\)</span> and target <span class="math inline">\(\operatorname{span}(q_3,q_2)\)</span>, calculate the tangent after one power step. It is <span class="math inline">\(1/3\)</span>, even though the first column is already exact.</p>
+</section>
+</section>
+<section id="session-5-krylov-spaces-and-projected-eigenproblems" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="session-5-krylov-spaces-and-projected-eigenproblems"><span class="header-section-number">17.6</span> Session 5 — Krylov spaces and projected eigenproblems</h2>
+<section id="keeping-the-history" class="level3">
+<h3 class="anchored" data-anchor-id="keeping-the-history">Keeping the history</h3>
+<p>For <span class="math inline">\(v\ne0\)</span>, <span class="math inline">\(\mathcal K_m(A,v)=\operatorname{span}(v,Av,\ldots,A^{m-1}v)=\{p(A)v:\deg p&lt;m\}\)</span>. Power iteration keeps one polynomial. Krylov projection searches the span of all these candidates. If <span class="math inline">\(A^m v\)</span> lies in the earlier span then applying <span class="math inline">\(A\)</span> to any spanning vector stays inside and the space is invariant. Algebraically, <span class="math inline">\(p\mapsto p(A)v\)</span> maps the polynomial ring onto the cyclic space generated by <span class="math inline">\(v\)</span>. Its kernel is the ideal generated by the least-degree monic polynomial annihilating <span class="math inline">\(v\)</span>. Polynomial division shows that its degree equals the eventual Krylov dimension. This is the first isomorphism theorem of Module A in the language of Module F2.</p>
+</section>
+<section id="arnoldi-lanczos-and-the-residual-shortcut" class="level3">
+<h3 class="anchored" data-anchor-id="arnoldi-lanczos-and-the-residual-shortcut">Arnoldi, Lanczos, and the residual shortcut</h3>
+<p>Normalize <span class="math inline">\(v_1=v/\|v\|\)</span>. Given <span class="math inline">\(V_j=[v_1,\ldots,v_j]\)</span>, project <span class="math inline">\(Av_j\)</span> onto the basis, subtract that projection and normalize the remainder: <span class="math display">\[
+h_{ij}=v_i^*Av_j,\quad w=Av_j-\sum_{i=1}^j h_{ij}v_i,\quad
+h_{j+1,j}=\|w\|,\quad v_{j+1}=w/h_{j+1,j}.
+\]</span> A zero norm gives an invariant space in exact arithmetic. Stacking the identities gives <span class="math display">\[
+AV_m=V_m H_m+h_{m+1,m}v_{m+1}e_m^*,\qquad H_m=V_m^*AV_m .
+\]</span> <span class="math inline">\(H_m\)</span> is upper Hessenberg because <span class="math inline">\(Av_j\)</span> lies in the first <span class="math inline">\(j+1\)</span> basis vectors. For a unit eigenvector <span class="math inline">\(H_m y=\theta y\)</span>, its lifted residual has norm <span class="math inline">\(|h_{m+1,m}|\,|e_m^*y|\)</span>. Only the last coefficient and the last subdiagonal enter.</p>
+<p>For Hermitian <span class="math inline">\(A\)</span>, Hermitian symmetry of <span class="math inline">\(H_m\)</span> forces all entries above its first superdiagonal to vanish as well. Writing its real diagonal as <span class="math inline">\(\alpha_j\)</span> and nonnegative subdiagonal as <span class="math inline">\(\beta_j\)</span> gives the Lanczos recurrence <span class="math display">\[
+\beta_jv_{j+1}=Av_j-\alpha_jv_j-\beta_{j-1}v_{j-1},
+\quad \beta_0=0 .
+\]</span> In exact arithmetic earlier projections vanish by the Hessenberg identity and symmetry. In finite precision tiny components along converged Ritz directions can grow back, causing duplicate approximate eigenvalues. Full or selective reorthogonalization trades additional work and communication for control of this effect. The direct residual checks both the recurrence shortcut and the projected solve.</p>
+<p><strong>Two steps by hand.</strong> Start <span class="math inline">\(A_0\)</span> at <span class="math inline">\(e_1\)</span>. Then <span class="math inline">\(Ae_1=2e_1+e_2\)</span>, so <span class="math inline">\(\alpha_1=2\)</span>, <span class="math inline">\(\beta_1=1\)</span>, <span class="math inline">\(v_2=e_2\)</span>. Next <span class="math inline">\(Ae_2=e_1+2e_2\)</span>, yielding <span class="math inline">\(\alpha_2=2\)</span>, <span class="math inline">\(\beta_2=0\)</span>. The projected problem has eigenvalues <span class="math inline">\(1,3\)</span>. The missing <span class="math inline">\(9\)</span> cannot be recovered from this start because every polynomial in <span class="math inline">\(A\)</span> preserves this coordinate plane.</p>
+<p>A sparse Arnoldi step needs one matrix application and projections against earlier vectors. For <span class="math inline">\(m\)</span> steps, storing the full basis costs order <span class="math inline">\(nm\)</span> and orthogonalization costs order <span class="math inline">\(nm^2\)</span>. Short-recurrence Lanczos can generate coefficients with a few vectors, but recovering Ritz vectors later requires stored or regenerated basis information. Restarting bounds storage by retaining selected approximate spectral information before building a new space. Discarding too much can erase progress near a cluster. Block iteration has fixed width and can exploit matrix–block products. A degree-<span class="math inline">\(d\)</span> filtered block also belongs to a block Krylov space, but evaluates a prescribed polynomial without storing every power.</p>
+<p><strong>Checkpoint.</strong> What evidence distinguishes exact invariance from numerical breakdown? A tiny computed <span class="math inline">\(\beta_j\)</span> is a clue. Directly test <span class="math inline">\(\|AV_j-V_jH_j\|\)</span> and <span class="math inline">\(\|V_j^*V_j-I\|\)</span> at the accuracy required by the application.</p>
+</section>
+</section>
+<section id="session-6-designing-and-evaluating-a-chebyshev-filter" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="session-6-designing-and-evaluating-a-chebyshev-filter"><span class="header-section-number">17.7</span> Session 6 — Designing and evaluating a Chebyshev filter</h2>
+<section id="the-design-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-design-problem">The design problem</h3>
+<p>Suppose the unwanted eigenvalues of a Hermitian operator lie in <span class="math inline">\([a,b]\)</span> and all desired eigenvalues lie above <span class="math inline">\(b\)</span>. Let <span class="math inline">\(c=(a+b)/2\)</span>, <span class="math inline">\(h=(b-a)/2&gt;0\)</span>, and <span class="math inline">\(B=(A-cI)/h\)</span>. The unwanted interval maps to <span class="math inline">\([-1,1]\)</span>. A filter should be bounded there and large at every target. The same map works for a target below <span class="math inline">\(a\)</span> using the parity of the polynomial. An interior band generally needs a different filter design: two exterior tails cannot both be mapped to this single unwanted interval by one affine map without also including the interior target.</p>
+<p>Define <span class="math inline">\(T_j(\cos t)=\cos(jt)\)</span>. The addition formula gives <span class="math inline">\(T_0=1\)</span>, <span class="math inline">\(T_1=z\)</span>, <span class="math inline">\(T_{j+1}=2zT_j-T_{j-1}\)</span>. Thus <span class="math inline">\(|T_j|\le1\)</span> on <span class="math inline">\([-1,1]\)</span>, and <span class="math inline">\(T_j(-z)=(-1)^jT_j(z)\)</span>. For <span class="math inline">\(z&gt;1\)</span> substitute <span class="math inline">\(z=\cosh s\)</span> into the same recurrence to obtain <span class="math inline">\(T_j(z)=\cosh(js)\)</span>, <span class="math inline">\(s=\operatorname{arcosh}z\)</span>. Growth is exponential for fixed exterior <span class="math inline">\(z\)</span>. It slows as the target approaches the cutoff. Taking higher powers <span class="math inline">\(z^j\)</span> also amplifies exterior components, but misses the extremal property below.</p>
+<p><strong>Normalized minimax theorem.</strong> Fix <span class="math inline">\(z_*&gt;1\)</span>, <span class="math inline">\(d\ge1\)</span>. Among real polynomials <span class="math inline">\(p\)</span> of degree at most <span class="math inline">\(d\)</span> satisfying <span class="math inline">\(p(z_*)=1\)</span>, the least possible maximum of <span class="math inline">\(|p|\)</span> on <span class="math inline">\([-1,1]\)</span> is <span class="math inline">\(1/T_d(z_*)\)</span>. The candidate is <span class="math inline">\(p=T_d/T_d(z_*)\)</span>. To prove optimality, suppose a competitor has strictly smaller maximum. The difference <span class="math inline">\(T_d-T_d(z_*)p\)</span> alternates in sign at <span class="math inline">\(\cos(j\pi/d)\)</span> for <span class="math inline">\(j=0,\ldots,d\)</span>. It has <span class="math inline">\(d\)</span> distinct interior zeros and another zero at <span class="math inline">\(z_*\)</span>. A nonzero polynomial of degree at most <span class="math inline">\(d\)</span> cannot have <span class="math inline">\(d+1\)</span> roots. This optimality concerns uniform suppression of an interval with a specified exterior normalization. It does not optimize wall time or rounding errors.</p>
+</section>
+<section id="subspace-convergence-and-degree-choice" class="level3">
+<h3 class="anchored" data-anchor-id="subspace-convergence-and-degree-choice">Subspace convergence and degree choice</h3>
+<p>The spectral theorem gives <span class="math inline">\(T_d(B)u_i=T_d((\lambda_i-c)/h)u_i\)</span>. Apply the graph proof from Session 4 with each eigenvalue replaced by its filter value. For full initial target overlap, <span class="math display">\[
+\tan\theta_{\max,k}\le \rho_d^k\tan\theta_{\max,0},\qquad
+\rho_d=\frac{\max_{\mathrm{out}}|T_d((\lambda-c)/h)|}
+{\min_{\mathrm{in}}|T_d((\lambda-c)/h)|}.
+\]</span> If the nearest target maps to <span class="math inline">\(z_*&gt;1\)</span> and all unwanted eigenvalues lie in the design interval, <span class="math inline">\(\rho_d\le\operatorname{sech}(d\,\operatorname{arcosh}z_*)\)</span>. For a desired one-block contraction <span class="math inline">\(\tau&lt;1\)</span> choose <span class="math inline">\(d\ge\operatorname{arcosh}(1/\tau)/\operatorname{arcosh}z_*\)</span>. Round upward. This counts polynomial degree, hence block products, per application. It is a sufficient interval estimate. The finite set of actual unwanted eigenvalues can give a smaller ratio.</p>
+<p><strong>Running matrix.</strong> Seek <span class="math inline">\(q_3\)</span> of <span class="math inline">\(A_0\)</span>. For <span class="math inline">\([1,3]\)</span>, <span class="math inline">\(B=A_0-2I\)</span> has eigenvalues <span class="math inline">\(-1,1,7\)</span>. A degree-two filter has values <span class="math inline">\(1,1,97\)</span>. Starting at <span class="math inline">\((q_2+q_3)/\sqrt2\)</span>, two ordinary power steps leave tangent <span class="math inline">\(1/9\)</span>. One degree-two filter also takes two products and leaves tangent <span class="math inline">\(1/97\)</span>. Both calculations start with the same angle and cost the same number of applications. Differences in QR, memory access and coefficient operations enter an actual timing comparison.</p>
+</section>
+<section id="evaluating-a-polynomial-without-forming-powers" class="level3">
+<h3 class="anchored" data-anchor-id="evaluating-a-polynomial-without-forming-powers">Evaluating a polynomial without forming powers</h3>
+<p>Use <span class="math inline">\(Y_0=X\)</span>, <span class="math inline">\(Y_1=BX\)</span>, <span class="math inline">\(Y_{j+1}=2BY_j-Y_{j-1}\)</span>. Induction gives <span class="math inline">\(Y_j=T_j(B)X\)</span>. Only successive blocks are needed. The product <span class="math inline">\(BY=(AY-cY)/h\)</span> can be implemented as an operator action. Forming <span class="math inline">\(B\)</span> once can change cancellation, rounding and memory requirements. An exact-arithmetic scalar normalization common to the entire block leaves the resulting space unchanged.</p>
+<p>To control range, choose an exterior reference <span class="math inline">\(z_s&gt;1\)</span>, typically near the largest mapped target, and set <span class="math inline">\(W_j=Y_j/T_j(z_s)\)</span>. Define <span class="math inline">\(s_j=T_{j-1}(z_s)/T_j(z_s)\)</span>. Then <span class="math display">\[
+s_1=1/z_s,\quad s_{j+1}=1/(2z_s-s_j),\quad
+W_0=X,\quad W_1=s_1BX,\quad
+W_{j+1}=2s_{j+1}BW_j-s_js_{j+1}W_{j-1}.
+\]</span> This follows by dividing the recurrence by <span class="math inline">\(T_{j+1}(z_s)\)</span>. It avoids computing the huge normalization factor explicitly. Common scaling controls overflow but leaves the ratio between the strongest and weakest wanted components intact. Large degree can make the filtered block nearly rank deficient before QR. Compare singular values of the small <span class="math inline">\(R\)</span> factor, shorten the polynomial or orthogonalize between complete shorter filters. Inserting arbitrary independent normalizations into an unmodified three-term recurrence changes the polynomial.</p>
+</section>
+<section id="what-a-local-error-becomes" class="level3">
+<h3 class="anchored" data-anchor-id="what-a-local-error-becomes">What a local error becomes</h3>
+<p>For the unscaled recurrence define a local additive defect <span class="math inline">\(F_j\)</span> in each computed step, incorporating whatever product and update errors occurred: <span class="math display">\[
+\widehat Y_0=X,\quad \widehat Y_1=BX+F_1,\quad
+\widehat Y_j=2B\widehat Y_{j-1}-\widehat Y_{j-2}+F_j,\quad j\ge2 .
+\]</span> Let <span class="math inline">\(U_0(z)=1\)</span>, <span class="math inline">\(U_1(z)=2z\)</span>, <span class="math inline">\(U_{k+1}=2zU_k-U_{k-1}\)</span> be the Chebyshev polynomials of the second kind (here <span class="math inline">\(U_k\)</span> is a polynomial). Subtract the exact recurrence. Induction, using <span class="math inline">\(U_0=1\)</span> for the newest defect, gives the exact error representation <span class="math display">\[
+\widehat Y_d-Y_d=\sum_{j=1}^d U_{d-j}(B)F_j .
+\]</span> This identity assumes a fixed exact <span class="math inline">\(B\)</span> and exact initial block. Errors in storing or applying <span class="math inline">\(B\)</span> can be included in <span class="math inline">\(F_j\)</span>. It does not presume independent random signs. Projection onto any eigendirection reduces the propagation to scalar weights. For <span class="math inline">\(z=\cos t\)</span>, <span class="math inline">\(U_k(z)=\sin((k+1)t)/\sin t\)</span>, bounded by <span class="math inline">\(k+1\)</span> including the limiting endpoints (expand the sine quotient as a sum of unit complex exponentials). Consequently for the unwanted spectral projector <span class="math inline">\(P_2\)</span>, <span class="math display">\[
+\|P_2(\widehat Y_d-Y_d)\|\le
+\sum_{j=1}^d(d-j+1)\|P_2 F_j\|.
+\]</span> For <span class="math inline">\(z=\cosh s&gt;1\)</span>, the corresponding weight is <span class="math inline">\(\sinh((k+1)s)/\sinh s\)</span>. An early error in a desired component can grow very large in absolute norm. Whether it rotates the range is a separate question. For instance, at <span class="math inline">\(d=3\)</span> a defect in the first product contributes <span class="math inline">\((4B^2-I)F_1\)</span>, while a defect in the last update contributes <span class="math inline">\(F_3\)</span> directly.</p>
+</section>
+<section id="turning-application-error-into-angle-error" class="level3">
+<h3 class="anchored" data-anchor-id="turning-application-error-into-angle-error">Turning application error into angle error</h3>
+<p>In the target/complement coordinates write the input block as <span class="math inline">\(\binom{C}{D}\)</span>, and write one computed filter output as <span class="math inline">\(\binom{P_1 C+G_1}{P_2' D+G_2}\)</span>, where <span class="math inline">\(P_1,P_2'\)</span> are diagonal target and unwanted filter values, and <span class="math inline">\(G_i\)</span> are the total filter errors in those coordinates. Put <span class="math inline">\(\alpha=\min|\operatorname{diag}P_1|\)</span>, <span class="math inline">\(\beta=\max|\operatorname{diag}P_2'|\)</span>. Right-multiplying by <span class="math inline">\(C^{-1}\)</span> shows that the graph of the output has tangent bounded by <span class="math display">\[
+t_{\mathrm{new}}\le
+\frac{\beta t+\|G_2 C^{-1}\|}{\alpha-\|G_1 C^{-1}\|},
+\qquad t=\|DC^{-1}\|.
+\]</span> Indeed the smallest singular value of the top block after multiplication is at least the denominator, which must be positive. The unwanted numerator is bounded by the triangle inequality. This inequality explains why a global absolute error bound alone is a poor predictor of angle accuracy. Unwanted leakage adds a new direction and poor target overlap can amplify it.</p>
+<p>If the resulting step bounds yield <strong>uniform</strong> constants <span class="math inline">\(t_{k+1}\le q t_k+\eta\)</span> with <span class="math inline">\(0\le q&lt;1\)</span>, summing a geometric progression gives <span class="math inline">\(t_k\le q^kt_0+\eta(1-q^k)/(1-q)\)</span>. The second term predicts a possible stagnation scale. It is an upper envelope, never a proof that every run stagnates there. Errors can cancel or decrease as the residual shrinks. A verified residual and a gap estimate are needed to diagnose a real run.</p>
+</section>
+<section id="bounds-that-miss-part-of-the-spectrum" class="level3">
+<h3 class="anchored" data-anchor-id="bounds-that-miss-part-of-the-spectrum">Bounds that miss part of the spectrum</h3>
+<p>If an unwanted eigenvalue falls just outside the designed interval, its multiplier becomes <span class="math inline">\(\cosh(d\,\operatorname{arcosh}|z|)\)</span> in magnitude. Recompute the <em>actual</em> ratio <span class="math inline">\(\rho_d\)</span>: convergence can slow and an unwanted direction can even dominate. Conversely an overly wide interval can bring the nearest target closer to <span class="math inline">\(1\)</span>, requiring higher degree. Obtain bounds from analysis of the operator, enclosing intervals such as Gershgorin bounds, or preliminary iterations with explicit margins. An interior Ritz estimate of an extreme eigenvalue alone is generally not an outer enclosure, as min–max already shows.</p>
+<p><strong>Checkpoint.</strong> With <span class="math inline">\([a,b]=[1,5]\)</span> and target <span class="math inline">\(8\)</span>, <span class="math inline">\(z_*=2.5\)</span>. Show <span class="math inline">\(T_3(2.5)=55\)</span>. If an unwanted <span class="math inline">\(6\)</span> was missed, its mapped value is <span class="math inline">\(1.5\)</span>, giving <span class="math inline">\(T_3(1.5)=9\)</span>. The ratio estimate changes from <span class="math inline">\(1/55\)</span> to <span class="math inline">\(9/55\)</span> when this is the only missed eigenvalue.</p>
+</section>
+</section>
+<section id="session-7-mixed-precision-and-hardware-aware-computation" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="session-7-mixed-precision-and-hardware-aware-computation"><span class="header-section-number">17.8</span> Session 7 — Mixed precision and hardware-aware computation</h2>
+<section id="an-error-budget-by-operation" class="level3">
+<h3 class="anchored" data-anchor-id="an-error-budget-by-operation">An error budget by operation</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operation</th>
+<th>Where accuracy enters</th>
+<th>Measurement or design choice</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Store and apply <span class="math inline">\(A\)</span></td>
+<td>Quantization perturbs the operator before accumulation begins</td>
+<td>Retain a reference action for verification</td>
+</tr>
+<tr class="even">
+<td>Evaluate the filter</td>
+<td>Every recurrence defect is propagated by a different polynomial</td>
+<td>Select degree, scaling, product and update precisions separately</td>
+</tr>
+<tr class="odd">
+<td>QR</td>
+<td>Small singular directions of the input may be obscured</td>
+<td>Check orthogonality and inspect the triangular factor</td>
+</tr>
+<tr class="even">
+<td>Rayleigh–Ritz</td>
+<td>Projection errors perturb a small Hermitian problem</td>
+<td>Form and solve the compression accurately, check its symmetry</td>
+</tr>
+<tr class="odd">
+<td>Stop and report</td>
+<td>Cancellation in <span class="math inline">\(AX-X\Theta\)</span> may hide the true residual</td>
+<td>Reapply the original operator in a specified verification precision</td>
+</tr>
+</tbody>
+</table>
+<p>If storage gives <span class="math inline">\(\widetilde A=A+E_s\)</span> and arithmetic returns <span class="math inline">\(\widetilde A X+F\)</span>, the product error relative to the original data is <span class="math inline">\(E_s X+F\)</span>. Higher-precision accumulation can reduce <span class="math inline">\(F\)</span> but does not remove <span class="math inline">\(E_sX\)</span>. If <span class="math inline">\(X\)</span> itself is quantized, expand <span class="math inline">\((A+E_s)(X+E_x)\)</span> to see the additional terms <span class="math inline">\(AE_x+E_sE_x\)</span>. In a distributed computation rounding communicated entries contributes to <span class="math inline">\(E_x\)</span>, possibly only on boundary data. A uniform normwise model may overestimate that effect. Floating-point format, product precision, accumulation precision and communication format must be specified separately.</p>
+<p><strong>Verification bound.</strong> If the computed verification residual is <span class="math inline">\(\hat r=r+e\)</span> with <span class="math inline">\(\|e\|\le\epsilon_v\)</span>, then <span class="math inline">\(\|r\|\le\|\hat r\|+\epsilon_v\)</span>. A matvec bound from Session 1 plus bounds for the scale and subtraction can supply <span class="math inline">\(\epsilon_v\)</span> under a known arithmetic model. A double-precision direct residual is a practical independent diagnostic when the filter ran in single. Calling it a rigorous enclosure additionally requires controlling its own evaluation and norm rounding. Increasing the verification precision can reveal an existing error without changing the iterate.</p>
+<p><strong>A scalar identity behind residual-based methods.</strong> For a polynomial <span class="math inline">\(p\)</span> and approximate eigenpair <span class="math inline">\((x,\theta)\)</span>, the factor theorem gives <span class="math inline">\(p(z)-p(\theta)=(z-\theta)s_\theta(z)\)</span>. Therefore <span class="math display">\[
+p(A)x=p(\theta)x+s_\theta(A)r,\qquad r=Ax-\theta x .
+\]</span> For <span class="math inline">\(p(z)=2z^2-1\)</span>, <span class="math inline">\(s_\theta(z)=2(z+\theta)\)</span>. Near convergence the argument of the operator in the correction is small. If a product error is proportional to the norm of its input, the error in applying an operator to a small residual may shrink with convergence. An accurately evaluated residual and a controlled correction recurrence are essential. When the input residual is already corrupted at the scale of <span class="math inline">\(u\|A\|\)</span>, the argument loses force. This identity provides a way into the seminar paper’s residual-based recurrence. The ordinary recurrence in the lab is its comparison case. For the actual algorithm and its numerical evidence see <a href="https://arxiv.org/abs/2503.22652">Kodali, Ramakrishnan and Motamarri, <em>Residual-based Chebyshev filtered subspace iteration</em></a>.</p>
+</section>
+<section id="cost-of-reaching-an-accuracy-target" class="level3">
+<h3 class="anchored" data-anchor-id="cost-of-reaching-an-accuracy-target">Cost of reaching an accuracy target</h3>
+<p>A dense matrix–block product with an <span class="math inline">\(n\times p\)</span> real block costs approximately <span class="math inline">\(2n^2p\)</span> scalar floating-point operations. A sparse product costs approximately <span class="math inline">\(2\,\mathrm{nnz}(A)p\)</span>. A thin dense QR costs order <span class="math inline">\(np^2\)</span> and the compressed eigensolve costs order <span class="math inline">\(p^3\)</span>. A degree-<span class="math inline">\(d\)</span> filter takes <span class="math inline">\(d\)</span> matrix–block products before extraction. These counts give no sustained bandwidth, occupancy or collective latency. For an illustrative machine model with peak rate <span class="math inline">\(F\)</span> and bandwidth <span class="math inline">\(B_w\)</span>, moving <span class="math inline">\(S\)</span> bytes and doing <span class="math inline">\(W\)</span> operations requires at least <span class="math inline">\(\max(W/F,S/B_w)\)</span> time for the modeled resources. Sparse indices, cache reuse, conversions, synchronization and contention affect actual time. A block may reuse matrix entries across columns. Distributed inner products require reductions, whereas stencil products often require neighbor exchanges.</p>
+<p>For a fair comparison specify a target cluster, a common residual tolerance on the original operator, an orthogonality threshold, starting block and stopping rule. Time setup, transfers, filtering, QR, extraction and verification; include all repetitions needed to reach tolerance. Record failures to meet tolerance. A low-precision run with faster individual products can take longer to deliver an acceptable subspace, or never meet the criterion. Timing the dense teaching example says little about a sparse device implementation.</p>
+<p><strong>Checkpoint.</strong> A single-precision filter and double-precision QR produce <span class="math inline">\(\|I-X^*X\|\approx10^{-15}\)</span> but a verified residual of <span class="math inline">\(10^{-6}\)</span>. These diagnostics can coexist: one measures internal geometry of the basis, the other tests its relation to <span class="math inline">\(A\)</span>.</p>
+</section>
+</section>
+<section id="session-8-a-controlled-experiment-from-prediction-to-verification" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="session-8-a-controlled-experiment-from-prediction-to-verification"><span class="header-section-number">17.9</span> Session 8 — A controlled experiment from prediction to verification</h2>
+<section id="construct-a-problem-with-known-answers" class="level3">
+<h3 class="anchored" data-anchor-id="construct-a-problem-with-known-answers">Construct a problem with known answers</h3>
+<p>Take <span class="math inline">\(n=32\)</span> and the orthonormal discrete cosine basis <span class="math inline">\(U\)</span>. Its zeroth column is constant <span class="math inline">\(1/\sqrt n\)</span>, and for row <span class="math inline">\(i=0,\ldots,n-1\)</span> and column <span class="math inline">\(j=1,\ldots,n-1\)</span> its entry is <span class="math inline">\(\sqrt{2/n}\cos(\pi(i+1/2)j/n)\)</span>. Set <span class="math inline">\(A=U\Lambda U^T\)</span> with 29 equally spaced unwanted eigenvalues from <span class="math inline">\(1\)</span> to <span class="math inline">\(5\)</span> and targets <span class="math inline">\(8,9,10\)</span>. The dense rotation is deliberate: rounding a diagonal example can preserve exact zeros and hide leakage between directions. The exact mathematical construction and its stored floating-point realization differ slightly.</p>
+<p>For each target eigenvector take its equal mixture with a different unwanted eigenvector. Pair <span class="math inline">\(8\)</span> with <span class="math inline">\(5\)</span>, <span class="math inline">\(9\)</span> with <span class="math inline">\(1\)</span>, and <span class="math inline">\(10\)</span> with the second-smallest eigenvalue. These three vectors are orthonormal. Each angle is initially <span class="math inline">\(\pi/4\)</span>. For the pair determining the worst angle the power multiplier ratio is <span class="math inline">\(5/8\)</span> and the degree-three Chebyshev ratio is <span class="math inline">\(1/55\)</span>. All other ratios are smaller. The graph estimate is attained, so the predicted largest tangents are <strong>exactly</strong> <span class="math inline">\((5/8)^k\)</span> and <span class="math inline">\(55^{-k}\)</span> in mathematical arithmetic. Convert a tangent <span class="math inline">\(t\)</span> to a sine by <span class="math inline">\(t/\sqrt{1+t^2}\)</span> before comparing with the lab’s sine diagnostic.</p>
+<p>Each outer step applies the chosen operator, orthogonalizes, solves the projected eigenproblem, and checks the residuals in the original coordinates. The lab retains the QR basis for the next step; rotating it to the Ritz basis gives the same next range in exact arithmetic. It records the largest column residual, largest sine, maximum sorted Ritz-value error and orthogonality defect. Only the synthetic example supplies the exact target basis and exact target values. In applications, identification and separation must come from other information.</p>
+</section>
+<section id="a-measured-history" class="level3">
+<h3 class="anchored" data-anchor-id="a-measured-history">A measured history</h3>
+<p>The numbers below were obtained by independently executing the real-valued case study in NumPy with the same cosine construction, polynomial and precision split used in the MATLAB script. Both variants use binary64 QR, extraction and verification. The binary32 variant stores the mapped matrix in single and performs the filter recurrence in single. Last digits and stagnation levels depend on implementation.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Outer steps</th>
+<th style="text-align: right;">Predicted tangent</th>
+<th style="text-align: right;">Largest sine, double filter</th>
+<th style="text-align: right;">Largest sine, single filter</th>
+<th style="text-align: right;">Max residual, double filter</th>
+<th style="text-align: right;">Max residual, single filter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;"><span class="math inline">\(1.82\,10^{-2}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.82\,10^{-2}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.82\,10^{-2}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(8.08\,10^{-2}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(8.08\,10^{-2}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;"><span class="math inline">\(1.09\,10^{-7}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.09\,10^{-7}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.23\,10^{-7}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(3.28\,10^{-7}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.36\,10^{-7}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;"><span class="math inline">\(1.19\,10^{-14}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(1.58\,10^{-14}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(5.56\,10^{-8}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(3.61\,10^{-14}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(3.75\,10^{-7}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;"><span class="math inline">\(3.95\,10^{-18}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(9.38\,10^{-15}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(6.90\,10^{-8}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.61\,10^{-15}\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(4.02\,10^{-7}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>At step one the largest angle belongs to the <span class="math inline">\(8,5\)</span> pair, while the largest residual can belong to a different pair: a residual weights the angle by the local eigenvalue separation. At step eight the double run meets an absolute residual tolerance of <span class="math inline">\(10^{-12}\)</span>; the displayed single run does not. The experiment combines storage and arithmetic errors. To isolate storage, round <span class="math inline">\(B\)</span> to binary32 once and convert it back to binary64 for all products. To probe communication errors separately, an experiment needs an explicit communication pattern and quantization model.</p>
+</section>
+<section id="transfer-to-a-variational-pde-problem" class="level3">
+<h3 class="anchored" data-anchor-id="transfer-to-a-variational-pde-problem">Transfer to a variational PDE problem</h3>
+<p>In §6.11, <span class="math inline">\(Kx=\lambda Mx\)</span> came from testing <span class="math inline">\(-u''=\lambda u\)</span> with finite-element basis functions. Assume <span class="math inline">\(K=K^*\)</span>, <span class="math inline">\(M=M^*&gt;0\)</span> and <span class="math inline">\(M=LL^*\)</span>. Set <span class="math inline">\(y=L^*x\)</span> and <span class="math inline">\(C=L^{-1}KL^{-*}\)</span>. Then <span class="math inline">\(Cy=\lambda y\)</span> is Hermitian, <span class="math inline">\(\|y\|^2=x^*Mx\)</span>, and <span class="math display">\[
+Cy-\theta y=L^{-1}(Kx-\theta Mx).
+\]</span> For an <span class="math inline">\(M\)</span>-normalized approximate eigenvector, <span class="math inline">\(\|Kx-\theta Mx\|_{M^{-1}}\)</span> is precisely the Euclidean residual norm of the transformed problem. Solve triangular systems to apply the transformations. An <span class="math inline">\(M\)</span>-orthonormal trial basis <span class="math inline">\(X\)</span> gives the small matrix <span class="math inline">\(X^*KX\)</span> and the Ritz residual satisfies <span class="math inline">\(X^*(KX-MXH)=0\)</span>. These are the Galerkin test equations again. A verified algebraic residual certifies the <em>discrete</em> eigenproblem. Errors due to the mesh and the choice of trial functions require an additional approximation argument.</p>
+<p><strong>Checkpoint.</strong> Why can a change of finite-element basis alter the Euclidean norm of a residual without changing the mathematical approximation? The residual represents a functional; its coordinates and the mass Gram matrix transform together. The dual norm accounts for both changes.</p>
+</section>
+</section>
+<section id="exercises-and-worked-solutions" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="exercises-and-worked-solutions"><span class="header-section-number">17.10</span> Exercises and worked solutions</h2>
+<p>Try each problem before reading its solution. Problems 4, 6, 8 and 11 form a short proof-reconstruction route into the seminar.</p>
+<section id="which-data-are-allowed-to-move" class="level3">
+<h3 class="anchored" data-anchor-id="which-data-are-allowed-to-move">1. Which data are allowed to move?</h3>
+<p>For <span class="math inline">\(A=\operatorname{diag}(1,10^{-6})\)</span>, <span class="math inline">\(b=e_1\)</span> and <span class="math inline">\(\hat x=(1,1)^T\)</span>, find the minimum absolute normwise perturbations when (i) only <span class="math inline">\(b\)</span> may move, (ii) only <span class="math inline">\(A\)</span> may move. Compare with the relative forward error.</p>
+<p><strong>Solution.</strong> The residual is <span class="math inline">\((0,-10^{-6})^T\)</span>. The new right side is forced to be <span class="math inline">\(A\hat x\)</span>, so its distance is <span class="math inline">\(10^{-6}\)</span>. For a matrix change <span class="math inline">\(E\hat x=r\)</span>, the lower bound is <span class="math inline">\(\|r\|/\|\hat x\|=10^{-6}/\sqrt2\)</span>. It is attained by <span class="math inline">\(E=r\hat x^*/\|\hat x\|^2\)</span>. The exact <span class="math inline">\(x=e_1\)</span> gives relative forward error <span class="math inline">\(1\)</span>. Backward error has meaning only after specifying the allowed data and norm.</p>
+</section>
+<section id="a-rayleigh-quotient-can-conceal-an-inaccurate-vector" class="level3">
+<h3 class="anchored" data-anchor-id="a-rayleigh-quotient-can-conceal-an-inaccurate-vector">2. A Rayleigh quotient can conceal an inaccurate vector</h3>
+<p>For <span class="math inline">\(A_0\)</span> take <span class="math inline">\(x=(q_2+0.01q_3)/\sqrt{1.0001}\)</span>. Compute the quotient error relative to <span class="math inline">\(3\)</span> in absolute units, the residual norm and the sine to <span class="math inline">\(q_2\)</span>.</p>
+<p><strong>Solution.</strong> With <span class="math inline">\(t=0.01\)</span>, <span class="math inline">\(\rho=(3+9t^2)/(1+t^2)\)</span>, so the absolute error is <span class="math inline">\(6t^2/(1+t^2)\approx 0.000600\)</span>. The two residual coordinates in the eigenbasis are <span class="math inline">\((3-\rho)/\sqrt{1+t^2}\)</span> and <span class="math inline">\((9-\rho)t/\sqrt{1+t^2}\)</span>. Squaring and adding gives <span class="math inline">\(6t/(1+t^2)\approx0.059994\)</span> for the norm. The sine is <span class="math inline">\(t/\sqrt{1+t^2}\approx0.0099995\)</span>. To call the quotient error relative, one would divide it by <span class="math inline">\(3\)</span>.</p>
+</section>
+<section id="a-backward-error-with-symmetry" class="level3">
+<h3 class="anchored" data-anchor-id="a-backward-error-with-symmetry">3. A backward error with symmetry</h3>
+<p>For <span class="math inline">\(A=\operatorname{diag}(1,3)\)</span>, <span class="math inline">\(x=(1,1)^T/\sqrt2\)</span>, find an optimal Hermitian perturbation for its Rayleigh quotient.</p>
+<p><strong>Solution.</strong> <span class="math inline">\(\theta=2\)</span>, <span class="math inline">\(r=(-1,1)^T/\sqrt2\)</span>, <span class="math inline">\(\|r\|=1\)</span>. Expanding <span class="math inline">\(-rx^*-xr^*\)</span> gives <span class="math inline">\(\operatorname{diag}(1,-1)\)</span>. The corrected matrix is <span class="math inline">\(2I\)</span>, so <span class="math inline">\((2,x)\)</span> is exact. Any admissible <span class="math inline">\(E\)</span> has <span class="math inline">\(\|E\|\ge\|Ex\|=1\)</span>, proving optimality. The perturbation merges two simple eigenvalues; the backward-error condition imposes no constraint on multiplicities.</p>
+</section>
+<section id="fixed-versus-adaptive-inverse-iteration" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-versus-adaptive-inverse-iteration">4. Fixed versus adaptive inverse iteration</h3>
+<p>In a two-dimensional Hermitian eigenspace mixture take <span class="math inline">\(x=(u_1+t u_2)/\sqrt{1+t^2}\)</span>, real <span class="math inline">\(t\ne0\)</span>, and distinct eigenvalues. Derive exactly the new signed coefficient ratio under RQI.</p>
+<p><strong>Solution.</strong> <span class="math inline">\(\rho=(\lambda_1+t^2\lambda_2)/(1+t^2)\)</span>. The new ratio equals <span class="math inline">\(t(\lambda_1-\rho)/(\lambda_2-\rho)=-t^3\)</span>. Thus the tangent cubes even with the sign change. A fixed shift produces <span class="math inline">\(t(\lambda_1-\sigma)/(\lambda_2-\sigma)\)</span> instead. Starting at <span class="math inline">\(t=1\)</span> gives a two-cycle in the line for RQI, illustrating the locality of the convergence statement.</p>
+</section>
+<section id="a-block-that-cannot-recover-its-target" class="level3">
+<h3 class="anchored" data-anchor-id="a-block-that-cannot-recover-its-target">5. A block that cannot recover its target</h3>
+<p>For <span class="math inline">\(A_0\)</span> target <span class="math inline">\(\operatorname{span}(q_2,q_3)\)</span> and start with <span class="math inline">\([q_1,q_3]\)</span>. Predict the residuals and the sine of the largest target angle after any number of power steps.</p>
+<p><strong>Solution.</strong> Multiplication and QR preserve the starting invariant plane. Both Ritz residuals are zero, whereas <span class="math inline">\(q_1\)</span> is orthogonal to the target plane and the largest sine is one. In target coordinates the overlap matrix has rank one. The invertibility hypothesis in the graph argument fails. This is why stopping on residuals requires an eigenvalue selection or cluster identification rule as well.</p>
+</section>
+<section id="from-an-approximate-arnoldi-relation-to-a-trustworthy-residual" class="level3">
+<h3 class="anchored" data-anchor-id="from-an-approximate-arnoldi-relation-to-a-trustworthy-residual">6. From an approximate Arnoldi relation to a trustworthy residual</h3>
+<p>Suppose <span class="math inline">\(AV=VH+hve_m^*+F\)</span>, <span class="math inline">\(\|v\|=1\)</span>, and <span class="math inline">\(Hy=\theta y+s\)</span> with <span class="math inline">\(\|y\|=1\)</span>. Bound the lifted residual and explain the role of <span class="math inline">\(\|Vy\|\)</span>.</p>
+<p><strong>Solution.</strong> Substitution gives <span class="math inline">\((A-\theta I)Vy=hve_m^*y+Vs+Fy\)</span>. By the reverse triangle inequality its norm differs from <span class="math inline">\(|h|\,|e_m^*y|\)</span> by at most <span class="math inline">\(\|V\|\|s\|+\|F\|\)</span>. To report the residual for a unit vector divide by <span class="math inline">\(\|Vy\|\)</span>. If <span class="math inline">\(\|V^*V-I\|\le\epsilon&lt;1\)</span> then <span class="math inline">\(\sqrt{1-\epsilon}\le\|Vy\|\le\sqrt{1+\epsilon}\)</span>. A shortcut reporting zero can coexist with a nonzero direct residual when the recurrence has a defect.</p>
+</section>
+<section id="designing-a-degree" class="level3">
+<h3 class="anchored" data-anchor-id="designing-a-degree">7. Designing a degree</h3>
+<p>For an unwanted interval <span class="math inline">\([1,5]\)</span>, a nearest target at <span class="math inline">\(8\)</span>, and a desired one-step angle contraction <span class="math inline">\(10^{-3}\)</span>, find the smallest degree certified by the interval bound.</p>
+<p><strong>Solution.</strong> <span class="math inline">\(z_*=(8-3)/2=2.5\)</span>. Successive values <span class="math inline">\(T_j(2.5)\)</span> are <span class="math inline">\(1,2.5,11.5,55,263.5,1262.5\)</span> by the recurrence. Since the requirement is <span class="math inline">\(T_d(2.5)\ge1000\)</span>, the first sufficient degree is five. Degrees lower than five might meet the goal on a particular starting block if the most weakly amplified target component carries no error, but the interval certificate is uniform.</p>
+</section>
+<section id="endpoint-accumulation" class="level3">
+<h3 class="anchored" data-anchor-id="endpoint-accumulation">8. Endpoint accumulation</h3>
+<p>Consider the scalar recurrence with <span class="math inline">\(B=1\)</span>, exact initial value, and the same additive defect <span class="math inline">\(f\)</span> at every computed step starting with step one. Find the exact error after <span class="math inline">\(d\)</span> steps. Compare it with a single defect only at step one.</p>
+<p><strong>Solution.</strong> <span class="math inline">\(U_k(1)=k+1\)</span> by induction. Summation gives <span class="math inline">\(f\sum_{j=1}^d(d-j+1)=fd(d+1)/2\)</span>. A single first defect gives <span class="math inline">\(df\)</span>. The polynomial endpoint satisfies <span class="math inline">\(|T_d(1)|=1\)</span>, yet perturbations in recurrence evaluation can accumulate quadratically with degree. Using a uniform bound <span class="math inline">\(\|F_j\|\le |f|\)</span> attains equality in this example.</p>
+</section>
+<section id="verification-with-a-mass-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="verification-with-a-mass-matrix">9. Verification with a mass matrix</h3>
+<p>Let <span class="math inline">\(M=\operatorname{diag}(4,1)\)</span>, <span class="math inline">\(K=\operatorname{diag}(4,3)\)</span>, <span class="math inline">\(x=(1/2,1)^T/\sqrt2\)</span>. Determine the generalized Rayleigh quotient and the dual residual norm.</p>
+<p><strong>Solution.</strong> <span class="math inline">\(x^*Mx=1\)</span>, <span class="math inline">\(x^*Kx=2\)</span>. Thus <span class="math inline">\(r=Kx-2Mx=(-2,1)^T/\sqrt2\)</span>. The Euclidean norm is <span class="math inline">\(\sqrt{5/2}\)</span>, whereas <span class="math inline">\(r^*M^{-1}r=(1+1)/2=1\)</span>. Under <span class="math inline">\(L=\operatorname{diag}(2,1)\)</span> the transformed matrix is <span class="math inline">\(\operatorname{diag}(1,3)\)</span>, <span class="math inline">\(y=(1,1)^T/\sqrt2\)</span>, and its Euclidean residual norm is exactly one.</p>
+</section>
+<section id="distinguishing-a-measured-floor-from-a-theorem" class="level3">
+<h3 class="anchored" data-anchor-id="distinguishing-a-measured-floor-from-a-theorem">10. Distinguishing a measured floor from a theorem</h3>
+<p>Suppose <span class="math inline">\(t_{k+1}\le0.1t_k+10^{-7}\)</span>. Can one prove that <span class="math inline">\(t_k\)</span> can never fall below <span class="math inline">\(10^{-7}\)</span>? For <span class="math inline">\(t_0=1\)</span> bound <span class="math inline">\(t_8\)</span>.</p>
+<p><strong>Solution.</strong> The zero sequence after step zero obeys the inequality, so it supplies no lower bound. Repeated substitution gives <span class="math inline">\(t_8\le10^{-8}+10^{-7}(1-10^{-8})/0.9\approx1.21\,10^{-7}\)</span>. A measured history that levels off there is consistent with this model. A smaller measured value is equally consistent.</p>
+</section>
+<section id="a-filter-written-in-terms-of-its-residual" class="level3">
+<h3 class="anchored" data-anchor-id="a-filter-written-in-terms-of-its-residual">11. A filter written in terms of its residual</h3>
+<p>With <span class="math inline">\(p(z)=4z^3-3z\)</span>, derive a correction formula involving <span class="math inline">\(r=Ax-\theta x\)</span>. Which products would you evaluate accurately if the requested tolerance is much smaller than the filter’s working unit roundoff?</p>
+<p><strong>Solution.</strong> Polynomial division gives <span class="math inline">\(s_\theta(z)=4(z^2+\theta z+\theta^2)-3\)</span>, hence <span class="math inline">\(p(A)x=p(\theta)x+[4(A^2+\theta A+\theta^2 I)-3I]r\)</span>. Compute the initial residual using the original operator in verification precision and accumulate the correction accurately. Products on the correction may tolerate lower precision since their absolute errors can scale with <span class="math inline">\(\|r\|\)</span>. This conclusion requires bounds on the correction operator, conversion errors and dynamic range. A small <span class="math inline">\(\|r\|\)</span> does not authorize treating its <em>relative</em> error as small automatically.</p>
+</section>
+<section id="design-an-equal-work-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="design-an-equal-work-comparison">12. Design an equal-work comparison</h3>
+<p>For the case study, compare one degree-three application with three ordinary power steps from the same start. Which conclusion follows before any timing experiment?</p>
+<p><strong>Solution.</strong> Both use three matrix–block products. The respective largest tangents are <span class="math inline">\(1/55\approx0.01818\)</span> and <span class="math inline">\((5/8)^3=125/512\approx0.24414\)</span>. The filter gives the smaller angle for this spectrum, block and work metric. Three ordinary outer steps may perform more QR and extraction operations. Timing must specify their frequency, data movement, precision, matrix layout and verification tolerance. Neither theoretical ratio determines the faster implementation on a given machine.</p>
+</section>
+</section>
+<section id="computational-laboratory-matlab" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="computational-laboratory-matlab"><span class="header-section-number">17.11</span> Computational laboratory — MATLAB</h2>
+<p>Copy the complete block into a script named <strong>module_e_lab.m</strong> and run it. It uses base MATLAB with local functions at the end of a script. It produces two convergence plots, histories for the three block variants and a direct check of the Arnoldi residual formula. All reported residuals are absolute norms for unit vectors. The fixed iteration count deliberately continues past practical stopping points to expose finite-precision behavior.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">%% Experiment 1: an exact two-mode prediction from Review II</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">A0</span> <span class="op">=</span> [<span class="fl">2</span> <span class="fl">1</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">1</span> <span class="fl">2</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">9</span>]<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">q2</span> <span class="op">=</span> [<span class="fl">1</span><span class="op">;</span><span class="fl">1</span><span class="op">;</span><span class="fl">0</span>]<span class="op">/</span><span class="va">sqrt</span>(<span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">q3</span> <span class="op">=</span> [<span class="fl">0</span><span class="op">;</span><span class="fl">0</span><span class="op">;</span><span class="fl">1</span>]<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">x</span> <span class="op">=</span> (<span class="va">q2</span><span class="op">+</span><span class="va">q3</span>)<span class="op">/</span><span class="va">sqrt</span>(<span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">fprintf</span>(<span class="ss">'Power iteration: k, tangent, predicted tangent, residual\n'</span>)<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">k</span> <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">8</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">theta</span> <span class="op">=</span> <span class="va">x</span><span class="op">'*</span>(<span class="va">A0</span><span class="op">*</span><span class="va">x</span>)<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">tangent</span> <span class="op">=</span> <span class="va">abs</span>(<span class="va">q2</span><span class="op">'*</span><span class="va">x</span>)<span class="op">/</span><span class="va">abs</span>(<span class="va">q3</span><span class="op">'*</span><span class="va">x</span>)<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">fprintf</span>(<span class="ss">'%2d  %.4e  %.4e  %.4e\n'</span><span class="op">,</span><span class="va">k</span><span class="op">,</span><span class="va">tangent</span><span class="op">,</span><span class="fl">3</span><span class="op">^</span>(<span class="op">-</span><span class="va">k</span>)<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">norm</span>(<span class="va">A0</span><span class="op">*</span><span class="va">x</span><span class="op">-</span><span class="va">theta</span><span class="op">*</span><span class="va">x</span>))<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">x</span> <span class="op">=</span> <span class="va">A0</span><span class="op">*</span><span class="va">x</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">x</span> <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="va">norm</span>(<span class="va">x</span>)<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">%% Experiment 2: a known cluster and explicit orthogonal complement</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="va">n</span> <span class="op">=</span> <span class="fl">32</span><span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="va">row</span> <span class="op">=</span> (<span class="fl">0</span><span class="op">:</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span>)<span class="op">';</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="va">freq</span> <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="va">U</span> <span class="op">=</span> <span class="va">sqrt</span>(<span class="fl">2</span><span class="op">/</span><span class="va">n</span>)<span class="op">*</span><span class="va">cos</span>((<span class="va">pi</span><span class="op">/</span><span class="va">n</span>)<span class="op">*</span>(<span class="va">row</span><span class="op">+</span><span class="fl">0.5</span>)<span class="op">*</span><span class="va">freq</span>)<span class="op">;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="va">U</span>(<span class="op">:,</span><span class="fl">1</span>) <span class="op">=</span> <span class="va">U</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">/</span><span class="va">sqrt</span>(<span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="va">lambda</span> <span class="op">=</span> [<span class="va">linspace</span>(<span class="fl">1</span><span class="op">,</span><span class="fl">5</span><span class="op">,</span><span class="va">n</span><span class="op">-</span><span class="fl">3</span>)<span class="op">,</span><span class="fl">8</span><span class="op">,</span><span class="fl">9</span><span class="op">,</span><span class="fl">10</span>]<span class="op">';</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="va">A</span> <span class="op">=</span> <span class="va">U</span><span class="op">*</span><span class="va">diag</span>(<span class="va">lambda</span>)<span class="op">*</span><span class="va">U</span><span class="op">';</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="va">A</span> <span class="op">=</span> (<span class="va">A</span><span class="op">+</span><span class="va">A</span><span class="op">'</span>)<span class="op">/</span><span class="fl">2</span><span class="op">;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="va">target</span> <span class="op">=</span> <span class="va">U</span>(<span class="op">:,</span><span class="kw">end</span><span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>)<span class="op">;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="va">outside</span> <span class="op">=</span> <span class="va">U</span>(<span class="op">:,</span><span class="fl">1</span><span class="op">:</span><span class="kw">end</span><span class="op">-</span><span class="fl">3</span>)<span class="op">;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="va">X0</span> <span class="op">=</span> (<span class="va">target</span><span class="op">+</span><span class="va">U</span>(<span class="op">:,</span>[<span class="va">n</span><span class="op">-</span><span class="fl">3</span><span class="op">,</span><span class="fl">1</span><span class="op">,</span><span class="fl">2</span>]))<span class="op">/</span><span class="va">sqrt</span>(<span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="va">B</span> <span class="op">=</span> (<span class="va">A</span><span class="op">-</span><span class="fl">3</span><span class="op">*</span><span class="va">eye</span>(<span class="va">n</span>))<span class="op">/</span><span class="fl">2</span><span class="op">;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="va">steps</span> <span class="op">=</span> <span class="fl">10</span><span class="op">;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">% Each row of a history stores [max residual, largest sine,</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">% max Ritz-value error, orthogonality defect].</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="va">powerHist</span> <span class="op">=</span> <span class="va">blockHistory</span>(<span class="va">A</span><span class="op">,</span><span class="va">A</span><span class="op">,</span><span class="va">X0</span><span class="op">,</span><span class="va">outside</span><span class="op">,</span><span class="va">lambda</span>(<span class="kw">end</span><span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>)<span class="op">,</span><span class="va">steps</span><span class="op">,</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="va">doubleHist</span> <span class="op">=</span> <span class="va">blockHistory</span>(<span class="va">A</span><span class="op">,</span><span class="va">B</span><span class="op">,</span><span class="va">X0</span><span class="op">,</span><span class="va">outside</span><span class="op">,</span><span class="va">lambda</span>(<span class="kw">end</span><span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>)<span class="op">,</span><span class="va">steps</span><span class="op">,</span><span class="fl">3</span>)<span class="op">;</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="va">singleHist</span> <span class="op">=</span> <span class="va">blockHistory</span>(<span class="va">A</span><span class="op">,</span><span class="va">single</span>(<span class="va">B</span>)<span class="op">,</span><span class="va">X0</span><span class="op">,</span><span class="va">outside</span><span class="op">,</span><span class="va">lambda</span>(<span class="kw">end</span><span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="kw">end</span>)<span class="op">,</span><span class="va">steps</span><span class="op">,</span><span class="fl">3</span>)<span class="op">;</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="va">k</span> <span class="op">=</span> (<span class="fl">0</span><span class="op">:</span><span class="va">steps</span>)<span class="op">';</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="va">tPower</span> <span class="op">=</span> (<span class="fl">5</span><span class="op">/</span><span class="fl">8</span>)<span class="op">.^</span><span class="va">k</span><span class="op">;</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="va">tCheb</span> <span class="op">=</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">55</span>)<span class="op">.^</span><span class="va">k</span><span class="op">;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="va">disp</span>(<span class="va">table</span>(<span class="va">k</span><span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">,</span><span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">2</span>)<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">2</span>)<span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">3</span>)<span class="op">,</span><span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">3</span>)<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="ss">'VariableNames'</span><span class="op">,</span>{<span class="ss">'k'</span><span class="op">,</span><span class="ss">'res64'</span><span class="op">,</span><span class="ss">'res32'</span><span class="op">,</span><span class="ss">'sin64'</span><span class="op">,</span><span class="ss">'sin32'</span><span class="op">,</span><span class="ss">'val64'</span><span class="op">,</span><span class="ss">'val32'</span>}))<span class="op">;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="va">fprintf</span>(<span class="ss">'Maximum orthogonality defects (power, double, mixed):\n'</span>)<span class="op">;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="va">disp</span>(<span class="va">max</span>([<span class="va">powerHist</span>(<span class="op">:,</span><span class="fl">4</span>)<span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">4</span>)<span class="op">,</span><span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">4</span>)]<span class="op">,</span>[]<span class="op">,</span><span class="fl">1</span>))<span class="op">;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="va">figure</span><span class="op">;</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="va">subplot</span>(<span class="fl">1</span><span class="op">,</span><span class="fl">2</span><span class="op">,</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="va">semilogy</span>(<span class="va">k</span><span class="op">,</span><span class="va">powerHist</span>(<span class="op">:,</span><span class="fl">2</span>)<span class="op">,</span><span class="ss">'o-'</span><span class="op">,</span><span class="va">k</span><span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">2</span>)<span class="op">,</span><span class="ss">'s-'</span><span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="va">k</span><span class="op">,</span><span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">2</span>)<span class="op">,</span><span class="ss">'^-'</span><span class="op">,</span><span class="va">k</span><span class="op">,</span><span class="va">tPower</span><span class="op">./</span><span class="va">hypot</span>(<span class="fl">1</span><span class="op">,</span><span class="va">tPower</span>)<span class="op">,</span><span class="ss">'k--'</span><span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="va">k</span><span class="op">,</span><span class="va">tCheb</span><span class="op">./</span><span class="va">hypot</span>(<span class="fl">1</span><span class="op">,</span><span class="va">tCheb</span>)<span class="op">,</span><span class="ss">'k:'</span>)<span class="op">;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="va">xlabel</span>(<span class="ss">'Outer steps'</span>)<span class="op">;</span> <span class="va">ylabel</span>(<span class="ss">'Largest sine'</span>)<span class="op">;</span> <span class="va">grid</span> <span class="va">on</span><span class="op">;</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="va">legend</span>(<span class="ss">'Power'</span><span class="op">,</span><span class="ss">'Cheb double'</span><span class="op">,</span><span class="ss">'Cheb mixed'</span><span class="op">,</span><span class="ss">'Power theory'</span><span class="op">,</span><span class="ss">'Cheb theory'</span>)<span class="op">;</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="va">subplot</span>(<span class="fl">1</span><span class="op">,</span><span class="fl">2</span><span class="op">,</span><span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co">% Use product count to expose differences in cost per outer step.</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="va">semilogy</span>(<span class="va">k</span><span class="op">,</span><span class="va">powerHist</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">,</span><span class="ss">'o-'</span><span class="op">,</span><span class="fl">3</span><span class="op">*</span><span class="va">k</span><span class="op">,</span><span class="va">doubleHist</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">,</span><span class="ss">'s-'</span><span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="fl">3</span><span class="op">*</span><span class="va">k</span><span class="op">,</span><span class="va">singleHist</span>(<span class="op">:,</span><span class="fl">1</span>)<span class="op">,</span><span class="ss">'^-'</span>)<span class="op">;</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="va">xlabel</span>(<span class="ss">'Filter or power products (extraction excluded)'</span>)<span class="op">;</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="va">ylabel</span>(<span class="ss">'Maximum verified Ritz residual'</span>)<span class="op">;</span> <span class="va">grid</span> <span class="va">on</span><span class="op">;</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="va">legend</span>(<span class="ss">'Power'</span><span class="op">,</span><span class="ss">'Cheb double'</span><span class="op">,</span><span class="ss">'Cheb mixed'</span>)<span class="op">;</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co">%% Experiment 3: Arnoldi applied to a symmetric problem</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="co">% Two passes of modified Gram-Schmidt control loss of orthogonality.</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="co">% Hermitian symmetry should make the Hessenberg projection tridiagonal.</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="va">start</span> <span class="op">=</span> <span class="va">U</span><span class="op">*</span><span class="va">ones</span>(<span class="va">n</span><span class="op">,</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>[<span class="va">V</span><span class="op">,</span><span class="va">H</span><span class="op">,</span><span class="va">tail</span>] <span class="op">=</span> <span class="va">arnoldiProjection</span>(<span class="va">A</span><span class="op">,</span><span class="va">start</span><span class="op">,</span><span class="fl">12</span>)<span class="op">;</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>[<span class="va">S</span><span class="op">,</span><span class="va">D</span>] <span class="op">=</span> <span class="va">eig</span>(<span class="va">H</span>)<span class="op">;</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="va">ritz</span> <span class="op">=</span> <span class="va">diag</span>(<span class="va">D</span>)<span class="op">;</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>[<span class="op">~,</span><span class="va">j</span>] <span class="op">=</span> <span class="va">max</span>(<span class="va">real</span>(<span class="va">ritz</span>))<span class="op">;</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="va">y</span> <span class="op">=</span> <span class="va">S</span>(<span class="op">:,</span><span class="va">j</span>)<span class="op">/</span><span class="va">norm</span>(<span class="va">S</span>(<span class="op">:,</span><span class="va">j</span>))<span class="op">;</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="va">v</span> <span class="op">=</span> <span class="va">V</span><span class="op">*</span><span class="va">y</span><span class="op">;</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="va">shortcut</span> <span class="op">=</span> <span class="va">tail</span><span class="op">*</span><span class="va">abs</span>(<span class="va">y</span>(<span class="kw">end</span>))<span class="op">;</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="va">direct</span> <span class="op">=</span> <span class="va">norm</span>(<span class="va">A</span><span class="op">*</span><span class="va">v</span><span class="op">-</span><span class="va">ritz</span>(<span class="va">j</span>)<span class="op">*</span><span class="va">v</span>)<span class="op">;</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="va">fprintf</span>(<span class="ss">'Arnoldi shortcut %.6e, direct %.6e, basis defect %.3e\n'</span><span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    <span class="va">shortcut</span><span class="op">,</span><span class="va">direct</span><span class="op">,</span><span class="va">norm</span>(<span class="va">V</span><span class="op">'*</span><span class="va">V</span><span class="op">-</span><span class="va">eye</span>(<span class="va">size</span>(<span class="va">H</span>))))<span class="op">;</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="va">fprintf</span>(<span class="ss">'Entries above first superdiagonal, Frobenius norm %.3e\n'</span><span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    <span class="va">norm</span>(<span class="va">triu</span>(<span class="va">H</span><span class="op">,</span><span class="fl">2</span>)<span class="op">,</span><span class="ss">'fro'</span>))<span class="op">;</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="va">hist</span> <span class="op">=</span> <span class="va">blockHistory</span>(<span class="va">A</span><span class="op">,</span><span class="va">op</span><span class="op">,</span><span class="va">X</span><span class="op">,</span><span class="va">outside</span><span class="op">,</span><span class="va">wanted</span><span class="op">,</span><span class="va">steps</span><span class="op">,</span><span class="va">degree</span>)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>    [<span class="va">X</span><span class="op">,~</span>] <span class="op">=</span> <span class="va">qr</span>(<span class="va">X</span><span class="op">,</span><span class="fl">0</span>)<span class="op">;</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    <span class="va">p</span> <span class="op">=</span> <span class="va">size</span>(<span class="va">X</span><span class="op">,</span><span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    <span class="va">hist</span> <span class="op">=</span> <span class="va">zeros</span>(<span class="va">steps</span><span class="op">+</span><span class="fl">1</span><span class="op">,</span><span class="fl">4</span>)<span class="op">;</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span> <span class="va">k</span> <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="va">steps</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>        <span class="va">H</span> <span class="op">=</span> <span class="va">X</span><span class="op">'*</span>(<span class="va">A</span><span class="op">*</span><span class="va">X</span>)<span class="op">;</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>        [<span class="va">W</span><span class="op">,</span><span class="va">D</span>] <span class="op">=</span> <span class="va">eig</span>((<span class="va">H</span><span class="op">+</span><span class="va">H</span><span class="op">'</span>)<span class="op">/</span><span class="fl">2</span>)<span class="op">;</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>        [<span class="va">theta</span><span class="op">,</span><span class="va">order</span>] <span class="op">=</span> <span class="va">sort</span>(<span class="va">diag</span>(<span class="va">D</span>))<span class="op">;</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>        <span class="va">Z</span> <span class="op">=</span> <span class="va">X</span><span class="op">*</span><span class="va">W</span>(<span class="op">:,</span><span class="va">order</span>)<span class="op">;</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>        <span class="va">residual</span> <span class="op">=</span> <span class="va">A</span><span class="op">*</span><span class="va">Z</span><span class="op">-</span><span class="va">Z</span><span class="op">*</span><span class="va">diag</span>(<span class="va">theta</span>)<span class="op">;</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>        <span class="va">hist</span>(<span class="va">k</span><span class="op">+</span><span class="fl">1</span><span class="op">,:</span>) <span class="op">=</span> [<span class="va">max</span>(<span class="va">vecnorm</span>(<span class="va">residual</span>))<span class="op">,</span><span class="va">norm</span>(<span class="va">outside</span><span class="op">'*</span><span class="va">Z</span>)<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>                       <span class="va">max</span>(<span class="va">abs</span>(<span class="va">theta</span><span class="op">-</span><span class="va">wanted</span>))<span class="op">,</span><span class="va">norm</span>(<span class="va">Z</span><span class="op">'*</span><span class="va">Z</span><span class="op">-</span><span class="va">eye</span>(<span class="va">p</span>))]<span class="op">;</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">k</span> <span class="op">==</span> <span class="va">steps</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>            <span class="kw">break</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>        <span class="va">previous</span> <span class="op">=</span> <span class="va">cast</span>(<span class="va">X</span><span class="op">,</span><span class="ss">'like'</span><span class="op">,</span><span class="va">op</span>)<span class="op">;</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>        <span class="va">current</span> <span class="op">=</span> <span class="va">op</span><span class="op">*</span><span class="va">previous</span><span class="op">;</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>        <span class="kw">for</span> <span class="va">j</span> <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="va">degree</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>            <span class="va">following</span> <span class="op">=</span> <span class="fl">2</span><span class="op">*</span>(<span class="va">op</span><span class="op">*</span><span class="va">current</span>)<span class="op">-</span><span class="va">previous</span><span class="op">;</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>            <span class="va">previous</span> <span class="op">=</span> <span class="va">current</span><span class="op">;</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>            <span class="va">current</span> <span class="op">=</span> <span class="va">following</span><span class="op">;</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>        [<span class="va">X</span><span class="op">,~</span>] <span class="op">=</span> <span class="va">qr</span>(<span class="va">double</span>(<span class="va">current</span>)<span class="op">,</span><span class="fl">0</span>)<span class="op">;</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> [<span class="va">V</span><span class="op">,</span><span class="va">H</span><span class="op">,</span><span class="va">tail</span>] <span class="op">=</span> <span class="va">arnoldiProjection</span>(<span class="va">A</span><span class="op">,</span><span class="va">start</span><span class="op">,</span><span class="va">m</span>)</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>    <span class="va">n</span> <span class="op">=</span> <span class="va">size</span>(<span class="va">A</span><span class="op">,</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>    <span class="va">V</span> <span class="op">=</span> <span class="va">zeros</span>(<span class="va">n</span><span class="op">,</span><span class="va">m</span><span class="op">+</span><span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>    <span class="va">H</span> <span class="op">=</span> <span class="va">zeros</span>(<span class="va">m</span><span class="op">+</span><span class="fl">1</span><span class="op">,</span><span class="va">m</span>)<span class="op">;</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>    <span class="va">V</span>(<span class="op">:,</span><span class="fl">1</span>) <span class="op">=</span> <span class="va">start</span><span class="op">/</span><span class="va">norm</span>(<span class="va">start</span>)<span class="op">;</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>    <span class="co">% A small tail signals possible numerical invariance. Keep its actual</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>    <span class="co">% norm in the reported estimate, even when no new vector is formed.</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>    <span class="va">tol</span> <span class="op">=</span> <span class="fl">10</span><span class="op">*</span><span class="va">eps</span><span class="op">*</span><span class="va">norm</span>(<span class="va">A</span><span class="op">,</span><span class="ss">'fro'</span>)<span class="op">;</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>    <span class="kw">for</span> <span class="va">j</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>        <span class="va">w</span> <span class="op">=</span> <span class="va">A</span><span class="op">*</span><span class="va">V</span>(<span class="op">:,</span><span class="va">j</span>)<span class="op">;</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>        <span class="kw">for</span> <span class="va">pass</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>            <span class="kw">for</span> <span class="va">i</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">j</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>                <span class="va">coeff</span> <span class="op">=</span> <span class="va">V</span>(<span class="op">:,</span><span class="va">i</span>)<span class="op">'*</span><span class="va">w</span><span class="op">;</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>                <span class="va">H</span>(<span class="va">i</span><span class="op">,</span><span class="va">j</span>) <span class="op">=</span> <span class="va">H</span>(<span class="va">i</span><span class="op">,</span><span class="va">j</span>)<span class="op">+</span><span class="va">coeff</span><span class="op">;</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>                <span class="va">w</span> <span class="op">=</span> <span class="va">w</span><span class="op">-</span><span class="va">coeff</span><span class="op">*</span><span class="va">V</span>(<span class="op">:,</span><span class="va">i</span>)<span class="op">;</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>            <span class="kw">end</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>        <span class="va">tail</span> <span class="op">=</span> <span class="va">norm</span>(<span class="va">w</span>)<span class="op">;</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>        <span class="va">H</span>(<span class="va">j</span><span class="op">+</span><span class="fl">1</span><span class="op">,</span><span class="va">j</span>) <span class="op">=</span> <span class="va">tail</span><span class="op">;</span></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">tail</span> <span class="op">&lt;=</span> <span class="va">tol</span> <span class="op">||</span> <span class="va">j</span> <span class="op">==</span> <span class="va">m</span></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>            <span class="kw">break</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>        <span class="va">V</span>(<span class="op">:,</span><span class="va">j</span><span class="op">+</span><span class="fl">1</span>) <span class="op">=</span> <span class="va">w</span><span class="op">/</span><span class="va">tail</span><span class="op">;</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>    <span class="va">H</span> <span class="op">=</span> <span class="va">H</span>(<span class="fl">1</span><span class="op">:</span><span class="va">j</span><span class="op">,</span><span class="fl">1</span><span class="op">:</span><span class="va">j</span>)<span class="op">;</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>    <span class="va">V</span> <span class="op">=</span> <span class="va">V</span>(<span class="op">:,</span><span class="fl">1</span><span class="op">:</span><span class="va">j</span>)<span class="op">;</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Read the output.</strong> In the left plot compare the early measured sines with their respective exact curves. In the right plot compare methods at equal product counts. Examine value error and residual separately once the value reaches its rounding scale. For Arnoldi inspect the difference between the shortcut and direct residual, and compare the off-tridiagonal entries with <span class="math inline">\(\|A\|\)</span>. The Arnoldi experiment uses full reorthogonalization on a symmetric matrix to reveal the Lanczos structure; a short-recurrence implementation has different storage and orthogonality behavior.</p>
+<p><strong>Two changes to try.</strong> First replace the input to the mixed run with double-precision products on a once-rounded matrix by passing <strong>double(single(B))</strong>. This isolates the effect of storing the mapped operator. Second, change the interval upper bound from <span class="math inline">\(5\)</span> to <span class="math inline">\(4\)</span>, recompute both <span class="math inline">\(c\)</span> and <span class="math inline">\(h\)</span>, and replace <span class="math inline">\(1/55\)</span> in the prediction with the largest actual unwanted multiplier divided by the smallest actual target multiplier. Check which part of the earlier estimate depended on enclosing the entire unwanted spectrum.</p>
+</section>
+<section id="synthesis-what-makes-the-computation-reliable" class="level2" data-number="17.12">
+<h2 data-number="17.12" class="anchored" data-anchor-id="synthesis-what-makes-the-computation-reliable"><span class="header-section-number">17.12</span> Synthesis — What makes the computation reliable?</h2>
+<p>Module A’s direct sum provides the coordinates <span class="math inline">\(\binom{C}{D}\)</span> in which algorithmic convergence becomes a graph contraction. Module B explains both why left eigenvectors measure perturbations and why Ritz tests annihilate the trial-space residual. Module C makes these tests computable through inner products and makes “close” precise through orthogonal projection. Module D diagonalizes a polynomial of a Hermitian operator. Module E uses all four results twice: first to choose the algorithm, then to decide what its output warrants. The hypotheses in the middle column below are as important as the formulas.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity or result</th>
+<th>Hypotheses</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\gamma_n\lvert A\rvert\lvert x\rvert\)</span></td>
+<td>Sequential real matvec, <span class="math inline">\(nu&lt;1\)</span>, normal-range model</td>
+<td>Componentwise absolute error envelope</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\min\|E\|=\|r\|\)</span></td>
+<td>Unit <span class="math inline">\(x\)</span>, unrestricted matrix perturbation</td>
+<td>Price of making the approximate pair exact</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\operatorname{dist}(\theta,\sigma(A))\le\|r\|\)</span></td>
+<td>Hermitian or normal <span class="math inline">\(A\)</span>, unit vector</td>
+<td>Existence of a nearby eigenvalue</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\|(I-P)x\|\le\|r\|/\delta\)</span></td>
+<td>Hermitian <span class="math inline">\(A\)</span>, unwanted spectrum separated from <span class="math inline">\(\theta\)</span></td>
+<td>Target-space angle certificate</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\tan t_k\le\rho^k\tan t_0\)</span></td>
+<td>Self-adjoint filter, full overlap, <span class="math inline">\(\rho=\beta/\alpha&lt;1\)</span></td>
+<td>Block convergence across a cluster boundary</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(X^*(AX-XH)=0\)</span></td>
+<td><span class="math inline">\(X^*X=I\)</span>, <span class="math inline">\(H=X^*AX\)</span></td>
+<td>Galerkin orthogonality</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\|r_{\mathrm{Ritz}}\|=h_{m+1,m}\lvert e_m^*y\rvert\)</span></td>
+<td>Exact Arnoldi relation, normalized projected eigenpair</td>
+<td>Cheap residual estimate</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\sum_{j=1}^d U_{d-j}(B)F_j\)</span></td>
+<td>Unscaled recurrence, fixed <span class="math inline">\(B\)</span>, exact initialization</td>
+<td>Total error from local filter defects</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\|L^{-1}(Kx-\theta Mx)\|\)</span></td>
+<td><span class="math inline">\(M=LL^*&gt;0\)</span>, <span class="math inline">\(x^*Mx=1\)</span></td>
+<td>Residual in the correct variational geometry</td>
+</tr>
+</tbody>
+</table>
+<section id="mastery-questions" class="level3">
+<h3 class="anchored" data-anchor-id="mastery-questions">Mastery questions</h3>
+<ol type="1">
+<li>Given a computed eigenpair, can you construct the optimal perturbation and specify exactly which structure it preserves?</li>
+<li>Given a cluster, can you explain why an orthonormal basis may change substantially even when the projector barely moves?</li>
+<li>Starting from a spectral decomposition, can you derive the tangent contraction for power, shifted inverse and filtered block iteration with their respective hypotheses?</li>
+<li>Can you derive an Arnoldi residual using only the last subdiagonal, then identify the two numerical defects that compromise it?</li>
+<li>Given spectral bounds and a requested contraction, can you map the interval, choose a degree and diagnose a missed unwanted eigenvalue?</li>
+<li>Can you propagate a single early recurrence defect, then explain why an absolute filter error need not equal an angle error?</li>
+<li>Can you design a mixed-precision comparison that separates storage error, arithmetic error, verification error and time to tolerance?</li>
+</ol>
+</section>
+<section id="where-to-go-next" class="level3">
+<h3 class="anchored" data-anchor-id="where-to-go-next">Where to go next</h3>
+<p><strong>For HASC.</strong> Read the seminar recurrence with three quantities on paper: the object being multiplied at each step, the norm in which its product error is bounded, and the factor that transfers this error into the unwanted space. Compare an error proportional to the norm of a full iterate with one proportional to a residual correction. Track which steps require access to the higher-precision operator. In an experiment, maintain a separate column for measured time and another for the verified final residual. This lets you judge a performance claim at a stated mathematical accuracy.</p>
+<p><strong>For functional analysis.</strong> Orthogonal projections, Rayleigh quotients and bounded polynomials of a bounded self-adjoint operator extend to Hilbert space. A compact self-adjoint operator has an eigen-expansion with possible accumulation at zero, so a uniform positive gap cannot be assumed along its whole spectrum. Differential operators can be unbounded and require domains and boundary conditions. A useful next step is to prove spectral convergence of finite-element approximations using compact solution operators, distinguishing discretization error from iteration error.</p>
+<p><strong>For structural algebra.</strong> The polynomial action <span class="math inline">\(p\mapsto p(A)\)</span> and the cyclic quotient by an annihilating ideal explain exact Krylov termination independently of the coordinate basis. An inner product, an error norm and a rounding model add information that an algebraic quotient does not encode. Under a badly conditioned nonunitary change of coordinates the abstract operator is isomorphic while measured sensitivity can change substantially.</p>
+<p><strong>Foundation established in principle.</strong> After reconstructing the proofs and reproducing the experiment, you have the tools to justify selection, contraction, extraction and verification for finite-dimensional Hermitian problems. <strong>Further study</strong> includes sharper clustered-subspace bounds, implicit restarting and locking, interior filter design, communication-avoiding QR, sparse generalized eigensolvers with inexact solves, and precision-dependent convergence proofs for a specific residual-based recurrence. Each needs assumptions beyond the elementary graph and residual estimates proved here.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review_2/d.html" class="pagination-link" aria-label="Module D — Spectral Theory">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../review_3/a03.html" class="pagination-link" aria-label="Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

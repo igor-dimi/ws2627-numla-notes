@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>24&nbsp; Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory – Numerical Linear Algebra WS 26/27 Notes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../review_2/f1.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-bf132de45b538d253cd2e2da5fec6016.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_2/f2.html"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Numerical Linear Algebra WS 26/27 Notes</a> 
+        <div class="sidebar-tools-main">
+    <a href="../Numerical-Linear-Algebra-WS-26-27-Notes.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_plan.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review I</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/01_vector_spaces.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Session 1 — Vector Spaces and Linear Maps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/02_inner_products_orthogonality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Session 2 — Inner Products and Orthogonality</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/03_orthogonal_projections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Session 3 — Orthogonal Projections</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/04_qr_factorization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Session 4 — QR Factorization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/05_eigenvalues_spectral_theorem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Session 5 — Eigenvalues and the Spectral Theorem</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/06_matrix_norms_conditioning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Session 6 — Matrix Norms and Conditioning</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/07_direct_numerical_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Session 7 — Direct Numerical Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/08_basic_iterative_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Session 8 — Basic Iterative Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/09_power_subspace_iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Session 9 — Power and Subspace Iteration</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/10_matrix_polynomials_chebyshev_filtering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Session 10 — Matrix Polynomials and Chebyshev Filtering</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review/11_rayleigh_ritz_integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Session 11 — Rayleigh–Ritz and Integration</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review II</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/a02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/b.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/c.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/e.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods, Conditioning, and Stability</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Review III</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/a03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Module A — Structural Linear Algebra: Linear Maps, Decomposition, and Quotient Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/b03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Module B — Duality and Linear Measurements: From Covectors to Universal Structure</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/c03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Module C — Inner-Product Geometry: From Duality to Orthogonality, Approximation, and Variational Methods</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/d03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Module D — Spectral Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_3/e03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Module E — Numerical Eigenvalue Methods: Conditioning, Stability, Polynomial Filtering, and Mixed Precision</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../review_2/f2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#session-1-which-maps-preserve-the-problem" id="toc-session-1-which-maps-preserve-the-problem" class="nav-link active" data-scroll-target="#session-1-which-maps-preserve-the-problem"><span class="header-section-number">24.1</span> Session 1 — Which maps preserve the problem?</a>
+  <ul class="collapse">
+  <li><a href="#from-changing-coordinates-to-changing-categories" id="toc-from-changing-coordinates-to-changing-categories" class="nav-link" data-scroll-target="#from-changing-coordinates-to-changing-categories">From changing coordinates to changing categories</a></li>
+  <li><a href="#what-a-diagram-asserts" id="toc-what-a-diagram-asserts" class="nav-link" data-scroll-target="#what-a-diagram-asserts">What a diagram asserts</a></li>
+  </ul></li>
+  <li><a href="#session-2-three-problems-that-determine-their-own-objects" id="toc-session-2-three-problems-that-determine-their-own-objects" class="nav-link" data-scroll-target="#session-2-three-problems-that-determine-their-own-objects"><span class="header-section-number">24.2</span> Session 2 — Three problems that determine their own objects</a>
+  <ul class="collapse">
+  <li><a href="#identifying-inputs-while-preserving-all-admissible-measurements" id="toc-identifying-inputs-while-preserving-all-admissible-measurements" class="nav-link" data-scroll-target="#identifying-inputs-while-preserving-all-admissible-measurements">Identifying inputs while preserving all admissible measurements</a></li>
+  <li><a href="#assembling-outputs-and-prescribing-inputs" id="toc-assembling-outputs-and-prescribing-inputs" class="nav-link" data-scroll-target="#assembling-outputs-and-prescribing-inputs">Assembling outputs and prescribing inputs</a></li>
+  <li><a href="#adding-subspaces-in-an-ambient-space" id="toc-adding-subspaces-in-an-ambient-space" class="nav-link" data-scroll-target="#adding-subspaces-in-an-ambient-space">Adding subspaces in an ambient space</a></li>
+  </ul></li>
+  <li><a href="#session-3-kernels-obstructions-and-splitting" id="toc-session-3-kernels-obstructions-and-splitting" class="nav-link" data-scroll-target="#session-3-kernels-obstructions-and-splitting"><span class="header-section-number">24.3</span> Session 3 — Kernels, obstructions and splitting</a></li>
+  <li><a href="#session-4-pulling-measurements-back" id="toc-session-4-pulling-measurements-back" class="nav-link" data-scroll-target="#session-4-pulling-measurements-back"><span class="header-section-number">24.4</span> Session 4 — Pulling measurements back</a>
+  <ul class="collapse">
+  <li><a href="#evaluation-and-its-limitations" id="toc-evaluation-and-its-limitations" class="nav-link" data-scroll-target="#evaluation-and-its-limitations">Evaluation and its limitations</a></li>
+  <li><a href="#exactness-seen-by-measurements" id="toc-exactness-seen-by-measurements" class="nav-link" data-scroll-target="#exactness-seen-by-measurements">Exactness seen by measurements</a></li>
+  </ul></li>
+  <li><a href="#session-5-when-constructions-respect-changes-of-data" id="toc-session-5-when-constructions-respect-changes-of-data" class="nav-link" data-scroll-target="#session-5-when-constructions-respect-changes-of-data"><span class="header-section-number">24.5</span> Session 5 — When constructions respect changes of data</a>
+  <ul class="collapse">
+  <li><a href="#why-a-mapping-problem-can-have-an-object-as-its-answer" id="toc-why-a-mapping-problem-can-have-an-object-as-its-answer" class="nav-link" data-scroll-target="#why-a-mapping-problem-can-have-an-object-as-its-answer">Why a mapping problem can have an object as its answer</a></li>
+  </ul></li>
+  <li><a href="#session-6-a-linear-operator-is-a-polynomial-action" id="toc-session-6-a-linear-operator-is-a-polynomial-action" class="nav-link" data-scroll-target="#session-6-a-linear-operator-is-a-polynomial-action"><span class="header-section-number">24.6</span> Session 6 — A linear operator is a polynomial action</a>
+  <ul class="collapse">
+  <li><a href="#why-enlarge-the-scalars" id="toc-why-enlarge-the-scalars" class="nav-link" data-scroll-target="#why-enlarge-the-scalars">Why enlarge the scalars?</a></li>
+  <li><a href="#cyclic-modules-krylov-spaces-and-annihilators" id="toc-cyclic-modules-krylov-spaces-and-annihilators" class="nav-link" data-scroll-target="#cyclic-modules-krylov-spaces-and-annihilators">Cyclic modules, Krylov spaces and annihilators</a></li>
+  <li><a href="#a-two-dimensional-extension-that-refuses-to-split" id="toc-a-two-dimensional-extension-that-refuses-to-split" class="nav-link" data-scroll-target="#a-two-dimensional-extension-that-refuses-to-split">A two-dimensional extension that refuses to split</a></li>
+  <li><a href="#coprime-annihilators-give-genuine-projectors" id="toc-coprime-annihilators-give-genuine-projectors" class="nav-link" data-scroll-target="#coprime-annihilators-give-genuine-projectors">Coprime annihilators give genuine projectors</a></li>
+  <li><a href="#why-jordan-blocks-arise-and-what-the-minimal-polynomial-omits" id="toc-why-jordan-blocks-arise-and-what-the-minimal-polynomial-omits" class="nav-link" data-scroll-target="#why-jordan-blocks-arise-and-what-the-minimal-polynomial-omits">Why Jordan blocks arise, and what the minimal polynomial omits</a></li>
+  </ul></li>
+  <li><a href="#session-7-turning-bilinear-rules-into-linear-maps" id="toc-session-7-turning-bilinear-rules-into-linear-maps" class="nav-link" data-scroll-target="#session-7-turning-bilinear-rules-into-linear-maps"><span class="header-section-number">24.7</span> Session 7 — Turning bilinear rules into linear maps</a></li>
+  <li><a href="#session-8-when-zero-composition-leaves-a-hole" id="toc-session-8-when-zero-composition-leaves-a-hole" class="nav-link" data-scroll-target="#session-8-when-zero-composition-leaves-a-hole"><span class="header-section-number">24.8</span> Session 8 — When zero composition leaves a hole</a>
+  <ul class="collapse">
+  <li><a href="#from-chains-to-differential-operators" id="toc-from-chains-to-differential-operators" class="nav-link" data-scroll-target="#from-chains-to-differential-operators">From chains to differential operators</a></li>
+  </ul></li>
+  <li><a href="#session-9-four-problems-seen-through-several-constructions" id="toc-session-9-four-problems-seen-through-several-constructions" class="nav-link" data-scroll-target="#session-9-four-problems-seen-through-several-constructions"><span class="header-section-number">24.9</span> Session 9 — Four problems seen through several constructions</a>
+  <ul class="collapse">
+  <li><a href="#a.-recovering-a-potential-from-measurements" id="toc-a.-recovering-a-potential-from-measurements" class="nav-link" data-scroll-target="#a.-recovering-a-potential-from-measurements">A. Recovering a potential from measurements</a></li>
+  <li><a href="#b.-what-a-krylov-process-can-recover" id="toc-b.-what-a-krylov-process-can-recover" class="nav-link" data-scroll-target="#b.-what-a-krylov-process-can-recover">B. What a Krylov process can recover</a></li>
+  <li><a href="#c.-a-mesh-with-one-remaining-circulation" id="toc-c.-a-mesh-with-one-remaining-circulation" class="nav-link" data-scroll-target="#c.-a-mesh-with-one-remaining-circulation">C. A mesh with one remaining circulation</a></li>
+  <li><a href="#d.-from-a-quotient-to-an-operator-equation" id="toc-d.-from-a-quotient-to-an-operator-equation" class="nav-link" data-scroll-target="#d.-from-a-quotient-to-an-operator-equation">D. From a quotient to an operator equation</a></li>
+  <li><a href="#bridge-to-f1-where-topology-changes-the-answer" id="toc-bridge-to-f1-where-topology-changes-the-answer" class="nav-link" data-scroll-target="#bridge-to-f1-where-topology-changes-the-answer">Bridge to F1 — Where topology changes the answer</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">24.10</span> Exercises</a></li>
+  <li><a href="#worked-solutions" id="toc-worked-solutions" class="nav-link" data-scroll-target="#worked-solutions"><span class="header-section-number">24.11</span> Worked solutions</a></li>
+  <li><a href="#computational-laboratory-exact-identities-in-matlab" id="toc-computational-laboratory-exact-identities-in-matlab" class="nav-link" data-scroll-target="#computational-laboratory-exact-identities-in-matlab"><span class="header-section-number">24.12</span> Computational laboratory — Exact identities in MATLAB</a>
+  <ul class="collapse">
+  <li><a href="#compute-quotient-coordinates-and-factor-a-map" id="toc-compute-quotient-coordinates-and-factor-a-map" class="nav-link" data-scroll-target="#compute-quotient-coordinates-and-factor-a-map">1. Compute quotient coordinates and factor a map</a></li>
+  <li><a href="#separate-primary-spaces-and-measure-krylov-growth" id="toc-separate-primary-spaces-and-measure-krylov-growth" class="nav-link" data-scroll-target="#separate-primary-spaces-and-measure-krylov-growth">2. Separate primary spaces and measure Krylov growth</a></li>
+  <li><a href="#identify-tensor-coordinates" id="toc-identify-tensor-coordinates" class="nav-link" data-scroll-target="#identify-tensor-coordinates">3. Identify tensor coordinates</a></li>
+  <li><a href="#count-classes-before-and-after-attaching-faces" id="toc-count-classes-before-and-after-attaching-faces" class="nav-link" data-scroll-target="#count-classes-before-and-after-attaching-faces">4. Count classes before and after attaching faces</a></li>
+  </ul></li>
+  <li><a href="#final-synthesis-choosing-the-object-that-answers-the-question" id="toc-final-synthesis-choosing-the-object-that-answers-the-question" class="nav-link" data-scroll-target="#final-synthesis-choosing-the-object-that-answers-the-question"><span class="header-section-number">24.13</span> Final synthesis — Choosing the object that answers the question</a></li>
+  <li><a href="#mastery-assessment" id="toc-mastery-assessment" class="nav-link" data-scroll-target="#mastery-assessment"><span class="header-section-number">24.14</span> Mastery assessment</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../review_3/a03.html">Review III</a></li><li class="breadcrumb-item"><a href="../review_2/f2.html"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-f2-structural-algebra" class="quarto-section-identifier"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Module F2 — Structural Algebra: From Linear Algebra to Universal Constructions and Category Theory</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Suppose a solver returns two different potentials for the same electric field. Their difference might be a constant. Which object should hold the answer? A quotient records precisely the ambiguity. Now suppose an eigensolver returns two different bases for the same eigenspace. Here the natural answer is a subspace, and, given a complementary spectral subspace, a projector onto it. Why does one problem call for a quotient and the other for a projector? The distinction is visible in the maps each answer must support.</p>
+<p>Module A traced the information lost by a linear map. Module B followed measurements backward through it. Module C used an inner product to turn measurements into vectors. Module D studied the subspaces preserved by an operator. We will vary the structure that maps must preserve and see which of these arguments survive. This is a parallel extension of Review II. The main spectral payoff comes in Session 6, where a single polynomial congruence constructs a projector even for a matrix with a defective eigenvalue.</p>
+<p><strong>Conventions.</strong> <span class="math inline">\(\mathbb F\)</span> denotes a field. <span class="math inline">\(V^*=V^\vee\)</span> is the algebraic dual, <span class="math inline">\(T^\vee\)</span> the dual map, <span class="math inline">\(U^0\)</span> the annihilator. For complex inner products we follow Module C and take <span class="math inline">\(\langle x,y\rangle=y^Hx\)</span> in standard coordinates. <span class="math inline">\(T^*\)</span> denotes the inner-product adjoint. Composition <span class="math inline">\(gf\)</span> means apply <span class="math inline">\(f\)</span> first. Infinite-dimensional algebraic basis arguments use the usual basis-extension principle.</p>
+<section id="session-1-which-maps-preserve-the-problem" class="level2" data-number="24.1">
+<h2 data-number="24.1" class="anchored" data-anchor-id="session-1-which-maps-preserve-the-problem"><span class="header-section-number">24.1</span> Session 1 — Which maps preserve the problem?</h2>
+<section id="from-changing-coordinates-to-changing-categories" class="level3">
+<h3 class="anchored" data-anchor-id="from-changing-coordinates-to-changing-categories">From changing coordinates to changing categories</h3>
+<p>Take the point set <span class="math inline">\(\mathbb R^2\)</span>. A translation preserves Euclidean distances. It preserves the vector-space origin only when the translation is zero. An invertible shear fixes the origin and respects addition and scaling, yet changes lengths. Before calling two descriptions equivalent, we must decide which operations, relations, or measurements matter.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Setting</th>
+<th>Objects</th>
+<th>Morphisms</th>
+<th>What an inverse must preserve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf{Set}\)</span></td>
+<td>Sets</td>
+<td>Functions</td>
+<td>A bijection suffices</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf{Grp}\)</span></td>
+<td>Groups</td>
+<td>Homomorphisms</td>
+<td>Multiplication</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf{Vect}_{\mathbb F}\)</span></td>
+<td>Spaces over one field</td>
+<td><span class="math inline">\(\mathbb F\)</span>-linear maps</td>
+<td>Addition and scalar multiplication</td>
+</tr>
+<tr class="even">
+<td>Unital rings</td>
+<td>Rings with identity</td>
+<td>Unital ring maps</td>
+<td>Addition, multiplication, and identity</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(R\)</span>-modules</td>
+<td>Left modules over a fixed ring</td>
+<td><span class="math inline">\(R\)</span>-linear maps</td>
+<td>Addition and the action of every scalar</td>
+</tr>
+<tr class="even">
+<td>Normed spaces</td>
+<td>Normed spaces over <span class="math inline">\(\mathbb R\)</span> or <span class="math inline">\(\mathbb C\)</span></td>
+<td>Bounded linear maps</td>
+<td>Both directions must be bounded</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf{Top}\)</span></td>
+<td>Topological spaces</td>
+<td>Continuous maps</td>
+<td>Both directions must be continuous</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>group</strong> has an associative multiplication, an identity and inverses. A <strong>ring</strong> has an abelian group of additions and an associative multiplication distributing over addition. We take rings with identity. A field additionally permits division by every nonzero scalar and has commutative multiplication. A <strong>left module</strong> is an abelian group with a scalar action of a ring satisfying the familiar vector-space distributivity, associativity and unit axioms. Over <span class="math inline">\(\mathbb Z\)</span>, integer scaling just means repeated addition and its negative. Over a matrix ring, the order of scalar multiplication matters. A bounded linear map satisfies <span class="math inline">\(\|Tx\|\le C\|x\|\)</span> for a fixed <span class="math inline">\(C\)</span> and all <span class="math inline">\(x\)</span>. Composition preserves this condition because the bounds multiply.</p>
+<p><strong>Two tests of equivalence.</strong> The sets underlying <span class="math inline">\(\mathbb Q\)</span> and <span class="math inline">\(\mathbb Q^2\)</span> are both countably infinite, so there is a bijection. A linear map from <span class="math inline">\(\mathbb Q\)</span> has image spanned by the image of <span class="math inline">\(1\)</span>, hence cannot cover <span class="math inline">\(\mathbb Q^2\)</span>. For an example on literally the same set, equip <span class="math inline">\(\mathbb R\)</span> once with the discrete topology and once with the usual topology. Every singleton is open in the former. A homeomorphism takes open sets to open sets, so no homeomorphism exists between the two. The choice of morphisms changes the answer even before we write any coordinates.</p>
+</section>
+<section id="what-a-diagram-asserts" class="level3">
+<h3 class="anchored" data-anchor-id="what-a-diagram-asserts">What a diagram asserts</h3>
+<p>A <strong>category</strong> specifies objects, morphisms <span class="math inline">\(\operatorname{Hom}(X,Y)\)</span> with specified source and target, an identity <span class="math inline">\(1_X\)</span> at each object, and a composite <span class="math inline">\(gf:X\to Z\)</span> whenever <span class="math inline">\(f:X\to Y\)</span>, <span class="math inline">\(g:Y\to Z\)</span>. The laws are <span class="math inline">\(h(gf)=(hg)f\)</span> and <span class="math inline">\(1_Y f=f=f1_X\)</span>. An isomorphism has a two-sided inverse in the category. The inverse is unique since two inverses <span class="math inline">\(g,h\)</span> satisfy <span class="math inline">\(g=g(fh)=(gf)h=h\)</span>.</p>
+<p>The diagram <span class="math inline">\(V\xrightarrow{T}W\)</span> records the type of a map. A <strong>commutative</strong> diagram additionally equates compositions along paths with common endpoints. For example, let <span class="math inline">\(T(x,y)=x-y\)</span> and <span class="math inline">\(D=\{(a,a)\}\)</span>. The following square is a claim that can be tested on an arbitrary input:</p>
+<p><span class="math display">\[
+\begin{array}{ccc}
+\mathbb R^2&amp;\xrightarrow{T}&amp;\mathbb R\\
+{\scriptstyle q}\downarrow &amp;&amp;\downarrow{\scriptstyle 1}\\
+\mathbb R^2/D&amp;\xrightarrow{\bar T}&amp;\mathbb R .
+\end{array}
+\]</span></p>
+<p>Here <span class="math inline">\(q(x,y)=[(x,y)]\)</span>. Changing a representative to <span class="math inline">\((x+a,y+a)\)</span> leaves <span class="math inline">\(x-y\)</span> unchanged. Thus the lower arrow exists and both paths give <span class="math inline">\(x-y\)</span>. One elementwise calculation constructs a map; the equation <span class="math inline">\(\bar Tq=T\)</span> then describes how to use it with every input map <span class="math inline">\(X\to\mathbb R^2\)</span> at once.</p>
+<p>Reversing all arrows and reversing the order of composition gives the <strong>opposite category</strong> <span class="math inline">\(\mathcal C^{\mathrm{op}}\)</span>. Its objects are the same and <span class="math inline">\(\operatorname{Hom}_{\mathcal C^{\mathrm{op}}}(X,Y)=\operatorname{Hom}_{\mathcal C}(Y,X)\)</span>. Associativity and the unit laws still hold. This permits us to reverse a whole statement about arrows. It gives the product/coproduct pairing in the next session. Constructing actual dual <em>spaces</em> and <em>maps</em> requires extra mathematics.</p>
+</section>
+</section>
+<section id="session-2-three-problems-that-determine-their-own-objects" class="level2" data-number="24.2">
+<h2 data-number="24.2" class="anchored" data-anchor-id="session-2-three-problems-that-determine-their-own-objects"><span class="header-section-number">24.2</span> Session 2 — Three problems that determine their own objects</h2>
+<section id="identifying-inputs-while-preserving-all-admissible-measurements" class="level3">
+<h3 class="anchored" data-anchor-id="identifying-inputs-while-preserving-all-admissible-measurements">Identifying inputs while preserving all admissible measurements</h3>
+<p>Let <span class="math inline">\(U\le V\)</span>. The relation <span class="math inline">\(v\sim v'\)</span> if <span class="math inline">\(v-v'\in U\)</span> partitions <span class="math inline">\(V\)</span> into affine translates of <span class="math inline">\(U\)</span>. Addition and scaling on classes are well defined because differences stay in <span class="math inline">\(U\)</span>. Let <span class="math inline">\(q(v)=v+U\)</span>.</p>
+<p><strong>Quotient factorization theorem.</strong> For every <span class="math inline">\(W\)</span>, composition with <span class="math inline">\(q\)</span> gives a bijection <span class="math display">\[
+\operatorname{Hom}(V/U,W)\longrightarrow
+\{f:V\to W\text{ linear}\mid f|_U=0\}.
+\]</span> <strong>Proof.</strong> For <span class="math inline">\(h:V/U\to W\)</span>, <span class="math inline">\(hq\)</span> kills <span class="math inline">\(U\)</span>. Conversely define <span class="math inline">\(\bar f([v])=f(v)\)</span>. Equivalent representatives differ by <span class="math inline">\(u\in U\)</span>, so linearity of <span class="math inline">\(f\)</span> gives equal values. The quotient operations make <span class="math inline">\(\bar f\)</span> linear, and <span class="math inline">\(\bar f q=f\)</span>. Any solution <span class="math inline">\(h\)</span> must take <span class="math inline">\([v]=q(v)\)</span> to <span class="math inline">\(f(v)\)</span>, which proves uniqueness. The constructions undo one another. <span class="math inline">\(\square\)</span></p>
+<p>It is the quantifier <em>for every target and every admissible map</em> that makes this property universal. There is even a computational prescription. For <span class="math inline">\(U=\operatorname{span}(1,1)\)</span> take quotient coordinate <span class="math inline">\(d=x-y\)</span>. Every matrix killing <span class="math inline">\(U\)</span> has columns <span class="math inline">\(b,-b\)</span>, hence sends <span class="math inline">\((x,y)\)</span> to <span class="math inline">\(bd\)</span>. Once <span class="math inline">\(d\)</span> is known one can change the output space or <span class="math inline">\(b\)</span> without recovering a representative.</p>
+<p><strong>Why universality determines the answer.</strong> If <span class="math inline">\(q':V\to Q'\)</span> also kills <span class="math inline">\(U\)</span> and satisfies the same property, factor <span class="math inline">\(q'\)</span> through <span class="math inline">\(q\)</span> to obtain <span class="math inline">\(a\)</span>, and <span class="math inline">\(q\)</span> through <span class="math inline">\(q'\)</span> to obtain <span class="math inline">\(b\)</span>. Then <span class="math inline">\(baq=q=1q\)</span>. Uniqueness gives <span class="math inline">\(ba=1\)</span>; exchanging the roles gives <span class="math inline">\(ab=1\)</span>. Exactly one isomorphism satisfies <span class="math inline">\(aq=q'\)</span>. The compatibility clause matters: the underlying spaces may admit many other isomorphisms.</p>
+<p>For a group <span class="math inline">\(G\)</span>, the same reasoning uses cosets of a <strong>normal</strong> subgroup <span class="math inline">\(N\)</span> (one satisfying <span class="math inline">\(gNg^{-1}=N\)</span>). Normality makes coset multiplication well defined. Every homomorphism killing <span class="math inline">\(N\)</span> factors uniquely by <span class="math inline">\([g]\mapsto f(g)\)</span>. For a ring, the required additive subgroup is a two-sided <strong>ideal</strong>, closed under multiplication from either side, so the multiplication of classes is well defined. These hypotheses tell us precisely when the proposed identification respects the operations.</p>
+</section>
+<section id="assembling-outputs-and-prescribing-inputs" class="level3">
+<h3 class="anchored" data-anchor-id="assembling-outputs-and-prescribing-inputs">Assembling outputs and prescribing inputs</h3>
+<p>Suppose two instruments read <span class="math inline">\(f:X\to V\)</span> and <span class="math inline">\(g:X\to W\)</span>. Their joint reading is the unique map <span class="math inline">\(\langle f,g\rangle:X\to V\times W\)</span>, <span class="math inline">\(x\mapsto(f(x),g(x))\)</span>, whose projections give <span class="math inline">\(f,g\)</span>. Existence follows from the formula; uniqueness follows because the coordinates determine a pair. This argument works for arbitrary sets or for vector spaces with componentwise operations. In any category this mapping problem defines a <strong>product</strong> <span class="math inline">\((P,\pi_1,\pi_2)\)</span> whenever a solution exists.</p>
+<p>Turn the problem around. Given linear rules <span class="math inline">\(a:V\to X\)</span>, <span class="math inline">\(b:W\to X\)</span>, can we extend both rules to a common domain? In the external direct sum <span class="math inline">\(V\oplus W\)</span> insert each input using <span class="math inline">\(i_1(v)=(v,0)\)</span> and <span class="math inline">\(i_2(w)=(0,w)\)</span>. Define <span class="math inline">\([a,b](v,w)=a(v)+b(w)\)</span>. This is linear and restricts correctly. Every pair is <span class="math inline">\(i_1(v)+i_2(w)\)</span>, forcing the formula. The object and its insertions satisfy the <strong>coproduct</strong> property. Reversing the product’s arrows gives exactly this uniqueness problem. The preceding two-factor uniqueness proof for quotients adapts verbatim by requiring the comparison maps to commute with both structure arrows.</p>
+<p>For a matrix example take <span class="math inline">\(f=[1\ 2]\)</span>, <span class="math inline">\(g=[0\ 3]\)</span> on <span class="math inline">\(\mathbb R^2\)</span>. Pairing them stacks their rows. Given column maps <span class="math inline">\(a=(1,2)^T\)</span>, <span class="math inline">\(b=(3,0)^T\)</span> out of <span class="math inline">\(\mathbb R\)</span>, extending them places their columns side by side. Composition computes <span class="math inline">\(af+bg\)</span>. This is the origin of block matrix multiplication.</p>
+<p>The common finite object is a <strong>biproduct</strong>. Its identities <span class="math display">\[
+\pi_j i_k=\delta_{jk}1\quad (0\text{ for }j\ne k),\qquad
+i_1\pi_1+i_2\pi_2=1
+\]</span> recover the two universal maps as <span class="math inline">\(i_1f+i_2g\)</span> and <span class="math inline">\(a\pi_1+b\pi_2\)</span>. The formulas apply to any finite number of factors. In sets the coproduct is a <em>tagged disjoint union</em>: define the outgoing function separately on each tag. Two singleton sets have a one-element product and a two-element coproduct. For infinitely many vector spaces the product permits arbitrary families, whereas the coproduct consists of finitely supported families. Finite support is what makes the extension <span class="math inline">\(\sum_j a_j(v_j)\)</span> meaningful algebraically.</p>
+</section>
+<section id="adding-subspaces-in-an-ambient-space" class="level3">
+<h3 class="anchored" data-anchor-id="adding-subspaces-in-an-ambient-space">Adding subspaces in an ambient space</h3>
+<p>Given <span class="math inline">\(U,W\le V\)</span>, the external sum maps onto the internal sum by <span class="math inline">\(s(u,w)=u+w\)</span>. Its kernel consists of <span class="math inline">\((z,-z)\)</span> for <span class="math inline">\(z\in U\cap W\)</span>. Thus the addition map identifies <span class="math inline">\(U\oplus W\)</span> with <span class="math inline">\(U+W\)</span> precisely when the intersection vanishes. For three subspaces one needs <span class="math inline">\(U_i\cap\sum_{j\ne i}U_j=0\)</span> for each <span class="math inline">\(i\)</span>: a nonzero component of a zero sum witnesses failure. The two coordinate axes and the diagonal in <span class="math inline">\(\mathbb R^2\)</span> test why pairwise intersections alone do not suffice. In the partially ordered category of subspaces of <em>a fixed</em> <span class="math inline">\(V\)</span> (one arrow for inclusion), <span class="math inline">\(U+W\)</span> is itself the coproduct: any subspace containing both contains all sums. Changing the category has changed the universal problem.</p>
+</section>
+</section>
+<section id="session-3-kernels-obstructions-and-splitting" class="level2" data-number="24.3">
+<h2 data-number="24.3" class="anchored" data-anchor-id="session-3-kernels-obstructions-and-splitting"><span class="header-section-number">24.3</span> Session 3 — Kernels, obstructions and splitting</h2>
+<p>For <span class="math inline">\(T:V\to W\)</span>, the inclusion <span class="math inline">\(k:K=\ker T\hookrightarrow V\)</span> is universal among maps <span class="math inline">\(h:X\to V\)</span> with <span class="math inline">\(Th=0\)</span>. Indeed <span class="math inline">\(h(x)\in K\)</span>, so corestrict <span class="math inline">\(h\)</span> to <span class="math inline">\(K\)</span>; injectivity of <span class="math inline">\(k\)</span> forces uniqueness. Conversely the projection <span class="math inline">\(c:W\to W/\operatorname{im}T\)</span> is universal among maps <span class="math inline">\(g:W\to Y\)</span> with <span class="math inline">\(gT=0\)</span>. The premise exactly says <span class="math inline">\(g\)</span> kills the image, so the quotient theorem supplies the unique map. This is the <strong>cokernel</strong>. Both constructions require a notion of zero morphism; a zero object, simultaneously initial and terminal, supplies one by <span class="math inline">\(X\to0\to Y\)</span>. In vector spaces the zero-dimensional space serves.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>Where it lives</th>
+<th>Question concerning <span class="math inline">\(Tv=w\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\ker T\)</span></td>
+<td>Subspace of the domain</td>
+<td>How do solutions differ?</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\operatorname{im}T\)</span></td>
+<td>Subspace of the target</td>
+<td>Which right-hand sides occur?</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\operatorname{coker}T\)</span></td>
+<td>Quotient of the target</td>
+<td>Which class <span class="math inline">\([w]\)</span> obstructs solvability?</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>monomorphism</strong> <span class="math inline">\(m\)</span> is left cancellable (<span class="math inline">\(ma=mb\Rightarrow a=b\)</span>). An <strong>epimorphism</strong> <span class="math inline">\(e\)</span> is right cancellable (<span class="math inline">\(ae=be\Rightarrow a=b\)</span>). In vector spaces injectivity gives left cancellation pointwise. If <span class="math inline">\(0\ne v\in\ker m\)</span>, the two maps from <span class="math inline">\(\mathbb F\)</span> given by <span class="math inline">\(s\mapsto sv\)</span> and zero disprove it. Surjectivity gives right cancellation by testing on preimages. If the image is proper, the nonzero cokernel projection and zero agree after composition with <span class="math inline">\(e\)</span>. The same cancellation characterizations hold in modules, using maps out of <span class="math inline">\(R\)</span> instead of <span class="math inline">\(\mathbb F\)</span>. They need care in other categories: the inclusion <span class="math inline">\(\mathbb Z\to\mathbb Q\)</span> is epic among commutative unital rings, since any two outgoing ring maps agreeing on integers agree on <span class="math inline">\(m/n\)</span> by preservation of inverses.</p>
+<p>A pair <span class="math inline">\(A\xrightarrow{f}B\xrightarrow{g}C\)</span> is <strong>exact at <span class="math inline">\(B\)</span></strong> if <span class="math inline">\(\operatorname{im} f=\ker g\)</span>. Composition zero only proves one inclusion. In a short exact sequence <span class="math inline">\(0\to A\xrightarrow{i}B\xrightarrow{p}C\to0\)</span>, <span class="math inline">\(i\)</span> is injective, <span class="math inline">\(p\)</span> surjective, and <span class="math inline">\(p\)</span> identifies <span class="math inline">\(B/i(A)\)</span> with <span class="math inline">\(C\)</span>: <span class="math inline">\([b]\mapsto p(b)\)</span> is well defined, injective by exactness, and onto. Exactness describes the ambiguity in lifting <span class="math inline">\(c\)</span> to <span class="math inline">\(b\)</span>. A <strong>section</strong> <span class="math inline">\(s:C\to B\)</span> with <span class="math inline">\(ps=1\)</span> makes one lift linear in <span class="math inline">\(c\)</span>.</p>
+<p><strong>Splitting theorem.</strong> Such a section exists exactly when there is a compatible decomposition <span class="math inline">\(B\simeq A\oplus C\)</span>. Given <span class="math inline">\(s\)</span>, send <span class="math inline">\((a,c)\mapsto i(a)+s(c)\)</span>. For <span class="math inline">\(b\)</span> put <span class="math inline">\(c=p(b)\)</span>; <span class="math inline">\(b-s(c)\)</span> is in <span class="math inline">\(\ker p=i(A)\)</span> and determines a unique <span class="math inline">\(a\)</span>. This gives a linear inverse. Conversely the second coordinate injection in a compatible decomposition is a section. A retraction <span class="math inline">\(r:B\to A\)</span> with <span class="math inline">\(ri=1\)</span> also suffices: <span class="math inline">\(p|_{\ker r}\)</span> is bijective since <span class="math inline">\(b-i r(b)\)</span> has the same image as <span class="math inline">\(b\)</span> and <span class="math inline">\(\ker r\cap i(A)=0\)</span>. Its inverse is a section.</p>
+<p>Over a field choose a basis of <span class="math inline">\(C\)</span>, lift its members separately along <span class="math inline">\(p\)</span>, then extend linearly. This proves every such sequence splits. Two sections differ by <span class="math inline">\(ih\)</span> with <span class="math inline">\(h:C\to A\)</span>, since <span class="math inline">\(p(s_1-s_2)=0\)</span>. The choice can be substantial. Over <span class="math inline">\(\mathbb Z\)</span> consider <span class="math display">\[0\to\mathbb Z\xrightarrow{\times2}\mathbb Z\xrightarrow{\bmod 2}\mathbb Z/2\to0.\]</span> The even integers are exactly the kernel. A section would send <span class="math inline">\([1]\)</span> to an odd integer <span class="math inline">\(n\)</span> satisfying <span class="math inline">\(2n=s(2[1])=0\)</span>, an impossibility. Exactness alone cannot produce independent coordinates compatible with the scalar action.</p>
+<p><strong>Why the first isomorphism theorem recurs.</strong> Define the coimage as the cokernel of <span class="math inline">\(k\)</span>, and the image as the kernel of <span class="math inline">\(c\)</span>. In vector spaces these are <span class="math inline">\(V/\ker T\)</span> and <span class="math inline">\(\operatorname{im}T\)</span>. The unique induced map <span class="math inline">\([v]\mapsto Tv\)</span> is onto by definition and has zero kernel since <span class="math inline">\(Tv=0\)</span> gives <span class="math inline">\([v]=0\)</span>. Thus <span class="math inline">\(T\)</span> factors canonically as quotient, isomorphism, inclusion. An <strong>abelian category</strong> abstracts this situation: morphisms can be added as abelian groups, composition distributes, finite biproducts and kernels and cokernels exist, and the canonical coimage-to-image map is always invertible. Modules over a ring satisfy these conditions even when sequences fail to split. Exactness and splitting express different properties.</p>
+</section>
+<section id="session-4-pulling-measurements-back" class="level2" data-number="24.4">
+<h2 data-number="24.4" class="anchored" data-anchor-id="session-4-pulling-measurements-back"><span class="header-section-number">24.4</span> Session 4 — Pulling measurements back</h2>
+<p>An output measurement <span class="math inline">\(\lambda:W\to\mathbb F\)</span> gives an input measurement without solving an inverse problem: apply <span class="math inline">\(T\)</span> and then <span class="math inline">\(\lambda\)</span>. In general, given <span class="math inline">\(a:V'\to V\)</span>, <span class="math inline">\(b:W\to W'\)</span>, define <span class="math display">\[
+\operatorname{Hom}(V,W)\to\operatorname{Hom}(V',W'),\qquad h\mapsto bha .
+\]</span> Postcomposition moves with the output arrow (covariance); precomposition moves against the input arrow (contravariance). Both operations preserve addition and commute with one another by associativity. Setting <span class="math inline">\(W=\mathbb F\)</span> and fixing the output gives <span class="math inline">\(T^\vee\lambda=\lambda T\)</span>. Evaluating on <span class="math inline">\(v\)</span> gives <span class="math inline">\((ST)^\vee\mu(v)=\mu(STv)=(T^\vee S^\vee\mu)(v)\)</span>, and <span class="math inline">\(1^\vee=1\)</span>. In dual bases <span class="math inline">\((T^\vee\epsilon^j)(e_i)=\epsilon^j(Te_i)=A_{ji}\)</span>, so the dual matrix is <span class="math inline">\(A^T\)</span> over any field, including <span class="math inline">\(\mathbb C\)</span>.</p>
+<section id="evaluation-and-its-limitations" class="level3">
+<h3 class="anchored" data-anchor-id="evaluation-and-its-limitations">Evaluation and its limitations</h3>
+<p>A vector determines a way to read every measurement: <span class="math inline">\(\iota_V(v)(\lambda)=\lambda(v)\)</span>. This is linear in <span class="math inline">\(\lambda\)</span> and in <span class="math inline">\(v\)</span>. If <span class="math inline">\(v\ne0\)</span>, extend <span class="math inline">\(v\)</span> to a basis and take its coordinate functional; thus <span class="math inline">\(\iota_V\)</span> is injective. In finite dimension the dual basis gives <span class="math inline">\(\dim V^{\vee\vee}=\dim V\)</span>, hence bijectivity. For any <span class="math inline">\(T:V\to W\)</span> we have a commutative square: <span class="math display">\[
+\begin{array}{ccc}
+V&amp;\xrightarrow{T}&amp;W\\
+{\scriptstyle\iota_V}\downarrow&amp;&amp;\downarrow{\scriptstyle\iota_W}\\
+V^{\vee\vee}&amp;\xrightarrow{T^{\vee\vee}}&amp;W^{\vee\vee}.
+\end{array}
+\]</span> Indeed both routes evaluated at <span class="math inline">\(\mu\in W^\vee\)</span> give <span class="math inline">\(\mu(Tv)\)</span>. This proof needs no finiteness assumption. Finiteness is used to turn the vertical arrows into isomorphisms.</p>
+<p>For a concrete failure of surjectivity take <span class="math inline">\(V=\mathbb F^{(\mathbb N)}\)</span>, finite sequences extended by zeros. Its dual consists of <strong>all</strong> sequences, acting by finite dot products. On the subspace of eventually constant sequences define <span class="math inline">\(L(a)\)</span> to be their eventual value; extend <span class="math inline">\(L\)</span> linearly to the entire dual by basis extension. If <span class="math inline">\(L=\iota_V(v)\)</span>, testing on each coordinate sequence forces every <span class="math inline">\(v_i=0\)</span>. But <span class="math inline">\(L(1,1,\ldots)=1\)</span>. This double-dual element is invisible to every candidate vector.</p>
+<p>What would identify <span class="math inline">\(V\)</span> with <span class="math inline">\(V^\vee\)</span>? A basis supplies the bilinear pairing <span class="math inline">\(\sum x_i y_i\)</span> in those coordinates; changing the basis generally changes the pairing. Even invariance under all changes of basis is too much to demand over <span class="math inline">\(\mathbb R\)</span>: invariance of a bilinear form <span class="math inline">\(B\)</span> under <span class="math inline">\(2I\)</span> gives <span class="math inline">\(B(v,w)=4B(v,w)\)</span>, hence <span class="math inline">\(B=0\)</span>. An inner product supplies extra data. In finite dimension, or for the <strong>continuous</strong> dual of a Hilbert space by Riesz representation, <span class="math inline">\(R_V(y)=\langle\,\cdot\,,y\rangle\)</span> identifies the two spaces, conjugate-linearly over <span class="math inline">\(\mathbb C\)</span>. The identity <span class="math inline">\(T^\vee R_W=R_VT^*\)</span> follows by evaluating on <span class="math inline">\(x\)</span>. In Hilbert spaces take <span class="math inline">\(T\)</span> bounded and restrict to continuous functionals. This is how <span class="math inline">\(A^H\)</span> enters in orthonormal coordinates. Reversing arrows in a category, pulling back scalar measurements, and forming a Hilbert adjoint are three distinct operations linked by these identities.</p>
+</section>
+<section id="exactness-seen-by-measurements" class="level3">
+<h3 class="anchored" data-anchor-id="exactness-seen-by-measurements">Exactness seen by measurements</h3>
+<p>Dualizing a short exact sequence gives <span class="math display">\[
+0\to C^\vee\xrightarrow{p^\vee}B^\vee\xrightarrow{i^\vee}A^\vee\to0.
+\]</span> Surjectivity of <span class="math inline">\(p\)</span> makes <span class="math inline">\(p^\vee\)</span> injective. A measurement on <span class="math inline">\(B\)</span> vanishing on <span class="math inline">\(i(A)\)</span> factors uniquely through <span class="math inline">\(p\)</span>, giving exactness in the middle and <span class="math inline">\((B/i(A))^\vee\simeq i(A)^0\)</span>. Every measurement on <span class="math inline">\(A\)</span> extends to <span class="math inline">\(B\)</span> by making it zero on a chosen complement. This proves surjectivity at the right, including in algebraic infinite dimension under basis extension. The set of extensions is canonical, even though an individual extension can require a choice.</p>
+<p>For modules <span class="math inline">\(\operatorname{Hom}_R(-,M)\)</span> always gives injectivity at the left and exactness in the middle by the same factorization. Extension can fail. Applying <span class="math inline">\(\operatorname{Hom}_{\mathbb Z}(-,\mathbb Z)\)</span> to the multiplication-by-two sequence gives restriction represented by multiplication by two on <span class="math inline">\(\mathbb Z\)</span>, which misses <span class="math inline">\(1\)</span>. Splitting of the original sequence would guarantee extension for every <span class="math inline">\(M\)</span>.</p>
+</section>
+</section>
+<section id="session-5-when-constructions-respect-changes-of-data" class="level2" data-number="24.5">
+<h2 data-number="24.5" class="anchored" data-anchor-id="session-5-when-constructions-respect-changes-of-data"><span class="header-section-number">24.5</span> Session 5 — When constructions respect changes of data</h2>
+<p>Consider computing a kernel before and after changing a linear system. The relevant input is a map, and a change consists of a commuting square <span class="math inline">\(bT=T'a\)</span>. For <span class="math inline">\(v\in\ker T\)</span>, <span class="math inline">\(T'av=bTv=0\)</span>. Thus <span class="math inline">\(a\)</span> restricts to a map of kernels. Restrictions of identities are identities, and restrictions compose. This is more informative than the bare association <span class="math inline">\(T\mapsto\ker T\)</span>: it specifies exactly which changes can be transported.</p>
+<p>A <strong>functor</strong> <span class="math inline">\(F:\mathcal C\to\mathcal D\)</span> assigns an object <span class="math inline">\(FX\)</span> to each object and a morphism <span class="math inline">\(Ff:FX\to FY\)</span> to each <span class="math inline">\(f:X\to Y\)</span>, preserving identities and composition. A contravariant functor is an ordinary functor from <span class="math inline">\(\mathcal C^{\mathrm{op}}\)</span>. The kernel example has the <em>arrow category</em> as source: its objects are linear maps, its arrows the squares just used, and squares compose by composing their two sides. Forgetting scalars gives a functor to abelian groups; forgetting the addition too gives one to sets. Both keep the underlying function. Fixing <span class="math inline">\(X\)</span> gives the covariant functor <span class="math inline">\(\operatorname{Hom}(X,-)\)</span> and fixing <span class="math inline">\(Y\)</span> gives the contravariant <span class="math inline">\(\operatorname{Hom}(-,Y)\)</span>. The dual functor is the latter at <span class="math inline">\(Y=\mathbb F\)</span>, keeping the vector-space structure on the outputs; applying it twice restores the direction.</p>
+<p>For two functors <span class="math inline">\(F,G:\mathcal C\to\mathcal D\)</span>, a <strong>natural transformation</strong> is a family <span class="math inline">\(\eta_X:FX\to GX\)</span> satisfying <span class="math inline">\(Gf\,\eta_X=\eta_Y Ff\)</span> for every <span class="math inline">\(f:X\to Y\)</span>. Think of two ways to transport an answer: translate it into the other description first, or first change the input. Naturality says these give identical results. If each <span class="math inline">\(\eta_X\)</span> is invertible, its inverses are natural as well (multiply the identity on both sides by the inverses). This is a natural isomorphism. The evaluation square proves that <span class="math inline">\(\iota\)</span> is a natural transformation everywhere and a natural isomorphism on finite-dimensional spaces.</p>
+<p>In contrast, an ordered basis <span class="math inline">\(B\)</span> gives a coordinate isomorphism <span class="math inline">\(c_B:V\to\mathbb F^n\)</span>. Replacing <span class="math inline">\(B\)</span> by <span class="math inline">\(BS\)</span> changes <span class="math inline">\(c_B\)</span> to <span class="math inline">\(S^{-1}c_B\)</span>. If one tried to keep coordinate outputs fixed under <em>all</em> automorphisms <span class="math inline">\(S\)</span> of <span class="math inline">\(V\)</span>, the condition <span class="math inline">\(c_B S=c_B\)</span> would force <span class="math inline">\(S=1\)</span>. Transporting the basis together with the space makes coordinates meaningful again. To test a claim of canonicity, specify the input data, the permitted maps, and the equation they must satisfy.</p>
+<section id="why-a-mapping-problem-can-have-an-object-as-its-answer" class="level3">
+<h3 class="anchored" data-anchor-id="why-a-mapping-problem-can-have-an-object-as-its-answer">Why a mapping problem can have an object as its answer</h3>
+<p>Fix <span class="math inline">\(V,U\)</span>. The rule <span class="math inline">\(H(W)=\{f:V\to W\mid f(U)=0\}\)</span> transports a solution forward by postcomposition. Session 2 identified it with <span class="math inline">\(\operatorname{Hom}(V/U,W)\)</span>. This identification is natural in <span class="math inline">\(W\)</span>: factoring <span class="math inline">\(bf\)</span> gives <span class="math inline">\(b\bar f\)</span>, since they agree after composition with <span class="math inline">\(q\)</span>. A functor of this form is called <strong>represented</strong> by its source object. Its universal element is the solution corresponding to the identity, here <span class="math inline">\(q\)</span>.</p>
+<p>There is a short reason the identity contains so much information. Given a covariant set-valued functor <span class="math inline">\(H\)</span> and natural maps <span class="math inline">\(\Phi_X:\operatorname{Hom}(Q,X)\to H(X)\)</span>, put <span class="math inline">\(u=\Phi_Q(1_Q)\)</span>. Naturality along <span class="math inline">\(g:Q\to X\)</span> forces <span class="math inline">\(\Phi_X(g)=H(g)(u)\)</span>. Conversely every <span class="math inline">\(u\in H(Q)\)</span> gives such a family because <span class="math inline">\(H(bg)=H(b)H(g)\)</span>. These operations are inverse. This is the covariant form of the <strong>Yoneda lemma</strong> for a category with sets of morphisms. It gives a practical proof strategy: construct one universal element, then show each solution is its unique transport. The tensor product will use exactly this strategy with a bilinear universal element.</p>
+</section>
+</section>
+<section id="session-6-a-linear-operator-is-a-polynomial-action" class="level2" data-number="24.6">
+<h2 data-number="24.6" class="anchored" data-anchor-id="session-6-a-linear-operator-is-a-polynomial-action"><span class="header-section-number">24.6</span> Session 6 — A linear operator is a polynomial action</h2>
+<section id="why-enlarge-the-scalars" class="level3">
+<h3 class="anchored" data-anchor-id="why-enlarge-the-scalars">Why enlarge the scalars?</h3>
+<p>Suppose an algorithm is allowed to add vectors, scale them, and repeatedly apply one fixed operator <span class="math inline">\(T\)</span>. From a starting vector <span class="math inline">\(v\)</span> it can build exactly <span class="math inline">\(p(T)v\)</span> as <span class="math inline">\(p\)</span> ranges over <span class="math inline">\(\mathbb F[t]\)</span>. We can record all three permitted operations in one scalar action. For a ring <span class="math inline">\(R\)</span>, a left action on an abelian group satisfies <span class="math display">\[
+(r+s)v=rv+sv,\quad r(v+w)=rv+rw,\quad (rs)v=r(sv),\quad 1v=v .
+\]</span> These rules include ordinary vector spaces, abelian groups with integer scalars, <span class="math inline">\(R\)</span> acting on itself by multiplication, and <span class="math inline">\(M_n(\mathbb F)\)</span> acting on column vectors. A module can have torsion: a nonzero scalar can kill a nonzero element, as <span class="math inline">\(2[1]=0\)</span> in <span class="math inline">\(\mathbb Z/2\)</span>. Such a module cannot have a basis over <span class="math inline">\(\mathbb Z\)</span>, since a free abelian group has no nonzero torsion elements.</p>
+<p>Set <span class="math inline">\(p(t)v=p(T)v\)</span>, where <span class="math inline">\(p(T)=\sum_j a_jT^j\)</span> and <span class="math inline">\(T^0=I\)</span>. Polynomial evaluation preserves sums, products and identity: for products expand and use <span class="math inline">\(T^jT^k=T^{j+k}\)</span>. Each <span class="math inline">\(p(T)\)</span> is linear. These facts prove every module axiom. Conversely, an <span class="math inline">\(\mathbb F[t]\)</span>-module restricts to a vector space using constant polynomials, and the action of <span class="math inline">\(t\)</span> recovers <span class="math inline">\(T\)</span>. A linear map <span class="math inline">\(L\)</span> between two such spaces is a module map precisely when <span class="math inline">\(LT=SL\)</span>: necessity follows by taking <span class="math inline">\(p=t\)</span>, sufficiency by induction on powers and linearity. An invertible intertwiner is exactly a similarity of operators.</p>
+<p><strong>Invariant-subspace theorem.</strong> An <span class="math inline">\(\mathbb F\)</span>-subspace <span class="math inline">\(U\)</span> is a submodule iff <span class="math inline">\(T(U)\subseteq U\)</span>. Closure under the action implies closure under <span class="math inline">\(t\)</span>; conversely invariance under <span class="math inline">\(T\)</span> gives invariance under its powers and linear combinations. In particular <span class="math inline">\(T\)</span> induces <span class="math inline">\(\bar T[v]=[Tv]\)</span> on <span class="math inline">\(V/U\)</span>: changing the representative adds <span class="math inline">\(Tu\in U\)</span>. A section of the quotient is a <em>module</em> section precisely when it also intertwines <span class="math inline">\(\bar T\)</span> and <span class="math inline">\(T\)</span>. Its image is then an invariant complement.</p>
+</section>
+<section id="cyclic-modules-krylov-spaces-and-annihilators" class="level3">
+<h3 class="anchored" data-anchor-id="cyclic-modules-krylov-spaces-and-annihilators">Cyclic modules, Krylov spaces and annihilators</h3>
+<p>For <span class="math inline">\(v\ne0\)</span> consider the module map <span class="math inline">\(\phi_v:\mathbb F[t]\to V\)</span>, <span class="math inline">\(p\mapsto p(T)v\)</span>. Its image is the cyclic submodule generated by <span class="math inline">\(v\)</span>. Its kernel is an ideal. Every nonzero ideal of <span class="math inline">\(\mathbb F[t]\)</span> has a monic generator: pick a nonzero polynomial of least degree, scale it to be monic and divide any ideal member by it; the remainder lies in the ideal and must vanish. Polynomial division uses the field assumption. A commutative integral domain in which all ideals have a single generator is called a <strong>principal ideal domain</strong> (PID).</p>
+<p>In finite dimension some powers <span class="math inline">\(v,Tv,\dots,T^nv\)</span> are dependent. Thus the kernel has a unique monic generator <span class="math inline">\(m_v\)</span>, the vector minimal polynomial. The first isomorphism theorem gives <span class="math display">\[
+\mathbb F[t]v\simeq\mathbb F[t]/(m_v).
+\]</span> If <span class="math inline">\(\deg m_v=d\)</span>, residues <span class="math inline">\(1,\ldots,t^{d-1}\)</span> are a basis by polynomial division and minimality. Hence <span class="math inline">\(\dim\mathcal K_j(T,v)=\min(j,d)\)</span> for <span class="math inline">\(j\ge1\)</span>. The first dependent Krylov column yields the coefficients of <span class="math inline">\(m_v\)</span>, and the space stops growing because the dependence expresses <span class="math inline">\(T^dv\)</span> in terms of earlier powers. In this basis the matrix is a companion matrix: it shifts all but the last basis vector and the last column is the recurrence.</p>
+<p>The operator annihilator is the intersection of the vector annihilators. Testing on a basis <span class="math inline">\(e_i\)</span> suffices, so its monic generator <span class="math inline">\(m_T\)</span> is <span class="math inline">\(\operatorname{lcm}_i m_{e_i}\)</span>. Consequently <span class="math inline">\(p(T)=0\)</span> iff <span class="math inline">\(m_T\mid p\)</span>. Two filters with equal residues modulo <span class="math inline">\(m_T\)</span> act identically on <em>all</em> vectors. On one starting vector it suffices to reduce modulo <span class="math inline">\(m_v\)</span>, which can have much smaller degree.</p>
+</section>
+<section id="a-two-dimensional-extension-that-refuses-to-split" class="level3">
+<h3 class="anchored" data-anchor-id="a-two-dimensional-extension-that-refuses-to-split">A two-dimensional extension that refuses to split</h3>
+<p>Let <span class="math inline">\(T=\left(\begin{smallmatrix}2&amp;1\\0&amp;2\end{smallmatrix}\right)\)</span> on <span class="math inline">\(\mathbb R^2\)</span>. Then <span class="math inline">\((T-2I)e_2=e_1\)</span> and <span class="math inline">\((T-2I)e_1=0\)</span>. The vector <span class="math inline">\(e_2\)</span> generates the whole space with <span class="math inline">\(m_{e_2}=(t-2)^2\)</span>; <span class="math inline">\(e_1\)</span> generates a line killed by <span class="math inline">\(t-2\)</span>. The quotient by that line is also killed by <span class="math inline">\(t-2\)</span>. An invariant complementary line would be another eigenline, yet <span class="math inline">\(\ker(T-2I)=\mathbb R e_1\)</span>. Thus the extension splits linearly and fails to split as a polynomial module. Two copies of the same one-dimensional factor can assemble into a Jordan block. The coupling is the single off-diagonal entry.</p>
+</section>
+<section id="coprime-annihilators-give-genuine-projectors" class="level3">
+<h3 class="anchored" data-anchor-id="coprime-annihilators-give-genuine-projectors">Coprime annihilators give genuine projectors</h3>
+<p>Suppose <span class="math inline">\(m_T=ab\)</span> with <span class="math inline">\(a,b\)</span> monic and coprime. The Euclidean algorithm gives <span class="math inline">\(u a+v b=1\)</span>. Put <span class="math inline">\(P_a=v(T)b(T)\)</span>, <span class="math inline">\(P_b=u(T)a(T)\)</span>. Then <span class="math inline">\(P_a+P_b=I\)</span> and <span class="math inline">\(P_aP_b=P_bP_a=0\)</span> because <span class="math inline">\(ab\)</span> annihilates <span class="math inline">\(T\)</span>. Multiplication by <span class="math inline">\(P_a\)</span> proves <span class="math inline">\(P_a^2=P_a\)</span>. Its image lies in <span class="math inline">\(\ker a(T)\)</span> and it is the identity there because <span class="math inline">\(P_b\)</span> vanishes there. Similarly <span class="math inline">\(\operatorname{im}P_b=\ker b(T)\)</span>. Thus <span class="math display">\[ V=\ker a(T)\oplus\ker b(T). \]</span> The projectors commute with <span class="math inline">\(T\)</span> and are independent of the Bézout coefficients: <span class="math inline">\(P_a\)</span> is prescribed as identity on one summand and zero on the other. Equivalently, the residue of <span class="math inline">\(vb\)</span> is <span class="math inline">\(1\)</span> modulo <span class="math inline">\(a\)</span> and <span class="math inline">\(0\)</span> modulo <span class="math inline">\(b\)</span>. This proves the two-factor <strong>Chinese remainder theorem</strong> here: the residue map <span class="math inline">\(\mathbb F[t]/(ab)\to\mathbb F[t]/(a)\times\mathbb F[t]/(b)\)</span> has zero kernel by coprimality, and <span class="math inline">\((r,s)\)</span> lifts to <span class="math inline">\(rvb+sua\)</span>.</p>
+<p>Iterating for <span class="math inline">\(m_T=\prod_i p_i^{d_i}\)</span> gives the <strong>primary decomposition</strong> into <span class="math inline">\(\ker p_i(T)^{d_i}\)</span> for distinct monic irreducibles <span class="math inline">\(p_i\)</span>. A linear factor gives a generalized eigenspace; <span class="math inline">\(\ker(T-\lambda I)\)</span> itself is the eigenspace. If all factors are distinct and linear, each primary space is an eigenspace, hence an eigenbasis exists. Conversely for a diagonal matrix a polynomial vanishes iff it vanishes at every distinct diagonal entry, so the minimal polynomial is the product of their distinct linear factors. This proves the diagonalizability criterion over the stated field. For simple factors the projectors use ordinary Lagrange interpolation, <span class="math inline">\(P_i=\prod_{j\ne i}(T-\lambda_jI)/(\lambda_i-\lambda_j)\)</span>. A real plane rotation by <span class="math inline">\(90^\circ\)</span> has <span class="math inline">\(m_T=t^2+1\)</span>, square-free but irreducible over <span class="math inline">\(\mathbb R\)</span>: the field matters.</p>
+<p><strong>Three-dimensional computation.</strong> Take the matrix from the eigenspace example <span class="math display">\[
+A=\begin{pmatrix}2&amp;0&amp;-3\\1&amp;-1&amp;-1\\0&amp;0&amp;-1\end{pmatrix}.
+\]</span> Its <span class="math inline">\(2\)</span>-eigenspace is <span class="math inline">\(\operatorname{span}(3,1,0)\)</span> and its <span class="math inline">\(-1\)</span>-eigenspace is <span class="math inline">\(\{(x,y,x)\}\)</span>. They span <span class="math inline">\(\mathbb R^3\)</span>, so <span class="math inline">\(m_A=(t-2)(t+1)\)</span>. For any <span class="math inline">\(x=(x_1,x_2,x_3)\)</span>, the projector <span class="math inline">\((A+I)/3\)</span> returns <span class="math inline">\((x_1-x_3)(1,1/3,0)\)</span>. Subtracting this from <span class="math inline">\(x\)</span> leaves first and third coordinates equal. It projects <em>along the other eigenspace</em>, which explains its oblique geometry. A single vector in either eigenspace has a degree-one annihilator; a vector with both components nonzero needs both factors.</p>
+</section>
+<section id="why-jordan-blocks-arise-and-what-the-minimal-polynomial-omits" class="level3">
+<h3 class="anchored" data-anchor-id="why-jordan-blocks-arise-and-what-the-minimal-polynomial-omits">Why Jordan blocks arise, and what the minimal polynomial omits</h3>
+<p><strong>Structure theorem used without proof.</strong> A finitely generated torsion module over a PID is a finite direct sum of cyclic modules <span class="math inline">\(R/(d_j)\)</span>, with nonunit invariant factors <span class="math inline">\(d_1\mid\cdots\mid d_r\)</span>, unique up to multiplication by units. Finite-dimensional <span class="math inline">\(V\)</span> is generated by any vector-space basis and is torsion under <span class="math inline">\(\mathbb F[t]\)</span> by the annihilator argument above. A proof of the general theorem uses reduction of a presentation matrix to Smith normal form; no claim below requires assuming that every invariant subspace splits.</p>
+<p>The cyclic and coprime-factor results already proved split these summands into prime powers. When the polynomial splits over <span class="math inline">\(\mathbb F\)</span>, each piece is <span class="math inline">\(\mathbb F[t]/((t-\lambda)^k)\)</span>. Write <span class="math inline">\(u=t-\lambda\)</span> and order the basis as <span class="math inline">\(u^{k-1},\ldots,u,1\)</span>. Multiplication by <span class="math inline">\(t\)</span> acts as <span class="math inline">\(\lambda I\)</span> plus a backward shift killing the first vector. Its matrix is exactly one Jordan block. This derives Jordan form from the stated theorem. The largest block at <span class="math inline">\(\lambda\)</span> gives the exponent in <span class="math inline">\(m_T\)</span>; smaller blocks can be present. More precisely a length-<span class="math inline">\(s\)</span> block contributes <span class="math inline">\(\min(j,s)\)</span> to <span class="math inline">\(\dim\ker(T-\lambda I)^j\)</span>, and blocks at other eigenvalues contribute zero. Successive differences count blocks of length at least <span class="math inline">\(j\)</span>. These counts recover information absent from <span class="math inline">\(m_T\)</span>.</p>
+<p><strong>Four-dimensional computation.</strong> Let <span class="math inline">\(A=J_2(2)\oplus[2]\oplus[-1]\)</span>. Then <span class="math inline">\(\chi_A=(t-2)^3(t+1)\)</span> and <span class="math inline">\(m_A=(t-2)^2(t+1)\)</span>. The <span class="math inline">\(2\)</span>-eigenspace is spanned by <span class="math inline">\(e_1,e_3\)</span> and its primary space also contains <span class="math inline">\(e_2\)</span>. To project onto the <span class="math inline">\(-1\)</span> line, take <span class="math inline">\(p(t)=(t-2)^2/9\)</span>. It is zero modulo <span class="math inline">\((t-2)^2\)</span> and equals <span class="math inline">\(1\)</span> at <span class="math inline">\(-1\)</span>. Hence <span class="math inline">\(p(A)=\operatorname{diag}(0,0,0,1)\)</span>. Merely imposing <span class="math inline">\(p(2)=0\)</span> would leave a term proportional to <span class="math inline">\(p'(2)\)</span> on the Jordan block: <span class="math inline">\(p(2I+N)=p(2)I+p'(2)N\)</span> when <span class="math inline">\(N^2=0\)</span>. Repeated factors require interpolation with multiplicity. This explains a concrete difference between filtering a normal matrix and filtering a defective one.</p>
+</section>
+</section>
+<section id="session-7-turning-bilinear-rules-into-linear-maps" class="level2" data-number="24.7">
+<h2 data-number="24.7" class="anchored" data-anchor-id="session-7-turning-bilinear-rules-into-linear-maps"><span class="header-section-number">24.7</span> Session 7 — Turning bilinear rules into linear maps</h2>
+<p>The product <span class="math inline">\(B(x,y)=xy\)</span> on <span class="math inline">\(\mathbb R\times\mathbb R\)</span> is linear in each argument separately. Joint linearity would imply <span class="math inline">\(B(1,1)=B(1,0)+B(0,1)=0\)</span>, whereas <span class="math inline">\(B(1,1)=1\)</span>. In fact <em>every</em> jointly linear bilinear map is zero by that argument. The direct sum therefore solves the wrong extension problem. We need a space generated by symbols for pairs, in which a linear map can reproduce exactly the separate linearity rules.</p>
+<p>Take the free vector space <span class="math inline">\(L\)</span> on the set <span class="math inline">\(V\times W\)</span>: elements are finite formal sums of basis symbols <span class="math inline">\([v,w]\)</span>. Quotient by the span of the relations <span class="math display">\[
+[av+bv',w]-a[v,w]-b[v',w],\qquad
+[v,aw+bw']-a[v,w]-b[v,w'] .
+\]</span> Write the resulting space <span class="math inline">\(V\otimes W\)</span> and the class of <span class="math inline">\([v,w]\)</span> as <span class="math inline">\(v\otimes w\)</span>. The defining map <span class="math inline">\(\tau(v,w)=v\otimes w\)</span> is bilinear by construction. Given bilinear <span class="math inline">\(B:V\times W\to Z\)</span>, extend <span class="math inline">\([v,w]\mapsto B(v,w)\)</span> linearly to <span class="math inline">\(L\)</span>. It kills the displayed relations, so quotient factorization gives a unique <span class="math inline">\(\tilde B\)</span> on <span class="math inline">\(V\otimes W\)</span>. Conversely any linear <span class="math inline">\(h\)</span> gives a bilinear <span class="math inline">\(h\tau\)</span>. Since the pure tensors span, these operations are inverse: <span class="math display">\[
+\operatorname{Bil}(V,W;Z)\simeq\operatorname{Hom}(V\otimes W,Z).
+\]</span> The isomorphism is linear and natural in <span class="math inline">\(Z\)</span> by postcomposition. The proof also constructs a tensor product over a commutative ring using free modules and the corresponding relations with ring scalars.</p>
+<p><strong>Coordinates and rank.</strong> Given bases <span class="math inline">\(e_i,f_j\)</span>, bilinearity expands <span class="math inline">\(v\otimes w=\sum_{ij}v_iw_j e_i\otimes f_j\)</span>. These elementary tensors span. For independence apply the functional induced by <span class="math inline">\((v,w)\mapsto e^k(v)f^\ell(w)\)</span>: it returns precisely coefficient <span class="math inline">\((k,\ell)\)</span>. Thus dimensions multiply in finite dimension. In <span class="math inline">\(\mathbb R^2\otimes\mathbb R^2\)</span>, the coefficients of a pure tensor form the rank-at-most-one matrix <span class="math inline">\(vw^T\)</span>. The tensor <span class="math inline">\(e_1\otimes e_1+e_2\otimes e_2\)</span> has coefficient matrix <span class="math inline">\(I_2\)</span> and cannot be expressed as one pure tensor. Arbitrary finite sums are essential.</p>
+<p><strong>Maps and Kronecker matrices.</strong> For <span class="math inline">\(A:V\to V'\)</span>, <span class="math inline">\(B:W\to W'\)</span>, the bilinear rule <span class="math inline">\((v,w)\mapsto Av\otimes Bw\)</span> gives <span class="math inline">\(A\otimes B\)</span>. Its <span class="math inline">\((i,j)\)</span> input basis column has coefficients <span class="math inline">\(A_{ki}B_{\ell j}\)</span>. With the second index varying fastest the matrix is the block array <span class="math inline">\((A_{ki}B)_{ki}\)</span>, the Kronecker product. On each pure tensor <span class="math inline">\((C\otimes D)(A\otimes B)=CA\otimes DB\)</span>; spanning proves the identity everywhere. The abstract map is independent of ordering, its array depends on ordering.</p>
+<p><strong>Why outer products build operators.</strong> The canonical map <span class="math inline">\(\Phi:V^\vee\otimes W\to\operatorname{Hom}(V,W)\)</span> sends <span class="math inline">\(\lambda\otimes w\)</span> to <span class="math inline">\(x\mapsto\lambda(x)w\)</span>. If <span class="math inline">\(V\)</span> is finite dimensional, an inverse sends <span class="math inline">\(T\)</span> to <span class="math inline">\(\sum_i e^i\otimes T(e_i)\)</span>. Applying the two composites to <span class="math inline">\(x\)</span> and to <span class="math inline">\(\lambda\otimes w\)</span> respectively gives <span class="math inline">\(T(x)\)</span> and <span class="math inline">\(\sum_i\lambda(e_i)e^i\otimes w=\lambda\otimes w\)</span>. Thus the inverse is independent of the basis used to compute it. In arbitrary dimension the image is exactly the finite-rank maps: every finite sum has finite-dimensional image, and reading coordinates in a basis for a finite-dimensional range supplies the reverse inclusion. In particular the infinite-dimensional identity lies outside the image. Likewise <span class="math inline">\(V^\vee\otimes W^\vee\to(V\otimes W)^\vee\)</span> pairs elementary tensors by multiplication of evaluations; it is an isomorphism for finite-dimensional factors by the basis calculation. The universal description of bilinear forms as <span class="math inline">\((V\otimes W)^\vee\)</span> holds in every dimension.</p>
+<p><strong>A discretization you can assemble without a full matrix.</strong> On a rectangular grid with separable boundary conditions take one-dimensional second-difference matrices <span class="math inline">\(L_x,L_y\)</span>. Write an array <span class="math inline">\(U\)</span> with the <span class="math inline">\(y\)</span> index down columns, and stack columns into <span class="math inline">\(\operatorname{vec}U\)</span>. Acting on each <span class="math inline">\(x\)</span> or <span class="math inline">\(y\)</span> fiber gives <span class="math display">\[
+(I_x\otimes L_y+L_x\otimes I_y)\operatorname{vec}U
+=\operatorname{vec}(L_yU+UL_x^T).
+\]</span> Check this first on <span class="math inline">\(U=wv^T\)</span>, for which <span class="math inline">\(\operatorname{vec}U=v\otimes w\)</span>, then use linearity. The tensor product explains why independent coordinate actions extend to general grid data. Applying the two small matrices to arrays is the computational benefit. A general mesh or variable coefficient need not have this two-term separable representation.</p>
+</section>
+<section id="session-8-when-zero-composition-leaves-a-hole" class="level2" data-number="24.8">
+<h2 data-number="24.8" class="anchored" data-anchor-id="session-8-when-zero-composition-leaves-a-hole"><span class="header-section-number">24.8</span> Session 8 — When zero composition leaves a hole</h2>
+<p>Orient the triangle edges <span class="math inline">\(a:1\to2\)</span>, <span class="math inline">\(b:2\to3\)</span>, <span class="math inline">\(c:3\to1\)</span>. Regard edge flows as elements of <span class="math inline">\(C_1=\mathbb R^3\)</span> and vertex loads as <span class="math inline">\(C_0=\mathbb R^3\)</span>. Send an edge to head minus tail: <span class="math display">\[
+D_1=\begin{pmatrix}-1&amp;0&amp;1\\1&amp;-1&amp;0\\0&amp;1&amp;-1\end{pmatrix}.
+\]</span> Then <span class="math inline">\(D_1(x,y,z)=0\)</span> exactly when <span class="math inline">\(x=y=z\)</span>. A circulating flow has zero net load everywhere. The image is the plane of zero-sum vertex loads: each column sums to zero, and the first two columns are independent. The graph alone has no faces, so it contains a cycle that is the boundary of no available face.</p>
+<p>Now fill the triangle. Take <span class="math inline">\(C_2=\mathbb R\)</span> and send its oriented face to <span class="math inline">\(a+b+c\)</span>, so <span class="math inline">\(D_2=(1,1,1)^T\)</span>. Then <span class="math inline">\(D_1D_2=0\)</span>. The circulation is still present, but now every circulation bounds a face multiple. The distinction cannot be seen from <span class="math inline">\(D_1\)</span> alone.</p>
+<p>A <strong>chain complex</strong> consists of maps <span class="math inline">\(d_k:C_k\to C_{k-1}\)</span> with <span class="math inline">\(d_kd_{k+1}=0\)</span>. Every boundary <span class="math inline">\(d_{k+1}x\)</span> therefore belongs to <span class="math inline">\(Z_k=\ker d_k\)</span>, the cycles. Put <span class="math inline">\(B_k=\operatorname{im}d_{k+1}\)</span>. Two cycles define the same homology class when their difference bounds: <span class="math display">\[
+H_k=Z_k/B_k,\qquad \dim H_k=\dim C_k-\operatorname{rank}d_k-\operatorname{rank}d_{k+1}
+\]</span> in finite-dimensional vector spaces. The dimension formula follows by rank-nullity and quotient dimension. Exactness at <span class="math inline">\(C_k\)</span> is equivalent to <span class="math inline">\(H_k=0\)</span>. Taking <span class="math inline">\(d_0=0\)</span>, the triangle graph has dimensions <span class="math inline">\((\dim H_0,\dim H_1)=(1,1)\)</span>. Filling it gives <span class="math inline">\((1,0,0)\)</span> in degrees zero through two, since <span class="math inline">\(D_2\)</span> is injective. The surviving <span class="math inline">\(H_0\)</span> measures total load; more generally each connected component contributes one independent total since differences of vertices along paths are edge boundaries.</p>
+<section id="from-chains-to-differential-operators" class="level3">
+<h3 class="anchored" data-anchor-id="from-chains-to-differential-operators">From chains to differential operators</h3>
+<p>Transposing the incidence matrix sends vertex potentials to oriented edge differences. A discrete potential <span class="math inline">\(u\)</span> gives <span class="math inline">\(g=D_1^Tu\)</span>. The sum around the face is <span class="math inline">\(D_2^Tg=0\)</span> since it telescopes. This is the direction of a <strong>cochain</strong> complex: the degree increases. With inner products, the adjoint of the gradient gives a divergence up to sign, and mass matrices encode the chosen inner products. The incidence identity itself only uses orientations.</p>
+<p>For smooth scalar and vector fields on an open subset of <span class="math inline">\(\mathbb R^3\)</span>, the gradient, curl and divergence are successive arrows with zero composites by equality of mixed partials. Their common generalization on differential forms is the exterior derivative <span class="math inline">\(d\)</span> satisfying <span class="math inline">\(d^2=0\)</span>, the <strong>de Rham complex</strong>. Exactness asks whether every closed field has a potential of the appropriate degree. On <span class="math inline">\(\mathbb R^2\setminus\{0\}\)</span>, <span class="math inline">\(F=(-y,x)/(x^2+y^2)\)</span> has zero scalar curl by differentiation. Its circulation on <span class="math inline">\((\cos t,\sin t)\)</span> is <span class="math inline">\(\int_0^{2\pi}1\,dt=2\pi\)</span>, whereas a global gradient integrates to zero on a closed path. Smoothness alone cannot fill the missing point. On a star-shaped domain, for a smooth curl-free field and star center <span class="math inline">\(0\)</span>, set <span class="math inline">\(u(x)=\int_0^1 F(tx)\cdot x\,dt\)</span>. Differentiating in <span class="math inline">\(x_i\)</span> and using <span class="math inline">\(\partial_i F_j=\partial_j F_i\)</span> makes the integrand <span class="math inline">\(\frac{d}{dt}(tF_i(tx))\)</span>, hence <span class="math inline">\(\partial_i u=F_i(x)\)</span>. This proves exactness at this position under a concrete geometric hypothesis.</p>
+<p>A compatible discretization chooses spaces and discrete derivatives forming a complex. If interpolation or projection maps <span class="math inline">\(\Pi_k\)</span> satisfy <span class="math inline">\(d_h\Pi_k=\Pi_{k+1}d\)</span>, differentiating interpolated data agrees with interpolating its derivative. For instance the difference of scalar values at an edge’s endpoints equals the edge integral of its gradient. This is a commuting square with a numerical meaning. Stability estimates and approximation rates require additional analysis; the commuting equation alone establishes an algebraic identity.</p>
+</section>
+</section>
+<section id="session-9-four-problems-seen-through-several-constructions" class="level2" data-number="24.9">
+<h2 data-number="24.9" class="anchored" data-anchor-id="session-9-four-problems-seen-through-several-constructions"><span class="header-section-number">24.9</span> Session 9 — Four problems seen through several constructions</h2>
+<section id="a.-recovering-a-potential-from-measurements" class="level3">
+<h3 class="anchored" data-anchor-id="a.-recovering-a-potential-from-measurements">A. Recovering a potential from measurements</h3>
+<p>Take <span class="math inline">\(T=D_1^T\)</span> from the triangle, so <span class="math inline">\(Tu=(u_2-u_1,u_3-u_2,u_1-u_3)\)</span>. Let <span class="math inline">\(K=\mathbb R(1,1,1)\)</span> and <span class="math inline">\(S=\{g:\sum_i g_i=0\}\)</span>. A lift of <span class="math inline">\((a,b,-a-b)\)</span> is <span class="math inline">\((0,a,a+b)\)</span>; every other lift adds a constant. Thus the two short exact sequences are <span class="math display">\[
+0\to K\to\mathbb R^3\xrightarrow{T} S\to0,\qquad
+0\to S\to\mathbb R^3\xrightarrow{\sum}\mathbb R\to0 .
+\]</span> In the first sequence <span class="math inline">\(T\)</span> is corestricted to <span class="math inline">\(S\)</span>. The induced quotient isomorphism <span class="math inline">\([u]\mapsto Tu\)</span> is canonical. In the second, the sum gives explicit coordinates on the cokernel. On dualizing, <span class="math inline">\(0\to S^\vee\to(\mathbb R^3)^\vee\to K^\vee\to0\)</span> describes the potential measurements insensitive to constants as exactly the pulled-back edge measurements. The second dual sequence says that two ambient edge measurements restricting equally to <span class="math inline">\(S\)</span> differ by a multiple of the sum functional. Choosing <span class="math inline">\(u_1=0\)</span> selects a section; choosing mean-zero potentials selects another, singled out by the Euclidean geometry and its symmetry under relabeling. Both recover the same quotient class.</p>
+</section>
+<section id="b.-what-a-krylov-process-can-recover" class="level3">
+<h3 class="anchored" data-anchor-id="b.-what-a-krylov-process-can-recover">B. What a Krylov process can recover</h3>
+<p>Return to <span class="math inline">\(A=J_2(2)\oplus[2]\oplus[-1]\)</span> and take <span class="math inline">\(v=e_2+e_4\)</span>. Its two nonzero primary components have annihilators <span class="math inline">\((t-2)^2\)</span> and <span class="math inline">\(t+1\)</span>. A polynomial kills their sum iff it kills each component, so <span class="math inline">\(m_v=m_A\)</span> and the Krylov dimension stabilizes at three. Yet <span class="math inline">\(e_3\)</span> can never appear: every polynomial image lies in <span class="math inline">\(\operatorname{span}(e_1,e_2,e_4)\)</span>. Knowing the full minimal polynomial does not make a single starting vector cyclic for the entire space. A block with a second start <span class="math inline">\(e_3\)</span> supplies the missing direction. The CRT filter <span class="math inline">\(p(A)\)</span> from Session 6 extracts <span class="math inline">\(e_4\)</span> from <span class="math inline">\(v\)</span> in one polynomial application.</p>
+<p>For a Hermitian operator with orthonormal eigenbasis, <span class="math inline">\(q(A)v=\sum_i q(\lambda_i)c_i u_i\)</span>. If the wanted and unwanted spectral sets have <span class="math inline">\(\min_{\mathrm{wanted}}|q|=\alpha&gt;0\)</span> and <span class="math inline">\(\max_{\mathrm{unwanted}}|q|=\beta\)</span>, then the ratio of unwanted to wanted component norms after filtering is at most <span class="math inline">\(\beta/\alpha\)</span> times its initial value, provided the wanted component is nonzero. This follows by squaring and summing coefficients in each orthogonal subspace. A Chebyshev filter exploits small values on an unwanted interval and large values on the desired part. Exact CRT interpolation presupposes detailed spectral data; interval filtering can use bounds. Both use the polynomial action, while their information requirements and numerical behavior differ.</p>
+</section>
+<section id="c.-a-mesh-with-one-remaining-circulation" class="level3">
+<h3 class="anchored" data-anchor-id="c.-a-mesh-with-one-remaining-circulation">C. A mesh with one remaining circulation</h3>
+<p>In a square, orient edges <span class="math inline">\(12,23,34,41\)</span> cyclically and add diagonal <span class="math inline">\(13\)</span>. Attach only face <span class="math inline">\(123\)</span>. The boundary vectors of the two triangular loops in edge coordinates are <span class="math inline">\(z=(1,1,0,0,-1)\)</span> and <span class="math inline">\(w=(0,0,1,1,1)\)</span>. The incidence matrix and face column are <span class="math display">\[
+D=\begin{pmatrix}-1&amp;0&amp;0&amp;1&amp;-1\\1&amp;-1&amp;0&amp;0&amp;0\\0&amp;1&amp;-1&amp;0&amp;1\\0&amp;0&amp;1&amp;-1&amp;0\end{pmatrix},
+\qquad E=\begin{pmatrix}1\\1\\0\\0\\-1\end{pmatrix},
+\]</span> where the columns of <span class="math inline">\(D\)</span> follow the stated edge order. Direct multiplication gives <span class="math inline">\(Dz=Dw=0\)</span> when loops are columns. The first three edge columns are independent (a path on four vertices), and zero column sums bound the rank by three. Thus <span class="math inline">\(z,w\)</span> form a basis of the two-dimensional kernel. Quotienting by <span class="math inline">\(\operatorname{im}E\)</span> leaves one class <span class="math inline">\([w]\)</span>; the outer boundary <span class="math inline">\(z+w\)</span> represents that same class. A zero face-sum constraint on edge differences enforces local compatibility on the filled triangle. The remaining loop integral tests a second, global compatibility condition for a vertex potential.</p>
+</section>
+<section id="d.-from-a-quotient-to-an-operator-equation" class="level3">
+<h3 class="anchored" data-anchor-id="d.-from-a-quotient-to-an-operator-equation">D. From a quotient to an operator equation</h3>
+<p>A real weak problem seeks <span class="math inline">\(u\in V\)</span> with <span class="math inline">\(a(u,v)=\ell(v)\)</span> for all <span class="math inline">\(v\in V\)</span>. A bounded bilinear form gives a bounded operator <span class="math inline">\(\mathcal A:V\to V'\)</span> by <span class="math inline">\((\mathcal Au)(v)=a(u,v)\)</span>, where the prime denotes continuous dual. For the pure Neumann energy <span class="math inline">\(a(u,v)=\int_\Omega\nabla u\cdot\nabla v\)</span> on <span class="math inline">\(H^1(\Omega)\)</span> of a bounded connected Lipschitz domain, constants are killed in both slots. Necessarily <span class="math inline">\(\ell(1)=0\)</span>. Then the form and load descend to the quotient by constants, and its elements describe potentials up to an additive constant. Existence and bounded dependence use a Poincaré inequality and coercivity on that quotient (analytical results used here without proof). In a Galerkin subspace <span class="math inline">\(V_h\)</span> the residual <span class="math inline">\(\ell-\mathcal Au_h\)</span> vanishes on all test vectors in <span class="math inline">\(V_h\)</span>: this is membership in an annihilator.</p>
+<p>For a generalized eigenproblem <span class="math inline">\(Kx=\lambda Mx\)</span> with <span class="math inline">\(K=K^H\)</span> and <span class="math inline">\(M\)</span> Hermitian positive definite, <span class="math inline">\(M\)</span> identifies coefficient vectors with dual loads in matrix coordinates. <span class="math inline">\(T=M^{-1}K\)</span> is self-adjoint for <span class="math inline">\(\langle x,y\rangle_M=y^HMx\)</span>, since <span class="math inline">\(MT=T^HM=K\)</span>. Polynomials in <span class="math inline">\(T\)</span> preserve its eigenspaces, and orthogonal projectors use the <span class="math inline">\(M\)</span> geometry. In particular for a full-column-rank basis <span class="math inline">\(Q\)</span> of a subspace, <span class="math inline">\(Q(Q^HMQ)^{-1}Q^HM\)</span> gives the <span class="math inline">\(M\)</span>-orthogonal projector: its output lies in the range of <span class="math inline">\(Q\)</span> and its error is annihilated by <span class="math inline">\(Q^HM\)</span>. Applying <span class="math inline">\(T\)</span> computationally can be realized by solving with <span class="math inline">\(M\)</span>.</p>
+</section>
+<section id="bridge-to-f1-where-topology-changes-the-answer" class="level3">
+<h3 class="anchored" data-anchor-id="bridge-to-f1-where-topology-changes-the-answer">Bridge to F1 — Where topology changes the answer</h3>
+<p>For a normed space <span class="math inline">\(X\)</span> the quotient seminorm is <span class="math inline">\(\|[x]\|=\inf_{u\in U}\|x-u\|\)</span>. It vanishes precisely when <span class="math inline">\(x\in\overline U\)</span>, so a normed quotient needs <span class="math inline">\(U\)</span> closed; a Banach space modulo a closed subspace is Banach. If a bounded <span class="math inline">\(f\)</span> kills <span class="math inline">\(U\)</span>, continuity makes it kill <span class="math inline">\(\overline U\)</span>, and <span class="math inline">\(\|\bar f[x]\|\le\|f\|\inf_{u\in U}\|x-u\|\)</span> proves bounded quotient factorization. Thus the cokernel of a bounded <span class="math inline">\(T\)</span> in Banach spaces is the quotient by the <strong>closure</strong> of its range.</p>
+<p>For example <span class="math inline">\(D:\ell^2\to\ell^2\)</span>, <span class="math inline">\((Dx)_n=x_n/n\)</span>, is bounded and injective. Its range contains all finitely supported sequences, hence is dense, but misses <span class="math inline">\((1/n)\)</span> because its preimage would be the constant sequence <span class="math inline">\(1\)</span>. Its Banach-space cokernel is zero although its algebraic cokernel is nonzero. Its inverse on the range is unbounded since <span class="math inline">\(\|De_n\|=1/n\)</span>. Kernels of bounded maps are always closed by continuity. Algebraic exactness alone gives no closed-range estimate.</p>
+<p>A topological direct sum requires bounded coordinate projections. For a bounded idempotent <span class="math inline">\(P\)</span>, <span class="math inline">\(X=\operatorname{im}P\oplus\ker P\)</span> with closed summands since the image is <span class="math inline">\(\ker(I-P)\)</span>. Conversely a decomposition into two closed subspaces of a Banach space has bounded projections: the addition map from the Banach product onto <span class="math inline">\(X\)</span> is a bounded bijection, so its inverse is bounded by the bounded inverse theorem. This argument assumes a complement exists. Hilbert spaces provide a bounded orthogonal projection onto each closed subspace; general Banach spaces need not. Finally, algebraic functionals need not be bounded: on the finite sequences with <span class="math inline">\(\ell^2\)</span> norm the map <span class="math inline">\(x\mapsto\sum n x_n\)</span> sends the unit vectors to <span class="math inline">\(n\)</span>. An algebraic dual construction, a continuous dual construction and a choice of geometric representative answer different questions.</p>
+</section>
+</section>
+<section id="exercises" class="level2" data-number="24.10">
+<h2 data-number="24.10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">24.10</span> Exercises</h2>
+<p>Try these in order with the solutions covered. For each factorization identify the arrow whose existence is claimed and the property that forces uniqueness.</p>
+<ol type="1">
+<li><strong>Quotients in stages.</strong> For <span class="math inline">\(U\subseteq W\subseteq V\)</span>, construct a canonical isomorphism <span class="math inline">\((V/U)/(W/U)\simeq V/W\)</span> using universal properties. Derive the first isomorphism theorem as a factorization.</li>
+<li><strong>A product that changes with its category.</strong> Compute the product and coproduct of two singleton sets. For vector spaces derive the product and coproduct formulas from the biproduct identities alone. Explain where addition is used.</li>
+<li><strong>Gluing measurements.</strong> Given <span class="math inline">\(\alpha:U\to X\)</span>, <span class="math inline">\(\beta:W\to X\)</span> on subspaces of <span class="math inline">\(V\)</span>, determine exactly when there is a linear <span class="math inline">\(h:U+W\to X\)</span> extending both.</li>
+<li><strong>A cokernel compatibility test.</strong> For <span class="math inline">\(T(x,y,z)=(x+y,2x+2y,z)\)</span>, compute kernel, image and cokernel. Give a compatible section on the image and all solutions for <span class="math inline">\((3,6,4)\)</span>.</li>
+<li><strong>Splitting depends on the scalars.</strong> Classify sections of <span class="math inline">\((x,y)\mapsto x\)</span> on <span class="math inline">\(\mathbb R^2\)</span>. Decide which sections are module maps when the domain operator is <span class="math inline">\((x,y)\mapsto(x,x+y)\)</span> and the target operator is the identity. Compare reduction modulo <span class="math inline">\(n\)</span> on <span class="math inline">\(\mathbb Z\)</span>, <span class="math inline">\(n&gt;1\)</span>.</li>
+<li><strong>Dualizing the gradient.</strong> With <span class="math inline">\(Tu=(u_2-u_1,u_3-u_2,u_1-u_3)\)</span>, pull back the measurement <span class="math inline">\((a,b,c)\)</span> and find all measurements pulling back to zero. Verify double-dual naturality on this example.</li>
+<li><strong>A functor that detects obstructions.</strong> A square <span class="math inline">\(bT=T'a\)</span> induces a map of cokernels. Construct it and verify functoriality and naturality of the cokernel projections.</li>
+<li><strong>Krylov recurrence.</strong> For <span class="math inline">\(A=J_2(2)\oplus[-1]\)</span> find <span class="math inline">\(m_v\)</span> for <span class="math inline">\(v=e_1\)</span>, <span class="math inline">\(e_2\)</span>, <span class="math inline">\(e_1+e_3\)</span>, <span class="math inline">\(e_2+e_3\)</span>. Predict the first index of Krylov stagnation in each case.</li>
+<li><strong>Interpolation with a repeated node.</strong> Construct the projector onto the generalized <span class="math inline">\(2\)</span>-eigenspace for the operator in Exercise 8. Verify its action on the Jordan chain and explain why a degree-one filter cannot work.</li>
+<li><strong>Reading block sizes.</strong> A nilpotent <span class="math inline">\(N\)</span> on a six-dimensional space has nullities <span class="math inline">\(3,5,6\)</span> for its first three powers. Determine the blocks, the minimal polynomial, and a module presentation as a sum of cyclic modules.</li>
+<li><strong>A bilinear rule and its matrix.</strong> Factor <span class="math inline">\(B(v,w)=v_1w_2-v_2w_1\)</span> through <span class="math inline">\(\mathbb R^2\otimes\mathbb R^2\)</span>. Determine its kernel. Decide whether <span class="math inline">\(e_1\otimes e_2-e_2\otimes e_1\)</span> is pure.</li>
+<li><strong>The effect of a second face.</strong> In the square example, attach face <span class="math inline">\(134\)</span> with column <span class="math inline">\(w\)</span>. Compute all homology dimensions. What happens if the second face instead duplicates the first with the same boundary?</li>
+<li><strong>Moving homology classes.</strong> Suppose maps <span class="math inline">\(f_k:C_k\to C'_k\)</span> commute with boundaries, <span class="math inline">\(d'_k f_k=f_{k-1}d_k\)</span>. Construct their action on <span class="math inline">\(H_k\)</span>, prove it is well defined, and check what inclusion of the triangle boundary into the filled triangle does in degrees zero and one.</li>
+<li><strong>An analytic counterexample.</strong> Show that any two bounded maps out of <span class="math inline">\(\ell^2\)</span> into a normed space agreeing after composition with <span class="math inline">\(D(x)_n=x_n/n\)</span> agree everywhere. Why does the proof fail for arbitrary algebraic maps?</li>
+</ol>
+</section>
+<section id="worked-solutions" class="level2" data-number="24.11">
+<h2 data-number="24.11" class="anchored" data-anchor-id="worked-solutions"><span class="header-section-number">24.11</span> Worked solutions</h2>
+<p><strong>1.</strong> The map <span class="math inline">\(v\mapsto[v]_W\)</span> kills <span class="math inline">\(U\)</span>, so it factors uniquely through <span class="math inline">\(V/U\)</span>. Its factor sends <span class="math inline">\([v]_U\)</span> to <span class="math inline">\([v]_W\)</span>, kills exactly <span class="math inline">\(W/U\)</span>, and is onto. Factoring once more gives <span class="math inline">\([[v]_U]\mapsto[v]_W\)</span>. An inverse sends <span class="math inline">\([v]_W\)</span> to <span class="math inline">\([[v]_U]\)</span> since changing <span class="math inline">\(v\)</span> by <span class="math inline">\(w\in W\)</span> changes the middle class by an element of <span class="math inline">\(W/U\)</span>. Both composites fix every represented class. For an arbitrary <span class="math inline">\(T\)</span>, corestrict to <span class="math inline">\(\operatorname{im}T\)</span> and factor through <span class="math inline">\(V/\ker T\)</span>. The factor is onto by corestriction and injective because <span class="math inline">\(Tv=Tw\)</span> means <span class="math inline">\(v-w\in\ker T\)</span>. Uniqueness after composition with the quotient singles out this isomorphism.</p>
+<p><strong>2.</strong> The product is a singleton, since every pair of incoming maps is the sole pair of constant functions. The coproduct has two tagged points; arbitrary outgoing functions specify one value at each point independently. For a biproduct, incoming <span class="math inline">\(f,g\)</span> induce <span class="math inline">\(h=i_1f+i_2g\)</span>. Projecting returns <span class="math inline">\(f,g\)</span>. Conversely any <span class="math inline">\(h'\)</span> with these projections satisfies <span class="math inline">\(h'=(i_1\pi_1+i_2\pi_2)h'=h\)</span>. Outgoing <span class="math inline">\(a,b\)</span> extend to <span class="math inline">\(k=a\pi_1+b\pi_2\)</span>, and <span class="math inline">\(k'=k'(i_1\pi_1+i_2\pi_2)=k\)</span> for any other extension. Both constructions used addition of parallel maps and distributivity of composition.</p>
+<p><strong>3.</strong> Necessity follows by restricting <span class="math inline">\(h\)</span> to <span class="math inline">\(U\cap W\)</span>. For sufficiency define <span class="math inline">\(H(u,w)=\alpha(u)+\beta(w)\)</span> on the external sum. It kills every <span class="math inline">\((z,-z)\)</span> for <span class="math inline">\(z\in U\cap W\)</span> precisely when the restrictions agree. These pairs form the entire kernel of addition, so <span class="math inline">\(H\)</span> factors uniquely through <span class="math inline">\(U+W\)</span>. This gluing property is called a pushout of the two inclusions from <span class="math inline">\(U\cap W\)</span>: it allows independent rules once they agree on their shared inputs.</p>
+<p><strong>4.</strong> Vanishing requires <span class="math inline">\(x=-y,z=0\)</span>, giving kernel <span class="math inline">\(\operatorname{span}(1,-1,0)\)</span>. Outputs fill the plane <span class="math inline">\((a,2a,b)\)</span> because <span class="math inline">\((a,0,b)\)</span> is a lift. The functional <span class="math inline">\((r,s,t)\mapsto s-2r\)</span> is onto and kills exactly that plane, hence provides a coordinate on the cokernel. The lift just given is linear and is a section on the plane. All solutions are <span class="math inline">\((3,0,4)+h(1,-1,0)\)</span>.</p>
+<p><strong>5.</strong> A section is <span class="math inline">\(s_c(x)=(x,cx)\)</span> with arbitrary <span class="math inline">\(c\in\mathbb R\)</span>. Intertwining would require <span class="math inline">\((x,(1+c)x)=(x,cx)\)</span> for every <span class="math inline">\(x\)</span>, impossible at <span class="math inline">\(x=1\)</span>. In the integer example a section must send <span class="math inline">\([1]\)</span> to some <span class="math inline">\(k\equiv1\bmod n\)</span> with <span class="math inline">\(nk=0\)</span> in <span class="math inline">\(\mathbb Z\)</span>. This forces <span class="math inline">\(k=0\)</span>, a contradiction. The two failures arise from preserving an additional operation: the operator action in the first example and integer addition in the second.</p>
+<p><strong>6.</strong> Expanding <span class="math inline">\(a(u_2-u_1)+b(u_3-u_2)+c(u_1-u_3)\)</span> gives coefficients <span class="math inline">\((c-a,a-b,b-c)\)</span>. All are zero exactly when <span class="math inline">\(a=b=c\)</span>. For <span class="math inline">\(\mu=(a,b,c)\)</span> and <span class="math inline">\(u\)</span>, <span class="math inline">\(T^{\vee\vee}\iota(u)\)</span> evaluated at <span class="math inline">\(\mu\)</span> is <span class="math inline">\(\iota(u)(T^\vee\mu)=(c-a)u_1+(a-b)u_2+(b-c)u_3\)</span>. The expansion shows this equals <span class="math inline">\(\mu(Tu)=\iota(Tu)(\mu)\)</span> for every measurement.</p>
+<p><strong>7.</strong> Define <span class="math inline">\(\hat b([w])=[bw]\)</span>. A difference <span class="math inline">\(Tx\)</span> is sent to <span class="math inline">\(bTx=T'ax\)</span>, which vanishes in the new quotient. This proves independence of representative. The identity square fixes all classes, and two successive squares send <span class="math inline">\([w]\)</span> to <span class="math inline">\([b'bw]\)</span>, the action of their composite. Write <span class="math inline">\(q_T\)</span> for the quotient; <span class="math inline">\(\hat b q_T=q_{T'}b\)</span> by evaluation at <span class="math inline">\(w\)</span>. These are the naturality squares from the functor taking an arrow to its codomain to the cokernel functor.</p>
+<p><strong>8.</strong> On <span class="math inline">\(e_1\)</span>, <span class="math inline">\(t-2\)</span> suffices. On <span class="math inline">\(e_2\)</span>, <span class="math inline">\(t-2\)</span> produces <span class="math inline">\(e_1\)</span> and applying it again kills <span class="math inline">\(e_1\)</span>, so <span class="math inline">\((t-2)^2\)</span> is minimal. A nonzero <span class="math inline">\(e_3\)</span> component contributes <span class="math inline">\(t+1\)</span>; the two coprime factors must both divide any annihilator of a sum from the distinct primary subspaces. Thus the last two answers are <span class="math inline">\((t-2)(t+1)\)</span> and <span class="math inline">\((t-2)^2(t+1)\)</span>. The first <span class="math inline">\(j\)</span> with <span class="math inline">\(\mathcal K_{j+1}=\mathcal K_j\)</span> is respectively <span class="math inline">\(1,2,2,3\)</span> by polynomial division.</p>
+<p><strong>9.</strong> Take <span class="math inline">\(q(t)=1-(t-2)^2/9\)</span>. Then <span class="math inline">\(q(-1)=0\)</span> and <span class="math inline">\(q\equiv1\bmod(t-2)^2\)</span>. Acting on <span class="math inline">\(e_1,e_2\)</span> the squared term vanishes, while on <span class="math inline">\(e_3\)</span> it is <span class="math inline">\(9I\)</span>. Thus <span class="math inline">\(q(A)=\operatorname{diag}(1,1,0)\)</span>, whose square equals itself. A linear polynomial <span class="math inline">\(r\)</span> satisfying <span class="math inline">\(r(2)=1,r(-1)=0\)</span> has slope <span class="math inline">\(1/3\)</span>; it sends <span class="math inline">\(e_2\)</span> to <span class="math inline">\(e_2+e_1/3\)</span> and fails to fix the entire primary space.</p>
+<p><strong>10.</strong> Differences from the initial nullity zero are <span class="math inline">\(3,2,1\)</span>. These count blocks of length at least one, two, and three. Since all six dimensions have appeared by the third power there are none longer. Subtracting consecutive counts gives one block of each length <span class="math inline">\(1,2,3\)</span>. The largest length gives <span class="math inline">\(m_N=t^3\)</span> and the module is <span class="math inline">\(\mathbb F[t]/(t)\oplus\mathbb F[t]/(t^2)\oplus\mathbb F[t]/(t^3)\)</span>.</p>
+<p><strong>11.</strong> In pair order <span class="math inline">\(11,12,21,22\)</span> the induced row is <span class="math inline">\((0,1,-1,0)\)</span> by evaluation on elementary tensors. Its kernel consists of coefficient arrays with <span class="math inline">\(c_{12}=c_{21}\)</span>, spanned by the two diagonal tensors and <span class="math inline">\(e_1\otimes e_2+e_2\otimes e_1\)</span>. The proposed difference has coefficient matrix with determinant <span class="math inline">\(1\)</span> and hence rank two. A single pure tensor has rank at most one.</p>
+<p><strong>12.</strong> The independent columns <span class="math inline">\(z,w\)</span> span <span class="math inline">\(\ker D\)</span>, so <span class="math inline">\(H_1=0\)</span>, and the face map is injective so <span class="math inline">\(H_2=0\)</span>. Vertices and edges have not changed, giving <span class="math inline">\(\dim H_0=1\)</span>. With duplicate columns the span has dimension one and <span class="math inline">\([w]\)</span> survives in <span class="math inline">\(H_1\)</span>. The difference of the two face generators spans the kernel in degree two. The dimensions are then <span class="math inline">\((1,1,1)\)</span>; the duplicate attachment is interpreted as a second two-cell, not a second copy of a simplex in an abstract simplicial complex.</p>
+<p><strong>13.</strong> For a cycle <span class="math inline">\(x\)</span>, <span class="math inline">\(d'_kf_kx=f_{k-1}d_kx=0\)</span>, so <span class="math inline">\(f_kx\)</span> is a cycle. Replacing <span class="math inline">\(x\)</span> by <span class="math inline">\(x+d_{k+1}y\)</span> changes its image by <span class="math inline">\(d'_{k+1}f_{k+1}y\)</span>, a boundary. Hence <span class="math inline">\([x]\mapsto[f_kx]\)</span> is well defined and linear. Identities and composition pass to classes. Under inclusion the three vertices and edges keep their names, so total load gives the identity on <span class="math inline">\(H_0\simeq\mathbb R\)</span>; the old generator of <span class="math inline">\(H_1\)</span> becomes a face boundary, giving the zero map.</p>
+<p><strong>14.</strong> If <span class="math inline">\(gD=hD\)</span>, <span class="math inline">\(g-h\)</span> vanishes on the dense range. For any <span class="math inline">\(y\)</span>, approximate it by its finite truncations, all in the range, and use continuity to get <span class="math inline">\((g-h)y=0\)</span>. Thus <span class="math inline">\(D\)</span> is epic among bounded maps even though it misses <span class="math inline">\((1/n)\)</span>. Algebraically the map to <span class="math inline">\(\ell^2/\operatorname{im}D\)</span> is nonzero and vanishes after <span class="math inline">\(D\)</span>. It detects the missing class because algebraic factorization requires no continuity.</p>
+</section>
+<section id="computational-laboratory-exact-identities-in-matlab" class="level2" data-number="24.12">
+<h2 data-number="24.12" class="anchored" data-anchor-id="computational-laboratory-exact-identities-in-matlab"><span class="header-section-number">24.12</span> Computational laboratory — Exact identities in MATLAB</h2>
+<p>Use a single MATLAB script with Symbolic Math Toolbox. Each block continues the script. Enter the matrices as exact integers before division. The assertions test structural equations independently of the particular basis returned by a null-space routine. In a floating-point experiment a rank decision would also require a scale and tolerance.</p>
+<section id="compute-quotient-coordinates-and-factor-a-map" class="level3">
+<h3 class="anchored" data-anchor-id="compute-quotient-coordinates-and-factor-a-map">1. Compute quotient coordinates and factor a map</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">T</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span> <span class="fl">1</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">2</span> <span class="fl">2</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">1</span>])<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">K</span> <span class="op">=</span> <span class="va">null</span>(<span class="va">T</span>)<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>[<span class="op">~,</span> <span class="va">pivot</span>] <span class="op">=</span> <span class="va">rref</span>(<span class="va">T</span>)<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">B</span> <span class="op">=</span> <span class="va">T</span>(<span class="op">:,</span><span class="va">pivot</span>)<span class="op">;</span>                 <span class="co">% basis for the range</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">Q</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span> <span class="fl">1</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">1</span>])<span class="op">;</span>       <span class="co">% coordinates on the domain modulo K</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">C</span> <span class="op">=</span> <span class="va">sym</span>([<span class="op">-</span><span class="fl">2</span> <span class="fl">1</span> <span class="fl">0</span>])<span class="op">;</span>             <span class="co">% quotient coordinate on the codomain</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">S</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">1</span>])<span class="op">;</span>      <span class="co">% lift a pair of quotient coordinates</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">B</span><span class="op">*</span><span class="va">Q</span><span class="op">,</span><span class="va">T</span>))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">Q</span><span class="op">*</span><span class="va">S</span><span class="op">,</span><span class="va">sym</span>(<span class="va">eye</span>(<span class="fl">2</span>))))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">Q</span><span class="op">*</span><span class="va">K</span><span class="op">,</span><span class="va">sym</span>(<span class="va">zeros</span>(<span class="fl">2</span><span class="op">,</span><span class="fl">1</span>))))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">C</span><span class="op">*</span><span class="va">T</span><span class="op">,</span><span class="va">sym</span>(<span class="va">zeros</span>(<span class="fl">1</span><span class="op">,</span><span class="fl">3</span>))))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">rank</span>(<span class="va">B</span>)<span class="op">==</span><span class="fl">2</span> <span class="op">&amp;&amp;</span> <span class="va">rank</span>(<span class="va">C</span>)<span class="op">==</span><span class="fl">1</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="va">disp</span>(<span class="va">K</span>)<span class="op">,</span> <span class="va">disp</span>(<span class="va">B</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The columns of <span class="math inline">\(B\)</span> span the solvable loads. Rank plus <span class="math inline">\(CB=0\)</span> proves <span class="math inline">\(\operatorname{im}B=\ker C\)</span>. The matrices <span class="math inline">\(B,Q\)</span> represent two different maps even though the factorization passes through the same coordinate space <span class="math inline">\(\mathbb F^2\)</span>. Alter the lift <span class="math inline">\(S\)</span> by adding a column of <span class="math inline">\(K\)</span> to either column. Predict which assertion detects this change. None should: adding a kernel vector leaves quotient coordinates unchanged.</p>
+</section>
+<section id="separate-primary-spaces-and-measure-krylov-growth" class="level3">
+<h3 class="anchored" data-anchor-id="separate-primary-spaces-and-measure-krylov-growth">2. Separate primary spaces and measure Krylov growth</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">A</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">2</span> <span class="fl">1</span> <span class="fl">0</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">2</span> <span class="fl">0</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">2</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">0</span> <span class="op">-</span><span class="fl">1</span>])<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">I</span> <span class="op">=</span> <span class="va">sym</span>(<span class="va">eye</span>(<span class="fl">4</span>))<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">P</span> <span class="op">=</span> (<span class="va">A</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">I</span>)<span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="fl">9</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">P</span><span class="op">*</span><span class="va">P</span><span class="op">,</span><span class="va">P</span>) <span class="op">&amp;&amp;</span> <span class="va">isequal</span>(<span class="va">P</span><span class="op">*</span><span class="va">A</span><span class="op">,</span><span class="va">A</span><span class="op">*</span><span class="va">P</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">P</span><span class="op">,</span><span class="va">diag</span>(<span class="va">sym</span>([<span class="fl">0</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">1</span>]))))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>((<span class="va">A</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">I</span>)<span class="op">^</span><span class="fl">2</span><span class="op">*</span>(<span class="va">A</span><span class="op">+</span><span class="va">I</span>)<span class="op">,</span><span class="va">sym</span>(<span class="va">zeros</span>(<span class="fl">4</span>))))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="va">v</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">0</span><span class="op">;</span><span class="fl">1</span><span class="op">;</span><span class="fl">0</span><span class="op">;</span><span class="fl">1</span>])<span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="va">Y</span> <span class="op">=</span> [<span class="va">v</span><span class="op">,</span><span class="va">A</span><span class="op">*</span><span class="va">v</span><span class="op">,</span><span class="va">A</span><span class="op">^</span><span class="fl">2</span><span class="op">*</span><span class="va">v</span><span class="op">,</span><span class="va">A</span><span class="op">^</span><span class="fl">3</span><span class="op">*</span><span class="va">v</span>]<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="va">dims</span> <span class="op">=</span> <span class="va">arrayfun</span>(<span class="op">@</span>(<span class="va">j</span>) <span class="va">double</span>(<span class="va">rank</span>(<span class="va">Y</span>(<span class="op">:,</span><span class="fl">1</span><span class="op">:</span><span class="va">j</span>)))<span class="op">,</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>)<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">dims</span><span class="op">,</span>[<span class="fl">1</span> <span class="fl">2</span> <span class="fl">3</span> <span class="fl">3</span>]))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">Y</span><span class="op">*</span><span class="va">sym</span>([<span class="fl">4</span><span class="op">;</span><span class="fl">0</span><span class="op">;-</span><span class="fl">3</span><span class="op">;</span><span class="fl">1</span>])<span class="op">,</span><span class="va">sym</span>(<span class="va">zeros</span>(<span class="fl">4</span><span class="op">,</span><span class="fl">1</span>))))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="va">disp</span>(<span class="va">P</span><span class="op">*</span><span class="va">v</span>)<span class="op">,</span> <span class="va">disp</span>(<span class="va">dims</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The last relation reads <span class="math inline">\(A^3v-3A^2v+4v=0\)</span>, the expansion of <span class="math inline">\((t-2)^2(t+1)\)</span>. The first three columns are independent, proving minimality on this vector. Repeating with <span class="math inline">\(e_3\)</span> gives immediate stagnation. Using <span class="math inline">\(e_3\)</span> as an additional block start instead raises the final reachable dimension to four.</p>
+</section>
+<section id="identify-tensor-coordinates" class="level3">
+<h3 class="anchored" data-anchor-id="identify-tensor-coordinates">3. Identify tensor coordinates</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">L</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">2</span> <span class="fl">1</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">3</span>])<span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">M</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span> <span class="op">-</span><span class="fl">1</span><span class="op">;</span> <span class="fl">2</span> <span class="fl">0</span>])<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="va">v</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span><span class="op">;</span><span class="fl">2</span>])<span class="op">;</span> <span class="va">w</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">3</span><span class="op">;-</span><span class="fl">1</span>])<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="va">U</span> <span class="op">=</span> <span class="va">w</span><span class="op">*</span><span class="va">v</span><span class="op">.';</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">kron</span>(<span class="va">v</span><span class="op">,</span><span class="va">w</span>)<span class="op">,</span><span class="va">U</span>(<span class="op">:</span>)))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">kron</span>(<span class="va">L</span><span class="op">,</span><span class="va">M</span>)<span class="op">*</span><span class="va">kron</span>(<span class="va">v</span><span class="op">,</span><span class="va">w</span>)<span class="op">,</span><span class="va">kron</span>(<span class="va">L</span><span class="op">*</span><span class="va">v</span><span class="op">,</span><span class="va">M</span><span class="op">*</span><span class="va">w</span>)))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="va">Vgrid</span> <span class="op">=</span> <span class="va">M</span><span class="op">*</span><span class="va">U</span><span class="op">+</span><span class="va">U</span><span class="op">*</span><span class="va">L</span><span class="op">.';</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="va">Ksum</span> <span class="op">=</span> <span class="va">kron</span>(<span class="va">sym</span>(<span class="va">eye</span>(<span class="fl">2</span>))<span class="op">,</span><span class="va">M</span>)<span class="op">+</span><span class="va">kron</span>(<span class="va">L</span><span class="op">,</span><span class="va">sym</span>(<span class="va">eye</span>(<span class="fl">2</span>)))<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">Ksum</span><span class="op">*</span><span class="va">U</span>(<span class="op">:</span>)<span class="op">,</span><span class="va">Vgrid</span>(<span class="op">:</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>MATLAB stacks columns, so the second factor varies fastest. The dot transpose here implements a bilinear coordinate identity. Reversing the factor order without changing the vectorization convention would apply the operators along the wrong axes.</p>
+</section>
+<section id="count-classes-before-and-after-attaching-faces" class="level3">
+<h3 class="anchored" data-anchor-id="count-classes-before-and-after-attaching-faces">4. Count classes before and after attaching faces</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode matlab code-with-copy"><code class="sourceCode matlab"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">D</span> <span class="op">=</span> <span class="va">sym</span>([<span class="op">-</span><span class="fl">1</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">1</span> <span class="op">-</span><span class="fl">1</span><span class="op">;</span> <span class="fl">1</span> <span class="op">-</span><span class="fl">1</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">1</span> <span class="op">-</span><span class="fl">1</span> <span class="fl">0</span> <span class="fl">1</span><span class="op">;</span> <span class="fl">0</span> <span class="fl">0</span> <span class="fl">1</span> <span class="op">-</span><span class="fl">1</span> <span class="fl">0</span>])<span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">z</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">1</span><span class="op">;</span><span class="fl">1</span><span class="op">;</span><span class="fl">0</span><span class="op">;</span><span class="fl">0</span><span class="op">;-</span><span class="fl">1</span>])<span class="op">;</span> <span class="va">w</span> <span class="op">=</span> <span class="va">sym</span>([<span class="fl">0</span><span class="op">;</span><span class="fl">0</span><span class="op">;</span><span class="fl">1</span><span class="op">;</span><span class="fl">1</span><span class="op">;</span><span class="fl">1</span>])<span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">faces</span> <span class="op">=</span> {<span class="va">z</span><span class="op">,</span>[<span class="va">z</span> <span class="va">w</span>]<span class="op">,</span>[<span class="va">z</span> <span class="va">z</span>]}<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="va">expected</span> <span class="op">=</span> [<span class="fl">1</span> <span class="fl">1</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">1</span> <span class="fl">0</span> <span class="fl">0</span><span class="op">;</span> <span class="fl">1</span> <span class="fl">1</span> <span class="fl">1</span>]<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">j</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">numel</span>(<span class="va">faces</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">E</span> <span class="op">=</span> <span class="va">faces</span>{<span class="va">j</span>}<span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">D</span><span class="op">*</span><span class="va">E</span><span class="op">,</span><span class="va">sym</span>(<span class="va">zeros</span>(<span class="fl">4</span><span class="op">,</span><span class="va">size</span>(<span class="va">E</span><span class="op">,</span><span class="fl">2</span>)))))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">b</span> <span class="op">=</span> [<span class="va">size</span>(<span class="va">D</span><span class="op">,</span><span class="fl">1</span>)<span class="op">-</span><span class="va">rank</span>(<span class="va">D</span>)<span class="op">,</span> <span class="va">size</span>(<span class="va">D</span><span class="op">,</span><span class="fl">2</span>)<span class="op">-</span><span class="va">rank</span>(<span class="va">D</span>)<span class="op">-</span><span class="va">rank</span>(<span class="va">E</span>)<span class="op">,</span> <span class="op">...</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>         <span class="va">size</span>(<span class="va">E</span><span class="op">,</span><span class="fl">2</span>)<span class="op">-</span><span class="va">rank</span>(<span class="va">E</span>)]<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">assert</span>(<span class="va">isequal</span>(<span class="va">double</span>(<span class="va">b</span>)<span class="op">,</span><span class="va">expected</span>(<span class="va">j</span><span class="op">,:</span>)))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">disp</span>(<span class="va">b</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Observe that <span class="math inline">\(DE=0\)</span> succeeds in all three complexes. Only the ranks reveal whether a surviving cycle bounds. To test whether the particular cycle <span class="math inline">\(w\)</span> survives, compare <span class="math inline">\(\operatorname{rank}[E\ w]\)</span> with <span class="math inline">\(\operatorname{rank}E\)</span>. The class is zero exactly when the ranks are equal.</p>
+</section>
+</section>
+<section id="final-synthesis-choosing-the-object-that-answers-the-question" class="level2" data-number="24.13">
+<h2 data-number="24.13" class="anchored" data-anchor-id="final-synthesis-choosing-the-object-that-answers-the-question"><span class="header-section-number">24.13</span> Final synthesis — Choosing the object that answers the question</h2>
+<p>Return to the potential problem. If measurements must ignore constants, the quotient is forced by how maps <em>leave</em> the potential space. If the question is which loads can be solved, the appropriate subspace is the image, and its inclusion describes which maps <em>land in</em> the solvable loads. If we need a test for failure, we project to the cokernel. Once a representative is wanted for plotting or numerical solution, a section enters. The input admits many sections; an inner product or a prescribed reference vertex can supply the missing choice. This one problem explains why universal constructions can be canonical even when the arrays produced by a solver depend on conventions.</p>
+<p>The spectral problem adds another datum, <span class="math inline">\(T\)</span>. Respecting that datum restricts the allowed maps to intertwiners. A vector-space splitting can thereby cease to be a splitting, as the Jordan chain shows. Conversely a relatively prime factorization gives more than a dimension count: it constructs actual intertwiners <span class="math inline">\(p(T)\)</span> selecting invariant components. A Krylov basis, an exact spectral projector and a polynomial filter use the same polynomial action. Their objectives are respectively to represent a cyclic space, to split a module, and to change the relative sizes of spectral components.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Structural concept</th>
+<th>Concrete manifestation</th>
+<th>Equation to reconstruct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Universal factorization</td>
+<td>Descending a map to a quotient</td>
+<td><span class="math inline">\(\bar f q=f\)</span></td>
+</tr>
+<tr class="even">
+<td>Product</td>
+<td>Joint output of several measurements</td>
+<td><span class="math inline">\(\pi_jh=f_j\)</span></td>
+</tr>
+<tr class="odd">
+<td>Coproduct</td>
+<td>Extending from independent inputs</td>
+<td><span class="math inline">\(hi_j=f_j\)</span></td>
+</tr>
+<tr class="even">
+<td>Biproduct</td>
+<td>A finite direct sum supporting both operations</td>
+<td><span class="math inline">\(\sum i_j\pi_j=I\)</span></td>
+</tr>
+<tr class="odd">
+<td>Kernel</td>
+<td>Null space with its inclusion</td>
+<td><span class="math inline">\(Th=0\Rightarrow h=k\bar h\)</span> uniquely</td>
+</tr>
+<tr class="even">
+<td>Cokernel</td>
+<td>Codomain modulo the range</td>
+<td><span class="math inline">\(gT=0\Rightarrow g=\bar g c\)</span> uniquely</td>
+</tr>
+<tr class="odd">
+<td>Exactness</td>
+<td>Every compatible datum at a position is produced upstream</td>
+<td><span class="math inline">\(\operatorname{im}f=\ker g\)</span></td>
+</tr>
+<tr class="even">
+<td>Splitting</td>
+<td>Coherent choice of a lift</td>
+<td><span class="math inline">\(ps=I\)</span></td>
+</tr>
+<tr class="odd">
+<td>Contravariant functor</td>
+<td>Pullback of measurements</td>
+<td><span class="math inline">\((ST)^\vee=T^\vee S^\vee\)</span></td>
+</tr>
+<tr class="even">
+<td>Natural transformation</td>
+<td>Evaluation into the double dual</td>
+<td><span class="math inline">\(T^{\vee\vee}\iota_V=\iota_W T\)</span></td>
+</tr>
+<tr class="odd">
+<td>Polynomial module</td>
+<td>Operator acting as a scalar generator</td>
+<td><span class="math inline">\(t v=T v\)</span></td>
+</tr>
+<tr class="even">
+<td>Tensor product</td>
+<td>Linear representation of a bilinear rule</td>
+<td><span class="math inline">\(\tilde B(v\otimes w)=B(v,w)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Chain complex</td>
+<td>Successive boundary maps</td>
+<td><span class="math inline">\(d_k d_{k+1}=0\)</span></td>
+</tr>
+<tr class="even">
+<td>Homology</td>
+<td>Closed data modulo boundaries</td>
+<td><span class="math inline">\(H_k=\ker d_k/\operatorname{im}d_{k+1}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Logical dependencies.</strong> Composition and equality of paths suffice to formulate products and coproducts. Zero arrows allow one to pose kernel and cokernel problems. The vector-space theory of exactness uses images and kernels; homology also needs their quotient. Functoriality asks how any of these constructions responds to changing its input, so it runs across the branches. Polynomial modules require a scalar action and polynomial arithmetic; they can be studied without homology. Tensor products begin with bilinear maps; their construction here uses a free space and quotient. Analytic applications add bounds, closedness and completeness at the point where passage to limits is required.</p>
+<p>For further study, abstract algebra asks which features of <span class="math inline">\(\mathbb F[t]\)</span> made classification possible. Category theory asks which mapping problems admit representing objects. Homological algebra studies how failure of exactness propagates through constructions such as <span class="math inline">\(\operatorname{Hom}\)</span>. Functional analysis asks whether a factor, inverse or projection is bounded. Numerical mathematics asks how accurately and economically these maps can be applied when data are approximate. Each direction can be entered through an explicit example already worked above.</p>
+</section>
+<section id="mastery-assessment" class="level2" data-number="24.14">
+<h2 data-number="24.14" class="anchored" data-anchor-id="mastery-assessment"><span class="header-section-number">24.14</span> Mastery assessment</h2>
+<p>Use a blank page for the proofs. For computations, write down the space containing the answer before choosing coordinates.</p>
+<ul class="task-list">
+<li><label><input type="checkbox">Give the objects, arrows and composition of two categories on familiar data. Exhibit a bijection that fails to give a structural isomorphism and explain why.</label></li>
+<li><label><input type="checkbox">Prove quotient factorization from representatives, then prove uniqueness of the representing pair using only arrows.</label></li>
+<li><label><input type="checkbox">Recover pairing and extension maps from biproduct identities. Explain the finite-support condition for an infinite coproduct.</label></li>
+<li><label><input type="checkbox">Prove the kernel and cokernel universal properties in opposite directions. Use each on a concrete linear system.</label></li>
+<li><label><input type="checkbox">Given a zero composite, decide what else must be checked for exactness. Construct a section when possible and distinguish its choice from the quotient isomorphism.</label></li>
+<li><label><input type="checkbox">Produce two nonsplitting examples, one over the integers and one involving an invariant subspace. Identify the operation a candidate section fails to preserve.</label></li>
+<li><label><input type="checkbox">Derive the dual matrix in dual bases, the double-dual naturality square, and the role of conjugation in the Riesz map.</label></li>
+<li><label><input type="checkbox">State a functor’s action on morphisms and check its laws. Prove the map induced on cokernels by a commuting square is well defined.</label></li>
+<li><label><input type="checkbox">Reconstruct the universal-element argument by evaluating a natural family on an identity map.</label></li>
+<li><label><input type="checkbox">Derive the polynomial module axioms and characterize intertwiners, invariant subspaces and quotient operators.</label></li>
+<li><label><input type="checkbox">Starting from a Krylov dependence, find a vector annihilator and prove minimality. Explain why an operator minimal polynomial alone cannot count all Jordan blocks.</label></li>
+<li><label><input type="checkbox">Construct complementary polynomial projectors by Bézout’s identity. Explain the extra interpolation condition at a defective eigenvalue.</label></li>
+<li><label><input type="checkbox">Construct a tensor product from bilinearity relations, prove the basis theorem and derive a Kronecker matrix in a declared ordering.</label></li>
+<li><label><input type="checkbox">Compute homology from two successive boundary matrices and determine whether a specific cycle represents zero. Interpret the dual compatibility condition on potentials.</label></li>
+<li><label><input type="checkbox">For a bounded operator with dense proper range, compare algebraic solvability, topological cokernel and bounded inversion.</label></li>
+<li><label><input type="checkbox">In a new numerical example, identify which parts use only uniqueness and factorization, which need an inner product, and which require an estimate.</label></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../review_2/f1.html" class="pagination-link" aria-label="Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Module F1 — Functional Analysis: Infinite-Dimensional Geometry and Operator Theory</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
